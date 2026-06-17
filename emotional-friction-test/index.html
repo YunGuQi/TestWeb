@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>1分钱情绪内耗测试</title>
+    <meta name="description" content="10题快速自测，测完立刻出完整结果。本测评仅供情绪状态参考，非医疗诊断。">
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <!-- 页面容器 -->
+    <div class="app-container">
+        
+        <!-- 1. 入口页 (Landing Page) -->
+        <section id="landing-page" class="active-page">
+            <div class="content-wrapper">
+                <div class="header-spacer"></div>
+                <h1 class="brand-name">安安心灵自评馆</h1>
+                <h2 class="main-title">情绪内耗·专业自评测评</h2>
+                <p class="subtitle">10题快速自测 | 即刻生成完整结果报告</p>
+                
+                <div class="trust-card">
+                    <div class="trust-item">
+                        <span class="icon">✅</span>
+                        <span class="text">完整结果直达</span>
+                    </div>
+                    <div class="trust-item">
+                        <span class="icon">✅</span>
+                        <span class="text">无隐藏消费</span>
+                    </div>
+                    <div class="trust-item">
+                        <span class="icon">✅</span>
+                        <span class="text">全程自助体验</span>
+                    </div>
+                </div>
+
+                <div class="action-area">
+                    <button id="start-btn" class="primary-btn pulse-animation">开始自评</button>
+                    <p class="disclaimer">本测评仅供情绪状态自我参考，非医疗诊断</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. 测试页 (Quiz Page) -->
+        <section id="quiz-page" class="hidden-page">
+            <div class="quiz-header">
+                <div class="progress-bar-container">
+                    <div class="progress-bar" id="progress-bar"></div>
+                </div>
+                <div class="progress-text">进度 <span id="current-q">1</span>/10</div>
+            </div>
+
+            <div class="question-container" id="question-container">
+                <!-- 题目内容由 JS 动态注入 -->
+                <h2 class="question-text" id="question-text">题目加载中...</h2>
+                <div class="options-list" id="options-list">
+                    <!-- 选项由 JS 生成 -->
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. 结果页 (Result Page) -->
+        <section id="result-page" class="hidden-page">
+            <div class="result-content">
+                <div class="score-card">
+                    <div class="result-icon" id="result-icon">🌱</div>
+                    <h2 class="result-title" id="result-title">测试结果生成中...</h2>
+                    <div class="result-divider"></div>
+                    <p class="result-desc" id="result-desc">
+                        正在分析您的答题情况...
+                    </p>
+                </div>
+
+                <div class="advice-card">
+                    <h3>💡 自愈小建议</h3>
+                    <p id="result-advice">保持深呼吸...</p>
+                </div>
+
+                <!-- 转化引导区 -->
+                <div class="promotion-card">
+                    <div class="promo-header">还想了解更多关于自己？</div>
+                    <p class="promo-text" id="promo-text">
+                        店铺还有MBTI人格、高敏感、恋爱占有欲等12款测试。
+                    </p>
+                    <a href="#" class="promo-btn" id="promo-btn">
+                        去安安心灵自评馆探索更多
+                        <span class="small-text">¥1.5 · 单测随心选</span>
+                    </a>
+                </div>
+
+                <p class="footer-disclaimer">本测评仅供参考，不作为心理咨询或医疗诊断依据。<br>如遇严重心理困扰，请寻求专业医生帮助。</p>
+                
+                <!-- 推荐测试列表 -->
+                <div class="recommended-section">
+                    <div class="divider">更多专业测试</div>
+                    <div id="recommended-list" class="rec-list">
+                        <!-- JS 动态生成 -->
+                    </div>
+                </div>
+
+                <button id="restart-btn" class="text-btn">重新测试</button>
+            </div>
+        </section>
+
+        <!-- 4. 测试介绍页 (Intro Page) -->
+        <section id="intro-page" class="hidden-page">
+            <div class="intro-nav">
+                <button id="back-btn" class="nav-back">❮ 返回结果</button>
+            </div>
+            
+            <div class="intro-content">
+                <div class="intro-header">
+                    <h1 id="intro-title" class="intro-title">测试标题</h1>
+                    <p id="intro-subtitle" class="intro-subtitle">测试副标题</p>
+                </div>
+                
+                <div class="intro-body" id="intro-body">
+                    <!-- JS 注入详情内容 -->
+                </div>
+                
+                <div class="intro-tags" id="intro-tags">
+                    <!-- JS 注入标签 -->
+                </div>
+            </div>
+
+            <!-- 底部悬浮转化栏 -->
+            <div class="bottom-bar">
+                <div class="price-info">
+                    <span class="price-original">¥1.5</span>
+                    <span class="price-val">¥0.99</span>
+                </div>
+                <!-- 链接占位，JS会更新 -->
+                <a href="#" class="buy-btn" id="intro-buy-btn">去店铺解锁</a>
+            </div>
+        </section>
+
+    </div>
+
+    <!-- 测试介绍弹窗 -->
+    <div id="test-modal" class="modal-overlay" onclick="closeModal(event)">
+        <div class="modal-card">
+            <button class="modal-close" onclick="closeModal()">✕</button>
+            <div class="modal-body">
+                <div class="modal-tags" id="modal-tags"></div>
+                <h3 class="modal-title" id="modal-title"></h3>
+                <p class="modal-subtitle" id="modal-subtitle"></p>
+                <div class="modal-divider"></div>
+                <div class="modal-desc" id="modal-desc"></div>
+            </div>
+            <div class="modal-footer">
+                <div class="modal-price-wrap">
+                    <span class="modal-price-original">¥1.5</span>
+                    <span class="modal-price-current">¥0.99</span>
+                </div>
+                <a href="#" class="modal-btn" id="modal-btn">去店铺购买</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

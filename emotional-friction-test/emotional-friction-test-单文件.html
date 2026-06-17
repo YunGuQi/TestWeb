@@ -1,0 +1,1753 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>1分钱情绪内耗测试</title>
+    <meta name="description" content="10题快速自测，测完立刻出完整结果。本测评仅供情绪状态参考，非医疗诊断。">
+    <style>
+/* 
+   安安心灵自评馆 - 样式表 
+   风格：浅雾蓝+柔粉白，高级治愈，去廉价感
+*/
+
+:root {
+    /* 核心配色：疗愈紫系 (Healing Purple) */
+    --bg-color: #F8F5FF;       /* 极淡紫背景 */
+    --card-bg: #FFFFFF;        /* 纯白卡片 */
+    --text-primary: #4C1D95;   /* 深紫主文字 (代替黑色) */
+    --text-secondary: #7C3AED; /* 紫灰次要文字 */
+    --accent-color: #8B5CF6;   /* 主题紫 (按钮/重点) */
+    --accent-dark: #7C3AED;    /* 按钮点击态 */
+    --accent-light: #E9D8FD;   /* 浅紫装饰 */
+    --border-radius: 16px;     /* 更圆润的圆角 */
+    --box-shadow: 0 8px 24px rgba(139, 92, 246, 0.12); /* 紫色系投影 */
+    --card-border: 1px solid rgba(139, 92, 246, 0.1);
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    -webkit-tap-highlight-color: transparent;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-primary);
+    line-height: 1.6;
+    height: 100vh;
+    overflow: hidden;
+    background-image: radial-gradient(circle at 50% 10%, #E9D8FD 0%, #F8F5FF 60%);
+}
+
+/* 容器与页面切换 */
+.app-container {
+    max-width: 480px;
+    margin: 0 auto;
+    width: 100%;
+    height: 100%;
+    position: relative;
+    background-color: transparent; /* 移动端背景透出 */
+}
+
+/* 桌面端适配 */
+@media (min-width: 768px) {
+    body {
+        background: #F3E8FF; /* 桌面端背景 */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .app-container {
+        max-width: 1000px; /* 更宽的桌面布局 */
+        width: 90%;
+        height: 85vh;
+        max-height: 900px;
+        margin: 0; 
+        background: white;
+        border-radius: 24px;
+        box-shadow: 0 20px 60px rgba(109, 40, 217, 0.15);
+        overflow: hidden;
+        border: 1px solid rgba(255,255,255,0.6);
+    }
+
+    /* 介绍页桌面布局 - 网格 */
+    #intro-page .intro-content {
+        max-width: 100%;
+        margin: 0;
+        display: grid;
+        grid-template-columns: 1fr 1.2fr;
+        gap: 40px;
+        padding: 40px;
+        height: 100%;
+        align-content: center;
+        box-sizing: border-box;
+    }
+
+    #intro-page .intro-header {
+        text-align: left;
+        grid-column: 1;
+        align-self: center;
+    }
+
+    #intro-page .intro-title {
+        font-size: 36px;
+        margin-bottom: 16px;
+    }
+
+    #intro-page .intro-subtitle {
+        font-size: 18px;
+    }
+
+    #intro-page .intro-tags {
+        grid-column: 1;
+        justify-content: flex-start;
+    }
+
+    #intro-page .intro-body {
+        grid-column: 2;
+        grid-row: 1 / span 3;
+        font-size: 16px;
+        background: #F7FAFC;
+        padding: 40px;
+        border-radius: 20px;
+        align-self: stretch;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        margin-bottom: 0; 
+    }
+
+    /* 底部栏在桌面端变为右侧卡片的一部分 */
+    #intro-page .bottom-bar {
+        position: absolute;
+        bottom: 40px;
+        right: 40px;
+        left: auto;
+        transform: none;
+        width: auto;
+        background: white;
+        padding: 16px 24px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        border-radius: 16px;
+        border: 1px solid rgba(0,0,0,0.05);
+    }
+
+    /* 结果页桌面布局 - 单栏居中堆叠 (参考 MBTI/INFP 风格) */
+    #result-page .result-content {
+        display: flex;
+        flex-direction: column;
+        max-width: 720px; /* 限制宽度以获得最佳阅读体验 */
+        margin: 0 auto;
+        padding: 40px 20px;
+        gap: 30px;
+    }
+
+    .score-card {
+        width: 100%;
+        text-align: center;
+        padding: 50px 40px;
+        /* 保持之前的卡片样式 */
+        background: white;
+        border: 2px solid #E9D8FD;
+        box-shadow: 0 10px 30px rgba(139, 92, 246, 0.15);
+        border-radius: 24px;
+        position: relative;
+    }
+    
+    /* 结果大标题强调 */
+    .result-title {
+        font-size: 32px;
+        color: #4C1D95;
+        margin: 16px 0;
+    }
+    
+    .result-desc {
+        text-align: center;
+        max-width: 90%;
+        margin: 0 auto;
+    }
+
+    .advice-card, .promotion-card {
+        width: 100%;
+        margin-bottom: 0;
+        /* 保持之前的卡片样式 */
+        background: #FAF5FF;
+        box-shadow: 0 4px 12px rgba(139, 92, 246, 0.05);
+        border: 1px solid #F3E8FF;
+        border-radius: 20px;
+        padding: 30px;
+    }
+
+    .recommended-section {
+        width: 100%;
+        margin-top: 20px;
+        border-top: 1px solid #E9D8FD;
+        padding-top: 30px;
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 20px;
+    }
+    
+    .rec-card {
+        margin-bottom: 0;
+        background: #F7FAFC;
+        border: none;
+    }
+}
+section {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow-y: auto;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s ease, transform 0.4s ease;
+    transform: translateY(20px);
+}
+
+section.active-page {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0);
+    z-index: 10;
+}
+
+/* 1. 入口页样式 */
+#landing-page .content-wrapper {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+.header-spacer {
+    height: 6%;
+}
+
+.brand-name {
+    font-size: 13px;
+    font-weight: 500;
+    color: #9F7AEA;
+    margin-bottom: 20px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    opacity: 0.8;
+}
+
+.main-title {
+    font-size: 30px;
+    font-weight: 800;
+    color: #2D1B69;
+    margin-bottom: 12px;
+    line-height: 1.25;
+    letter-spacing: -0.5px;
+}
+
+.subtitle {
+    font-size: 13px;
+    margin-bottom: 36px;
+    background: linear-gradient(135deg, #EDE9FE, #DDD6FE);
+    padding: 7px 18px;
+    border-radius: 20px;
+    color: #6D28D9;
+    font-weight: 500;
+    letter-spacing: 0.3px;
+}
+
+.trust-card {
+    background: white;
+    border-radius: 18px;
+    padding: 18px 20px;
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    gap: 12px;
+    margin-bottom: 36px;
+    box-shadow: 0 4px 20px rgba(109, 40, 217, 0.08);
+    border: 1px solid rgba(139, 92, 246, 0.08);
+}
+
+.trust-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+.trust-item .icon {
+    font-size: 18px;
+}
+
+.trust-item .text {
+    font-size: 12px;
+    color: #553C9A;
+    font-weight: 500;
+}
+
+.action-area {
+    width: 100%;
+    margin-top: auto;
+    padding-bottom: 44px;
+}
+
+.primary-btn {
+    background: linear-gradient(135deg, #8B5CF6, #6D28D9);
+    color: white;
+    border: none;
+    width: 100%;
+    padding: 17px;
+    font-size: 17px;
+    font-weight: 700;
+    border-radius: 50px;
+    cursor: pointer;
+    box-shadow: 0 8px 24px rgba(109, 40, 217, 0.35);
+    transition: transform 0.1s, box-shadow 0.1s;
+    letter-spacing: 0.5px;
+}
+
+.primary-btn:active {
+    transform: scale(0.97);
+    box-shadow: 0 4px 12px rgba(109, 40, 217, 0.25);
+}
+
+.disclaimer, .footer-disclaimer {
+    font-size: 11px;
+    color: #B794F4;
+    margin-top: 14px;
+    text-align: center;
+    opacity: 0.8;
+}
+
+/* 2. 测试页样式 */
+.quiz-header {
+    margin-bottom: 28px;
+    padding-top: 8px;
+}
+
+.progress-bar-container {
+    height: 6px;
+    background-color: #EDE9FE;
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: 8px;
+}
+
+.progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #8B5CF6, #A78BFA);
+    width: 10%;
+    transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 3px;
+}
+
+.progress-text {
+    text-align: right;
+    font-size: 12px;
+    color: #9F7AEA;
+    font-weight: 500;
+}
+
+.question-text {
+    font-size: 19px;
+    font-weight: 700;
+    color: #2D1B69;
+    margin-bottom: 28px;
+    min-height: 60px;
+    line-height: 1.55;
+}
+
+.option-btn {
+    background: white;
+    border: 1.5px solid #EDE9FE;
+    width: 100%;
+    padding: 16px 20px;
+    margin-bottom: 10px;
+    border-radius: 14px;
+    text-align: left;
+    font-size: 15px;
+    color: #4A3880;
+    cursor: pointer;
+    transition: all 0.18s;
+    box-shadow: 0 2px 8px rgba(109, 40, 217, 0.04);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.option-btn::before {
+    content: attr(data-label);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 26px;
+    height: 26px;
+    background: #F3F0FF;
+    border-radius: 50%;
+    font-size: 12px;
+    font-weight: 600;
+    color: #7C3AED;
+    flex-shrink: 0;
+}
+
+.option-btn:active, .option-btn.selected {
+    background: linear-gradient(135deg, #F3F0FF, #EDE9FE);
+    border-color: #8B5CF6;
+    color: #4C1D95;
+    box-shadow: 0 4px 14px rgba(109, 40, 217, 0.15);
+}
+
+.option-btn.selected::before {
+    background: #8B5CF6;
+    color: white;
+}
+
+
+/* 3. 结果页样式 */
+.result-content {
+    padding-bottom: 40px;
+}
+
+.score-card {
+    background: white;
+    border-radius: 24px;
+    padding: 36px 24px 28px;
+    text-align: center;
+    box-shadow: 0 8px 32px rgba(109, 40, 217, 0.12);
+    margin-bottom: 20px;
+    border: 1.5px solid #EDE9FE;
+    position: relative;
+    overflow: hidden;
+}
+
+.score-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 5px;
+    background: linear-gradient(90deg, #8B5CF6, #C4B5FD, #8B5CF6);
+}
+
+.result-icon {
+    font-size: 52px;
+    margin-bottom: 12px;
+    display: block;
+}
+
+.result-title {
+    font-size: 26px;
+    font-weight: 800;
+    color: #2D1B69;
+    margin-bottom: 14px;
+    letter-spacing: -0.3px;
+}
+
+.result-divider {
+    height: 1px;
+    background: linear-gradient(to right, transparent, #DDD6FE, transparent);
+    margin: 0 20px 16px;
+}
+
+.result-desc {
+    font-size: 14.5px;
+    color: #553C9A;
+    line-height: 1.85;
+    text-align: left;
+    background: #FAFAFF;
+    border-radius: 12px;
+    padding: 14px 16px;
+    white-space: pre-line;
+}
+
+.advice-card {
+    background: linear-gradient(135deg, #FFF5F7, #FFF0F5);
+    border-radius: 20px;
+    padding: 20px;
+    margin-bottom: 20px;
+    border: 1px solid #FED7E2;
+}
+
+.advice-card h3 {
+    font-size: 15px;
+    font-weight: 700;
+    color: #B83280;
+    margin-bottom: 10px;
+}
+
+.advice-card p {
+    font-size: 14px;
+    color: #553C9A;
+    line-height: 1.8;
+    white-space: pre-line;
+}
+
+.promotion-card {
+    background: linear-gradient(135deg, #2D1B69, #4C1D95);
+    border-radius: 20px;
+    padding: 24px;
+    margin-bottom: 28px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.promotion-card::before {
+    content: '✨';
+    position: absolute;
+    top: -8px; right: 16px;
+    font-size: 48px;
+    opacity: 0.12;
+}
+
+.promo-header {
+    font-size: 16px;
+    font-weight: 700;
+    color: white;
+    margin-bottom: 8px;
+}
+
+.promo-text {
+    font-size: 13px;
+    color: #C4B5FD;
+    margin-bottom: 16px;
+    line-height: 1.6;
+}
+
+.promo-btn {
+    display: block;
+    background: white;
+    color: #5B21B6;
+    text-decoration: none;
+    padding: 14px;
+    border-radius: 50px;
+    font-size: 14px;
+    font-weight: 700;
+    transition: opacity 0.15s;
+}
+
+.promo-btn:active {
+    opacity: 0.85;
+}
+
+.promo-btn .small-text {
+    display: block;
+    font-size: 11px;
+    font-weight: 400;
+    color: #7C3AED;
+    margin-top: 2px;
+}
+
+#restart-btn {
+    background: none;
+    border: 1.5px solid #EDE9FE;
+    color: #9F7AEA;
+    font-size: 14px;
+    cursor: pointer;
+    width: 100%;
+    margin-top: 10px;
+    padding: 12px;
+    border-radius: 50px;
+    transition: background 0.15s;
+}
+
+#restart-btn:active {
+    background: #F3F0FF;
+}
+
+/* 4. 推荐测试区域样式 */
+.recommended-section {
+    margin-top: 28px;
+    margin-bottom: 16px;
+}
+
+.divider {
+    font-size: 13px;
+    font-weight: 600;
+    color: #9F7AEA;
+    text-align: center;
+    margin-bottom: 16px;
+    position: relative;
+    letter-spacing: 1px;
+}
+
+.divider::before, .divider::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    width: 28%;
+    height: 1px;
+    background: linear-gradient(to right, transparent, #DDD6FE);
+}
+.divider::before { left: 0; background: linear-gradient(to right, transparent, #DDD6FE); }
+.divider::after { right: 0; background: linear-gradient(to left, transparent, #DDD6FE); }
+
+.rec-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.rec-card {
+    background: white;
+    border-radius: 16px;
+    padding: 16px 18px;
+    cursor: pointer;
+    transition: all 0.18s;
+    border: 1.5px solid #F0EBFF;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.rec-card:active {
+    transform: scale(0.98);
+    background: #FAFAFF;
+    border-color: #C4B5FD;
+}
+
+.rec-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.rec-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    background: linear-gradient(135deg, #EDE9FE, #DDD6FE);
+    border-radius: 50%;
+    font-size: 11px;
+    font-weight: 700;
+    color: #6D28D9;
+    flex-shrink: 0;
+}
+
+.rec-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #2D1B69;
+    flex: 1;
+}
+
+.rec-desc {
+    font-size: 12px;
+    color: #9F7AEA;
+    padding-left: 34px;
+}
+
+.rec-tags {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    padding-left: 34px;
+}
+
+.tag {
+    background: #F3F0FF;
+    color: #7C3AED;
+    border-radius: 20px;
+    padding: 2px 9px;
+    font-size: 11px;
+    font-weight: 500;
+}
+
+/* 5. 介绍页样式 */
+#intro-page {
+    background: linear-gradient(180deg, #FAFAFF 0%, white 100%);
+    padding-bottom: 88px;
+}
+
+.intro-nav {
+    margin-bottom: 20px;
+}
+
+.nav-back {
+    background: none;
+    border: none;
+    font-size: 14px;
+    color: #8B5CF6;
+    cursor: pointer;
+    padding: 8px 0;
+    font-weight: 500;
+}
+
+.intro-header {
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.intro-title {
+    font-size: 24px;
+    font-weight: 800;
+    color: #2D1B69;
+    margin-bottom: 6px;
+    line-height: 1.3;
+}
+
+.intro-subtitle {
+    font-size: 13px;
+    color: #9F7AEA;
+    font-weight: 500;
+}
+
+.intro-body {
+    font-size: 14.5px;
+    line-height: 1.85;
+    color: #4A3880;
+    margin-bottom: 20px;
+    background: white;
+    border-radius: 16px;
+    padding: 20px;
+    border: 1px solid #EDE9FE;
+}
+
+.intro-body p {
+    margin-bottom: 14px;
+}
+
+.intro-body p:last-child {
+    margin-bottom: 0;
+}
+
+.intro-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 20px;
+}
+
+.intro-tag {
+    background: #EDE9FE;
+    color: #6D28D9;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 5px 13px;
+    border-radius: 20px;
+}
+
+/* 底部悬浮转化栏 */
+.bottom-bar {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 480px;
+    background: white;
+    padding: 12px 24px 20px;
+    box-shadow: 0 -4px 24px rgba(109, 40, 217, 0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    z-index: 100;
+    border-top: 1px solid #EDE9FE;
+}
+
+.price-info {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+}
+
+.price-original {
+    font-size: 12px;
+    color: #CBD5E0;
+    text-decoration: line-through;
+}
+
+.price-val {
+    font-size: 22px;
+    font-weight: 800;
+    color: #E53E3E;
+}
+
+.buy-btn {
+    background: linear-gradient(135deg, #8B5CF6, #6D28D9);
+    color: white;
+    text-decoration: none;
+    padding: 12px 24px;
+    border-radius: 50px;
+    font-size: 14px;
+    font-weight: 700;
+    box-shadow: 0 4px 14px rgba(109, 40, 217, 0.35);
+    transition: opacity 0.15s;
+}
+
+.buy-btn:active {
+    opacity: 0.85;
+}
+
+.btn-secondary {
+    background: linear-gradient(135deg, #FF9A9E 0%, #FECFEF 100%);
+    color: #fff;
+    box-shadow: 0 4px 15px rgba(255, 154, 158, 0.4);
+}
+
+/* 小红书风格按钮 */
+.btn-xhs {
+    background: #FF2442 !important; /* 小红书品牌红 */
+    color: white !important;
+    box-shadow: 0 4px 12px rgba(255, 36, 66, 0.3) !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+.btn-xhs::before {
+    content: ''; /* 可后续添加小红书Logo图标 */
+}
+
+/* 未开发警告样式 */
+.text-undeveloped {
+    color: #FF2442; /* 与按钮呼应 */
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.undeveloped-tip {
+    font-size: 12px;
+    font-weight: normal;
+    opacity: 0.9;
+}
+
+.warning-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    background-color: #FED7D7;
+    color: #C53030;
+    border-radius: 50%;
+    border-radius: 50%;
+    font-size: 12px;
+    margin: 0 4px; /* 调整间距 */
+    vertical-align: text-bottom;
+}
+
+/* ===== 测试介绍弹窗 ===== */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(76, 29, 149, 0.35);
+    z-index: 1000;
+    justify-content: center;
+    align-items: flex-end;
+    padding: 0;
+    backdrop-filter: blur(2px);
+}
+
+.modal-overlay.active {
+    display: flex;
+    animation: fadeInOverlay 0.2s ease;
+}
+
+@keyframes fadeInOverlay {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.modal-card {
+    background: white;
+    border-radius: 24px 24px 0 0;
+    padding: 0;
+    width: 100%;
+    max-width: 480px;
+    position: relative;
+    animation: slideUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    max-height: 82vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+@media (min-width: 768px) {
+    .modal-overlay {
+        align-items: center;
+    }
+    .modal-card {
+        border-radius: 24px;
+        max-width: 400px;
+        max-height: 72vh;
+    }
+}
+
+@keyframes slideUp {
+    from { transform: translateY(60px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+/* 弹窗顶部装饰条 */
+.modal-card::before {
+    content: '';
+    display: block;
+    width: 40px;
+    height: 4px;
+    background: #E9D8FD;
+    border-radius: 2px;
+    margin: 12px auto 0;
+    flex-shrink: 0;
+}
+
+.modal-body {
+    padding: 20px 24px 0;
+    overflow-y: auto;
+    flex: 1;
+}
+
+.modal-close {
+    position: absolute;
+    top: 14px;
+    right: 16px;
+    background: #F3F0FF;
+    border: none;
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    font-size: 12px;
+    color: #9F7AEA;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s;
+}
+
+.modal-close:hover {
+    background: #E9D8FD;
+}
+
+.modal-tags {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 10px;
+}
+
+.modal-tag {
+    background: #F3F0FF;
+    color: #7C3AED;
+    border-radius: 20px;
+    padding: 3px 10px;
+    font-size: 11px;
+    font-weight: 500;
+}
+
+.modal-title {
+    font-size: 19px;
+    font-weight: 700;
+    color: #2D3748;
+    margin: 0 0 4px;
+    line-height: 1.3;
+    padding-right: 32px;
+}
+
+.modal-subtitle {
+    font-size: 13px;
+    color: #9F7AEA;
+    margin: 0 0 14px;
+    font-weight: 500;
+}
+
+.modal-divider {
+    height: 1px;
+    background: linear-gradient(to right, #E9D8FD, transparent);
+    margin: 0 0 14px;
+}
+
+.modal-desc {
+    font-size: 13.5px;
+    color: #4A5568;
+    line-height: 1.75;
+    margin-bottom: 20px;
+}
+
+.modal-desc p {
+    margin: 0 0 10px;
+}
+
+.modal-desc b {
+    color: #553C9A;
+}
+
+.modal-footer {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 24px 28px;
+    background: #FDFBFF;
+    border-top: 1px solid #F0EBF8;
+    flex-shrink: 0;
+}
+
+.modal-price-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1px;
+    min-width: 52px;
+}
+
+.modal-price-original {
+    font-size: 11px;
+    color: #CBD5E0;
+    text-decoration: line-through;
+    line-height: 1;
+}
+
+.modal-price-current {
+    font-size: 22px;
+    font-weight: 800;
+    color: #E53E3E;
+    line-height: 1;
+}
+
+.modal-btn {
+    flex: 1;
+    background: linear-gradient(135deg, #8B5CF6, #6D28D9);
+    color: white;
+    text-align: center;
+    padding: 13px 16px;
+    border-radius: 50px;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    box-shadow: 0 4px 14px rgba(109, 40, 217, 0.35);
+    transition: opacity 0.15s;
+}
+
+.modal-btn:active {
+    opacity: 0.85;
+}
+
+.modal-btn.btn-undeveloped {
+    background: #EDF2F7;
+    box-shadow: none;
+    color: #A0AEC0;
+    pointer-events: none;
+}
+}
+
+
+</style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <!-- 页面容器 -->
+    <div class="app-container">
+        
+        <!-- 1. 入口页 (Landing Page) -->
+        <section id="landing-page" class="active-page">
+            <div class="content-wrapper">
+                <div class="header-spacer"></div>
+                <h1 class="brand-name">安安心灵自评馆</h1>
+                <h2 class="main-title">情绪内耗·专业自评测评</h2>
+                <p class="subtitle">10题快速自测 | 即刻生成完整结果报告</p>
+                
+                <div class="trust-card">
+                    <div class="trust-item">
+                        <span class="icon">✅</span>
+                        <span class="text">完整结果直达</span>
+                    </div>
+                    <div class="trust-item">
+                        <span class="icon">✅</span>
+                        <span class="text">无隐藏消费</span>
+                    </div>
+                    <div class="trust-item">
+                        <span class="icon">✅</span>
+                        <span class="text">全程自助体验</span>
+                    </div>
+                </div>
+
+                <div class="action-area">
+                    <button id="start-btn" class="primary-btn pulse-animation">开始自评</button>
+                    <p class="disclaimer">本测评仅供情绪状态自我参考，非医疗诊断</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. 测试页 (Quiz Page) -->
+        <section id="quiz-page" class="hidden-page">
+            <div class="quiz-header">
+                <div class="progress-bar-container">
+                    <div class="progress-bar" id="progress-bar"></div>
+                </div>
+                <div class="progress-text">进度 <span id="current-q">1</span>/10</div>
+            </div>
+
+            <div class="question-container" id="question-container">
+                <!-- 题目内容由 JS 动态注入 -->
+                <h2 class="question-text" id="question-text">题目加载中...</h2>
+                <div class="options-list" id="options-list">
+                    <!-- 选项由 JS 生成 -->
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. 结果页 (Result Page) -->
+        <section id="result-page" class="hidden-page">
+            <div class="result-content">
+                <div class="score-card">
+                    <div class="result-icon" id="result-icon">🌱</div>
+                    <h2 class="result-title" id="result-title">测试结果生成中...</h2>
+                    <div class="result-divider"></div>
+                    <p class="result-desc" id="result-desc">
+                        正在分析您的答题情况...
+                    </p>
+                </div>
+
+                <div class="advice-card">
+                    <h3>💡 自愈小建议</h3>
+                    <p id="result-advice">保持深呼吸...</p>
+                </div>
+
+                <!-- 转化引导区 -->
+                <div class="promotion-card">
+                    <div class="promo-header">还想了解更多关于自己？</div>
+                    <p class="promo-text" id="promo-text">
+                        店铺还有MBTI人格、高敏感、恋爱占有欲等12款测试。
+                    </p>
+                    <a href="#" class="promo-btn" id="promo-btn">
+                        去安安心灵自评馆探索更多
+                        <span class="small-text">¥1.5 · 单测随心选</span>
+                    </a>
+                </div>
+
+                <p class="footer-disclaimer">本测评仅供参考，不作为心理咨询或医疗诊断依据。<br>如遇严重心理困扰，请寻求专业医生帮助。</p>
+                
+                <!-- 推荐测试列表 -->
+                <div class="recommended-section">
+                    <div class="divider">更多专业测试</div>
+                    <div id="recommended-list" class="rec-list">
+                        <!-- JS 动态生成 -->
+                    </div>
+                </div>
+
+                <button id="restart-btn" class="text-btn">重新测试</button>
+            </div>
+        </section>
+
+        <!-- 4. 测试介绍页 (Intro Page) -->
+        <section id="intro-page" class="hidden-page">
+            <div class="intro-nav">
+                <button id="back-btn" class="nav-back">❮ 返回结果</button>
+            </div>
+            
+            <div class="intro-content">
+                <div class="intro-header">
+                    <h1 id="intro-title" class="intro-title">测试标题</h1>
+                    <p id="intro-subtitle" class="intro-subtitle">测试副标题</p>
+                </div>
+                
+                <div class="intro-body" id="intro-body">
+                    <!-- JS 注入详情内容 -->
+                </div>
+                
+                <div class="intro-tags" id="intro-tags">
+                    <!-- JS 注入标签 -->
+                </div>
+            </div>
+
+            <!-- 底部悬浮转化栏 -->
+            <div class="bottom-bar">
+                <div class="price-info">
+                    <span class="price-original">¥1.5</span>
+                    <span class="price-val">¥0.99</span>
+                </div>
+                <!-- 链接占位，JS会更新 -->
+                <a href="#" class="buy-btn" id="intro-buy-btn">去店铺解锁</a>
+            </div>
+        </section>
+
+    </div>
+
+    <!-- 测试介绍弹窗 -->
+    <div id="test-modal" class="modal-overlay" onclick="closeModal(event)">
+        <div class="modal-card">
+            <button class="modal-close" onclick="closeModal()">✕</button>
+            <div class="modal-body">
+                <div class="modal-tags" id="modal-tags"></div>
+                <h3 class="modal-title" id="modal-title"></h3>
+                <p class="modal-subtitle" id="modal-subtitle"></p>
+                <div class="modal-divider"></div>
+                <div class="modal-desc" id="modal-desc"></div>
+            </div>
+            <div class="modal-footer">
+                <div class="modal-price-wrap">
+                    <span class="modal-price-original">¥1.5</span>
+                    <span class="modal-price-current">¥0.99</span>
+                </div>
+                <a href="#" class="modal-btn" id="modal-btn">去店铺购买</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+// 推荐测试数据 (已调整顺序：已开发在前)
+const recommendedTests = [
+    // 已开发
+    { 
+        id: 'scl90', 
+        title: 'SCL-90 心理健康测评', 
+        subtitle: '国际通用 · 全面心理体检', 
+        desc: '<p><b>【测评简介】</b><br>国际通用的心理健康“体检表”，广泛应用于医疗与心理咨询领域。</p><p><b>【评估维度】</b><br>涵盖躯体化、强迫、人际敏感、抑郁、焦虑、敌对、恐怖、偏执、精神病性等10大核心心理指标。</p>',
+        tags: ['心理健康', '专业'], 
+        price: '1.5', 
+        developed: true 
+    },
+    { 
+        id: 'love_possession', 
+        title: '恋爱占有欲测试', 
+        subtitle: '你的爱是由于不安还是深情？', 
+        desc: '<p><b>【测评简介】</b><br>爱一个人就想占有TA？适度的占有欲是爱的表现，过度的占有欲则是关系的毒药。</p><p><b>【评估维度】</b><br>占有欲强度、情感安全感、控制倾向、独立性需求。</p>',
+        tags: ['恋爱', '情感'], 
+        price: '1.5', 
+        developed: true 
+    },
+    { 
+        id: 'mbti_16', 
+        title: 'MBTI 16型人格测试', 
+        subtitle: '探索你的核心性格代码', 
+        desc: '<p><b>【测评简介】</b><br>全球最流行的性格测试工具，帮你找到自己在生活、工作、恋爱中的“出厂设置”。</p><p><b>【评估维度】</b><br>E/I (外向/内向)、S/N (实感/直觉)、T/F (理智/情感)、J/P (判断/感知)。</p>',
+        tags: ['人格', 'MBTI'], 
+        price: '1.5', 
+        developed: true 
+    },
+    { 
+        id: 'city_match', 
+        title: '性格城市匹配测试', 
+        subtitle: '哪座城市是你的灵魂归属？', 
+        desc: '<p><b>【测评简介】</b><br>每个人都有属于自己的“能量城市”。在适合的城市生活，你会感到如鱼得水。</p><p><b>【评估维度】</b><br>生活节奏偏好、社交距离需求、气候适应性、文化包容度。</p>',
+        tags: ['生活', '趣味'], 
+        price: '1.5', 
+        developed: true 
+    },
+    
+    // 待开发 (暂未开放)
+    { 
+        id: 'mbti_love', 
+        title: 'MBTI 恋爱理想型测试', 
+        subtitle: '谁才是你的灵魂伴侣？', 
+        desc: '<p><b>【测评简介】</b><br>基于MBTI人格理论，精准匹配最适合你的伴侣类型。</p><p><b>【如有期待】</b><br>本测试正在紧锣密鼓开发中，将深度解析你的依恋需求与适配人格。</p>',
+        tags: ['恋爱', 'MBTI'], 
+        price: '1.5', 
+        developed: false 
+    },
+    { 
+        id: 'childhood', 
+        title: '童年创伤测试', 
+        subtitle: '疗愈内在小孩的第一步', 
+        desc: '<p><b>【测评简介】</b><br>看见童年的伤，是疗愈的开始。带你拥抱那个内心深处哭泣的小孩。</p><p><b>【如有期待】</b><br>本测试正在开发中，将包含家庭功能评估与情感忽视分析。</p>',
+        tags: ['疗愈', '成长'], 
+        price: '1.5', 
+        developed: false 
+    },
+    { 
+        id: 'spiritual', 
+        title: '精神需求测试', 
+        subtitle: '你灵魂深处真正渴望什么？', 
+        desc: '<p><b>【测评简介】</b><br>拨开物质欲望的迷雾，直视灵魂深处的真实渴求。</p><p><b>【如有期待】</b><br>本测试正在开发中，敬请期待。</p>',
+        tags: ['自我', '探索'], 
+        price: '1.5', 
+        developed: false 
+    },
+    { 
+        id: 'adhd', 
+        title: 'ADHD 注意力缺陷测试', 
+        subtitle: '总是分心？测测专注力', 
+        desc: '<p><b>【测评简介】</b><br>这是天赋还是障碍？科学评估你的专注力水平。</p><p><b>【如有期待】</b><br>本测试正在开发中，敬请期待。</p>',
+        tags: ['健康', '科普'], 
+        price: '1.5', 
+        developed: false 
+    },
+    { 
+        id: 'appearance', 
+        title: '高颜值测试', 
+        subtitle: '你的美学风格属于哪一种？', 
+        desc: '<p><b>【测评简介】</b><br>发现你的独特美学气质，找到最适合你的变美思路。</p><p><b>【如有期待】</b><br>本测试正在开发中，敬请期待。</p>',
+        tags: ['审美', '趣味'], 
+        price: '1.5', 
+        developed: false 
+    },
+    { 
+        id: 'attachment', 
+        title: '成人依恋类型测试', 
+        subtitle: '回避/焦虑/安全型？', 
+        desc: '<p><b>【测评简介】</b><br>深度解析你在亲密关系中的安全感来源与行为模式。</p><p><b>【如有期待】</b><br>本测试正在开发中，敬请期待。</p>',
+        tags: ['关系', '心理'], 
+        price: '1.5', 
+        developed: false 
+    },
+    { 
+        id: 'female_type', 
+        title: '女性类型测试', 
+        subtitle: '探索你的女性力量原型', 
+        desc: '<p><b>【测评简介】</b><br>你是雅典娜、赫拉还是阿佛洛狄忒？探索你的原型力量。</p><p><b>【如有期待】</b><br>本测试正在开发中，敬请期待。</p>',
+        tags: ['性格', '女性'], 
+        price: '1.5', 
+        developed: false 
+    },
+    { 
+        id: 'age_love', 
+        title: '年上年下恋爱人格', 
+        subtitle: '你适合“爹系”还是“奶狗”？', 
+        desc: '<p><b>【测评简介】</b><br>测测你在恋爱中更适合扮演照顾者还是被照顾者。</p><p><b>【如有期待】</b><br>本测试正在开发中，敬请期待。</p>',
+        tags: ['恋爱', '趣味'], 
+        price: '1.5', 
+        developed: false 
+    },
+    { 
+        id: 'npd', 
+        title: 'NPD 自恋型人格测试', 
+        subtitle: '识别身边的“有毒”关系 (测他人)', 
+        desc: '<p><b>【测评简介】</b><br>你的TA是否极度自负、缺乏共情？帮你快速识别危险关系。</p><p><b>【如有期待】</b><br>本测试正在开发中，敬请期待。</p>',
+        tags: ['关系', '避坑'], 
+        price: '1.5', 
+        developed: false 
+    },
+    { 
+        id: 'psy_age', 
+        title: '心理年龄测试', 
+        subtitle: '你的心智比实际年龄成熟吗？', 
+        desc: '<p><b>【测评简介】</b><br>测试你的心理成熟度是否与生理年龄匹配。</p><p><b>【如有期待】</b><br>本测试正在开发中，敬请期待。</p>',
+        tags: ['趣味', '认知'], 
+        price: '1.5', 
+        developed: false 
+    },
+    { 
+        id: 'talent', 
+        title: '天赋测试', 
+        subtitle: '挖掘你被埋没的天生优势', 
+        desc: '<p><b>【测评简介】</b><br>找到你的盖洛普优势领域，让努力事半功倍。</p><p><b>【如有期待】</b><br>本测试正在开发中，敬请期待。</p>',
+        tags: ['职场', '潜能'], 
+        price: '1.5', 
+        developed: false 
+    },
+    { 
+        id: 'animal', 
+        title: '动物性格测试', 
+        subtitle: '你的性格像哪种动物？', 
+        desc: '<p><b>【测评简介】</b><br>老虎、孔雀、考拉、猫头鹰，测测你的职场性格原型。</p><p><b>【如有期待】</b><br>本测试正在开发中，敬请期待。</p>',
+        tags: ['趣味', '性格'], 
+        price: '1.5', 
+        developed: false 
+    }
+];
+
+// 小红书店铺链接
+const SHOP_URL = "https://www.xiaohongshu.com/user/profile/601a023b000000000101fb44?xsec_token=YBzfLUaEGC48Kn_H4uNVPPudm5zNIfcyoxvRfnR2VZumo%3D&xsec_source=app_share&xhsshare=&shareRedId=ODYzQTM3N0s2NzUyOTgwNjY0OThKRzo9&apptime=1768918803&share_id=5e6b7913cee843faa97b7b0b9c4eecac&share_channel=copy_link";
+
+// 题目数据 (新版10题，4选项)
+const questions = [
+    {
+        id: 1,
+        text: "经常因小事反复胡思乱想，难以平复情绪",
+        options: [
+            { text: "A·完全不符合", score: 1 },
+            { text: "B·偶尔符合", score: 2 },
+            { text: "C·比较符合", score: 3 },
+            { text: "D·完全符合", score: 4 }
+        ]
+    },
+    {
+        id: 2,
+        text: "明明未做体力事，却常感身心疲惫、提不起劲",
+        options: [
+            { text: "A·完全不符合", score: 1 },
+            { text: "B·偶尔符合", score: 2 },
+            { text: "C·比较符合", score: 3 },
+            { text: "D·完全符合", score: 4 }
+        ]
+    },
+    {
+        id: 3,
+        text: "过度在意他人的看法，害怕被否定或批评",
+        options: [
+            { text: "A·完全不符合", score: 1 },
+            { text: "B·偶尔符合", score: 2 },
+            { text: "C·比较符合", score: 3 },
+            { text: "D·完全符合", score: 4 }
+        ]
+    },
+    {
+        id: 4,
+        text: "做事前反复纠结，很难快速做出决定",
+        options: [
+            { text: "A·完全不符合", score: 1 },
+            { text: "B·偶尔符合", score: 2 },
+            { text: "C·比较符合", score: 3 },
+            { text: "D·完全符合", score: 4 }
+        ]
+    },
+    {
+        id: 5,
+        text: "独处时容易陷入胡思乱想，情绪低落",
+        options: [
+            { text: "A·完全不符合", score: 1 },
+            { text: "B·偶尔符合", score: 2 },
+            { text: "C·比较符合", score: 3 },
+            { text: "D·完全符合", score: 4 }
+        ]
+    },
+    {
+        id: 6,
+        text: "总觉得心里装着事，无法真正放松下来",
+        options: [
+            { text: "A·完全不符合", score: 1 },
+            { text: "B·偶尔符合", score: 2 },
+            { text: "C·比较符合", score: 3 },
+            { text: "D·完全符合", score: 4 }
+        ]
+    },
+    {
+        id: 7,
+        text: "容易因他人的一句话，影响一整天的心情",
+        options: [
+            { text: "A·完全不符合", score: 1 },
+            { text: "B·偶尔符合", score: 2 },
+            { text: "C·比较符合", score: 3 },
+            { text: "D·完全符合", score: 4 }
+        ]
+    },
+    {
+        id: 8,
+        text: "习惯自我否定，觉得自己不够好",
+        options: [
+            { text: "A·完全不符合", score: 1 },
+            { text: "B·偶尔符合", score: 2 },
+            { text: "C·比较符合", score: 3 },
+            { text: "D·完全符合", score: 4 }
+        ]
+    },
+    {
+        id: 9,
+        text: "睡前容易回想过往事，导致入睡困难",
+        options: [
+            { text: "A·完全不符合", score: 1 },
+            { text: "B·偶尔符合", score: 2 },
+            { text: "C·比较符合", score: 3 },
+            { text: "D·完全符合", score: 4 }
+        ]
+    },
+    {
+        id: 10,
+        text: "面对选择时，总担心做出错误的决定",
+        options: [
+            { text: "A·完全不符合", score: 1 },
+            { text: "B·偶尔符合", score: 2 },
+            { text: "C·比较符合", score: 3 },
+            { text: "D·完全符合", score: 4 }
+        ]
+    }
+];
+
+// 结果文案配置 (版本1：温柔共情版 - 动态适配等级)
+// 总分范围: 10 - 40
+// 轻度: 10-20
+// 中度: 21-30
+// 重度: 31-40
+const results = {
+    low: {
+        title: "轻度内耗",
+        desc: "• 你的情绪调节能力尚可，但偶尔会陷入纠结\n• 对生活保持着敏感度，有时会因此感到疲惫\n• 内心有一片宁静花园，通过简单的自我调适即可恢复",
+        advice: "• 每天留10分钟放空时间，不强迫自己思考\n• 保持现在的节奏，多去户外走走，记录生活中的小确幸",
+        promoText: "想更了解自己潜在的优势性格吗？",
+        promoBtn: "去安安心灵自评馆探索更多"
+    },
+    mid: {
+        title: "中度内耗",
+        desc: "• 你习惯把情绪藏在心里，容易自我消耗\n• 对周遭感受敏锐，常因小事牵动情绪\n• 看似平静，内心却一直在反复纠结",
+        advice: "• 试着每天给自己10分钟“断网时间”，不看消息，只关注呼吸\n• 接纳自己的情绪，不必事事追求完美",
+        promoText: "这种“心累”的感觉，也许与高敏感特质或讨好型人格有关。",
+        promoBtn: "去安安心灵自评馆探索更多"
+    },
+    high: {
+        title: "重度内耗",
+        desc: "• 你的心理能量正在被大量消耗，大脑像无法关机的电脑\n• 极度在意他人评价，常因害怕犯错而不敢行动\n• 长期处于精神紧绷状态，急需深度放松与疗愈",
+        advice: "• 请尝试寻找信任的朋友倾诉，或寻求专业心理咨询师的帮助\n• 允许自己今天“什么都不做”，这没关系",
+        promoText: "了解自己的情绪根源是改变的第一步。",
+        promoBtn: "去小红书店铺获取支持"
+    }
+};
+
+// 状态变量
+let currentQuestionIndex = 0;
+let totalScore = 0;
+
+// DOM 元素
+const landingPage = document.getElementById('landing-page');
+const quizPage = document.getElementById('quiz-page');
+const resultPage = document.getElementById('result-page');
+const introPage = document.getElementById('intro-page');
+
+const startBtn = document.getElementById('start-btn');
+const restartBtn = document.getElementById('restart-btn');
+const backBtn = document.getElementById('back-btn');
+
+const questionText = document.getElementById('question-text');
+const optionsList = document.getElementById('options-list');
+const progressBar = document.getElementById('progress-bar');
+const currentQSpan = document.getElementById('current-q');
+const recommendedList = document.getElementById('recommended-list');
+
+// 页面切换函数
+function switchPage(fromPage, toPage) {
+    fromPage.classList.remove('active-page');
+    fromPage.classList.add('hidden-page');
+    
+    setTimeout(() => {
+        toPage.classList.remove('hidden-page');
+        toPage.classList.add('active-page');
+        toPage.scrollTop = 0;
+    }, 100); 
+}
+
+// 初始化测试
+function startQuiz() {
+    currentQuestionIndex = 0;
+    totalScore = 0;
+    showQuestion();
+    switchPage(landingPage, quizPage);
+}
+
+// 显示题目
+function showQuestion() {
+    const question = questions[currentQuestionIndex];
+    
+    // 更新进度条
+    const progressPercent = ((currentQuestionIndex + 1) / questions.length) * 100;
+    progressBar.style.width = `${progressPercent}%`;
+    currentQSpan.textContent = currentQuestionIndex + 1;
+
+    // 更新题目内容 (淡入动画)
+    questionText.style.opacity = 0;
+    setTimeout(() => {
+        questionText.textContent = question.text;
+        questionText.style.opacity = 1;
+    }, 200);
+
+    // 生成选项
+    const labels = ['A', 'B', 'C', 'D'];
+    optionsList.innerHTML = '';
+    question.options.forEach((option, idx) => {
+        const btn = document.createElement('div');
+        btn.className = 'option-btn';
+        btn.setAttribute('data-label', labels[idx]);
+        btn.textContent = option.text;
+        btn.onclick = () => selectOption(option.score, btn);
+        optionsList.appendChild(btn);
+    });
+}
+
+// 选择选项
+function selectOption(score, btnElement) {
+    btnElement.classList.add('selected');
+    totalScore += score;
+    
+    setTimeout(() => {
+        if (currentQuestionIndex < questions.length - 1) {
+            currentQuestionIndex++;
+            showQuestion();
+        } else {
+            showResult();
+        }
+    }, 300);
+}
+
+// 显示结果
+function showResult() {
+    // 根据总分判定等级 (10-40分)
+    let resultKey = 'low';
+    if (totalScore >= 21 && totalScore <= 30) {
+        resultKey = 'mid';
+    } else if (totalScore >= 31) {
+        resultKey = 'high';
+    }
+
+    const data = results[resultKey];
+
+    document.getElementById('result-title').textContent = data.title;
+    
+    // 处理多行文本，转为HTML换行
+    document.getElementById('result-desc').innerHTML = data.desc.replace(/\n/g, '<br>');
+    document.getElementById('result-advice').innerHTML = data.advice.replace(/\n/g, '<br>');
+    
+    document.getElementById('promo-text').textContent = data.promoText;
+    
+    const promoBtn = document.getElementById('promo-btn');
+    promoBtn.innerHTML = `${data.promoBtn} <span class="small-text">含MBTI、高敏感、恋爱观等</span>`;
+    promoBtn.href = SHOP_URL;
+
+    // 显示结果图案
+    const icons = { low: '🍃', mid: '☁️', high: '🌧️' };
+    const iconEl = document.getElementById('result-icon');
+    iconEl.textContent = icons[resultKey];
+    iconEl.style.display = 'block';
+
+    renderRecommendedTests();
+    switchPage(quizPage, resultPage);
+}
+
+// 渲染推荐测试列表
+function renderRecommendedTests() {
+    recommendedList.innerHTML = '';
+    recommendedTests.forEach((test, index) => {
+        const card = document.createElement('div');
+        card.className = 'rec-card';
+        // 添加序号
+        const num = index + 1;
+        // 如果未开发，添加标记
+        const statusBadge = test.developed ? '' : '<span style="font-size:10px; color:#A0AEC0; margin-left:4px;">(开发中)</span>';
+        
+        card.innerHTML = `
+            <div class="rec-header">
+                <span class="rec-num">${num}</span>
+                <span class="rec-title">${test.title} ${statusBadge}</span>
+            </div>
+            <div class="rec-desc">${test.subtitle}</div>
+            <div class="rec-tags">
+                ${test.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+            </div>
+        `;
+        
+        // 统一交互：点击弹出介绍弹窗
+        card.onclick = () => showModal(test);
+        
+        recommendedList.appendChild(card);
+    });
+}
+
+// 显示测试介绍页 (统一入口)
+function showIntroPage(testData) {
+    document.getElementById('intro-title').textContent = testData.title;
+    document.getElementById('intro-subtitle').textContent = testData.subtitle;
+    document.getElementById('intro-body').innerHTML = testData.desc;
+    
+    // 渲染标签
+    const tagsContainer = document.getElementById('intro-tags');
+    tagsContainer.innerHTML = '';
+    testData.tags.forEach(tag => {
+        const span = document.createElement('div');
+        span.className = 'intro-tag';
+        span.textContent = tag;
+        tagsContainer.appendChild(span);
+    });
+
+    const buyBtn = document.getElementById('intro-buy-btn');
+    
+    // 检查是否需要插入"开发中"提示容器 (单例模式，如果没有就创建)
+    let devNotice = document.getElementById('intro-dev-notice');
+    if (!devNotice) {
+        devNotice = document.createElement('p');
+        devNotice.id = 'intro-dev-notice';
+        devNotice.style.cssText = "color: #E53E3E; font-size: 14px; margin-bottom: 12px; font-weight: 500;";
+        // 插入到按钮之前
+        buyBtn.parentNode.insertBefore(devNotice, buyBtn);
+    }
+
+    const priceVal = document.getElementById('price-bundle-val');
+
+    if (testData.developed) {
+        // 已开发状态：显示"前往测试"
+        buyBtn.textContent = "前往测试";
+        buyBtn.className = 'buy-btn'; // 重置类名
+        buyBtn.classList.remove('btn-xhs'); 
+        
+        devNotice.style.display = 'none'; // 隐藏提示
+        priceVal.textContent = "¥1.5";
+        priceVal.classList.remove('text-undeveloped');
+    } else {
+        // 未开发状态：只显示"关注小红书"
+        buyBtn.textContent = "关注小红书";
+        buyBtn.className = 'buy-btn btn-xhs'; // 添加小红书风格
+        
+        devNotice.style.display = 'none';
+        
+        // 添加警告图标和红色文字 (顺序：价格 -> 图标 -> 文字)
+        priceVal.innerHTML = `¥1.5 <span class="warning-icon">!</span> <span class="undeveloped-tip">测试未开发</span>`;
+        priceVal.classList.add('text-undeveloped');
+    }
+
+    // 两个按钮都指向同一店铺链接
+    buyBtn.href = SHOP_URL;
+
+    switchPage(resultPage, introPage);
+}
+
+// 事件监听
+startBtn.addEventListener('click', startQuiz);
+restartBtn.addEventListener('click', () => {
+    switchPage(resultPage, landingPage);
+});
+backBtn.addEventListener('click', () => {
+    switchPage(introPage, resultPage);
+});
+
+// 初始化
+document.addEventListener('DOMContentLoaded', () => {
+    // 确保 landingPage 是 active
+    landingPage.classList.add('active-page');
+    // 确保其他页面是 hidden
+    quizPage.classList.add('hidden-page');
+    resultPage.classList.add('hidden-page');
+    introPage.classList.add('hidden-page');
+});
+
+// 弹窗：打开
+function showModal(testData) {
+    document.getElementById('modal-title').textContent = testData.title;
+    document.getElementById('modal-subtitle').textContent = testData.subtitle;
+    document.getElementById('modal-desc').innerHTML = testData.desc;
+
+    const tagsEl = document.getElementById('modal-tags');
+    tagsEl.innerHTML = testData.tags.map(t => `<span class="modal-tag">${t}</span>`).join('');
+
+    const btn = document.getElementById('modal-btn');
+    if (testData.developed) {
+        btn.textContent = '去店铺购买';
+        btn.href = SHOP_URL;
+        btn.className = 'modal-btn';
+    } else {
+        btn.textContent = '测试开发中';
+        btn.href = '#';
+        btn.className = 'modal-btn btn-undeveloped';
+    }
+
+    document.getElementById('test-modal').classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+
+// 弹窗：关闭
+function closeModal(event) {
+    if (event && event.target !== document.getElementById('test-modal')) return;
+    document.getElementById('test-modal').classList.remove('active');
+    document.body.style.overflow = '';
+}
+
+
+</script>
+</body>
+</html>
