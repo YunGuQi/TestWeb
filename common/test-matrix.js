@@ -158,24 +158,23 @@ function initTestMatrix({ containerId, currentId, theme = 'dark' }) {
         detailModal.id = 'shared-detail-modal';
         detailModal.className = overlayClass;
         detailModal.onclick = (e) => {
-            if (e.target === detailModal) closeTestDetailModal();
+            if (e.target === detailModal || e.target.id === 'detail-close-zone') closeTestDetailModal();
         };
         detailModal.innerHTML = `
-            <div class="${cardClass}" id="shared-detail-card" style="transition-duration: 400ms; max-height: 85vh; overflow: hidden; position: relative;">
-                <button class="${closeBtnClass}" onclick="closeTestDetailModal()">
-                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                </button>
+            <button id="detail-close-btn" onclick="closeTestDetailModal()" style="position: fixed; top: max(env(safe-area-inset-top, 8px), 12px); right: 16px; z-index: 220; width: 36px; height: 36px; border-radius: 50%; background: rgba(0,0,0,0.5); backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.2); color: white; display: flex; align-items: center; justify-content: center; cursor: pointer;">
+                <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+            <div class="${cardClass}" id="shared-detail-card" style="transition-duration: 400ms; max-height: 85vh; overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain;">
                 <div class="${handleClass}"></div>
-                <div id="detail-modal-content" style="overflow-y: auto; max-height: calc(85vh - 4rem); -webkit-overflow-scrolling: touch; overscroll-behavior: contain; padding: 0 4px 16px 4px;">
+                <div id="detail-modal-content" style="padding: 0 4px 16px 4px;">
                     <!-- content injected dynamically -->
                 </div>
             </div>
         `;
-        // 阻止详情弹窗遮罩层的touchmove传递到下层
+        // 阻止详情弹窗遮罩背景的 touchmove 穿透，但允许卡片内部滚动
         detailModal.addEventListener('touchmove', function(e) {
-            const content = document.getElementById('detail-modal-content');
-            // 如果触摸点不在可滚动内容区域内，则阻止默认行为
-            if (!content || !content.contains(e.target)) {
+            const card = document.getElementById('shared-detail-card');
+            if (!card || !card.contains(e.target)) {
                 e.preventDefault();
             }
         }, { passive: false });
@@ -281,7 +280,7 @@ window.openTestDetailModal = function(idx) {
     
     // Add theme class for CSS desc overrides
     content.className = `${isLight ? 'theme-light' : 'theme-dark'}`;
-    content.style.cssText = 'overflow-y: auto; max-height: calc(85vh - 4rem); -webkit-overflow-scrolling: touch; overscroll-behavior: contain; padding: 0 4px 16px 4px;';
+    content.style.cssText = 'padding: 0 4px 16px 4px;';
 
     const imgHtml = test.previewImg ? `
         <div style="width:100%; border-radius:12px; overflow:hidden; margin-bottom:1.5rem; position:relative; background:#1a1a1a; padding:8px; border:1px solid ${isLight ? '#e5e7eb' : 'rgba(255,255,255,0.1)'}">
