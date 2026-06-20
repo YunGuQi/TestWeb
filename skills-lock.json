@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "skills": {
+    "xiaohongshu": {
+      "source": "zhjiang22/openclaw-xhs",
+      "sourceType": "github",
+      "skillPath": "SKILL.md",
+      "computedHash": "c9dd3d311539d483df91c558a7925dccdd73ad004b7120bf0bc163d8ea5e63e5"
+    }
+  }
+}

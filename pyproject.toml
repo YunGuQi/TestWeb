@@ -1,0 +1,13 @@
+[project]
+name = "xhs-bot"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "playwright>=1.60.0",
+    "pyautogui>=0.9.54",
+    "pyperclip>=1.11.0",
+    "python-docx>=1.2.0",
+    "requests>=2.34.2",
+]
