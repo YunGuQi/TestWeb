@@ -183,9 +183,16 @@ function initTestMatrix({ containerId, currentId, theme = 'dark' }) {
                 #shared-detail-modal.show { opacity: 1; pointer-events: auto; z-index: 210; }
                 #shared-detail-modal.show #shared-detail-card { transform: translateY(0); }
                 .hide-scrollbar::-webkit-scrollbar { display: none; }
+                /* 详情弹窗内容区域 - 显示细滚动条作为视觉提示 */
+                #detail-modal-content::-webkit-scrollbar { width: 3px; }
+                #detail-modal-content::-webkit-scrollbar-track { background: transparent; }
+                #detail-modal-content::-webkit-scrollbar-thumb { background: rgba(150,150,150,0.4); border-radius: 3px; }
+                /* 防止滑动穿透到下层弹窗 */
+                #shared-detail-modal.show { touch-action: none; }
+                #shared-detail-modal.show #shared-detail-card { touch-action: pan-y; }
+                #detail-modal-content { overscroll-behavior: contain; }
                 .detail-desc p { margin-bottom: 0.5rem; }
                 .detail-desc b { font-weight: bold; color: inherit; }
-                /* Force text colors in detail desc based on theme */
                 .theme-light .detail-desc b { color: #1a1a1a !important; }
                 .theme-dark .detail-desc b { color: #ffffff !important; }
                 .theme-light .detail-desc p { color: #4b5563 !important; }
@@ -260,9 +267,9 @@ window.openTestDetailModal = function(idx) {
     content.style.cssText = 'overflow-y: auto; flex: 1; -webkit-overflow-scrolling: touch;';
 
     const imgHtml = test.previewImg ? `
-        <div class="w-full rounded-xl overflow-hidden mb-8 relative bg-[#1a1a1a] shadow-inner border ${isLight ? 'border-gray-200' : 'border-white/10'} p-2">
-            <img src="${test.previewImg}" alt="${test.title}" onerror="this.style.display='none'" class="w-full h-auto max-h-[50vh] object-contain opacity-95 mx-auto">
-            <div class="absolute top-4 right-4 px-2 py-0.5 bg-black/60 backdrop-blur text-white/90 text-[10px] rounded border border-white/20 tracking-wider z-10 shadow-md">SAMPLE</div>
+        <div style="width:100%; border-radius:12px; overflow:hidden; margin-bottom:1.5rem; position:relative; background:#1a1a1a; padding:8px; border:1px solid ${isLight ? '#e5e7eb' : 'rgba(255,255,255,0.1)'}">
+            <img src="${test.previewImg}" alt="${test.title}" onerror="this.style.display='none'" style="width:100%; height:auto; max-height:40vh; object-fit:contain; opacity:0.95; display:block; margin:0 auto;">
+            <div style="position:absolute; top:12px; right:12px; padding:2px 8px; background:rgba(0,0,0,0.6); backdrop-filter:blur(4px); color:rgba(255,255,255,0.9); font-size:10px; border-radius:4px; border:1px solid rgba(255,255,255,0.2); letter-spacing:0.05em; z-index:10;">SAMPLE</div>
         </div>
     ` : '';
 
@@ -294,6 +301,12 @@ window.openTestDetailModal = function(idx) {
         </div>
     `;
 
+    // 冻结下层列表弹窗的滚动，防止滑动穿透
+    const matrixModal = document.getElementById('shared-matrix-modal');
+    if (matrixModal) matrixModal.style.overflow = 'hidden';
+    const matrixCard = document.getElementById('shared-matrix-card');
+    if (matrixCard) matrixCard.style.overflow = 'hidden';
+
     modal.style.display = 'flex';
     void modal.offsetWidth;
     modal.classList.add('show');
@@ -303,6 +316,11 @@ window.closeTestDetailModal = function() {
     const modal = document.getElementById('shared-detail-modal');
     if(modal) {
         modal.classList.remove('show');
+        // 解冻下层列表弹窗的滚动
+        const matrixCard = document.getElementById('shared-matrix-card');
+        if (matrixCard) matrixCard.style.overflow = '';
+        const matrixModal = document.getElementById('shared-matrix-modal');
+        if (matrixModal) matrixModal.style.overflow = '';
         setTimeout(() => {
             if(!modal.classList.contains('show')) modal.style.display = 'none';
         }, 400);
