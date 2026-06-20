@@ -4,8 +4,9 @@
  */
 
 const MATRIX_DATA = [
-{ id: 'city-matching-test', title: '性格城市匹配测试', subtitle: '哪座城市是你的灵魂归属？', tags: ['生活', '趣味'], developed: true , desc: '<p class="mb-2"><b class="text-white">【测评简介】</b><br>每个人都有属于自己的“能量城市”。在适合的城市生活，你会感到如鱼得水。</p><p><b class="text-white">【评估维度】</b><br>生活节奏偏好、社交距离需求、气候适应性、文化包容度。</p>', price: '0.99', oldPrice: '1.50' },
-    { id: 'emotional-friction-test', title: '深度情绪内耗测试', subtitle: '测一测你的精神内耗程度，开出一剂情绪处方', tags: ['心理健康', '专业'], developed: true , desc: '<p class="mb-2"><b class="text-white">【测评简介】</b><br>深度解析你的底层心理逻辑，找到内心真实的渴望。</p><p><b class="text-white">【如有期待】</b><br>本测试正在紧锣密鼓开发中，敬请期待。</p>', price: '0.99', oldPrice: '1.50' },
+{ id: 'city-matching-test', title: '性格城市匹配测试', subtitle: '哪座城市是你的灵魂归属？', tags: ['生活', '趣味'], developed: true , previewImg: '../city-matching-test/preview.jpg', desc: '<p class="mb-2"><b class="text-white">【测评简介】</b><br>每个人都有属于自己的“能量城市”。在适合的城市生活，你会感到如鱼得水。</p><p><b class="text-white">【评估维度】</b><br>生活节奏偏好、社交距离需求、气候适应性、文化包容度。</p>', price: '0.99', oldPrice: '1.50' },
+    { id: 'five-elements-city-test', title: '五行本命城市测算', subtitle: '勘探地气，寻找你的命定之城', tags: ['玄学', '趣味', '生活'], developed: true , previewImg: '../five-elements-city-test/preview.jpg', desc: '<p class="mb-2"><b class="text-white">【测评简介】</b><br>结合性格投射与玄学五行，为你生成一份专属的“异地迁徙调令”。</p><p><b class="text-white">【评估维度】</b><br>金(秩序)、木(生长)、水(包容)、火(激情)、土(安稳)。</p>', price: '0.99', oldPrice: '1.50' },
+    { id: 'emotional-friction-test', title: '深度情绪内耗测试', subtitle: '测一测你的精神内耗程度，开出一剂情绪处方', tags: ['心理健康', '专业'], developed: true , previewImg: '../emotional-friction-test/preview.jpg', desc: '<p class="mb-2"><b class="text-white">【测评简介】</b><br>深度解析你的底层心理逻辑，找到内心真实的渴望。</p><p><b class="text-white">【如有期待】</b><br>本测试正在紧锣密鼓开发中，敬请期待。</p>', price: '0.99', oldPrice: '1.50' },
     { id: 'scl90', title: 'SCL-90 心理健康测评', subtitle: '国际通用 · 全面心理体检', tags: ['心理健康', '专业'], developed: false, hot: true , desc: '<p class="mb-2"><b class="text-white">【测评简介】</b><br>国际通用的心理健康“体检表”，广泛应用于医疗与心理咨询领域。</p><p><b class="text-white">【评估维度】</b><br>涵盖躯体化、强迫、人际敏感、抑郁、焦虑、敌对、恐怖、偏执、精神病性等10大核心心理指标。</p>', price: '0.99', oldPrice: '1.50' },
     { id: 'love_possession', title: '恋爱占有欲测试', subtitle: '你的爱是由于不安还是深情？', tags: ['恋爱', '情感'], developed: false, hot: true , desc: '<p class="mb-2"><b class="text-white">【测评简介】</b><br>爱一个人就想占有TA？适度的占有欲是爱的表现，过度的占有欲则是关系的毒药。</p><p><b class="text-white">【评估维度】</b><br>占有欲强度、情感安全感、控制倾向、独立性需求。</p>', price: '0.99', oldPrice: '1.50' },
     { id: 'mbti_16', title: 'MBTI 16型人格测试', subtitle: '探索你的核心性格代码', tags: ['人格', 'MBTI'], developed: false , desc: '<p class="mb-2"><b class="text-white">【测评简介】</b><br>全球最流行的性格测试工具，帮你找到自己在生活、工作、恋爱中的“出厂设置”。</p><p><b class="text-white">【评估维度】</b><br>E/I (外向/内向)、S/N (实感/直觉)、T/F (理智/情感)、J/P (判断/感知)。</p>', price: '0.99', oldPrice: '1.50' },
@@ -40,8 +41,8 @@ function initTestMatrix({ containerId, currentId, theme = 'dark' }) {
     // 1. 生成呼出按钮
     const isLight = theme === 'light';
     const btnClass = isLight 
-        ? "w-full bg-[#1a1a1a] text-white py-4 rounded font-bold tracking-widest hover:bg-black active:scale-[0.98] transition-transform flex justify-center items-center gap-2 mt-6"
-        : "w-full py-4 text-[15px] font-bold text-white bg-white/10 border border-white/20 rounded-full hover:bg-white/20 transition-all flex justify-center items-center gap-2 active:scale-[0.97] mt-6";
+        ? "w-full bg-[#1a1a1a] text-white py-4 rounded font-bold tracking-widest hover:bg-black active:scale-[0.98] transition-transform flex justify-center items-center gap-2 mt-4 shadow-md"
+        : "w-full py-4 text-[15px] font-bold text-white bg-white/10 border border-white/20 rounded-full hover:bg-white/20 transition-all flex justify-center items-center gap-2 active:scale-[0.97] mt-4";
     
     const btnHtml = `
         <button onclick="openMatrixModal()" class="${btnClass}">
@@ -77,14 +78,28 @@ function initTestMatrix({ containerId, currentId, theme = 'dark' }) {
         };
 
         let listHtml = '';
+
+        // Map original index
+        const rawDisplayData = MATRIX_DATA.map((test, index) => ({ test, originalIndex: index }));
         
-        // Map original index and sort to put current test at the top
-        const displayData = MATRIX_DATA.map((test, index) => ({ test, originalIndex: index }));
-        displayData.sort((a, b) => {
-            if (a.test.id === currentId) return -1;
-            if (b.test.id === currentId) return 1;
-            return 0;
+        let currentTest = null;
+        let emotionalTest = null;
+        let others = [];
+
+        rawDisplayData.forEach(item => {
+            if (item.test.id === currentId) {
+                currentTest = item;
+            } else if (item.test.id === 'emotional-friction-test') {
+                emotionalTest = item;
+            } else {
+                others.push(item);
+            }
         });
+
+        const displayData = [];
+        if (currentTest) displayData.push(currentTest);
+        if (emotionalTest) displayData.push(emotionalTest);
+        displayData.push(...others);
         
         displayData.forEach((item, displayIdx) => {
             const test = item.test;
@@ -243,6 +258,13 @@ window.openTestDetailModal = function(idx) {
     // Add theme class for CSS desc overrides
     content.className = `flex flex-col hide-scrollbar pb-4 px-1 ${isLight ? 'theme-light' : 'theme-dark'}`;
 
+    const imgHtml = test.previewImg ? `
+        <div class="w-full rounded-xl overflow-hidden mb-8 relative bg-[#1a1a1a] shadow-inner border ${isLight ? 'border-gray-200' : 'border-white/10'} p-2">
+            <img src="${test.previewImg}" alt="${test.title}" onerror="this.style.display='none'" class="w-full h-auto max-h-[50vh] object-contain opacity-95 mx-auto">
+            <div class="absolute top-4 right-4 px-2 py-0.5 bg-black/60 backdrop-blur text-white/90 text-[10px] rounded border border-white/20 tracking-wider z-10 shadow-md">SAMPLE</div>
+        </div>
+    ` : '';
+
     content.innerHTML = `
         <div class="flex gap-2 mb-4">
             ${test.tags.map(t => `<span class="${tagClass}">${t}</span>`).join('')}
@@ -253,6 +275,8 @@ window.openTestDetailModal = function(idx) {
         <div class="${boxClass} detail-desc text-[13px] leading-relaxed">
             ${test.desc}
         </div>
+
+        ${imgHtml}
 
         <div class="flex items-center justify-between mt-auto">
             <div class="flex flex-col">

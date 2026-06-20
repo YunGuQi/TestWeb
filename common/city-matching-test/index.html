@@ -108,9 +108,9 @@
             <p class="font-ticket text-sm opacity-70 mb-8 uppercase tracking-widest">One-way Ticket to your soul</p>
             
             <div class="text-left w-full bg-black/5 p-4 rounded text-sm text-gray-600 mb-8 font-ticket leading-relaxed">
-                > 目的地：未知<br>
-                > 乘客：你<br>
-                > 启程时间：现在<br><br>
+                > DESTINATION: UNKNOWN<br>
+                > PASSENGER: YOU<br>
+                > DEPARTURE: NOW<br><br>
                 回答20个极其真实的生存哲学问题，获取你的专属单程车票。寻找全国34个省份中最懂你的那座城。
             </div>
 
@@ -118,9 +118,14 @@
                 开始检票 [CHECK-IN]
             </button>
             
-            <button id="history-btn" onclick="openHistoryModal()" class="w-full mt-4 bg-transparent border border-gray-400 text-gray-600 py-3 rounded font-bold tracking-widest hover:bg-gray-200 active:scale-[0.98] transition-transform hidden">
-                历史车票 [HISTORY]
-            </button>
+            <div class="flex justify-center gap-6 w-full mt-6">
+                <button onclick="if(window.openMatrixModal) openMatrixModal();" class="text-xs text-gray-500 hover:text-gray-800 transition-colors tracking-widest underline underline-offset-4 font-ticket">
+                    探索其他测试
+                </button>
+                <button id="history-btn" onclick="openHistoryModal()" class="hidden text-xs text-gray-500 hover:text-gray-800 transition-colors tracking-widest underline underline-offset-4 font-ticket">
+                    历史车票记录
+                </button>
+            </div>
         </div>
     </section>
 
@@ -137,6 +142,12 @@
 
         <div id="options-list" class="w-full flex flex-col gap-4">
             <!-- options generated here -->
+        </div>
+
+        <div class="mt-8 flex justify-between items-center">
+            <button id="prev-btn" onclick="prevQuestion()" class="text-sm text-gray-500 hover:text-black transition-colors tracking-widest underline underline-offset-4 hidden">
+                上一题
+            </button>
         </div>
     </section>
 
@@ -206,8 +217,8 @@
             <!-- Cross-promotion section -->
             <div id="test-matrix-container" class="w-full"></div>
 
-            <button onclick="backToHome()" class="w-full bg-transparent border border-gray-400 text-gray-600 py-4 rounded font-bold tracking-widest hover:bg-gray-200 active:scale-[0.98] transition-transform">
-                返回首页 / 历史车票
+            <button onclick="backToHome()" class="w-full text-center text-xs text-gray-500 hover:text-gray-800 transition-colors tracking-widest underline underline-offset-4 py-2 font-ticket">
+                重新启程
             </button>
         </div>
     </section>
@@ -311,6 +322,7 @@
         let activeQuestions = [];
         let currentIndex = 0;
         let scores = { p:0, b:0, r:0, t:0 };
+        let selectedHistory = [];
 
         // 随机挑选20题
         function initQuestions() {
@@ -318,12 +330,26 @@
             activeQuestions = shuffled.slice(0, 20);
         }
 
+        function switchPage(pageId) {
+            document.querySelectorAll('.page-section').forEach(p => p.classList.remove('active'));
+            document.getElementById(pageId).classList.add('active');
+            
+            const hashMap = {
+                'landing-page': '#landing',
+                'quiz-page': '#quiz',
+                'result-page': '#result'
+            };
+            if (hashMap[pageId] && window.location.hash !== hashMap[pageId]) {
+                history.pushState(null, '', hashMap[pageId]);
+            }
+        }
+
         function startQuiz() {
             initQuestions();
             currentIndex = 0;
             scores = { p:0, b:0, r:0, t:0 };
-            document.getElementById('landing-page').classList.remove('active');
-            document.getElementById('quiz-page').classList.add('active');
+            selectedHistory = [];
+            switchPage('quiz-page');
             renderQuestion();
         }
 
@@ -341,17 +367,37 @@
                     B. ${q.opt2}
                 </button>
             `;
+
+            const prevBtn = document.getElementById('prev-btn');
+            if (prevBtn) {
+                if (currentIndex > 0) {
+                    prevBtn.classList.remove('hidden');
+                } else {
+                    prevBtn.classList.add('hidden');
+                }
+            }
         }
 
         function answer(val) {
             const dim = activeQuestions[currentIndex].dim;
             scores[dim] += val;
+            selectedHistory.push(val);
             
             currentIndex++;
             if (currentIndex < activeQuestions.length) {
                 renderQuestion();
             } else {
                 calculateResult();
+            }
+        }
+
+        function prevQuestion() {
+            if (currentIndex > 0) {
+                currentIndex--;
+                const lastVal = selectedHistory.pop();
+                const dim = activeQuestions[currentIndex].dim;
+                scores[dim] -= lastVal;
+                renderQuestion();
             }
         }
 
@@ -410,8 +456,7 @@
             currentResultCity = city;
             currentResultDims = dims;
             
-            document.getElementById('quiz-page').classList.remove('active');
-            document.getElementById('result-page').classList.add('active');
+            switchPage('result-page');
 
             document.getElementById('r-city').textContent = city.city;
             document.getElementById('r-province').textContent = city.province;
@@ -528,8 +573,7 @@
         });
 
         function backToHome() {
-            document.getElementById('result-page').classList.remove('active');
-            document.getElementById('landing-page').classList.add('active');
+            switchPage('landing-page');
             loadHistory();
             window.scrollTo(0, 0);
         }
@@ -556,6 +600,35 @@
                 alert('保存失败，请截图保存');
             });
         }
+
+        // SPA Routing / Back Button Interception
+        window.addEventListener('DOMContentLoaded', () => {
+            if (!window.location.hash) {
+                history.replaceState(null, '', '#landing');
+            }
+        });
+
+        window.addEventListener('popstate', (e) => {
+            const hash = window.location.hash;
+            const quizPage = document.getElementById('quiz-page');
+            const resultPage = document.getElementById('result-page');
+            
+            if (quizPage && quizPage.classList.contains('active')) {
+                // If on quiz page and pressed back
+                if (currentIndex > 0) {
+                    prevQuestion();
+                    // Trap the user in quiz page hash
+                    history.pushState(null, '', '#quiz');
+                } else {
+                    switchPage('landing-page');
+                }
+            } else if (resultPage && resultPage.classList.contains('active')) {
+                // If on result page and pressed back
+                switchPage('landing-page');
+            } else {
+                switchPage('landing-page');
+            }
+        });
     </script>
 </body>
 </html>

@@ -166,10 +166,14 @@
                         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
                     </div>
                 </button>
-                <div id="history-container" class="text-center mb-6 hidden">
-                    <button id="history-btn" class="text-sm font-medium text-gray-500 hover:text-cyberblue transition-colors inline-flex items-center gap-1.5" onclick="openHistoryModal()">
+                <div class="flex items-center justify-center gap-8 mb-6">
+                    <button onclick="if(window.openMatrixModal) openMatrixModal();" class="text-sm font-medium text-gray-500 hover:text-cyberblue transition-colors inline-flex items-center gap-1.5">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+                        探索其他测试
+                    </button>
+                    <button id="history-container" class="hidden text-sm font-medium text-gray-500 hover:text-cyberblue transition-colors inline-flex items-center gap-1.5" onclick="openHistoryModal()">
                         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                        查看历史诊断记录
+                        查看历史诊断
                     </button>
                 </div>
                 <p class="text-xs text-gray-600 text-center uppercase tracking-widest font-mono">本测评仅供情绪状态参考 · 非医疗诊断</p>
@@ -193,6 +197,12 @@
                 </h2>
                 <div id="options-list" class="flex flex-col gap-4 mt-auto mb-10">
                     <!-- Options injected via JS -->
+                </div>
+                
+                <div class="mt-4 mb-8 flex justify-between items-center">
+                    <button id="prev-btn" onclick="prevQuestion()" class="text-sm text-gray-500 hover:text-white transition-colors tracking-widest underline underline-offset-4 hidden">
+                        上一题
+                    </button>
                 </div>
             </div>
         </section>
@@ -235,7 +245,7 @@
                     <!-- Section Divider -->
                     <div id="test-matrix-container" class="w-full"></div>
 
-                    <button id="restart-btn" class="w-full py-4 text-sm font-semibold text-gray-500 border border-transparent rounded-full hover:bg-white/5 transition-colors active:scale-[0.97]">
+                    <button id="restart-btn" class="w-full text-center text-xs text-gray-500 hover:text-white transition-colors tracking-widest underline underline-offset-4 py-2 mt-2">
                         重新测试
                     </button>
                 </div>
@@ -389,6 +399,15 @@
                 
                 toEl.classList.add('active');
                 gsap.set(toEl, { opacity: 0, y: 40, filter: "blur(12px)" });
+                
+                const hashMap = {
+                    'landing': '#landing',
+                    'quiz': '#quiz',
+                    'result': '#result'
+                };
+                if (hashMap[toKey] && window.location.hash !== hashMap[toKey]) {
+                    history.pushState(null, '', hashMap[toKey]);
+                }
             }
         });
         
@@ -406,6 +425,7 @@
     function startQuiz() {
         currentQuestionIndex = 0;
         totalScore = 0;
+        selectedHistory = [];
         transitionPage('landing', 'quiz', showQuestion);
     }
 
@@ -426,6 +446,15 @@
         const qText = document.getElementById('question-text');
         const optionsList = document.getElementById('options-list');
         
+        const prevBtn = document.getElementById('prev-btn');
+        if (prevBtn) {
+            if (currentQuestionIndex > 0) {
+                prevBtn.classList.remove('hidden');
+            } else {
+                prevBtn.classList.add('hidden');
+            }
+        }
+
         gsap.to(qText, { opacity: 0, y: 15, filter: "blur(4px)", duration: 0.3, onComplete: () => {
             qText.textContent = q.text;
             gsap.to(qText, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.6, ease: customEase });
@@ -467,6 +496,7 @@
         gsap.to(siblings, { opacity: 0.3, scale: 0.98, duration: 0.4, ease: customEase });
         
         totalScore += score;
+        selectedHistory.push(score);
         
         setTimeout(() => {
             if (currentQuestionIndex < questions.length - 1) {
@@ -475,7 +505,16 @@
             } else {
                 generateResult('quiz', true);
             }
-        }, 500);
+        }, 600);
+    }
+
+    function prevQuestion() {
+        if (currentQuestionIndex > 0) {
+            currentQuestionIndex--;
+            const lastScore = selectedHistory.pop();
+            totalScore -= lastScore;
+            showQuestion();
+        }
     }
 
     function generateResult(fromPage = 'quiz', isNewRun = false) {
@@ -656,6 +695,37 @@
         if (e && e.target !== modal && !e.target.closest('.modal-close')) return;
         modal.classList.remove('show');
     }
+
+    // SPA Routing / Back Button Interception
+    window.addEventListener('DOMContentLoaded', () => {
+        if (!window.location.hash) {
+            history.replaceState(null, '', '#landing');
+        }
+    });
+
+    window.addEventListener('popstate', (e) => {
+        const hash = window.location.hash;
+        const quizPage = document.getElementById('quiz-page');
+        const resultPage = document.getElementById('result-page');
+        
+        if (quizPage && quizPage.classList.contains('active')) {
+            // If on quiz page and pressed back
+            if (currentQuestionIndex > 0) {
+                prevQuestion();
+                // Trap the user in quiz page hash
+                history.pushState(null, '', '#quiz');
+            } else {
+                transitionPage('quiz', 'landing');
+            }
+        } else if (resultPage && resultPage.classList.contains('active')) {
+            // If on result page and pressed back
+            transitionPage('result', 'landing');
+        } else {
+            // Assuming landing
+            if (quizPage.classList.contains('active')) transitionPage('quiz', 'landing');
+            else if (resultPage.classList.contains('active')) transitionPage('result', 'landing');
+        }
+    });
     </script>
 </body>
 </html>

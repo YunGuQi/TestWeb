@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>地气勘探局 · 迁徙调令</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 农历阳历转换库 -->
+    <script src="https://cdn.jsdelivr.net/npm/lunar-javascript/lunar.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'paper': '#f0ebe1',
+                        'ink': '#1a1a1a',  
+                        'stamp': '#ab2828',
+                        'metal': '#949494', 
+                        'wood': '#5b7051',  
+                        'water': '#364f6b', 
+                        'fire': '#a33b3b',  
+                        'earth': '#8f7754', 
+                    },
+                    fontFamily: {
+                        'serif': ['"Noto Serif SC"', '"Songti SC"', '"SimSun"', 'serif'],
+                        'sans': ['"PingFang SC"', '"Microsoft YaHei"', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- html2canvas -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    
+    <style>
+        body {
+            background-color: #f0ebe1;
+            color: #1a1a1a;
+            font-family: 'Noto Serif SC', 'Songti SC', 'SimSun', serif;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.08'/%3E%3C/svg%3E");
+            overscroll-behavior-y: none;
+        }
+
+        .vertical-text {
+            writing-mode: vertical-rl;
+            text-orientation: upright;
+            letter-spacing: 0.2em;
+        }
+
+        .hover-line-btn {
+            position: relative;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .hover-line-btn::after {
+            content: '';
+            position: absolute;
+            left: 0; bottom: 0; width: 0; height: 1px;
+            background-color: #1a1a1a;
+            transition: width 0.3s ease;
+        }
+        .hover-line-btn:hover::after { width: 100%; }
+
+        .active-press:active { transform: scale(0.98) translateY(1px); }
+
+        .stamp-vintage {
+            border: 2px solid #ab2828;
+            color: #ab2828;
+            font-weight: 900;
+            opacity: 0.85;
+            mix-blend-mode: multiply;
+            transform: rotate(-10deg);
+        }
+
+        .fade-enter { animation: fadeEnter 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        @keyframes fadeEnter { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
+        @keyframes spin-slow { 100% { transform: rotate(360deg); } }
+        @keyframes spin-slow-reverse { 100% { transform: rotate(-360deg); } }
+        
+        .compass-outer { animation: spin-slow 40s linear infinite; }
+        .compass-inner { animation: spin-slow-reverse 30s linear infinite; }
+        
+        @keyframes needle-shake {
+            0% { transform: rotate(0deg); }
+            25% { transform: rotate(2deg); }
+            50% { transform: rotate(-1.5deg); }
+            75% { transform: rotate(1deg); }
+            100% { transform: rotate(0deg); }
+        }
+        .needle-animate {
+            transform-origin: bottom center;
+            animation: needle-shake 0.5s ease-in-out infinite;
+        }
+
+        ::-webkit-scrollbar { display: none; }
+        
+        select {
+            appearance: none;
+            background: transparent;
+            border-bottom: 1px solid rgba(26,26,26,0.3);
+            border-radius: 0;
+            padding: 8px 0;
+            font-family: inherit;
+            color: #1a1a1a;
+            outline: none;
+            cursor: pointer;
+            transition: border-color 0.3s;
+        }
+        select:focus { border-color: #1a1a1a; }
+        
+        /* Modal Animation */
+        .modal-enter { animation: modalFade 0.3s ease forwards; }
+        @keyframes modalFade { from { opacity: 0; backdrop-filter: blur(0px); } to { opacity: 1; backdrop-filter: blur(4px); } }
+    </style>
+</head>
+<body class="min-h-screen flex justify-center">
+
+    <div id="app" class="w-full max-w-md min-h-screen relative flex flex-col border-x border-ink/5">
+        
+        <!-- ================= 1. LANDING PAGE ================= -->
+        <div id="landing-page" class="flex-1 flex flex-col p-8 fade-enter">
+            <div class="flex justify-between items-start mt-12 mb-16">
+                <div class="w-8 h-8 rounded-full border border-ink flex items-center justify-center text-xs">局</div>
+                <h1 class="vertical-text text-4xl font-black text-ink">地气勘探局</h1>
+                <div class="vertical-text text-xs text-ink/60 mt-12 tracking-widest font-sans">
+                    绝密档案 · 异地迁徙测算
+                </div>
+            </div>
+            
+            <div class="mt-auto mb-12">
+                <p class="text-[13px] leading-loose text-ink/80 text-justify mb-8">
+                    当你在当前城市感到疲惫、停滞不前时，并非你不努力，而是你的「灵魂五行」与此地的「地气」发生了冲突。<br><br>
+                    开启勘探，我们将为你寻得命定之城，并下发调令。
+                </p>
+                <button onclick="navTo('bazi-page')" class="group flex items-center justify-between w-full border-b border-ink pb-4 hover-line-btn active-press">
+                    <span class="text-xl font-bold tracking-widest">开启勘探</span>
+                    <span class="text-2xl group-hover:translate-x-2 transition-transform">→</span>
+                </button>
+                <div class="mt-6 flex items-center justify-center gap-8">
+                    <button onclick="if(window.openMatrixModal) openMatrixModal(); else console.warn('Matrix module not loaded');" class="text-xs text-ink/50 hover:text-ink transition-colors tracking-widest underline underline-offset-4">探索其他测试</button>
+                    <button id="history-entry" onclick="openHistoryModal()" class="hidden text-xs text-ink/50 hover:text-ink transition-colors tracking-widest underline underline-offset-4">调取历史档案</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= 2. BAZI INPUT PAGE ================= -->
+        <div id="bazi-page" class="hidden flex-1 flex flex-col p-8 fade-enter">
+            <div class="mb-12">
+                <div class="text-[10px] text-ink/50 uppercase tracking-widest font-sans mb-2">Step 01</div>
+                <h2 class="text-3xl font-bold tracking-widest mb-4">输入生辰</h2>
+                <p class="text-xs text-ink/60">测算需先立八字根基，请提供基本降生信息（阳历或农历皆可，直觉为准）。</p>
+            </div>
+
+            <div class="space-y-6 flex-1">
+                <div class="flex items-center gap-4 mb-2">
+                    <label class="text-xs text-ink/50">历法 (Calendar)</label>
+                    <div class="flex border border-ink rounded overflow-hidden text-sm">
+                        <button id="cal-solar" onclick="setCalendar('solar')" class="px-4 py-1 bg-ink text-paper transition-colors">阳历</button>
+                        <button id="cal-lunar" onclick="setCalendar('lunar')" class="px-4 py-1 bg-transparent text-ink transition-colors">农历</button>
+                    </div>
+                </div>
+
+                <div class="flex flex-col">
+                    <label class="text-xs text-ink/50 mb-1">年份 (Year)</label>
+                    <select id="bazi-year" class="text-lg font-bold"></select>
+                </div>
+                <div class="flex flex-col">
+                    <label class="text-xs text-ink/50 mb-1">月份 (Month)</label>
+                    <select id="bazi-month" class="text-lg font-bold"></select>
+                </div>
+                
+                <div class="flex flex-col">
+                    <label class="text-xs text-ink/50 mb-1">日期 (Day)</label>
+                    <select id="bazi-day" class="text-lg font-bold"></select>
+                </div>
+                <div class="flex flex-col">
+                    <label class="text-xs text-ink/50 mb-1">时辰 (Time)</label>
+                    <select id="bazi-time" class="text-lg font-bold">
+                        <option value="子">子时 (23:00 - 01:00)</option>
+                        <option value="丑">丑时 (01:00 - 03:00)</option>
+                        <option value="寅">寅时 (03:00 - 05:00)</option>
+                        <option value="卯">卯时 (05:00 - 07:00)</option>
+                        <option value="辰">辰时 (07:00 - 09:00)</option>
+                        <option value="巳">巳时 (09:00 - 11:00)</option>
+                        <option value="午">午时 (11:00 - 13:00)</option>
+                        <option value="未">未时 (13:00 - 15:00)</option>
+                        <option value="申">申时 (15:00 - 17:00)</option>
+                        <option value="酉">酉时 (17:00 - 19:00)</option>
+                        <option value="戌">戌时 (19:00 - 21:00)</option>
+                        <option value="亥">亥时 (21:00 - 23:00)</option>
+                        <option value="未知">不清楚 (随机补齐)</option>
+                    </select>
+                </div>
+            </div>
+
+            <button onclick="calculateBaziAndNav()" class="w-full py-4 border border-ink text-ink font-bold tracking-widest mt-8 active-press hover:bg-ink hover:text-paper transition-colors">
+                封存档案，进入勘探
+            </button>
+            <button onclick="openHistoryModal()" class="w-full text-center text-xs text-ink/50 hover:text-ink transition-colors tracking-widest underline underline-offset-4 py-2 mt-4 font-receipt">
+                查看历史档案
+            </button>
+        </div>
+
+        <!-- ================= 3. QUIZ PAGE ================= -->
+        <div id="quiz-page" class="hidden flex-1 flex flex-col p-8 pt-12 fade-enter">
+            <div class="flex justify-between items-end border-b border-ink/20 pb-4 mb-8">
+                <span class="text-[10px] text-ink/50 font-sans tracking-widest">心相测试</span>
+                <span id="question-counter" class="text-xl font-bold font-serif">壹 / 拾</span>
+            </div>
+            
+            <h2 id="question-text" class="text-xl font-bold mb-10 leading-relaxed"></h2>
+            
+            <div id="options-container" class="space-y-2 flex-1">
+                <!-- 选项动态渲染 -->
+            </div>
+            
+            <div class="mt-8 flex justify-between items-center">
+                <button id="prev-btn" onclick="prevQuestion()" class="text-sm text-ink/50 hover:text-ink transition-colors tracking-widest underline underline-offset-4 hidden">
+                    上一题
+                </button>
+            </div>
+        </div>
+
+        <!-- ================= 4. LOADING PAGE ================= -->
+        <div id="loading-page" class="hidden flex-1 flex flex-col justify-center items-center p-8 fade-enter relative overflow-hidden">
+            <div class="relative w-64 h-64 mb-12 flex items-center justify-center">
+                <svg class="absolute inset-0 w-full h-full text-ink opacity-80 compass-outer" viewBox="0 0 200 200">
+                    <circle cx="100" cy="100" r="95" fill="none" stroke="currentColor" stroke-width="1"/>
+                    <circle cx="100" cy="100" r="85" fill="none" stroke="currentColor" stroke-width="0.5"/>
+                    <g font-size="6" fill="currentColor" text-anchor="middle">
+                        <text x="100" y="12">子</text><text x="144" y="24">丑</text>
+                        <text x="176" y="56">寅</text><text x="188" y="102">卯</text>
+                        <text x="176" y="148">辰</text><text x="144" y="180">巳</text>
+                        <text x="100" y="192">午</text><text x="56" y="180">未</text>
+                        <text x="24" y="148">申</text><text x="12" y="102">酉</text>
+                        <text x="24" y="56">戌</text><text x="56" y="24">亥</text>
+                    </g>
+                </svg>
+                <svg class="absolute inset-4 w-[calc(100%-2rem)] h-[calc(100%-2rem)] text-ink opacity-60 compass-inner" viewBox="0 0 200 200">
+                    <circle cx="100" cy="100" r="90" fill="none" stroke="currentColor" stroke-dasharray="2 4" stroke-width="1.5"/>
+                    <g font-size="10" fill="currentColor" text-anchor="middle">
+                        <text x="100" y="20">☰</text><text x="156" y="43">☱</text>
+                        <text x="180" y="103">☲</text><text x="156" y="163">☳</text>
+                        <text x="100" y="186">☴</text><text x="44" y="163">☵</text>
+                        <text x="20" y="103">☶</text><text x="44" y="43">☷</text>
+                    </g>
+                </svg>
+                <div class="absolute w-1 h-16 bg-stamp rounded-full -mt-16 needle-animate" style="box-shadow: 0 0 10px rgba(171,40,40,0.5);"></div>
+                <div class="absolute w-3 h-3 bg-ink rounded-full z-10 border-2 border-paper"></div>
+            </div>
+            
+            <div class="text-center">
+                <div id="loading-text" class="text-xl tracking-[0.3em] font-bold h-8">拨动命盘</div>
+                <div class="text-[10px] text-ink/40 mt-2 font-sans">EARTH QI SYNC IN PROGRESS...</div>
+            </div>
+        </div>
+
+        <!-- ================= 5. RESULT PAGE ================= -->
+        <div id="result-page" class="hidden flex-col items-center pb-24 w-full bg-paper min-h-screen">
+            
+            <div id="poster-area" class="w-full relative px-6 py-10 bg-paper">
+                <div class="flex flex-col items-center mb-8 border-b border-ink/20 pb-6 relative">
+                    <div class="text-stamp font-bold tracking-[0.5em] text-sm mb-1">【绝密】</div>
+                    <h2 class="text-3xl font-black text-ink tracking-widest mb-3">异地迁徙调令</h2>
+                    <div class="w-16 h-0.5 bg-stamp mb-2"></div>
+                    <div class="text-[10px] font-sans text-ink/50">编号：<span id="doc-id"></span></div>
+                </div>
+
+                <div class="mb-10 pl-4 border-l-2 border-ink/30 relative">
+                    <div class="absolute -left-[5px] top-0 w-2 h-2 rounded-full bg-ink"></div>
+                    <p class="text-sm text-ink/50 mb-1">致：</p>
+                    <p class="text-lg font-bold mb-4">被困在原地的灵魂</p>
+                    <div id="result-desc" class="text-[13px] leading-loose text-ink/80 text-justify"></div>
+                </div>
+
+                <!-- 调往城市结论 -->
+                <div class="flex flex-col items-center mb-10">
+                    <div class="text-[10px] px-2 mb-1 tracking-widest text-ink/60">特批调往</div>
+                    <div id="result-city" class="text-4xl font-black tracking-widest px-4 py-2 border-y-2 border-ink"></div>
+                </div>
+
+                <!-- 雷达罗盘区 -->
+                <div class="relative w-full aspect-square flex items-center justify-center mb-6">
+                    <svg class="absolute inset-0 w-full h-full text-ink" viewBox="0 0 200 200">
+                        <!-- 底图五边形网格 -->
+                        <polygon points="100,10 185.6,72.2 152.9,172.8 47.1,172.8 14.4,72.2" fill="none" stroke="currentColor" stroke-width="1" opacity="0.15"/>
+                        <polygon points="100,55 142.8,86.1 126.4,136.4 73.6,136.4 57.2,86.1" fill="none" stroke="currentColor" stroke-width="1" stroke-dasharray="2 2" opacity="0.1"/>
+                        
+                        <!-- 放射状五行线：-90°(火), -18°(土), 54°(金), 126°(水), 198°(木) -->
+                        <line x1="100" y1="100" x2="100" y2="10" stroke="currentColor" stroke-dasharray="2 4" opacity="0.15"/>
+                        <line x1="100" y1="100" x2="185.6" y2="72.2" stroke="currentColor" stroke-dasharray="2 4" opacity="0.15"/>
+                        <line x1="100" y1="100" x2="152.9" y2="172.8" stroke="currentColor" stroke-dasharray="2 4" opacity="0.15"/>
+                        <line x1="100" y1="100" x2="47.1" y2="172.8" stroke="currentColor" stroke-dasharray="2 4" opacity="0.15"/>
+                        <line x1="100" y1="100" x2="14.4" y2="72.2" stroke="currentColor" stroke-dasharray="2 4" opacity="0.15"/>
+                        
+                        <!-- 五行雷达图 (提前渲染使其处于底层) -->
+                        <polygon id="radar-shape" points="100,100 100,100 100,100 100,100 100,100" fill="rgba(171,40,40,0.25)" stroke="#ab2828" stroke-width="2" />
+                        <circle cx="100" cy="100" r="2" fill="#ab2828" />
+
+                        <!-- 标签 (滞后渲染使其处于顶层，增加背景发光避免盖住) -->
+                        <style>
+                            .label-halo { text-shadow: 0 0 4px #f0ebe1, 0 0 2px #f0ebe1, 1px 1px 0 #f0ebe1, -1px -1px 0 #f0ebe1; }
+                        </style>
+                        <text id="label-fire" x="100" y="24" class="label-halo" font-size="8" font-weight="bold" text-anchor="middle" fill="#1a1a1a" opacity="0.9">火</text>
+                        <text id="label-earth" x="168" y="78" class="label-halo" font-size="8" font-weight="bold" text-anchor="middle" fill="#1a1a1a" opacity="0.9">土</text>
+                        <text id="label-metal" x="142" y="165" class="label-halo" font-size="8" font-weight="bold" text-anchor="middle" fill="#1a1a1a" opacity="0.9">金</text>
+                        <text id="label-water" x="58" y="165" class="label-halo" font-size="8" font-weight="bold" text-anchor="middle" fill="#1a1a1a" opacity="0.9">水</text>
+                        <text id="label-wood" x="32" y="78" class="label-halo" font-size="8" font-weight="bold" text-anchor="middle" fill="#1a1a1a" opacity="0.9">木</text>
+                    </svg>
+                    
+                    <div class="absolute bottom-4 right-4 stamp-vintage p-2 text-center text-[10px] leading-tight rotate-12 backdrop-blur-sm bg-paper/30">
+                        勘探局<br>执行盖章
+                    </div>
+                </div>
+
+                <div class="text-center text-[9px] text-ink/30 font-sans tracking-widest pt-4 border-t border-ink/10">
+                    地气勘探局 · <span id="current-date"></span> 签发
+                </div>
+            </div>
+
+            <div class="flex flex-col gap-3 w-full px-6 mt-4 z-20">
+                <button onclick="savePoster()" class="w-full py-4 bg-ink text-paper font-bold tracking-widest active-press flex justify-center items-center shadow-xl">
+                    存档并下发调令
+                </button>
+                
+                <div id="test-matrix-container" class="w-full"></div>
+
+                <button onclick="location.reload()" class="w-full text-center text-xs text-ink/60 hover:text-ink transition-colors tracking-widest underline underline-offset-4 py-2 mt-2">
+                    重新勘探
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ================= 6. HISTORY MODAL ================= -->
+    <div id="history-modal" class="hidden fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-ink/60 modal-enter">
+        <div class="w-full max-w-md bg-paper max-h-[80vh] overflow-y-auto border-t sm:border border-ink shadow-2xl p-6 rounded-t-2xl sm:rounded-2xl">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-bold tracking-widest">历史勘探档案</h3>
+                <button onclick="closeHistoryModal()" class="text-ink/50 hover:text-ink p-2 text-2xl leading-none">&times;</button>
+            </div>
+            <div id="history-list-container" class="space-y-3">
+                <!-- 历史列表动态渲染 -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 历法切换与日期重新渲染逻辑
+        let currentCalendar = 'solar';
+        const lunarMonths = ['正月','二月','三月','四月','五月','六月','七月','八月','九月','十月','冬月','腊月'];
+        const lunarDays = ['初一','初二','初三','初四','初五','初六','初七','初八','初九','初十','十一','十二','十三','十四','十五','十六','十七','十八','十九','二十','廿一','廿二','廿三','廿四','廿五','廿六','廿七','廿八','廿九','三十'];
+
+        function renderDateOptions(type, targetYear, targetMonth, targetDay) {
+            const yearSelect = document.getElementById('bazi-year');
+            const monthSelect = document.getElementById('bazi-month');
+            const daySelect = document.getElementById('bazi-day');
+            
+            yearSelect.innerHTML = '';
+            monthSelect.innerHTML = '';
+            daySelect.innerHTML = '';
+            
+            for(let i=1970; i<=2020; i++) { yearSelect.add(new Option(`${i}年`, i)); }
+            yearSelect.value = targetYear || "1995";
+            
+            for(let i=1; i<=12; i++) { 
+                const text = type === 'lunar' ? lunarMonths[i-1] : `${i}月`;
+                monthSelect.add(new Option(text, i)); 
+            }
+            monthSelect.value = targetMonth || "1";
+            
+            const dayCount = type === 'lunar' ? 30 : 31;
+            for(let i=1; i<=dayCount; i++) { 
+                const text = type === 'lunar' ? lunarDays[i-1] : `${i}日`;
+                daySelect.add(new Option(text, i)); 
+            }
+            
+            if (parseInt(targetDay) > dayCount) {
+                daySelect.value = dayCount.toString();
+            } else {
+                daySelect.value = targetDay || "1";
+            }
+        }
+
+        function setCalendar(type) {
+            if (currentCalendar === type) return;
+
+            const yearSelect = document.getElementById('bazi-year');
+            const monthSelect = document.getElementById('bazi-month');
+            const daySelect = document.getElementById('bazi-day');
+            
+            let y = parseInt(yearSelect.value || 1995);
+            let m = parseInt(monthSelect.value || 1);
+            let d = parseInt(daySelect.value || 1);
+
+            if (typeof Lunar !== 'undefined') {
+                if(currentCalendar === 'solar' && type === 'lunar') {
+                    try {
+                        const lunarDate = Lunar.fromDate(new Date(y, m - 1, d));
+                        y = lunarDate.getYear();
+                        m = Math.abs(lunarDate.getMonth());
+                        d = lunarDate.getDay();
+                    } catch(e) { console.error(e); }
+                } else if(currentCalendar === 'lunar' && type === 'solar') {
+                    try {
+                        const lunarDate = Lunar.fromYmd(y, m, d);
+                        const solarDate = lunarDate.getSolar();
+                        y = solarDate.getYear();
+                        m = solarDate.getMonth();
+                        d = solarDate.getDay();
+                    } catch(e) { console.error(e); }
+                }
+            }
+
+            currentCalendar = type;
+            if(type === 'solar') {
+                document.getElementById('cal-solar').classList.replace('bg-transparent', 'bg-ink');
+                document.getElementById('cal-solar').classList.replace('text-ink', 'text-paper');
+                document.getElementById('cal-lunar').classList.replace('bg-ink', 'bg-transparent');
+                document.getElementById('cal-lunar').classList.replace('text-paper', 'text-ink');
+            } else {
+                document.getElementById('cal-lunar').classList.replace('bg-transparent', 'bg-ink');
+                document.getElementById('cal-lunar').classList.replace('text-ink', 'text-paper');
+                document.getElementById('cal-solar').classList.replace('bg-ink', 'bg-transparent');
+                document.getElementById('cal-solar').classList.replace('text-paper', 'text-ink');
+            }
+            renderDateOptions(type, y, m, d);
+        }
+
+        const savedBazi = JSON.parse(localStorage.getItem('diqi_bazi_state') || 'null');
+        if (savedBazi) {
+            currentCalendar = savedBazi.calendar;
+            if(currentCalendar === 'solar') {
+                document.getElementById('cal-solar').classList.replace('bg-transparent', 'bg-ink');
+                document.getElementById('cal-solar').classList.replace('text-ink', 'text-paper');
+                document.getElementById('cal-lunar').classList.replace('bg-ink', 'bg-transparent');
+                document.getElementById('cal-lunar').classList.replace('text-paper', 'text-ink');
+            } else {
+                document.getElementById('cal-lunar').classList.replace('bg-transparent', 'bg-ink');
+                document.getElementById('cal-lunar').classList.replace('text-ink', 'text-paper');
+                document.getElementById('cal-solar').classList.replace('bg-ink', 'bg-transparent');
+                document.getElementById('cal-solar').classList.replace('text-paper', 'text-ink');
+            }
+            renderDateOptions(currentCalendar, savedBazi.year, savedBazi.month, savedBazi.day);
+            document.getElementById('bazi-time').value = savedBazi.time;
+        } else {
+            renderDateOptions('solar', 1995, 1, 1);
+        }
+
+        document.getElementById('current-date').innerText = new Date().toLocaleDateString('zh-CN').replace(/\//g, '.');
+        document.getElementById('doc-id').innerText = `XHS-${Math.floor(Math.random()*10000).toString().padStart(4,'0')}`;
+
+        // 历史记录逻辑（支持多个）
+        window.addEventListener('DOMContentLoaded', () => {
+            const histList = JSON.parse(localStorage.getItem('diqi_history_list') || '[]');
+            if(histList.length > 0) {
+                document.getElementById('history-entry').classList.remove('hidden');
+            }
+
+            // 初始化测试矩阵，确保模态框准备就绪
+            if(window.initTestMatrix) {
+                window.initTestMatrix({
+                    containerId: 'test-matrix-container', 
+                    currentId: 'five-elements-city-test', 
+                    theme: 'light'
+                });
+            }
+        });
+
+        function openHistoryModal() {
+            const histList = JSON.parse(localStorage.getItem('diqi_history_list') || '[]');
+            const container = document.getElementById('history-list-container');
+            container.innerHTML = '';
+            
+            if(histList.length === 0) {
+                container.innerHTML = '<div class="text-center text-ink/50 py-4 text-sm">暂无历史档案</div>';
+            } else {
+                // 倒序显示，最新在前
+                histList.reverse().forEach(hist => {
+                    const btn = document.createElement('button');
+                    btn.className = 'w-full text-left p-4 border border-ink/20 hover:border-ink transition-colors group flex justify-between items-center';
+                    
+                    const dateStr = new Date(hist.timestamp).toLocaleDateString('zh-CN') + ' ' + new Date(hist.timestamp).toLocaleTimeString('zh-CN', {hour: '2-digit', minute:'2-digit'});
+                    
+                    btn.innerHTML = `
+                        <div>
+                            <div class="text-xs text-ink/50 mb-1 font-sans">${dateStr}</div>
+                            <div class="font-bold">档案编号：${hist.docId}</div>
+                            <div class="text-sm mt-1 text-stamp font-bold">最终调往：${hist.city}</div>
+                        </div>
+                        <div class="text-ink/30 group-hover:text-ink transition-colors font-sans text-xl">→</div>
+                    `;
+                    btn.onclick = () => loadHistoryRecord(hist);
+                    container.appendChild(btn);
+                });
+            }
+            
+            document.getElementById('history-modal').classList.remove('hidden');
+        }
+
+        function closeHistoryModal() {
+            document.getElementById('history-modal').classList.add('hidden');
+        }
+
+        function loadHistoryRecord(hist) {
+            closeHistoryModal();
+            scores = hist.scores;
+            document.getElementById('result-desc').innerHTML = hist.desc;
+            document.getElementById('result-city').innerText = hist.city;
+            document.getElementById('doc-id').innerText = hist.docId;
+            navTo('result-page');
+            drawRadarChart();
+        }
+
+        const elementData = {
+            '金': { cities: ['北京', '上海', '深圳', '香港', '澳门', '天津', '沈阳', '长春', '乌鲁木齐', '拉萨'], desc: '经测算，该员命盘【金气】汇聚或极度渴求。骨子里的锐利与对秩序的追求，在安逸中只会被消磨。特批调往极度慕强、效率至上的钢铁森林，唯有极致的搞钱节奏和厮杀，能治愈你的精神内耗。' },
+            '木': { cities: ['大理', '阿勒泰', '昆明', '呼和浩特', '贵阳', '南宁', '合肥', '西宁'], desc: '经测算，该员【木气】枯竭。灵魂正在钢筋水泥的格子间里加速枯萎。特批即日流放至旷野，急需极高浓度的含氧量、没有天花板的自然疗愈，以及毫无目的地的精神散步，以恢复生命力。' },
+            '水': { cities: ['广州', '杭州', '南京', '泉州', '福州', '哈尔滨', '济南', '海口', '台北'], desc: '经测算，该员【水流】停滞，神经紧绷过度。水利万物而不争，特批调往南方沿海或极具市井烟火气之地。在老街的茶香、肠粉的热气和海风中，找回生命的流动感与松弛。' },
+            '火': { cities: ['重庆', '长沙', '武汉', '南昌', '三亚', '厦门', '柳州'], desc: '经测算，该员【命格缺火】，生命体征趋于平庸，一眼望到头的生活是致命毒药。特调往火炉之城，你需要一顿爆辣的火锅、不夜城的绝对喧嚣和一次彻底的狂欢，来重新点燃心跳。' },
+            '土': { cities: ['成都', '西安', '郑州', '太原', '石家庄', '兰州', '银川'], desc: '经测算，该员【土气】流失，漂泊感过重，根系已然不稳。建议即刻调往底蕴深厚的安逸之都。你需要厚重的历史围墙和巴适到骨子里的生活节奏，来稳稳接住你所有的疲惫。' }
+        };
+
+        const questions = [
+            { text: "早晨醒来，推开窗，你最希望看到的是什么？", options: [
+                { text: "繁忙穿梭的车流与高耸入云的玻璃幕墙", element: "金" },
+                { text: "漫无边际的绿色森林与薄雾", element: "木" },
+                { text: "缓缓流淌的江水或无边的大海", element: "水" },
+                { text: "阳光刺眼，街边摊贩已经开始热气腾腾地叫卖", element: "火" },
+                { text: "一眼望不到头的平原与厚实的黄土地", element: "土" }
+            ]},
+            { text: "最近压力巨大，你幻想的“彻底崩溃前的最后一次逃亡”是？", options: [
+                { text: "找个没人的天台，整理所有的思绪，然后重新杀回战场", element: "金" },
+                { text: "买一张去野外的单程票，手机关机，直接消失", element: "木" },
+                { text: "漫无目的地坐上公交车，跟着车流漂泊，直到终点", element: "水" },
+                { text: "去蹦极或去狂嗨一整夜，把所有的情绪狠狠发泄出来", element: "火" },
+                { text: "回到老家的旧房子，吃一顿热乎饭，睡个三天三夜", element: "土" }
+            ]},
+            { text: "如果可以获得一种超能力，你希望是？", options: [
+                { text: "绝对理性：永远能在复杂局面中做出最优解", element: "金" },
+                { text: "万物沟通：能听懂植物和动物的语言", element: "木" },
+                { text: "变形水态：能融入任何环境且不被察觉", element: "水" },
+                { text: "情绪操控：能瞬间点燃自己和他人的激情", element: "火" },
+                { text: "大地重力：能让自己在任何风暴中岿然不动", element: "土" }
+            ]},
+            { text: "在社交场合中，你通常扮演什么角色？", options: [
+                { text: "控场者：把握节奏，直奔主题，不喜欢废话", element: "金" },
+                { text: "倾听者：不怎么说话，但让人感到舒服和治愈", element: "木" },
+                { text: "适应者：像水一样，跟什么样的人都能聊上几句", element: "水" },
+                { text: "气氛组：聚光灯所在，没有你场子就冷了", element: "火" },
+                { text: "定海神针：话不多，但大家遇事都爱找你商量", element: "土" }
+            ]},
+            { text: "你对“时间”的感知更偏向哪一种？", options: [
+                { text: "时间就是金钱，是衡量效率的刻度尺", element: "金" },
+                { text: "时间是年轮，是顺应四季的自然生长", element: "木" },
+                { text: "时间是一条长河，逝者如斯夫", element: "水" },
+                { text: "时间是燃烧的火柴，必须在熄灭前绽放", element: "火" },
+                { text: "时间是沉积的土壤，越久越能沉淀出价值", element: "土" }
+            ]},
+            { text: "你的直觉更倾向于哪一种颜色和材质的搭配？", options: [
+                { text: "银灰色金属与冷硬的玻璃", element: "金" },
+                { text: "原木色与粗糙的棉麻", element: "木" },
+                { text: "墨蓝色与柔软的丝绸", element: "水" },
+                { text: "绛红色与粗粝的砖石", element: "火" },
+                { text: "赭石色与带有纹理的陶土", element: "土" }
+            ]},
+            // 新增 4 道题目，凑齐 10 道
+            { text: "如果可以彻底告别现有的生活，你希望下一份工作是？", options: [
+                { text: "精英高管，掌控庞大的资金与资源流向", element: "金" },
+                { text: "植物学者，安静地在山野和花草待在一起", element: "木" },
+                { text: "自由撰稿人，永远在移动，没有固定工位", element: "水" },
+                { text: "摇滚乐手，燃烧生命，享受舞台和欢呼", element: "火" },
+                { text: "老店传人，每天重复同样但安稳的手工活", element: "土" }
+            ]},
+            { text: "最能让你感到“安全感”的场景是？", options: [
+                { text: "存款稳步增长，一切按照计划精准运行", element: "金" },
+                { text: "身边有懂你的知己，能毫无保留地分享情绪", element: "木" },
+                { text: "独自一人坐在海边，没有任何人能找到我", element: "水" },
+                { text: "身处狂热的人群中，大家一起为了同一个目标呐喊", element: "火" },
+                { text: "下大雨的周末待在自己买的房子里，裹着厚被子", element: "土" }
+            ]},
+            { text: "你最反感或者难以忍受的人性特质是？", options: [
+                { text: "软弱无能、没有上进心、做事拖泥带水", element: "金" },
+                { text: "虚伪做作、破坏规则、过度消耗别人", element: "木" },
+                { text: "控制欲极强、试图把所有人锁在固定框架里", element: "水" },
+                { text: "沉闷死板、没有一点幽默感和激情", element: "火" },
+                { text: "朝令夕改、轻浮夸张、做事毫无底线", element: "土" }
+            ]},
+            { text: "回顾你的前半生，你觉得目前最缺失的是什么？", options: [
+                { text: "绝对的权力和世俗意义上的巨大成功", element: "金" },
+                { text: "纯粹的、不带任何功利目的的爱与被爱", element: "木" },
+                { text: "挣脱一切世俗眼光、说走就走的极致自由", element: "水" },
+                { text: "一次奋不顾身、燃烧殆尽的疯狂经历", element: "火" },
+                { text: "一个永远不会背叛、稳稳扎根的避风港", element: "土" }
+            ]}
+        ];
+
+        let currentQuestion = 0;
+        let scores = { '金': 0, '木': 0, '水': 0, '火': 0, '土': 0 };
+        let selectedHistory = [];
+        const NUM_MAP = ['壹','贰','叁','肆','伍','陆','柒','捌','玖','拾','拾壹','拾贰','拾叁','拾肆','拾伍'];
+
+        function navTo(pageId) {
+            document.querySelectorAll('#app > div').forEach(el => el.classList.add('hidden'));
+            document.getElementById(pageId).classList.remove('hidden');
+            
+            // Sync hash state implicitly if navigated not via back button
+            const hashMap = {
+                'landing-page': '#landing',
+                'quiz-page': '#quiz',
+                'result-page': '#result'
+            };
+            if (hashMap[pageId] && window.location.hash !== hashMap[pageId]) {
+                history.pushState(null, '', hashMap[pageId]);
+            }
+        }
+
+        function calculateBaziAndNav() {
+            const year = parseInt(document.getElementById('bazi-year').value);
+            const month = parseInt(document.getElementById('bazi-month').value);
+            const day = parseInt(document.getElementById('bazi-day').value);
+            const timeRaw = document.getElementById('bazi-time').value;
+            let time = timeRaw;
+
+            // 保存用户输入的八字记录，下次自动回显
+            localStorage.setItem('diqi_bazi_state', JSON.stringify({
+                calendar: currentCalendar,
+                year: year,
+                month: month,
+                day: day,
+                time: timeRaw
+            }));
+
+            if(currentCalendar === 'lunar') {
+                scores['土'] += 0.2; // 微小偏移
+            }
+
+            const lastDigit = year % 10;
+            if([0,1].includes(lastDigit)) scores['金'] += 0.5;
+            else if([2,3].includes(lastDigit)) scores['水'] += 0.5;
+            else if([4,5].includes(lastDigit)) scores['木'] += 0.5;
+            else if([6,7].includes(lastDigit)) scores['火'] += 0.5;
+            else scores['土'] += 0.5;
+
+            if([1,2].includes(month)) scores['木'] += 0.5;
+            else if([4,5].includes(month)) scores['火'] += 0.5;
+            else if([7,8].includes(month)) scores['金'] += 0.5;
+            else if([10,11].includes(month)) scores['水'] += 0.5;
+            else scores['土'] += 0.5;
+
+            const dayDigit = day % 10; 
+            if([1,6].includes(dayDigit)) scores['水'] += 0.5;
+            else if([2,7].includes(dayDigit)) scores['火'] += 0.5;
+            else if([3,8].includes(dayDigit)) scores['木'] += 0.5;
+            else if([4,9].includes(dayDigit)) scores['金'] += 0.5;
+            else scores['土'] += 0.5; 
+
+            if(time === '未知') {
+                const elements = ['金','木','水','火','土'];
+                time = elements[Math.floor(Math.random() * elements.length)];
+                scores[time] += 0.5;
+            } else {
+                const timeMap = { '子':'水', '丑':'土', '寅':'木', '卯':'木', '辰':'土', '巳':'火', '午':'火', '未':'土', '申':'金', '酉':'金', '戌':'土', '亥':'水' };
+                scores[timeMap[time]] += 0.5;
+            }
+
+            navTo('quiz-page');
+            renderQuestion();
+        }
+
+        function renderQuestion() {
+            const q = questions[currentQuestion];
+            document.getElementById('question-counter').innerText = `${NUM_MAP[currentQuestion]} / 拾`;
+            
+            const qText = document.getElementById('question-text');
+            qText.innerText = q.text;
+            qText.classList.remove('fade-enter');
+            void qText.offsetWidth; 
+            qText.classList.add('fade-enter');
+
+            const prevBtn = document.getElementById('prev-btn');
+            if (currentQuestion > 0) {
+                prevBtn.classList.remove('hidden');
+            } else {
+                prevBtn.classList.add('hidden');
+            }
+
+            const optionsContainer = document.getElementById('options-container');
+            optionsContainer.innerHTML = '';
+            
+            const optionsToRender = q.options;
+
+            optionsToRender.forEach((opt, index) => {
+                const btn = document.createElement('button');
+                btn.className = `w-full text-left py-4 border-b border-ink/10 text-[14px] hover:pl-4 transition-all duration-300 fade-enter`;
+                btn.style.animationDelay = `${index * 0.1}s`;
+                btn.innerHTML = `<span class="opacity-50 mr-2 font-serif text-xs">${index+1}.</span> ${opt.text}`;
+                btn.onclick = () => selectOption(opt.element);
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        function selectOption(element) {
+            scores[element]++;
+            selectedHistory.push(element);
+            currentQuestion++;
+            
+            if (currentQuestion < questions.length) {
+                renderQuestion();
+            } else {
+                showLoading();
+            }
+        }
+
+        function prevQuestion() {
+            if (currentQuestion > 0) {
+                currentQuestion--;
+                const lastElement = selectedHistory.pop();
+                scores[lastElement]--;
+                renderQuestion();
+            }
+        }
+
+        function showLoading() {
+            navTo('loading-page');
+            const texts = ["拨动命盘", "汇聚地气", "核对八字", "签发调令"];
+            let i = 0;
+            const interval = setInterval(() => {
+                i++;
+                if (i < texts.length) {
+                    document.getElementById('loading-text').innerText = texts[i];
+                } else {
+                    clearInterval(interval);
+                    generateResult();
+                }
+            }, 1000);
+        }
+
+        function generateResult() {
+            navTo('result-page');
+
+            let maxScore = 0;
+            let topElement = '';
+            for (const [elem, score] of Object.entries(scores)) {
+                if (score > maxScore) { maxScore = score; topElement = elem; }
+            }
+            
+            const result = elementData[topElement];
+            
+            const scoreStr = `${scores['金']}-${scores['木']}-${scores['水']}-${scores['火']}-${scores['土']}`;
+            let hash = 0;
+            for(let i = 0; i < scoreStr.length; i++) {
+                hash = scoreStr.charCodeAt(i) + ((hash << 5) - hash);
+            }
+            const absHash = Math.abs(hash);
+            
+            const n = result.cities.length;
+            const idx1 = absHash % n;
+            let idx2 = (absHash + Math.max(1, Math.floor(n / 2))) % n;
+            if (idx1 === idx2) idx2 = (idx2 + 1) % n;
+            
+            const displayCity = `${result.cities[idx1]}/${result.cities[idx2]}`;
+
+            document.getElementById('result-desc').innerHTML = result.desc;
+            document.getElementById('result-city').innerText = displayCity;
+
+            // 保存历史记录列表
+            const docId = document.getElementById('doc-id').innerText;
+            const histList = JSON.parse(localStorage.getItem('diqi_history_list') || '[]');
+            
+            // 避免完全相同的记录重复存
+            const isDuplicate = histList.length > 0 && histList[histList.length-1].docId === docId;
+            if(!isDuplicate) {
+                histList.push({
+                    timestamp: Date.now(),
+                    scores: scores,
+                    desc: result.desc,
+                    city: displayCity,
+                    docId: docId
+                });
+                localStorage.setItem('diqi_history_list', JSON.stringify(histList));
+            }
+
+            drawRadarChart();
+        }
+
+        function drawRadarChart() {
+            const elements = ['火', '土', '金', '水', '木'];
+            const maxRadius = 75; 
+            const centerX = 100, centerY = 100;
+            let pointsStr = '';
+            
+            const maxScoreAmongAll = Math.max(...Object.values(scores));
+
+            document.getElementById('label-fire').textContent = `火能量: ${scores['火']}`;
+            document.getElementById('label-earth').textContent = `土能量: ${scores['土']}`;
+            document.getElementById('label-metal').textContent = `金能量: ${scores['金']}`;
+            document.getElementById('label-water').textContent = `水能量: ${scores['水']}`;
+            document.getElementById('label-wood').textContent = `木能量: ${scores['木']}`;
+
+            elements.forEach((elem, index) => {
+                const angleDeg = -90 + (index * 72);
+                const angleRad = angleDeg * (Math.PI / 180);
+                
+                const score = scores[elem];
+                const normalizedScore = maxScoreAmongAll > 0 ? 0.35 + (score / maxScoreAmongAll) * 0.65 : 0.35; 
+                const radius = normalizedScore * maxRadius;
+                
+                const x = centerX + radius * Math.cos(angleRad);
+                const y = centerY + radius * Math.sin(angleRad);
+                pointsStr += `${x},${y} `;
+            });
+            
+            setTimeout(() => {
+                const poly = document.getElementById('radar-shape');
+                poly.style.transition = 'all 1.5s cubic-bezier(0.16, 1, 0.3, 1)';
+                poly.setAttribute('points', pointsStr.trim());
+            }, 100);
+        }
+
+        function savePoster() {
+            const posterArea = document.getElementById('poster-area');
+            const btn = event.currentTarget;
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '档案封存中...';
+            
+            html2canvas(posterArea, {
+                scale: 2,
+                useCORS: true,
+                backgroundColor: '#f0ebe1'
+            }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = `勘探局调令-${document.getElementById('doc-id').innerText}.jpg`;
+                link.href = canvas.toDataURL('image/jpeg', 0.9);
+                link.click();
+                btn.innerHTML = originalText;
+            });
+        }
+
+        // SPA Routing / Back Button Interception
+        window.addEventListener('DOMContentLoaded', () => {
+            if (!window.location.hash) {
+                history.replaceState(null, '', '#landing');
+            }
+        });
+
+        window.addEventListener('popstate', (e) => {
+            const hash = window.location.hash;
+            const quizPage = document.getElementById('quiz-page');
+            const resultPage = document.getElementById('result-page');
+            
+            if (quizPage && !quizPage.classList.contains('hidden')) {
+                // If on quiz page and pressed back
+                if (currentQuestion > 0) {
+                    prevQuestion();
+                    // Trap the user in quiz page hash
+                    history.pushState(null, '', '#quiz');
+                } else {
+                    navTo('landing-page');
+                }
+            } else if (resultPage && !resultPage.classList.contains('hidden')) {
+                // If on result page and pressed back
+                navTo('landing-page');
+            } else {
+                navTo('landing-page');
+            }
+        });
+    </script>
+
+    <!-- 矩阵引流模块 -->
+    <script src="../test-matrix.js"></script>
+    <script>
+        // Matrix initialized in DOMContentLoaded
+    </script>
+</body>
+</html>
