@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>性格城市匹配测试 - 你的心灵逃跑车票</title>
+    <!-- Tailwind -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background-color: #e6e4df; /* textured paper feel */
+            color: #1a1a1a;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            overflow-x: hidden;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
+        }
+        .font-ticket {
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .ticket {
+            position: relative;
+            background: #fdfbf7;
+            border-radius: 4px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.06);
+            border: 1px solid #d1cdc1;
+        }
+        /* Perforated edges */
+        .ticket::before, .ticket::after {
+            content: '';
+            position: absolute;
+            top: 60%;
+            width: 30px;
+            height: 30px;
+            background: #e6e4df;
+            border-radius: 50%;
+            transform: translateY(-50%);
+            box-shadow: inset 0px 2px 4px rgba(0,0,0,0.05);
+            border: 1px solid var(--ticket-border, #d1cdc1);
+        }
+        .ticket::before { left: -16px; border-right-color: transparent; border-top-color: transparent; transform: translateY(-50%) rotate(45deg); }
+        .ticket::after { right: -16px; border-left-color: transparent; border-bottom-color: transparent; transform: translateY(-50%) rotate(45deg); }
+        
+        .ticket-divider {
+            border-top: 2px dashed var(--ticket-div, #b5b1a3);
+            margin: 0 16px;
+            position: relative;
+        }
+        .page-section {
+            display: none;
+            min-height: 100dvh;
+            padding: 2rem 1rem;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .page-section.active {
+            display: flex;
+        }
+        .stamp {
+            border: 3px solid #d93838;
+            color: #d93838;
+            border-radius: 50%;
+            width: 80px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 14px;
+            transform: rotate(-15deg);
+            opacity: 0.8;
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            text-align: center;
+            line-height: 1.2;
+        }
+        .barcode {
+            font-family: 'Libre Barcode 39', cursive, monospace;
+            font-size: 48px;
+            line-height: 1;
+            letter-spacing: -2px;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <!-- History Modal -->
+    <div id="history-modal" class="fixed inset-0 z-50 hidden bg-black/50 flex items-center justify-center p-4 backdrop-blur-sm transition-opacity">
+        <div class="bg-[#fdfbf7] w-full max-w-md rounded-lg shadow-2xl overflow-hidden border border-[#d1cdc1]">
+            <div class="p-4 border-b border-[#d1cdc1] flex justify-between items-center bg-[#e6e4df]">
+                <h3 class="font-bold tracking-widest text-[#1a1a1a]">历史车票记录</h3>
+                <button onclick="closeHistoryModal()" class="text-gray-500 hover:text-black font-bold text-xl">&times;</button>
+            </div>
+            <div class="p-4 max-h-[60vh] overflow-y-auto">
+                <div id="history-list" class="flex flex-col gap-3">
+                    <!-- list injected here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- 1. Landing Page -->
+    <section id="landing-page" class="page-section active max-w-md mx-auto">
+        <div class="ticket w-full p-8 text-center flex flex-col items-center">
+            <h1 class="text-4xl font-black tracking-tight mb-2">心灵逃跑车票</h1>
+            <p class="font-ticket text-sm opacity-70 mb-8 uppercase tracking-widest">One-way Ticket to your soul</p>
+            
+            <div class="text-left w-full bg-black/5 p-4 rounded text-sm text-gray-600 mb-8 font-ticket leading-relaxed">
+                > 目的地：未知<br>
+                > 乘客：你<br>
+                > 启程时间：现在<br><br>
+                回答20个极其真实的生存哲学问题，获取你的专属单程车票。寻找全国34个省份中最懂你的那座城。
+            </div>
+
+            <button onclick="startQuiz()" class="w-full bg-[#1a1a1a] text-[#fdfbf7] py-4 rounded font-bold tracking-widest text-lg hover:bg-black active:scale-[0.98] transition-transform shadow-lg">
+                开始检票 [CHECK-IN]
+            </button>
+            
+            <button id="history-btn" onclick="openHistoryModal()" class="w-full mt-4 bg-transparent border border-gray-400 text-gray-600 py-3 rounded font-bold tracking-widest hover:bg-gray-200 active:scale-[0.98] transition-transform hidden">
+                历史车票 [HISTORY]
+            </button>
+        </div>
+    </section>
+
+    <!-- 2. Quiz Page -->
+    <section id="quiz-page" class="page-section max-w-md mx-auto">
+        <div class="w-full flex justify-between items-center mb-8 font-ticket text-sm font-bold opacity-70">
+            <span>QUESTION</span>
+            <span id="q-progress">01/20</span>
+        </div>
+        
+        <div class="ticket w-full p-8 mb-8">
+            <h2 id="q-text" class="text-xl font-bold leading-relaxed mb-2 text-current">题目加载中...</h2>
+        </div>
+
+        <div id="options-list" class="w-full flex flex-col gap-4">
+            <!-- options generated here -->
+        </div>
+    </section>
+
+    <!-- 3. Result Page -->
+    <section id="result-page" class="page-section max-w-md mx-auto py-8">
+        <div class="w-full flex justify-between items-center mb-4 px-2 select-none">
+            <button onclick="switchTheme(-1)" class="text-gray-400 hover:text-black font-bold p-2 text-xl active:scale-90 transition-transform">&lsaquo;</button>
+            <div class="flex flex-col items-center">
+                <span class="text-[10px] text-gray-400 font-ticket mb-1 tracking-widest uppercase">左右滑动切换设计风格</span>
+                <span id="theme-indicator" class="text-sm font-bold tracking-widest text-gray-800">工业诊断风</span>
+            </div>
+            <button onclick="switchTheme(1)" class="text-gray-400 hover:text-black font-bold p-2 text-xl active:scale-90 transition-transform">&rsaquo;</button>
+        </div>
+        <div id="ticket-capture" class="ticket w-full flex flex-col overflow-hidden  pb-6">
+            <!-- Top Section -->
+            <div class="p-6 relative">
+                <div class="stamp" id="stamp-mark" style="transition: color 0.5s, border-color 0.5s;">逃离<br>许可</div>
+                <div class="flex justify-between items-start mb-6">
+                    <div>
+                        <div class="font-ticket text-xs opacity-70 mb-1">FLIGHT / TRAIN NO.</div>
+                        <div class="font-bold text-lg">XHS-2026</div>
+                    </div>
+                    <div class="text-right">
+                        <div class="font-ticket text-xs opacity-70 mb-1">CLASS</div>
+                        <div class="font-bold text-lg">SOUL</div>
+                    </div>
+                </div>
+
+                <div class="font-ticket text-xs opacity-70 mb-1">DESTINATION</div>
+                <div class="flex items-end gap-3 mb-2">
+                    <h2 id="r-city" class="text-5xl font-black tracking-tighter">北京</h2>
+                    <span id="r-province" class="text-lg font-bold opacity-50 mb-1">北京</span>
+                </div>
+                
+                <div id="r-tag" class="transition-colors duration-500 inline-block bg-black text-white text-xs font-bold px-3 py-1 mt-2 uppercase tracking-widest">冰冷的齿轮驱动者</div>
+            </div>
+
+            <div class="ticket-divider"></div>
+
+            <!-- Middle Section -->
+            <div class="p-6">
+                <div class="font-ticket text-xs opacity-70 mb-3">DIAGNOSTIC REPORT</div>
+                <p id="r-desc" class="text-[15px] leading-relaxed text-current font-medium border-l-4 border-current pl-4">
+                    “在绝对理性的巨型机器里，你找到了最安全的齿轮位置。”
+                </p>
+                
+                <div class="mt-6 flex flex-wrap gap-2" id="r-dimensions">
+                    <!-- dims -->
+                </div>
+            </div>
+
+            <!-- Bottom Section -->
+            <div class="px-6 flex flex-col items-center mt-2">
+                <div class="barcode text-center opacity-80 select-none">
+                    || | ||| || || | | || | |
+                </div>
+                <div class="font-ticket text-[10px] opacity-50 mt-1">NO. 8492039485721</div>
+            </div>
+        </div>
+
+        <div class="w-full mt-8 flex flex-col gap-4">
+            <button onclick="saveTicket()" class="w-full bg-[#1a1a1a] text-white py-4 rounded font-bold tracking-widest hover:bg-black active:scale-[0.98] transition-transform flex justify-center items-center gap-2">
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                长按保存车票分享
+            </button>
+            <button onclick="backToHome()" class="w-full bg-transparent border border-gray-400 text-gray-600 py-4 rounded font-bold tracking-widest hover:bg-gray-200 active:scale-[0.98] transition-transform">
+                返回首页 / 历史车票
+            </button>
+        </div>
+    </section>
+
+    <!-- html2canvas -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script>
+        // ----------------------------------------------------------------
+        // 34个省级代表城市及映射
+        // 维度: Pace (P), Boundary (B), Rule (R), Temp (T)
+        // ----------------------------------------------------------------
+        // P: 1(快), 0(慢)
+        // B: 1(高边界), 0(低边界)
+        // R: 1(秩序), 0(混沌)
+        // T: 1(冷峻), 0(温情)
+
+        const cityPool = [
+            { province: '北京', city: '北京', p:1, b:1, r:1, t:1, tag: '冰冷的齿轮驱动者', desc: '在绝对理性的巨型机器里，你找到了最安全的齿轮位置。不需要废话，只看效率。', theme: 'industrial' },
+            { province: '香港', city: '香港', p:1, b:1, r:1, t:1, tag: '中环的金融隐士', desc: '在高度商业化和规则感中，你用冷漠保护着自己最后一点孤独的体面。', theme: 'industrial' },
+            { province: '上海', city: '上海', p:1, b:1, r:1, t:0, tag: '精致的都市异乡人', desc: '手握冰美式穿梭在梧桐区，用恰到好处的冷淡保持着人际交往的体面。', theme: 'industrial' },
+            { province: '浙江', city: '杭州', p:1, b:1, r:1, t:0, tag: '互联网的修行僧', desc: '白天在代码和PPT里卷生卷死，周末躲进西湖边的茶馆里自我疗愈。', theme: 'wabisabi' },
+            { province: '广东', city: '深圳', p:1, b:0, r:1, t:1, tag: '深南大道的无眠者', desc: '不谈感情，只看效率。这座搞钱之城完美接纳了你的野心和入世法则。', theme: 'industrial' },
+            { province: '湖北', city: '武汉', p:1, b:0, r:1, t:1, tag: '码头上的实干家', desc: '火气大，性子直。你讨厌虚伪的弯弯绕绕，信奉江湖里的实力为王。', theme: 'cyber' },
+            { province: '黑龙江', city: '哈尔滨', p:1, b:0, r:1, t:0, tag: '冰雪里的炽热灵魂', desc: '外面再冷，心里也得有一盆火炕。你做事雷厉风行，对人却有一颗仗义的火热心肠。', theme: 'industrial' },
+            { province: '辽宁', city: '大连', p:1, b:0, r:1, t:0, tag: '海风里的豪爽客', desc: '既有北方的直爽热情，又有海滨的浪漫情怀，你活得通透又响亮。', theme: 'ocean' },
+            { province: '台湾', city: '台北', p:1, b:1, r:0, t:0, tag: '温润的文艺过客', desc: '在快节奏的都市里保留了一丝小确幸，用轻声细语对抗着坚硬的世界。', theme: 'wabisabi' },
+            { province: '澳门', city: '澳门', p:1, b:0, r:0, t:1, tag: '豪客与冒险家', desc: '在纸醉金迷和市井交错的地方，你有一种随时准备 All In 的狂热。', theme: 'cyber' },
+            { province: '重庆', city: '重庆', p:1, b:0, r:0, t:0, tag: '赛博江湖的夜游神', desc: '你适合在8D魔幻的街头吃着火锅，让喧嚣掩盖心事，在混沌中野蛮生长。', theme: 'cyber' },
+            { province: '湖南', city: '长沙', p:1, b:0, r:0, t:0, tag: '解放西的狂欢者', desc: '生活需要一点辣度和酒精。你害怕无聊，喜欢在热闹的人群中感受活着的实感。', theme: 'cyber' },
+            { province: '天津', city: '天津', p:1, b:0, r:0, t:0, tag: '相声剧场的捧哏', desc: '天大的事儿也能编成个段子，你用一种略带戏谑的热情消解了所有的高压。', theme: 'industrial' },
+            { province: '福建', city: '泉州', p:0, b:1, r:1, t:1, tag: '诸神旁的旁观者', desc: '半城烟火半城仙，你需要的不是逃避，而是长久的平静和冷眼旁观。', theme: 'wabisabi' },
+            { province: '青海', city: '西宁', p:0, b:1, r:1, t:1, tag: '高原上的守望者', desc: '冷峻、高远，你就像这里的空气一样稀薄而清冽，绝不轻易让人靠近。', theme: 'nature' },
+            { province: '山西', city: '平遥', p:0, b:1, r:1, t:1, tag: '古城里的守旧人', desc: '你对现代社会的狂奔感到厌倦，比起创新，你更喜欢有规矩、有厚重感的安稳。', theme: 'wabisabi' },
+            { province: '吉林', city: '长白山', p:0, b:1, r:1, t:1, tag: '林海雪原的独行侠', desc: '凛冽的寒风和守秩序的雪松，正好安放你那个冷静且高度自律的灵魂。', theme: 'nature' },
+            { province: '江苏', city: '苏州', p:0, b:1, r:1, t:0, tag: '园林里的理想主义', desc: '慢条斯理，外柔内刚。你在严谨的规矩里，给自己造了一个温情的江南幻梦。', theme: 'wabisabi' },
+            { province: '西藏', city: '拉萨', p:0, b:1, r:1, t:0, tag: '八廓街的朝圣者', desc: '有着极强的精神边界，却又内心柔软。你渴望一种超越世俗的纯粹归属。', theme: 'nature' },
+            { province: '宁夏', city: '银川', p:0, b:1, r:1, t:0, tag: '大漠孤烟的归人', desc: '在苍茫与温柔之间，你找到了完美的平衡，不被打扰，但也绝不冷酷。', theme: 'wabisabi' },
+            { province: '河北', city: '秦皇岛', p:0, b:1, r:1, t:0, tag: '孤独图书馆的读者', desc: '在离京城一步之遥的沙滩上，你找到了逃避内卷但依然保持体面的最优解。', theme: 'ocean' },
+            { province: '江西', city: '景德镇', p:0, b:1, r:0, t:1, tag: '泥土与火的修行者', desc: '不需要太多社交，把无处安放的焦虑揉进泥土里，在混沌中打磨自己的世界。', theme: 'wabisabi' },
+            { province: '内蒙古', city: '呼伦贝尔', p:0, b:1, r:0, t:1, tag: '凛风中的牧人', desc: '向往一望无际的旷野，对复杂的人情世故感到厌烦，只想要绝对的自由与理智。', theme: 'nature' },
+            { province: '甘肃', city: '敦煌', p:0, b:1, r:0, t:1, tag: '荒沙里的壁画师', desc: '在时间的洪流面前，你极其清醒，在苍凉的风景中独自品味着历史的宏大。', theme: 'wabisabi' },
+            { province: '云南', city: '大理', p:0, b:1, r:0, t:0, tag: '苍山洱海的流浪汉', desc: '把手表扔掉吧，你的灵魂在这里不需要打卡。随波逐流是你治愈自己的方式。', theme: 'nature' },
+            { province: '新疆', city: '阿勒泰', p:0, b:1, r:0, t:0, tag: '旷野里的吟游诗人', desc: '去爱，去生活，去受伤。你的心太大，只有雪山和无垠的草场才能装得下。', theme: 'nature' },
+            { province: '广西', city: '桂林', p:0, b:1, r:0, t:0, tag: '漓江边的垂钓者', desc: '你不关心世界的变化，只关心今天晚霞的颜色。你是个懂得避世的浪漫派。', theme: 'nature' },
+            { province: '安徽', city: '黄山', p:0, b:1, r:0, t:0, tag: '云海深处的隐士', desc: '在变幻莫测的云海里，你找到了内心的宁静。随性且温柔，远离尘嚣。', theme: 'nature' },
+            { province: '河南', city: '洛阳', p:0, b:0, r:1, t:1, tag: '中原大地的记录者', desc: '入世且通达。你用极强的生存智慧应对着社会规则，理性但不失大度。', theme: 'wabisabi' },
+            { province: '山东', city: '青岛', p:0, b:0, r:1, t:1, tag: '海滨的踏浪人', desc: '讲究规矩，豪爽且务实。海风吹走了焦虑，留下了踏踏实实的现实主义。', theme: 'ocean' },
+            { province: '陕西', city: '西安', p:0, b:0, r:1, t:0, tag: '城墙根的听戏人', desc: '厚重且温情。你在历史的框架里和周围人打成一片，活得有滋有味。', theme: 'wabisabi' },
+            { province: '四川', city: '成都', p:0, b:0, r:0, t:0, tag: '玉林路的老茶客', desc: '在市井的茶馆里虚度光阴，是你对抗世界的终极武器。无拘无束，巴适得板。', theme: 'nature' },
+            { province: '海南', city: '三亚', p:0, b:0, r:0, t:0, tag: '热带海岛的岛民', desc: '阳光、沙滩和永远停不下来的派对。你需要大量的社交和极低的压力来回血。', theme: 'ocean' },
+            { province: '贵州', city: '贵阳', p:0, b:0, r:0, t:0, tag: '街巷里的酸汤客', desc: '接地气，爱凑热闹。在随性的市井生活中，你总能找到最安逸的角落。', theme: 'wabisabi' }
+        ];
+
+        // ----------------------------------------------------------------
+        // 30题库 
+        // 维度: p(Pace), b(Boundary), r(Rule), t(Temp)
+        // 选项1: +1 (快/高边界/秩序/冷峻)
+        // 选项2: -1 (慢/低边界/混沌/温情)
+        // ----------------------------------------------------------------
+        const allQuestions = [
+            { dim: 'p', text: '星期五晚上 11 点，你刚结束连续 14 天的加班，走出写字楼。', opt1: '叫专车回家，只想赶紧把大脑关机', opt2: '突然觉得还没累透，想找个喧闹的地方报复性熬夜' },
+            { dim: 'p', text: '刷短视频时，遇到那种需要 3 分钟才能看完的剧情铺垫，你会：', opt1: '毫不犹豫滑走，只看“一分钟看完”', opt2: '既然点开了就慢慢看完，或许有惊喜' },
+            { dim: 'p', text: '回老家休息时，亲戚非要带你去几个没啥意思的景点打卡：', opt1: '随便走一圈赶紧结束，完成任务', opt2: '就当散步了，慢悠悠逛一天也行' },
+            { dim: 'p', text: '对于“30岁之前必须攒够100万”这种网络观点，你内心的真实反应：', opt1: '深表认同，这是一种安全感底线', opt2: '太焦虑了吧，人生为什么要被数字绑架' },
+            { dim: 'p', text: '等外卖时，骑手迷路迟迟送不到，你会：', opt1: '有点急躁，频繁看地图甚至准备打电话催', opt2: '算了，刚好趁这个时间刷会儿剧' },
+            { dim: 'p', text: '休年假去旅行，你更倾向于：', opt1: '每天安排2个城市，特种兵式打卡', opt2: '找个舒服的酒店躺三天，哪也不去' },
+            { dim: 'p', text: '如果一天突然空出来3个小时，你会用来干嘛？', opt1: '处理几封邮件，或者看一本干货书提升自己', opt2: '漫无目的地发呆，或者在阳台晒太阳' },
+            
+            { dim: 'b', text: '难得的周末休息，手机突然弹出一条消息：“在吗？”', opt1: '瞳孔地震，假装没看见，半小时后再回复', opt2: '秒回，顺便问对方有什么局' },
+            { dim: 'b', text: '坐长途高铁，旁边的人很热情地开始跟你聊他的家乡：', opt1: '礼貌敷衍两句，然后戴上降噪耳机闭眼装睡', opt2: '聊就聊，甚至最后互相加了微信' },
+            { dim: 'b', text: '公司团建，大家要在一栋大别墅里玩剧本杀过夜：', opt1: '找个借口不去，或者早早回房间躲着', opt2: '立刻化身气氛组，玩到深夜也不累' },
+            { dim: 'b', text: '去常买的咖啡店，老板突然开始热情地叫出你的名字：', opt1: '感觉私人领地被入侵，下次考虑换一家买', opt2: '觉得很亲切，顺便多聊了几句' },
+            { dim: 'b', text: '你理想的“独处”是怎样的状态？', opt1: '关门断网，绝对没有任何人能联系到我', opt2: '在一家人来人往的咖啡馆里独自敲电脑' },
+            { dim: 'b', text: '心情极度低落的时候，你的疗愈方式是：', opt1: '谁也不见，自己一个人消化', opt2: '叫上最好的朋友出来大喝一顿' },
+            { dim: 'b', text: '在一场全是陌生人的社交局上，你的状态通常是：', opt1: '角落里的观察者，尽量降低存在感', opt2: '很快就能找到共同话题跟人聊起来' },
+            { dim: 'b', text: '朋友圈功能里，你最常用的设置是：', opt1: '三天可见，极少发动态', opt2: '全部可见，经常分享日常点滴' },
+
+            { dim: 'r', text: '如果你的生活是一列火车，你最怕遇到哪种情况？', opt1: '突然脱轨，不知道下一站停在哪里的失控', opt2: '永远按既定轨道行驶，一眼望到头的无趣' },
+            { dim: 'r', text: '突然有了三天意外的假期，你的反应是：', opt1: '赶紧做攻略、订车票，把行程安排满', opt2: '睡到自然醒，起床看心情走到哪算哪' },
+            { dim: 'r', text: '你的电脑桌面和文件夹的常态是：', opt1: '分门别类，强迫症般的整齐', opt2: '文件堆满屏幕，靠记忆和搜索找东西' },
+            { dim: 'r', text: '在处理一件棘手的工作任务时，你的习惯是：', opt1: '先列好详细的步骤123，按部就班', opt2: '边做边摸索，跟着感觉走' },
+            { dim: 'r', text: '去超市买东西，你通常：', opt1: '拿着清单，买完立刻走人', opt2: '瞎逛一圈，买了一堆计划外的东西' },
+            { dim: 'r', text: '对于“人生必须在某个年龄结婚生子”这种社会时钟：', opt1: '虽然有压力，但觉得跟着大流走比较安稳', opt2: '完全不屑一顾，我有我自己的时区' },
+            { dim: 'r', text: '组装一个新买的复杂家具，你会：', opt1: '严格对照说明书，一步一步来', opt2: '直接上手拼，遇到问题了再看图纸' },
+
+            { dim: 't', text: '面对职场上的“画大饼”和“谈情怀”，你内心的真实反应是：', opt1: '冷笑一声，只想看工资条上的数字', opt2: '虽然知道是饼，但如果团队氛围好，也愿意拼一把' },
+            { dim: 't', text: '朋友找你倾诉在职场受了极大的委屈：', opt1: '帮他客观分析局势，甚至指出他哪里做错了', opt2: '先一起大骂老板和同事，情绪价值给满' },
+            { dim: 't', text: '你更认同哪一句毒鸡汤？', opt1: '成年人的世界，没有利益交换很难交到真朋友', opt2: '即便世界再烂，也要保留一点天真和柔软' },
+            { dim: 't', text: '看一部电影，主人公为了拯救地球牺牲了自己的伴侣：', opt1: '理智上可以理解，大局为重', opt2: '无法接受，连爱人都护不住算什么英雄' },
+            { dim: 't', text: '你觉得现在的自己，最像以下哪种状态？', opt1: '一台内存快满，急需清理碎片的电脑', opt2: '一只在雨天找不到屋檐，渴望被收留的流浪猫' },
+            { dim: 't', text: '面对犯错的下属或后辈，你通常会：', opt1: '直接指出错误，按规章制度处理', opt2: '先安抚情绪，再委婉地给出改进建议' },
+            { dim: 't', text: '如果这世界是一座森林，你觉得自己的生存法则是：', opt1: '物竞天择，时刻保持警惕的独狼', opt2: '即使受伤，也愿意相信其他动物的鹿' },
+            { dim: 't', text: '在评价一个人的时候，你更看重：', opt1: '他的能力和产出', opt2: '他的人品和态度' }
+        ];
+
+        // ----------------------------------------------------------------
+        // 运行时逻辑
+        // ----------------------------------------------------------------
+        let activeQuestions = [];
+        let currentIndex = 0;
+        let scores = { p:0, b:0, r:0, t:0 };
+
+        // 随机挑选20题
+        function initQuestions() {
+            let shuffled = [...allQuestions].sort(() => 0.5 - Math.random());
+            activeQuestions = shuffled.slice(0, 20);
+        }
+
+        function startQuiz() {
+            initQuestions();
+            currentIndex = 0;
+            scores = { p:0, b:0, r:0, t:0 };
+            document.getElementById('landing-page').classList.remove('active');
+            document.getElementById('quiz-page').classList.add('active');
+            renderQuestion();
+        }
+
+        function renderQuestion() {
+            document.getElementById('q-progress').textContent = `${String(currentIndex + 1).padStart(2, '0')}/20`;
+            const q = activeQuestions[currentIndex];
+            document.getElementById('q-text').textContent = q.text;
+
+            const list = document.getElementById('options-list');
+            list.innerHTML = `
+                <button onclick="answer(1)" class="w-full text-left bg-white border border-current p-4 rounded text-[#1a1a1a] hover: shadow-sm font-medium leading-relaxed active:scale-[0.98] transition-transform">
+                    A. ${q.opt1}
+                </button>
+                <button onclick="answer(-1)" class="w-full text-left bg-white border border-current p-4 rounded text-[#1a1a1a] hover: shadow-sm font-medium leading-relaxed active:scale-[0.98] transition-transform">
+                    B. ${q.opt2}
+                </button>
+            `;
+        }
+
+        function answer(val) {
+            const dim = activeQuestions[currentIndex].dim;
+            scores[dim] += val;
+            
+            currentIndex++;
+            if (currentIndex < activeQuestions.length) {
+                renderQuestion();
+            } else {
+                calculateResult();
+            }
+        }
+
+        function calculateResult() {
+            // 解析维度: p, b, r, t (>0 = 1, <=0 = 0)
+            const finalP = scores.p > 0 ? 1 : 0;
+            const finalB = scores.b > 0 ? 1 : 0;
+            const finalR = scores.r > 0 ? 1 : 0;
+            const finalT = scores.t > 0 ? 1 : 0;
+
+            // 过滤城市
+            let matchedCities = cityPool.filter(c => c.p === finalP && c.b === finalB && c.r === finalR && c.t === finalT);
+            
+            // Fallback (极小概率如果某个组合为空，选一个最近的)
+            if (matchedCities.length === 0) {
+                matchedCities = cityPool.filter(c => c.p === finalP && c.b === finalB);
+            }
+
+            const resultCity = matchedCities[Math.floor(Math.random() * matchedCities.length)];
+
+            // Save to localStorage
+            let history = JSON.parse(localStorage.getItem('cityMatchHistory') || '[]');
+            history.unshift({
+                date: new Date().toLocaleString(),
+                city: resultCity,
+                dims: {p: finalP, b: finalB, r: finalR, t: finalT}
+            });
+            // Keep top 5
+            if (history.length > 5) history = history.slice(0, 5);
+            localStorage.setItem('cityMatchHistory', JSON.stringify(history));
+
+            renderResultPage(resultCity, {p: finalP, b: finalB, r: finalR, t: finalT});
+        }
+
+        let currentResultCity = null;
+        let currentResultDims = null;
+        let currentThemeIndex = 0;
+        const themeKeys = ['industrial', 'cyber', 'wabisabi', 'nature', 'ocean'];
+        const themeNames = {
+            'industrial': '工业诊断风', 
+            'cyber': '赛博朋克风', 
+            'wabisabi': '东方侘寂风', 
+            'nature': '自然旷野风', 
+            'ocean': '深海治愈风'
+        };
+
+        const themes = {
+            industrial: { bg: '#fdfbf7', text: '#1a1a1a', stamp: '#d93838', dimBg: '#e6e4df', border: '#d1cdc1', div: '#b5b1a3', tagBg: '#1a1a1a', tagText: '#ffffff' },
+            cyber: { bg: '#171717', text: '#f5f5f5', stamp: '#ef4444', dimBg: '#262626', border: '#404040', div: '#525252', tagBg: '#f5f5f5', tagText: '#171717' },
+            wabisabi: { bg: '#f5f5f4', text: '#44403c', stamp: '#78716c', dimBg: '#e7e5e4', border: '#d6d3d1', div: '#a8a29e', tagBg: '#44403c', tagText: '#f5f5f4' },
+            nature: { bg: '#f0fdf4', text: '#14532d', stamp: '#16a34a', dimBg: '#dcfce7', border: '#bbf7d0', div: '#86efac', tagBg: '#14532d', tagText: '#f0fdf4' },
+            ocean: { bg: '#f0f9ff', text: '#0c4a6e', stamp: '#0284c7', dimBg: '#e0f2fe', border: '#bae6fd', div: '#7dd3fc', tagBg: '#0c4a6e', tagText: '#f0f9ff' }
+        };
+
+        function renderResultPage(city, dims) {
+            currentResultCity = city;
+            currentResultDims = dims;
+            
+            document.getElementById('quiz-page').classList.remove('active');
+            document.getElementById('result-page').classList.add('active');
+
+            document.getElementById('r-city').textContent = city.city;
+            document.getElementById('r-province').textContent = city.province;
+            
+            const tagEl = document.getElementById('r-tag');
+            tagEl.textContent = city.tag;
+            
+            document.getElementById('r-desc').textContent = `“${city.desc}”`;
+
+            // Determine theme index
+            const defaultTheme = city.theme || 'industrial';
+            currentThemeIndex = themeKeys.indexOf(defaultTheme);
+            if(currentThemeIndex === -1) currentThemeIndex = 0;
+            
+            applyTheme(themeKeys[currentThemeIndex]);
+        }
+
+        function applyTheme(themeKey) {
+            const theme = themes[themeKey];
+            const ticket = document.getElementById('ticket-capture');
+            ticket.style.backgroundColor = theme.bg;
+            ticket.style.color = theme.text;
+            ticket.style.borderColor = theme.border;
+            
+            document.documentElement.style.setProperty('--ticket-bg', theme.bg);
+            document.documentElement.style.setProperty('--ticket-border', theme.border);
+            document.documentElement.style.setProperty('--ticket-div', theme.div);
+            
+            document.getElementById('stamp-mark').style.borderColor = theme.stamp;
+            document.getElementById('stamp-mark').style.color = theme.stamp;
+            
+            const tagEl = document.getElementById('r-tag');
+            tagEl.style.backgroundColor = theme.tagBg;
+            tagEl.style.color = theme.tagText;
+
+            const dimLabels = [
+                currentResultDims.p === 1 ? '快节奏' : '慢摇摆',
+                currentResultDims.b === 1 ? '高边界' : '低边界',
+                currentResultDims.r === 1 ? '秩序掌控' : '混沌随性',
+                currentResultDims.t === 1 ? '冷峻现实' : '温情理想'
+            ];
+
+            const dimsHtml = dimLabels.map(l => `<span style="background-color:${theme.dimBg}; border-color:${theme.border}; transition: background-color 0.5s, border-color 0.5s;" class="px-2 py-1 text-xs font-bold font-ticket border">${l}</span>`).join('');
+            document.getElementById('r-dimensions').innerHTML = dimsHtml;
+            
+            document.getElementById('theme-indicator').textContent = themeNames[themeKey];
+        }
+
+        function switchTheme(dir) {
+            currentThemeIndex = (currentThemeIndex + dir + themeKeys.length) % themeKeys.length;
+            applyTheme(themeKeys[currentThemeIndex]);
+        }
+
+        // History functions
+        function loadHistory() {
+            const history = JSON.parse(localStorage.getItem('cityMatchHistory') || '[]');
+            if (history.length > 0) {
+                document.getElementById('history-btn').classList.remove('hidden');
+            }
+        }
+
+        function openHistoryModal() {
+            const history = JSON.parse(localStorage.getItem('cityMatchHistory') || '[]');
+            const list = document.getElementById('history-list');
+            list.innerHTML = history.map((item, index) => `
+                <button onclick="viewHistory(${index})" class="w-full text-left bg-white border border-[#d1cdc1] p-3 rounded text-[#1a1a1a] hover:bg-[#e6e4df] shadow-sm flex justify-between items-center active:scale-[0.98] transition-colors">
+                    <span class="font-bold text-lg">${item.city.city} <span class="text-xs font-normal text-gray-500 ml-2">${item.date}</span></span>
+                    <span class="text-xs px-3 py-1 border border-gray-400 rounded-full font-ticket">检票</span>
+                </button>
+            `).join('');
+            document.getElementById('history-modal').classList.remove('hidden');
+        }
+
+        function closeHistoryModal() {
+            document.getElementById('history-modal').classList.add('hidden');
+        }
+
+        function viewHistory(index) {
+            const history = JSON.parse(localStorage.getItem('cityMatchHistory') || '[]');
+            const item = history[index];
+            if(item) {
+                closeHistoryModal();
+                // Crucial fix: hide landing page when viewing history
+                document.getElementById('landing-page').classList.remove('active');
+                renderResultPage(item.city, item.dims);
+            }
+        }
+
+        // Initialize landing page
+        let touchstartX = 0;
+        let touchendX = 0;
+
+        function checkDirection() {
+            if (touchendX < touchstartX - 40) switchTheme(1); // swiped left
+            if (touchendX > touchstartX + 40) switchTheme(-1); // swiped right
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadHistory();
+            
+            const ticketEl = document.getElementById('ticket-capture');
+            ticketEl.addEventListener('touchstart', e => {
+                touchstartX = e.changedTouches[0].screenX;
+            }, {passive: true});
+            ticketEl.addEventListener('touchend', e => {
+                touchendX = e.changedTouches[0].screenX;
+                checkDirection();
+            }, {passive: true});
+        });
+
+        function backToHome() {
+            document.getElementById('result-page').classList.remove('active');
+            document.getElementById('landing-page').classList.add('active');
+            loadHistory();
+            window.scrollTo(0, 0);
+        }
+
+        // 保存截图
+        function saveTicket() {
+            const el = document.getElementById('ticket-capture');
+            const btn = event.currentTarget;
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '正在打印车票...';
+            
+            html2canvas(el, {
+                scale: 2, // 高清
+                backgroundColor: '#e6e4df',
+                logging: false
+            }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = `心灵逃跑车票_${document.getElementById('r-city').textContent}.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+                btn.innerHTML = originalText;
+            }).catch(() => {
+                btn.innerHTML = originalText;
+                alert('保存失败，请截图保存');
+            });
+        }
+    </script>
+</body>
+</html>
