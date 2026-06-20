@@ -202,12 +202,18 @@
                 <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
                 长按保存车票分享
             </button>
+
+            <!-- Cross-promotion section -->
+            <div id="test-matrix-container" class="w-full"></div>
+
             <button onclick="backToHome()" class="w-full bg-transparent border border-gray-400 text-gray-600 py-4 rounded font-bold tracking-widest hover:bg-gray-200 active:scale-[0.98] transition-transform">
                 返回首页 / 历史车票
             </button>
         </div>
     </section>
 
+    <!-- Shared Component -->
+    <script src="../test-matrix.js"></script>
     <!-- html2canvas -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script>
@@ -460,6 +466,9 @@
         }
 
         // History functions
+
+        
+
         function loadHistory() {
             const history = JSON.parse(localStorage.getItem('cityMatchHistory') || '[]');
             if (history.length > 0) {
@@ -503,7 +512,9 @@
             if (touchendX > touchstartX + 40) switchTheme(-1); // swiped right
         }
 
+                // Initialize landing page
         document.addEventListener('DOMContentLoaded', () => {
+            initTestMatrix({ containerId: 'test-matrix-container', currentId: 'city-matching-test', theme: 'light' });
             loadHistory();
             
             const ticketEl = document.getElementById('ticket-capture');

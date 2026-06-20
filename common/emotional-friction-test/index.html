@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>1分钱情绪内耗测试</title>
+    <title>深度情绪内耗测试</title>
     <meta name="description" content="10题快速自测，测完立刻出完整结果。本测评仅供情绪状态参考，非医疗诊断。">
     
     <!-- Google Fonts: Outfit (Geometry/Tech Feel) -->
@@ -225,24 +225,16 @@
                     </div>
                 </div>
 
-                <!-- Section Divider -->
-                <div class="flex items-center gap-4 mb-8 gsap-result opacity-60 mt-12">
-                    <div class="h-px bg-white/10 flex-1"></div>
-                    <span class="text-[10px] uppercase tracking-[0.2em] font-medium text-gray-500">专业测评库</span>
-                    <div class="h-px bg-white/10 flex-1"></div>
-                </div>
-
-                <!-- Recommendations -->
-                <div id="recommended-list" class="flex flex-col gap-5 gsap-result">
-                    <!-- Items injected here -->
-                </div>
-                
                 <!-- Poster & Action Buttons -->
                 <div class="mt-12 flex flex-col gap-4 gsap-result">
                     <button id="generate-poster-btn" class="w-full py-4 text-[15px] font-bold text-white bg-white/10 border border-white/20 rounded-full hover:bg-white/20 transition-all flex justify-center items-center gap-2 active:scale-[0.97]" onclick="generatePoster()">
                         <svg class="w-5 h-5 text-cyberblue" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
                         生成专属能量海报
                     </button>
+
+                    <!-- Section Divider -->
+                    <div id="test-matrix-container" class="w-full"></div>
+
                     <button id="restart-btn" class="w-full py-4 text-sm font-semibold text-gray-500 border border-transparent rounded-full hover:bg-white/5 transition-colors active:scale-[0.97]">
                         重新测试
                     </button>
@@ -270,41 +262,6 @@
         </section>
 
     </main>
-
-    <!-- Glass Modal -->
-    <div id="test-modal" class="modal-overlay" onclick="closeModal(event)">
-        <div class="modal-card max-w-lg mx-auto w-full">
-            <button class="absolute top-6 right-6 w-9 h-9 flex items-center justify-center rounded-full bg-white/10 text-white/60 hover:bg-white/20 hover:text-white transition-colors" onclick="closeModal()">
-                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-            </button>
-            
-            <div class="mb-2 w-12 h-1 bg-white/20 rounded-full mx-auto -mt-4 mb-10"></div>
-            
-            <div id="modal-tags" class="flex flex-wrap gap-2 mb-5"></div>
-            <h3 id="modal-title" class="text-3xl font-extrabold text-white tracking-tighter mb-2"></h3>
-            <p id="modal-subtitle" class="text-cyberblue text-[15px] font-medium mb-8"></p>
-            
-            <div class="doppel-shell mb-10">
-                <div class="doppel-core bg-white/[0.02] text-[14px] text-gray-300 leading-relaxed font-medium p-6" id="modal-desc"></div>
-            </div>
-            
-            <div class="flex items-center gap-5">
-                <div class="flex flex-col">
-                    <span class="text-[10px] text-gray-500 uppercase tracking-widest mb-1 font-medium">专属价</span>
-                    <div class="flex items-baseline gap-2">
-                        <span class="text-2xl font-black text-white">¥0.99</span>
-                        <span class="text-xs text-gray-600 line-through">¥1.50</span>
-                    </div>
-                </div>
-                <a href="#" id="modal-btn" class="btn-cyber flex-1 !py-4 text-lg group">
-                    <span>去店铺购买</span>
-                    <div class="ml-2 w-7 h-7 rounded-full bg-black/20 flex items-center justify-center transition-transform duration-300 group-hover:translate-x-1 group-hover:scale-105">
-                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
-                    </div>
-                </a>
-            </div>
-        </div>
-    </div>
 
     <!-- History Modal -->
     <div id="history-modal" class="modal-overlay" onclick="closeHistoryModal(event)">
@@ -340,34 +297,24 @@
         </div>
     </div>
 
+    <!-- Shared Component -->
+    <script src="../test-matrix.js"></script>
     <!-- CDNs -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 
     <script>
+        // History functions
+        document.addEventListener('DOMContentLoaded', () => {
+            initTestMatrix({ containerId: 'test-matrix-container', currentId: 'emotional-friction-test', theme: 'dark' });
+        });
+
     // ----------------------------------------------------------------
     // 数据集 (Data)
     // ----------------------------------------------------------------
     const SHOP_URL = "https://www.xiaohongshu.com/user/profile/601a023b000000000101fb44?xsec_token=YBzfLUaEGC48Kn_H4uNVPPudm5zNIfcyoxvRfnR2VZumo%3D&xsec_source=app_share&xhsshare=&shareRedId=ODYzQTM3N0s2NzUyOTgwNjY0OThKRzo9&apptime=1768918803&share_id=5e6b7913cee843faa97b7b0b9c4eecac&share_channel=copy_link";
     
-    const recommendedTests = [
-        { id: 'city_match', title: '性格城市匹配测试', subtitle: '哪座城市是你的灵魂归属？', desc: '<p class="mb-2"><b class="text-white">【测评简介】</b><br>每个人都有属于自己的“能量城市”。在适合的城市生活，你会感到如鱼得水。</p><p><b class="text-white">【评估维度】</b><br>生活节奏偏好、社交距离需求、气候适应性、文化包容度。</p>', tags: ['生活', '趣味'], price: '1.5', developed: true },
-        { id: 'scl90', title: 'SCL-90 心理健康测评', subtitle: '国际通用 · 全面心理体检', desc: '<p class="mb-2"><b class="text-white">【测评简介】</b><br>国际通用的心理健康“体检表”，广泛应用于医疗与心理咨询领域。</p><p><b class="text-white">【评估维度】</b><br>涵盖躯体化、强迫、人际敏感、抑郁、焦虑、敌对、恐怖、偏执、精神病性等10大核心心理指标。</p>', tags: ['心理健康', '专业'], price: '1.5', developed: true },
-        { id: 'love_possession', title: '恋爱占有欲测试', subtitle: '你的爱是由于不安还是深情？', desc: '<p class="mb-2"><b class="text-white">【测评简介】</b><br>爱一个人就想占有TA？适度的占有欲是爱的表现，过度的占有欲则是关系的毒药。</p><p><b class="text-white">【评估维度】</b><br>占有欲强度、情感安全感、控制倾向、独立性需求。</p>', tags: ['恋爱', '情感'], price: '1.5', developed: true },
-        { id: 'mbti_16', title: 'MBTI 16型人格测试', subtitle: '探索你的核心性格代码', desc: '<p class="mb-2"><b class="text-white">【测评简介】</b><br>全球最流行的性格测试工具，帮你找到自己在生活、工作、恋爱中的“出厂设置”。</p><p><b class="text-white">【评估维度】</b><br>E/I (外向/内向)、S/N (实感/直觉)、T/F (理智/情感)、J/P (判断/感知)。</p>', tags: ['人格', 'MBTI'], price: '1.5', developed: true },
-        { id: 'mbti_love', title: 'MBTI 恋爱理想型测试', subtitle: '谁才是你的灵魂伴侣？', desc: '<p class="mb-2"><b class="text-white">【测评简介】</b><br>基于MBTI人格理论，精准匹配最适合你的伴侣类型。</p><p><b class="text-white">【如有期待】</b><br>本测试正在紧锣密鼓开发中，将深度解析你的依恋需求与适配人格。</p>', tags: ['恋爱', 'MBTI'], price: '1.5', developed: false },
-        { id: 'childhood', title: '童年创伤测试', subtitle: '疗愈内在小孩的第一步', desc: '<p class="mb-2"><b class="text-white">【测评简介】</b><br>看见童年的伤，是疗愈的开始。带你拥抱那个内心深处哭泣的小孩。</p><p><b class="text-white">【如有期待】</b><br>本测试正在开发中，将包含家庭功能评估与情感忽视分析。</p>', tags: ['疗愈', '成长'], price: '1.5', developed: false },
-        { id: 'spiritual', title: '精神需求测试', subtitle: '你灵魂深处真正渴望什么？', desc: '<p class="mb-2"><b class="text-white">【测评简介】</b><br>拨开物质欲望的迷雾，直视灵魂深处的真实渴求。</p><p><b class="text-white">【如有期待】</b><br>本测试正在开发中，敬请期待。</p>', tags: ['自我', '探索'], price: '1.5', developed: false },
-        { id: 'adhd', title: 'ADHD 注意力缺陷测试', subtitle: '总是分心？测测专注力', desc: '<p class="mb-2"><b class="text-white">【测评简介】</b><br>这是天赋还是障碍？科学评估你的专注力水平。</p><p><b class="text-white">【如有期待】</b><br>本测试正在开发中，敬请期待。</p>', tags: ['健康', '科普'], price: '1.5', developed: false },
-        { id: 'appearance', title: '高颜值测试', subtitle: '你的美学风格属于哪一种？', desc: '<p class="mb-2"><b class="text-white">【测评简介】</b><br>发现你的独特美学气质，找到最适合你的变美思路。</p><p><b class="text-white">【如有期待】</b><br>本测试正在开发中，敬请期待。</p>', tags: ['审美', '趣味'], price: '1.5', developed: false },
-        { id: 'attachment', title: '成人依恋类型测试', subtitle: '回避/焦虑/安全型？', desc: '<p class="mb-2"><b class="text-white">【测评简介】</b><br>深度解析你在亲密关系中的安全感来源与行为模式。</p><p><b class="text-white">【如有期待】</b><br>本测试正在开发中，敬请期待。</p>', tags: ['关系', '心理'], price: '1.5', developed: false },
-        { id: 'female_type', title: '女性类型测试', subtitle: '探索你的女性力量原型', desc: '<p class="mb-2"><b class="text-white">【测评简介】</b><br>你是雅典娜、赫拉还是阿佛洛狄忒？探索你的原型力量。</p><p><b class="text-white">【如有期待】</b><br>本测试正在开发中，敬请期待。</p>', tags: ['性格', '女性'], price: '1.5', developed: false },
-        { id: 'age_love', title: '年上年下恋爱人格', subtitle: '你适合“爹系”还是“奶狗”？', desc: '<p class="mb-2"><b class="text-white">【测评简介】</b><br>测测你在恋爱中更适合扮演照顾者还是被照顾者。</p><p><b class="text-white">【如有期待】</b><br>本测试正在开发中，敬请期待。</p>', tags: ['恋爱', '趣味'], price: '1.5', developed: false },
-        { id: 'npd', title: 'NPD 自恋型人格测试', subtitle: '识别身边的“有毒”关系 (测他人)', desc: '<p class="mb-2"><b class="text-white">【测评简介】</b><br>你的TA是否极度自负、缺乏共情？帮你快速识别危险关系。</p><p><b class="text-white">【如有期待】</b><br>本测试正在开发中，敬请期待。</p>', tags: ['关系', '避坑'], price: '1.5', developed: false },
-        { id: 'psy_age', title: '心理年龄测试', subtitle: '你的心智比实际年龄成熟吗？', desc: '<p class="mb-2"><b class="text-white">【测评简介】</b><br>测试你的心理成熟度是否与生理年龄匹配。</p><p><b class="text-white">【如有期待】</b><br>本测试正在开发中，敬请期待。</p>', tags: ['趣味', '认知'], price: '1.5', developed: false },
-        { id: 'talent', title: '天赋测试', subtitle: '挖掘你被埋没的天生优势', desc: '<p class="mb-2"><b class="text-white">【测评简介】</b><br>找到你的盖洛普优势领域，让努力事半功倍。</p><p><b class="text-white">【如有期待】</b><br>本测试正在开发中，敬请期待。</p>', tags: ['职场', '潜能'], price: '1.5', developed: false },
-        { id: 'animal', title: '动物性格测试', subtitle: '你的性格像哪种动物？', desc: '<p class="mb-2"><b class="text-white">【测评简介】</b><br>老虎、孔雀、考拉、猫头鹰，测测你的职场性格原型。</p><p><b class="text-white">【如有期待】</b><br>本测试正在开发中，敬请期待。</p>', tags: ['趣味', '性格'], price: '1.5', developed: false }
-    ];
+    
 
     const questions = [
         { id: 1, text: "深夜看到一条同事发来的仅你可见的吐槽朋友圈，你会？", options: [ { text: "假装没看见，直接划走", score: 1 }, { text: "默默点个赞，表示已阅", score: 2 }, { text: "心里咯噔一下：是不是在内涵我？", score: 3 }, { text: "反复揣摩她的用意，甚至整晚失眠", score: 4 } ] },
@@ -559,7 +506,7 @@
         const icons = { low: '✧', mid: '⚝', high: '✦' };
         document.getElementById('result-icon').textContent = icons[resultKey];
         
-        renderRecommended();
+        
 
         transitionPage(fromPage, 'result', () => {
             // Staggered cinematic reveal for result elements
@@ -575,65 +522,7 @@
         });
     }
 
-    function renderRecommended() {
-        const list = document.getElementById('recommended-list');
-        list.innerHTML = '';
-        recommendedTests.forEach((test, idx) => {
-            const card = document.createElement('div');
-            card.className = 'doppel-shell cursor-pointer group hover:scale-[1.01] transition-transform active:scale-[0.99]';
-            card.onclick = () => showModal(test);
-            
-            const badge = test.developed ? '' : `<span class="px-2 py-0.5 bg-red-500/10 text-red-400 text-[10px] rounded uppercase font-bold tracking-wider">Dev</span>`;
-            
-            card.innerHTML = `
-                <div class="doppel-core bg-white/[0.02] flex items-center justify-between p-5">
-                    <div class="flex-1 pr-4">
-                        <div class="flex items-center gap-3 mb-2">
-                            <span class="text-[10px] font-mono text-cyberblue bg-cyberblue/10 px-1.5 py-0.5 rounded">0${idx+1}</span>
-                            <h4 class="text-[15px] font-extrabold text-white tracking-tight">${test.title}</h4>
-                            ${badge}
-                        </div>
-                        <p class="text-[13px] text-gray-400 mb-4 font-medium">${test.subtitle}</p>
-                        <div class="flex flex-wrap gap-2">
-                            ${test.tags.map(t => `<span class="text-[10px] px-2.5 py-1 bg-white/5 rounded-full text-gray-300 border border-white/10 uppercase tracking-wider">${t}</span>`).join('')}
-                        </div>
-                    </div>
-                    <div class="text-white/20 group-hover:text-cyberblue transition-colors group-hover:translate-x-1 duration-300">
-                        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-                    </div>
-                </div>
-            `;
-            list.appendChild(card);
-        });
-    }
 
-    // Modal Logic
-    const modal = document.getElementById('test-modal');
-    function showModal(testData) {
-        document.getElementById('modal-title').textContent = testData.title;
-        document.getElementById('modal-subtitle').textContent = testData.subtitle;
-        document.getElementById('modal-desc').innerHTML = testData.desc;
-        
-        document.getElementById('modal-tags').innerHTML = testData.tags.map(t => `<span class="text-[10px] uppercase tracking-wider px-2.5 py-1 bg-white/5 rounded-md text-gray-300 border border-white/10">${t}</span>`).join('');
-        
-        const btn = document.getElementById('modal-btn');
-        if (testData.developed) {
-            btn.querySelector('span').textContent = '去店铺购买';
-            btn.className = 'btn-cyber flex-1 !py-4 text-lg group';
-            btn.href = SHOP_URL;
-        } else {
-            btn.querySelector('span').textContent = '测试开发中';
-            btn.className = 'btn-cyber flex-1 !py-4 text-lg group opacity-40 cursor-not-allowed';
-            btn.href = '#';
-        }
-        
-        modal.classList.add('show');
-    }
-
-    function closeModal(e) {
-        if (e && e.target !== modal && !e.target.closest('.modal-close')) return;
-        modal.classList.remove('show');
-    }
 
     // Bind Actions
     document.getElementById('start-btn').addEventListener('click', startQuiz);
@@ -741,7 +630,7 @@
                         watermark.className = 'mt-6 pt-4 border-t border-white/10 flex justify-between items-center';
                         watermark.innerHTML = `
                             <span class="text-[10px] text-gray-500 tracking-widest">在小红书搜【测试同款】</span>
-                            <span class="text-[10px] text-cyberblue font-mono">1分钱测算灵魂频率</span>
+                            <span class="text-[10px] text-cyberblue font-mono">深度解析情绪内耗</span>
                         `;
                         cloneCard.appendChild(watermark);
                     }
