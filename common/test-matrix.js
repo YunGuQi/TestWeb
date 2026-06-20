@@ -161,12 +161,12 @@ function initTestMatrix({ containerId, currentId, theme = 'dark' }) {
             if (e.target === detailModal) closeTestDetailModal();
         };
         detailModal.innerHTML = `
-            <div class="${cardClass}" id="shared-detail-card" style="transition-duration: 400ms;">
+            <div class="${cardClass}" id="shared-detail-card" style="transition-duration: 400ms; max-height: 85vh; display: flex; flex-direction: column; overflow: hidden;">
                 <button class="${closeBtnClass}" onclick="closeTestDetailModal()">
                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                 </button>
                 <div class="${handleClass}"></div>
-                <div id="detail-modal-content" class="flex flex-col hide-scrollbar pb-4 px-1">
+                <div id="detail-modal-content" class="flex flex-col hide-scrollbar pb-4 px-1" style="overflow-y: auto; flex: 1; -webkit-overflow-scrolling: touch;">
                     <!-- content injected dynamically -->
                 </div>
             </div>
@@ -257,6 +257,7 @@ window.openTestDetailModal = function(idx) {
     
     // Add theme class for CSS desc overrides
     content.className = `flex flex-col hide-scrollbar pb-4 px-1 ${isLight ? 'theme-light' : 'theme-dark'}`;
+    content.style.cssText = 'overflow-y: auto; flex: 1; -webkit-overflow-scrolling: touch;';
 
     const imgHtml = test.previewImg ? `
         <div class="w-full rounded-xl overflow-hidden mb-8 relative bg-[#1a1a1a] shadow-inner border ${isLight ? 'border-gray-200' : 'border-white/10'} p-2">
