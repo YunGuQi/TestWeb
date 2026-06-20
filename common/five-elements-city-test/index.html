@@ -847,6 +847,8 @@
 
         window.addEventListener('popstate', (e) => {
             const hash = window.location.hash;
+            // 矩阵弹窗的 hash 由 test-matrix.js 自行处理，页面级不干预
+            if (hash === '#matrix' || hash === '#matrix-detail') return;
             const quizPage = document.getElementById('quiz-page');
             const resultPage = document.getElementById('result-page');
             

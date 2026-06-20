@@ -161,16 +161,24 @@ function initTestMatrix({ containerId, currentId, theme = 'dark' }) {
             if (e.target === detailModal) closeTestDetailModal();
         };
         detailModal.innerHTML = `
-            <div class="${cardClass}" id="shared-detail-card" style="transition-duration: 400ms; max-height: 85vh; display: flex; flex-direction: column; overflow: hidden;">
+            <div class="${cardClass}" id="shared-detail-card" style="transition-duration: 400ms; max-height: 85vh; overflow: hidden; position: relative;">
                 <button class="${closeBtnClass}" onclick="closeTestDetailModal()">
                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                 </button>
                 <div class="${handleClass}"></div>
-                <div id="detail-modal-content" class="flex flex-col hide-scrollbar pb-4 px-1" style="overflow-y: auto; flex: 1; -webkit-overflow-scrolling: touch;">
+                <div id="detail-modal-content" style="overflow-y: auto; max-height: calc(85vh - 4rem); -webkit-overflow-scrolling: touch; overscroll-behavior: contain; padding: 0 4px 16px 4px;">
                     <!-- content injected dynamically -->
                 </div>
             </div>
         `;
+        // 阻止详情弹窗遮罩层的touchmove传递到下层
+        detailModal.addEventListener('touchmove', function(e) {
+            const content = document.getElementById('detail-modal-content');
+            // 如果触摸点不在可滚动内容区域内，则阻止默认行为
+            if (!content || !content.contains(e.target)) {
+                e.preventDefault();
+            }
+        }, { passive: false });
         document.body.appendChild(detailModal);
 
         // Inject styles
@@ -183,13 +191,10 @@ function initTestMatrix({ containerId, currentId, theme = 'dark' }) {
                 #shared-detail-modal.show { opacity: 1; pointer-events: auto; z-index: 210; }
                 #shared-detail-modal.show #shared-detail-card { transform: translateY(0); }
                 .hide-scrollbar::-webkit-scrollbar { display: none; }
-                /* 详情弹窗内容区域 - 显示细滚动条作为视觉提示 */
+                /* 详情弹窗内容区域 - 显示细滚动条 */
                 #detail-modal-content::-webkit-scrollbar { width: 3px; }
                 #detail-modal-content::-webkit-scrollbar-track { background: transparent; }
                 #detail-modal-content::-webkit-scrollbar-thumb { background: rgba(150,150,150,0.4); border-radius: 3px; }
-                /* 防止滑动穿透到下层弹窗 */
-                #shared-detail-modal.show { touch-action: none; }
-                #shared-detail-modal.show #shared-detail-card { touch-action: pan-y; }
                 #detail-modal-content { overscroll-behavior: contain; }
                 .detail-desc p { margin-bottom: 0.5rem; }
                 .detail-desc b { font-weight: bold; color: inherit; }
@@ -203,22 +208,34 @@ function initTestMatrix({ containerId, currentId, theme = 'dark' }) {
     }
 }
 
+// ====== Hash 路由状态追踪 ======
+let _matrixModalOpen = false;
+let _detailModalOpen = false;
+
 window.openMatrixModal = function() {
     const modal = document.getElementById('shared-matrix-modal');
     if(modal) {
+        // 推入 hash 状态，返回键时触发 popstate 关闭弹窗
+        history.pushState({ matrixModal: true }, '', '#matrix');
+        _matrixModalOpen = true;
         modal.style.display = 'flex';
         void modal.offsetWidth;
         modal.classList.add('show');
     }
 };
 
-window.closeMatrixModal = function() {
+window.closeMatrixModal = function(fromPopstate) {
     const modal = document.getElementById('shared-matrix-modal');
-    if(modal) {
+    if(modal && _matrixModalOpen) {
+        _matrixModalOpen = false;
         modal.classList.remove('show');
         setTimeout(() => {
             if(!modal.classList.contains('show')) modal.style.display = 'none';
         }, 500);
+        // 只有用户点 X 按钮时才 history.back()，popstate 触发的不需要
+        if (!fromPopstate) {
+            history.back();
+        }
     }
 };
 
@@ -263,8 +280,8 @@ window.openTestDetailModal = function(idx) {
     const boxClass = isLight ? "bg-white p-5 rounded-2xl border border-gray-200 mb-8" : "bg-white/[0.02] border border-white/10 p-5 rounded-2xl mb-8";
     
     // Add theme class for CSS desc overrides
-    content.className = `flex flex-col hide-scrollbar pb-4 px-1 ${isLight ? 'theme-light' : 'theme-dark'}`;
-    content.style.cssText = 'overflow-y: auto; flex: 1; -webkit-overflow-scrolling: touch;';
+    content.className = `${isLight ? 'theme-light' : 'theme-dark'}`;
+    content.style.cssText = 'overflow-y: auto; max-height: calc(85vh - 4rem); -webkit-overflow-scrolling: touch; overscroll-behavior: contain; padding: 0 4px 16px 4px;';
 
     const imgHtml = test.previewImg ? `
         <div style="width:100%; border-radius:12px; overflow:hidden; margin-bottom:1.5rem; position:relative; background:#1a1a1a; padding:8px; border:1px solid ${isLight ? '#e5e7eb' : 'rgba(255,255,255,0.1)'}">
@@ -307,14 +324,19 @@ window.openTestDetailModal = function(idx) {
     const matrixCard = document.getElementById('shared-matrix-card');
     if (matrixCard) matrixCard.style.overflow = 'hidden';
 
+    // 推入 hash 状态
+    history.pushState({ detailModal: true }, '', '#matrix-detail');
+    _detailModalOpen = true;
+
     modal.style.display = 'flex';
     void modal.offsetWidth;
     modal.classList.add('show');
 };
 
-window.closeTestDetailModal = function() {
+window.closeTestDetailModal = function(fromPopstate) {
     const modal = document.getElementById('shared-detail-modal');
-    if(modal) {
+    if(modal && _detailModalOpen) {
+        _detailModalOpen = false;
         modal.classList.remove('show');
         // 解冻下层列表弹窗的滚动
         const matrixCard = document.getElementById('shared-matrix-card');
@@ -324,5 +346,22 @@ window.closeTestDetailModal = function() {
         setTimeout(() => {
             if(!modal.classList.contains('show')) modal.style.display = 'none';
         }, 400);
+        // 只有用户点 X 按钮时才 history.back()
+        if (!fromPopstate) {
+            history.back();
+        }
     }
 };
+
+// ====== Popstate 监听：返回键关闭弹窗 ======
+window.addEventListener('popstate', function(e) {
+    const hash = window.location.hash;
+    // 如果详情弹窗开着，但 hash 不再是 #matrix-detail → 关闭详情
+    if (_detailModalOpen && hash !== '#matrix-detail') {
+        closeTestDetailModal(true);
+    }
+    // 如果列表弹窗开着，但 hash 不再是 #matrix 或 #matrix-detail → 关闭列表
+    if (_matrixModalOpen && hash !== '#matrix' && hash !== '#matrix-detail') {
+        closeMatrixModal(true);
+    }
+});
