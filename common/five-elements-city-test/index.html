@@ -373,8 +373,8 @@
             <h3 class="text-[#1a1a1a] text-lg font-bold mb-5 tracking-widest font-sans">
                 [长按调令保存相册]
             </h3>
-            <div id="poster-img-container" class="w-full min-h-[350px] flex items-center justify-center">
-                <span class="text-[#1a1a1a]/40 text-sm animate-pulse font-sans font-bold" id="poster-loading">制卷中...</span>
+            <div id="poster-img-container" class="w-full min-h-[350px] max-h-[65vh] overflow-y-auto overflow-x-hidden flex flex-col items-center justify-start rounded-md">
+                <div class="m-auto"><span class="text-[#1a1a1a]/40 text-sm animate-pulse font-sans font-bold" id="poster-loading">制卷中...</span></div>
             </div>
             <p class="text-ink/50 text-xs mt-6 font-sans font-bold">在小红书分享你的调令档案</p>
         </div>
@@ -858,7 +858,7 @@
             const posterArea = document.getElementById('poster-area');
             
             modal.classList.add('show');
-            container.innerHTML = '<span class="text-[#1a1a1a]/40 text-sm animate-pulse font-sans font-bold">制卷中...</span>';
+            container.innerHTML = '<div class="m-auto"><span class="text-[#1a1a1a]/40 text-sm animate-pulse font-sans font-bold">制卷中...</span></div>';
             
             try {
                 await document.fonts.ready;
@@ -884,7 +884,7 @@
                 container.appendChild(img);
             } catch (err) {
                 console.error(err);
-                container.innerHTML = '<span class="text-[#ab2828] font-sans text-sm">制卷失败，请重试或直接截屏</span>';
+                container.innerHTML = '<div class="m-auto"><span class="text-[#ab2828] font-sans text-sm">制卷失败，请重试或直接截屏</span></div>';
             }
         }
 

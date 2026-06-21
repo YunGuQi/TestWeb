@@ -333,8 +333,8 @@
             <h3 class="text-white text-lg font-bold mb-5 tracking-widest font-mono">
                 [长按小票保存相册]
             </h3>
-            <div id="poster-img-container" class="w-full min-h-[350px] flex items-center justify-center">
-                <span class="text-white/40 text-sm animate-pulse font-mono font-bold" id="poster-loading">打印机运作中...</span>
+            <div id="poster-img-container" class="w-full min-h-[350px] max-h-[65vh] overflow-y-auto overflow-x-hidden flex flex-col items-center justify-start rounded-md">
+                <div class="m-auto"><span class="text-white/40 text-sm animate-pulse font-mono font-bold" id="poster-loading">打印机运作中...</span></div>
             </div>
             <p class="text-gray-400 text-xs mt-6 font-mono font-bold">在小红书分享你的内耗账单</p>
         </div>
@@ -758,7 +758,7 @@
         const container = document.getElementById('poster-img-container');
         
         modal.classList.add('show');
-        container.innerHTML = '<span class="text-white/40 text-sm animate-pulse font-mono font-bold" id="poster-loading">打印机运作中...</span>';
+        container.innerHTML = '<div class="m-auto"><span class="text-white/40 text-sm animate-pulse font-mono font-bold">制卷中...</span></div>';
         
         document.getElementById('result-bottom-bar').style.display = 'none';
         await document.fonts.ready;
@@ -788,7 +788,7 @@
             container.appendChild(img);
         } catch (e) {
             console.error(e);
-            container.innerHTML = '<span class="text-red-400 font-mono text-sm">打印机卡纸，请重试</span>';
+            container.innerHTML = '<div class="m-auto"><span class="text-red-400 font-mono text-sm">制卷失败，请重试或直接截屏</span></div>';
         } finally {
             document.getElementById('result-bottom-bar').style.display = 'block';
         }
