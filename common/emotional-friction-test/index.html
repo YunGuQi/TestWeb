@@ -221,7 +221,10 @@
                         
                         <div class="w-full h-px bg-gradient-to-r from-white/10 to-transparent mb-8"></div>
                         
-                        <div id="result-desc" class="text-[15px] text-gray-300 leading-relaxed space-y-4 font-medium"></div>
+                        <div id="result-desc" class="text-[15px] text-gray-300 leading-relaxed space-y-4 font-medium mb-6"></div>
+                        <div class="pt-4 border-t border-white/10 text-center">
+                            <span class="text-[10px] text-white/30 tracking-widest font-mono">* 本测评仅供心理状态参考 · 非医疗诊断</span>
+                        </div>
                     </div>
                 </div>
 
@@ -664,6 +667,9 @@
                 onclone: (clonedDoc) => {
                     // Inject a watermark in the clone
                     const cloneCard = clonedDoc.querySelector('.doppel-core');
+                    const cloneShell = clonedDoc.querySelector('.doppel-shell');
+                    if (cloneShell) cloneShell.style.width = targetCard.offsetWidth + 'px';
+                    
                     if (cloneCard) {
                         const watermark = clonedDoc.createElement('div');
                         watermark.className = 'mt-6 pt-4 border-t border-white/10 flex justify-between items-center';

@@ -204,14 +204,17 @@
                 <div class="barcode text-center opacity-80 select-none">
                     || | ||| || || | | || | |
                 </div>
-                <div class="font-ticket text-[10px] opacity-50 mt-1">NO. 8492039485721</div>
+                <div class="font-ticket text-[10px] opacity-50 mt-1 mb-2">NO. 8492039485721</div>
+                <div class="font-ticket text-[9px] opacity-40 text-center tracking-widest mt-1 border-t border-current pt-2 w-full">
+                    * 本档案结果仅供娱乐参考，请凭直觉执行
+                </div>
             </div>
         </div>
 
         <div class="w-full mt-8 flex flex-col gap-4">
             <button onclick="saveTicket()" class="w-full bg-[#1a1a1a] text-white py-4 rounded font-bold tracking-widest hover:bg-black active:scale-[0.98] transition-transform flex justify-center items-center gap-2">
                 <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
-                长按保存车票分享
+                点击保存车票分享
             </button>
 
             <!-- Cross-promotion section -->
@@ -579,26 +582,58 @@
         }
 
         // 保存截图
-        function saveTicket() {
+        async function saveTicket() {
             const el = document.getElementById('ticket-capture');
             const btn = event.currentTarget;
             const originalText = btn.innerHTML;
-            btn.innerHTML = '正在打印车票...';
+            btn.innerHTML = '正在合成车票...';
             
-            html2canvas(el, {
-                scale: 2, // 高清
-                backgroundColor: '#e6e4df',
-                logging: false
-            }).then(canvas => {
+            try {
+                // 等待所有字体加载完毕，防止错位
+                await document.fonts.ready;
+                // 稍微延时让DOM彻底重绘
+                await new Promise(r => setTimeout(r, 100));
+
+                const canvas = await html2canvas(el, {
+                    scale: window.devicePixelRatio > 1 ? window.devicePixelRatio : 2, // 动态高清
+                    backgroundColor: getComputedStyle(document.body).backgroundColor,
+                    useCORS: true,
+                    logging: false,
+                    // 修复移动端 flex 和 absolute 导致的塌陷错位
+                    onclone: (clonedDoc) => {
+                        const cloneEl = clonedDoc.getElementById('ticket-capture');
+                        if (cloneEl) {
+                            // 强制赋予固定宽度，避免弹性盒子被挤压
+                            cloneEl.style.width = el.offsetWidth + 'px';
+                            // 修复目的地标题和Tag重叠：改用 block 布局
+                            const cityFlex = cloneEl.querySelector('div.flex.items-end.gap-3.mb-2');
+                            if (cityFlex) {
+                                cityFlex.style.display = 'block';
+                                cityFlex.querySelector('h2').style.display = 'inline-block';
+                                cityFlex.querySelector('h2').style.lineHeight = '1';
+                                cityFlex.querySelector('span').style.display = 'inline-block';
+                                cityFlex.querySelector('span').style.marginLeft = '12px';
+                            }
+                            // 修复条形码和数字重叠
+                            const barcode = cloneEl.querySelector('.barcode');
+                            if (barcode) {
+                                barcode.style.lineHeight = '1';
+                                barcode.style.height = '48px';
+                            }
+                        }
+                    }
+                });
+                
                 const link = document.createElement('a');
                 link.download = `心灵逃跑车票_${document.getElementById('r-city').textContent}.png`;
-                link.href = canvas.toDataURL('image/png');
+                link.href = canvas.toDataURL('image/png', 0.9);
                 link.click();
+            } catch (err) {
+                console.error(err);
+                alert('保存失败，请直接截屏保存');
+            } finally {
                 btn.innerHTML = originalText;
-            }).catch(() => {
-                btn.innerHTML = originalText;
-                alert('保存失败，请截图保存');
-            });
+            }
         }
 
         // SPA Routing / Back Button Interception

@@ -315,7 +315,8 @@
                 </div>
 
                 <div class="text-center text-[9px] text-ink/30 font-sans tracking-widest pt-4 border-t border-ink/10">
-                    地气勘探局 · <span id="current-date"></span> 签发
+                    <p class="mb-1">地气勘探局 · <span id="current-date"></span> 签发</p>
+                    <p class="opacity-70">* 勘探档案仅供娱乐参考，请凭直觉执行</p>
                 </div>
             </div>
 
@@ -819,23 +820,38 @@
             }, 100);
         }
 
-        function savePoster() {
+        async function savePoster() {
             const posterArea = document.getElementById('poster-area');
             const btn = event.currentTarget;
             const originalText = btn.innerHTML;
             btn.innerHTML = '档案封存中...';
             
-            html2canvas(posterArea, {
-                scale: 2,
-                useCORS: true,
-                backgroundColor: '#f0ebe1'
-            }).then(canvas => {
+            try {
+                await document.fonts.ready;
+                await new Promise(r => setTimeout(r, 100));
+
+                const canvas = await html2canvas(posterArea, {
+                    scale: window.devicePixelRatio > 1 ? window.devicePixelRatio : 2,
+                    useCORS: true,
+                    backgroundColor: '#f0ebe1',
+                    onclone: (clonedDoc) => {
+                        const cloneEl = clonedDoc.getElementById('poster-area');
+                        if (cloneEl) {
+                            cloneEl.style.width = posterArea.offsetWidth + 'px';
+                        }
+                    }
+                });
+                
                 const link = document.createElement('a');
                 link.download = `勘探局调令-${document.getElementById('doc-id').innerText}.jpg`;
                 link.href = canvas.toDataURL('image/jpeg', 0.9);
                 link.click();
+            } catch (err) {
+                console.error(err);
+                alert('保存失败，请直接截屏保存');
+            } finally {
                 btn.innerHTML = originalText;
-            });
+            }
         }
 
         // SPA Routing / Back Button Interception

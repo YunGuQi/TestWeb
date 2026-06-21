@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>小红书图文一键生成器</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;700;900&family=Noto+Serif+SC:wght@700;900&display=swap" rel="stylesheet">
+    <!-- Load barcode font -->
+    <link href="https://fonts.googleapis.com/css2?family=Libre+Barcode+39&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-kraft: #efe9db; /* 牛皮纸底色 */
+            --text-dark: #1a1a1a;
+            --text-red: #d93838;
+        }
+        body {
+            background: #333;
+            padding: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            font-family: 'Noto Sans SC', sans-serif;
+        }
+        .controls {
+            width: 100%;
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        button {
+            background: #fff;
+            padding: 10px 20px;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        /* XHS Vertical Image 3:4 aspect ratio */
+        .post-card {
+            width: 1080px;
+            height: 1440px;
+            background-color: var(--bg-kraft);
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.08'/%3E%3C/svg%3E");
+            position: relative;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            overflow: hidden;
+            transform-origin: top left;
+            transform: scale(0.3); /* scale down for viewing in browser */
+            margin-right: -756px; /* offset the scale */
+            margin-bottom: -1008px;
+            color: var(--text-dark);
+            border: 2px solid #ccc;
+        }
+
+        /* typography */
+        .font-serif-title {
+            font-family: 'Noto Serif SC', serif;
+        }
+        .font-ticket {
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .highlight-red {
+            color: var(--text-red);
+        }
+        
+        /* Layouts */
+        .header-tag {
+            position: absolute;
+            top: 80px;
+            left: 80px;
+            font-size: 32px;
+            font-weight: 900;
+            letter-spacing: 2px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .header-tag::before {
+            content: '';
+            width: 40px;
+            height: 8px;
+            background: var(--text-dark);
+        }
+
+        .cover-title {
+            position: absolute;
+            top: 400px;
+            left: 80px;
+            width: 920px;
+            font-size: 110px;
+            font-weight: 900;
+            line-height: 1.3;
+            letter-spacing: -2px;
+        }
+
+        .cover-sub {
+            position: absolute;
+            top: 250px;
+            right: 80px;
+            font-size: 48px;
+            font-weight: 700;
+            color: var(--text-red);
+            border: 4px solid var(--text-red);
+            padding: 20px 40px;
+            transform: rotate(5deg);
+        }
+
+        .tags-container {
+            position: absolute;
+            bottom: 200px;
+            left: 80px;
+            display: flex;
+            gap: 20px;
+        }
+        .tag {
+            background: rgba(0,0,0,0.05);
+            padding: 16px 32px;
+            font-size: 36px;
+            font-weight: bold;
+            border-radius: 8px;
+        }
+
+        .swipe-hint {
+            position: absolute;
+            bottom: 80px;
+            right: 80px;
+            font-size: 42px;
+            font-weight: 900;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        /* Question Layout */
+        .q-number {
+            position: absolute;
+            top: 100px;
+            left: 80px;
+            font-size: 48px;
+            font-weight: 900;
+            color: var(--text-red);
+            letter-spacing: 2px;
+        }
+        
+        .content-wrapper {
+            position: absolute;
+            top: 260px;
+            left: 80px;
+            width: 920px;
+            display: flex;
+            flex-direction: column;
+            gap: 60px;
+        }
+        .q-text {
+            font-size: 64px;
+            font-weight: 900;
+            line-height: 1.5;
+        }
+        .options-container {
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+        }
+        .option {
+            display: flex;
+            align-items: flex-start;
+            gap: 30px;
+            font-size: 48px;
+            font-weight: 700;
+            line-height: 1.4;
+            background: rgba(255,255,255,0.4);
+            border: 4px solid var(--text-dark);
+            padding: 40px;
+            border-radius: 16px;
+        }
+        .option-letter {
+            font-size: 56px;
+            font-weight: 900;
+            color: var(--text-red);
+        }
+        .page-num {
+            position: absolute;
+            bottom: 80px;
+            right: 80px;
+            font-size: 32px;
+            font-weight: 900;
+            opacity: 0.5;
+            letter-spacing: 4px;
+        }
+
+        /* hand drawn underline */
+        .underline-rough {
+            position: relative;
+            display: inline-block;
+        }
+        .underline-rough::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            width: 100%;
+            height: 16px;
+            background: url('data:image/svg+xml;utf8,<svg preserveAspectRatio="none" viewBox="0 0 100 10" xmlns="http://www.w3.org/2000/svg"><path d="M0 5 Q 25 0, 50 5 T 100 5" stroke="%23d93838" stroke-width="3" fill="transparent"/></svg>');
+            background-size: 100% 100%;
+        }
+
+        /* Ticket Styles */
+        .ticket-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            width: 100%;
+        }
+        .ticket {
+            position: relative;
+            background: #fdfbf7;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+            border: 3px solid #1a1a1a;
+            width: 860px;
+        }
+        .ticket::before, .ticket::after {
+            content: '';
+            position: absolute;
+            top: 55%;
+            width: 60px;
+            height: 60px;
+            background: var(--bg-kraft);
+            border-radius: 50%;
+            transform: translateY(-50%);
+            border: 3px solid #1a1a1a;
+        }
+        .ticket::before { left: -33px; border-right-color: transparent; border-top-color: transparent; transform: translateY(-50%) rotate(45deg); }
+        .ticket::after { right: -33px; border-left-color: transparent; border-bottom-color: transparent; transform: translateY(-50%) rotate(45deg); }
+        
+        .ticket-divider {
+            border-top: 4px dashed #b5b1a3;
+            margin: 0 40px;
+            position: relative;
+        }
+        .stamp {
+            border: 8px solid #d93838;
+            color: #d93838;
+            border-radius: 50%;
+            width: 200px;
+            height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 38px;
+            transform: rotate(-15deg);
+            opacity: 0.9;
+            position: absolute;
+            top: 40px;
+            right: 40px;
+            text-align: center;
+            line-height: 1.2;
+        }
+        .barcode {
+            font-family: 'Libre Barcode 39', cursive, monospace;
+            font-size: 110px;
+            line-height: 1;
+            letter-spacing: -2px;
+        }
+        .ticket-title-large { font-size: 96px; font-weight: 900; letter-spacing: -4px; line-height: 1; }
+        .ticket-prov { font-size: 32px; font-weight: bold; opacity: 0.5; margin-bottom: 8px; }
+        .ticket-tag { background: #1a1a1a; color: white; padding: 12px 24px; font-size: 24px; font-weight: bold; display: inline-block; letter-spacing: 2px; }
+
+    </style>
+</head>
+<body>
+
+    <div class="controls">
+        <button onclick="downloadAll()">一键生成并下载所有图片</button>
+    </div>
+
+    <!-- Cover -->
+    <div id="capture-cover" class="post-card">
+        <div class="header-tag">NO.08 | 城市与性格</div>
+        <div class="cover-sub font-serif-title"># 现在的城市真的懂你吗？</div>
+        <div class="cover-title font-serif-title">
+            你在现在的城市，<br><br>是在<span class="highlight-red">「消耗」</span><br><br>还是在<span class="highlight-red">「生长」</span>？
+        </div>
+        <div class="tags-container">
+            <div class="tag">5道题</div>
+            <div class="tag">深度解析</div>
+            <div class="tag">心灵归属</div>
+        </div>
+        <div class="swipe-hint highlight-red">
+            左滑开始测试 
+            <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </div>
+    </div>
+
+    <!-- Q1 -->
+    <div id="capture-q1" class="post-card">
+        <div class="header-tag">NO.08 | 城市与性格</div>
+        <div class="q-number">QUESTION 01</div>
+        <div class="content-wrapper">
+            <div class="q-text">星期五晚上 11 点，你刚结束连续 14 天的加班，走出写字楼。</div>
+            <div class="options-container">
+                <div class="option">
+                    <div class="option-letter">A</div>
+                    <div>叫专车回家，只想赶紧把大脑关机。</div>
+                </div>
+                <div class="option">
+                    <div class="option-letter">B</div>
+                    <div>突然觉得还没累透，想找个喧闹的地方报复性熬夜。</div>
+                </div>
+            </div>
+        </div>
+        <div class="page-num">1 / 6</div>
+    </div>
+
+    <!-- Q2 -->
+    <div id="capture-q2" class="post-card">
+        <div class="header-tag">NO.08 | 城市与性格</div>
+        <div class="q-number">QUESTION 02</div>
+        <div class="content-wrapper">
+            <div class="q-text">对于<span class="highlight-red underline-rough">“30岁之前必须攒够100万”</span>这种网络观点，你内心的真实反应：</div>
+            <div class="options-container">
+                <div class="option">
+                    <div class="option-letter">A</div>
+                    <div>深表认同，这是一种安全感底线。</div>
+                </div>
+                <div class="option">
+                    <div class="option-letter">B</div>
+                    <div>太焦虑了吧，人生为什么要被数字绑架。</div>
+                </div>
+            </div>
+        </div>
+        <div class="page-num">2 / 6</div>
+    </div>
+
+    <!-- Q3 -->
+    <div id="capture-q3" class="post-card">
+        <div class="header-tag">NO.08 | 城市与性格</div>
+        <div class="q-number">QUESTION 03</div>
+        <div class="content-wrapper">
+            <div class="q-text">去常买的咖啡店，老板突然开始<span class="highlight-red">热情地叫出你的名字</span>：</div>
+            <div class="options-container">
+                <div class="option">
+                    <div class="option-letter">A</div>
+                    <div>感觉私人领地被入侵，下次考虑换一家买。</div>
+                </div>
+                <div class="option">
+                    <div class="option-letter">B</div>
+                    <div>觉得很亲切，顺便多聊了几句。</div>
+                </div>
+            </div>
+        </div>
+        <div class="page-num">3 / 6</div>
+    </div>
+
+    <!-- Q4 -->
+    <div id="capture-q4" class="post-card">
+        <div class="header-tag">NO.08 | 城市与性格</div>
+        <div class="q-number">QUESTION 04</div>
+        <div class="content-wrapper">
+            <div class="q-text">休年假去旅行，你更倾向于：</div>
+            <div class="options-container">
+                <div class="option">
+                    <div class="option-letter">A</div>
+                    <div>每天安排2个城市，特种兵式打卡。</div>
+                </div>
+                <div class="option">
+                    <div class="option-letter">B</div>
+                    <div>找个舒服的酒店躺三天，哪也不去。</div>
+                </div>
+            </div>
+        </div>
+        <div class="page-num">4 / 6</div>
+    </div>
+
+    <!-- Q5 -->
+    <div id="capture-q5" class="post-card">
+        <div class="header-tag">NO.08 | 城市与性格</div>
+        <div class="q-number">QUESTION 05</div>
+        <div class="content-wrapper">
+            <div class="q-text">如果你的生活是一列火车，你<span class="highlight-red">最怕</span>遇到哪种情况？</div>
+            <div class="options-container">
+                <div class="option">
+                    <div class="option-letter">A</div>
+                    <div>突然脱轨，不知道下一站停在哪里的失控。</div>
+                </div>
+                <div class="option">
+                    <div class="option-letter">B</div>
+                    <div>永远按既定轨道行驶，一眼望到头的无趣。</div>
+                </div>
+            </div>
+        </div>
+        <div class="page-num">5 / 6</div>
+    </div>
+
+    <!-- Result Ticket -->
+    <div id="capture-ticket" class="post-card">
+        <div class="header-tag">NO.08 | 城市与性格</div>
+        <div class="ticket-wrapper">
+            
+            <div class="text-center mb-10 mt-32">
+                <div class="text-5xl font-black mb-4 tracking-wider">评论区留下 5 个选项字母 <span class="highlight-red">@问一问</span></div>
+                <div class="text-3xl font-bold tracking-widest mb-6">即可获取你的简版性格诊断</div>
+                <div class="text-4xl font-bold highlight-red tracking-widest mt-4">主页查看完整版，获取专属单程车票 👇</div>
+            </div>
+
+            <!-- Fake Ticket -->
+            <div class="ticket flex flex-col overflow-hidden pb-10">
+                <div class="p-10 relative">
+                    <div class="stamp">逃离<br>许可</div>
+                    <div class="flex justify-between items-start mb-10">
+                        <div>
+                            <div class="font-ticket text-xl opacity-70 mb-2">FLIGHT / TRAIN NO.</div>
+                            <div class="font-bold text-3xl">XHS-2026</div>
+                        </div>
+                        <div class="text-right">
+                            <div class="font-ticket text-xl opacity-70 mb-2">CLASS</div>
+                            <div class="font-bold text-3xl">SOUL</div>
+                        </div>
+                    </div>
+
+                    <div class="font-ticket text-xl opacity-70 mb-2">DESTINATION</div>
+                    <div class="flex items-end gap-4 mb-4">
+                        <div class="ticket-title-large">北京</div>
+                        <div class="ticket-prov">北京</div>
+                    </div>
+                    
+                    <div class="ticket-tag mt-4">冰冷的齿轮驱动者</div>
+                </div>
+
+                <div class="ticket-divider"></div>
+
+                <div class="p-10">
+                    <div class="font-ticket text-xl opacity-70 mb-4">DIAGNOSTIC REPORT</div>
+                    <p class="text-[28px] leading-relaxed font-bold border-l-8 border-[#1a1a1a] pl-6">
+                        “在绝对理性的巨型机器里，你找到了最安全的齿轮位置。”
+                    </p>
+                    
+                    <div class="mt-10 flex flex-wrap gap-4">
+                        <span class="px-4 py-2 text-xl font-bold font-ticket border-2 border-[#1a1a1a] bg-[#e6e4df]">快节奏</span>
+                        <span class="px-4 py-2 text-xl font-bold font-ticket border-2 border-[#1a1a1a] bg-[#e6e4df]">高边界</span>
+                        <span class="px-4 py-2 text-xl font-bold font-ticket border-2 border-[#1a1a1a] bg-[#e6e4df]">秩序掌控</span>
+                        <span class="px-4 py-2 text-xl font-bold font-ticket border-2 border-[#1a1a1a] bg-[#e6e4df]">冷峻现实</span>
+                    </div>
+                </div>
+
+                <div class="px-10 flex flex-col items-center mt-4">
+                    <div class="barcode text-center opacity-80 select-none">
+                        || | ||| || || | | || | |
+                    </div>
+                    <div class="font-ticket text-[18px] opacity-50 mt-2">NO. 8492039485721</div>
+                </div>
+            </div>
+
+        </div>
+        <div class="page-num">6 / 6</div>
+    </div>
+
+    <script>
+        async function downloadAll() {
+            const ids = ['capture-cover', 'capture-q1', 'capture-q2', 'capture-q3', 'capture-q4', 'capture-q5', 'capture-ticket'];
+            const names = ['0-首图.png', '1-题1.png', '2-题2.png', '3-题3.png', '4-题4.png', '5-题5.png', '6-车票引导.png'];
+            
+            try {
+                // 弹出文件夹选择框，让用户自己指定存到“帖子物料”目录下
+                const dirHandle = await window.showDirectoryPicker({
+                    mode: 'readwrite'
+                });
+                
+                for(let i=0; i<ids.length; i++) {
+                    const el = document.getElementById(ids[i]);
+                    // Temporarily remove transform to get full resolution
+                    const oldTransform = el.style.transform;
+                    const oldMargin = el.style.margin;
+                    el.style.transform = 'none';
+                    el.style.margin = '0';
+                    
+                    const canvas = await html2canvas(el, { scale: 1, backgroundColor: null });
+                    
+                    el.style.transform = oldTransform;
+                    el.style.margin = oldMargin;
+
+                    // 将 canvas 转换成 blob 对象 (真正的 png 图片)
+                    const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+                    
+                    // 在用户选择的目录里创建文件
+                    const fileHandle = await dirHandle.getFileHandle(names[i], { create: true });
+                    const writable = await fileHandle.createWritable();
+                    await writable.write(blob);
+                    await writable.close();
+                    
+                    // Small delay between downloads
+                    await new Promise(r => setTimeout(r, 500));
+                }
+                alert('所有图片已成功保存到你指定的文件夹中！');
+            } catch (err) {
+                console.error(err);
+                if (err.name !== 'AbortError') {
+                    alert('保存失败。请确保你的浏览器(如 Chrome/Edge)支持文件夹写入功能，并且你授予了修改权限。');
+                }
+            }
+        }
+    </script>
+</body>
+</html>
