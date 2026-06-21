@@ -113,6 +113,15 @@
         /* Modal Animation */
         .modal-enter { animation: modalFade 0.3s ease forwards; }
         @keyframes modalFade { from { opacity: 0; backdrop-filter: blur(0px); } to { opacity: 1; backdrop-filter: blur(4px); } }
+        
+        .modal-overlay {
+            position: fixed; inset: 0; z-index: 100; background-color: rgba(0,0,0,0.6); backdrop-filter: blur(4px); opacity: 0; pointer-events: none; transition: opacity 0.3s; display: flex; flex-direction: column; justify-content: flex-end;
+        }
+        .modal-overlay.show { opacity: 1; pointer-events: auto; }
+        .modal-card {
+            transform: translateY(100%); transition: transform 0.5s cubic-bezier(0.32, 0.72, 0, 1);
+        }
+        .modal-overlay.show .modal-card { transform: translateY(0); }
     </style>
 </head>
 <body class="min-h-screen flex justify-center">
@@ -352,6 +361,22 @@
             <div id="history-list-container" class="space-y-3">
                 <!-- 历史列表动态渲染 -->
             </div>
+        </div>
+    </div>
+
+    <!-- ================= 7. POSTER MODAL ================= -->
+    <div id="poster-modal" class="modal-overlay" onclick="closePosterModal(event)">
+        <div class="modal-card max-w-sm mx-auto w-full relative p-6 flex flex-col items-center bg-[#f0ebe1] border-t-4 border-[#1a1a1a] text-[#1a1a1a] pb-[calc(2rem+env(safe-area-inset-bottom))]">
+            <button class="absolute -top-14 right-0 w-10 h-10 flex items-center justify-center border-2 border-[#f0ebe1] hover:bg-[#f0ebe1] hover:text-[#1a1a1a] transition-colors modal-close font-bold text-[#f0ebe1]" onclick="closePosterModal()">
+                X
+            </button>
+            <h3 class="text-[#1a1a1a] text-lg font-bold mb-5 tracking-widest font-sans">
+                [长按调令保存相册]
+            </h3>
+            <div id="poster-img-container" class="w-full min-h-[350px] flex items-center justify-center">
+                <span class="text-[#1a1a1a]/40 text-sm animate-pulse font-sans font-bold" id="poster-loading">制卷中...</span>
+            </div>
+            <p class="text-ink/50 text-xs mt-6 font-sans font-bold">在小红书分享你的调令档案</p>
         </div>
     </div>
 
@@ -828,10 +853,12 @@
         }
 
         async function savePoster() {
+            const modal = document.getElementById('poster-modal');
+            const container = document.getElementById('poster-img-container');
             const posterArea = document.getElementById('poster-area');
-            const btn = event.currentTarget;
-            const originalText = btn.innerHTML;
-            btn.innerHTML = '档案封存中...';
+            
+            modal.classList.add('show');
+            container.innerHTML = '<span class="text-[#1a1a1a]/40 text-sm animate-pulse font-sans font-bold">制卷中...</span>';
             
             try {
                 await document.fonts.ready;
@@ -840,22 +867,31 @@
                 const dataUrl = await htmlToImage.toJpeg(posterArea, {
                     pixelRatio: window.devicePixelRatio > 1 ? window.devicePixelRatio : 2,
                     backgroundColor: '#f0ebe1',
+                    width: posterArea.offsetWidth,
+                    height: posterArea.offsetHeight,
                     style: {
                         transform: 'scale(1)',
-                        transformOrigin: 'top left'
+                        transformOrigin: 'top left',
+                        margin: '0'
                     }
                 });
                 
-                const link = document.createElement('a');
-                link.download = `勘探局调令-${document.getElementById('doc-id').innerText}.jpg`;
-                link.href = dataUrl;
-                link.click();
+                const img = document.createElement('img');
+                img.src = dataUrl;
+                img.className = 'w-full h-auto drop-shadow-2xl touch-callout-default select-all pointer-events-auto';
+                
+                container.innerHTML = '';
+                container.appendChild(img);
             } catch (err) {
                 console.error(err);
-                alert('保存失败，请直接截屏保存');
-            } finally {
-                btn.innerHTML = originalText;
+                container.innerHTML = '<span class="text-[#ab2828] font-sans text-sm">制卷失败，请重试或直接截屏</span>';
             }
+        }
+
+        function closePosterModal(e) {
+            const modal = document.getElementById('poster-modal');
+            if (e && e.target !== modal && !e.target.closest('.modal-close')) return;
+            modal.classList.remove('show');
         }
 
         // SPA Routing / Back Button Interception

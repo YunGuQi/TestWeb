@@ -530,28 +530,30 @@
             else prevBtn.classList.add('hidden');
         }
 
-        gsap.to(qText, { opacity: 0, y: 10, duration: 0.2, onComplete: () => {
-            qText.innerHTML = `<span class="text-sm font-mono text-gray-500 block mb-2">[扫描条码: ${Math.floor(Math.random()*8999+1000)}]</span>${q.text}`;
-            gsap.to(qText, { opacity: 1, y: 0, duration: 0.4, ease: customEase });
-        }});
+        // 极速切换：去掉旧元素的渐出动画，直接重绘并渐入，消除卡顿感
+        gsap.killTweensOf(qText);
+        gsap.killTweensOf(optionsList.children);
 
-        gsap.to(optionsList.children, { opacity: 0, y: 10, duration: 0.2, onComplete: () => {
-            optionsList.innerHTML = '';
-            q.options.forEach((opt) => {
-                const btn = document.createElement('button');
-                btn.className = 'option-btn opacity-0 translate-y-4';
-                btn.innerHTML = `
-                    <div class="flex items-start gap-3">
-                        <div class="w-5 h-5 border-2 border-black flex-shrink-0 mt-0.5 bg-white box"></div>
-                        <span class="text-base font-bold tracking-wide">${opt.text}</span>
-                    </div>
-                `;
-                btn.onclick = () => selectOption(opt, btn);
-                optionsList.appendChild(btn);
-            });
-            
-            gsap.to(".option-btn", { opacity: 1, y: 0, duration: 0.4, stagger: 0.05, ease: customEase });
-        }});
+        qText.style.opacity = 0;
+        qText.style.transform = "translateY(10px)";
+        qText.innerHTML = `<span class="text-sm font-mono text-gray-500 block mb-2">[扫描条码: ${Math.floor(Math.random()*8999+1000)}]</span>${q.text}`;
+        gsap.to(qText, { opacity: 1, y: 0, duration: 0.3, ease: customEase });
+
+        optionsList.innerHTML = '';
+        q.options.forEach((opt) => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn opacity-0 translate-y-4';
+            btn.innerHTML = `
+                <div class="flex items-start gap-3">
+                    <div class="w-5 h-5 border-2 border-black flex-shrink-0 mt-0.5 bg-white box"></div>
+                    <span class="text-base font-bold tracking-wide text-left">${opt.text}</span>
+                </div>
+            `;
+            btn.onclick = () => selectOption(opt, btn);
+            optionsList.appendChild(btn);
+        });
+        
+        gsap.to(".option-btn", { opacity: 1, y: 0, duration: 0.3, stagger: 0.05, ease: customEase });
     }
 
     function selectOption(opt, btn) {
@@ -563,11 +565,12 @@
         box.classList.add('bg-white');
         
         const siblings = Array.from(btn.parentNode.children).filter(el => el !== btn);
-        gsap.to(siblings, { opacity: 0.3, scale: 0.98, duration: 0.3 });
+        gsap.to(siblings, { opacity: 0.3, scale: 0.98, duration: 0.2 });
         
         totalScore += opt.score;
         selectedHistory.push({ billName: opt.billName, score: opt.score });
         
+        // 降低跳转延迟，从 400ms 降低至 200ms
         setTimeout(() => {
             if (currentQuestionIndex < questions.length - 1) {
                 currentQuestionIndex++;
@@ -575,7 +578,7 @@
             } else {
                 generateResult('quiz', true);
             }
-        }, 400);
+        }, 200);
     }
 
     function prevQuestion() {
@@ -767,10 +770,13 @@
             const dataUrl = await htmlToImage.toPng(targetCard, {
                 backgroundColor: 'transparent', 
                 pixelRatio: window.devicePixelRatio > 1 ? window.devicePixelRatio : 2,
+                width: targetCard.offsetWidth,
+                height: targetCard.offsetHeight,
                 style: {
                     transform: 'scale(1)',
                     transformOrigin: 'top left',
-                    filter: 'none' // remove drop-shadow for cleaner PNG output
+                    filter: 'none', // remove drop-shadow for cleaner PNG output
+                    margin: '0'
                 }
             });
             

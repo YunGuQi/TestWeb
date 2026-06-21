@@ -82,6 +82,14 @@
             line-height: 1;
             letter-spacing: -2px;
         }
+        .modal-overlay {
+            position: fixed; inset: 0; z-index: 100; background-color: rgba(0,0,0,0.6); backdrop-filter: blur(4px); opacity: 0; pointer-events: none; transition: opacity 0.3s; display: flex; flex-direction: column; justify-content: flex-end;
+        }
+        .modal-overlay.show { opacity: 1; pointer-events: auto; }
+        .modal-card {
+            transform: translateY(100%); transition: transform 0.5s cubic-bezier(0.32, 0.72, 0, 1);
+        }
+        .modal-overlay.show .modal-card { transform: translateY(0); }
     </style>
 </head>
 <body class="antialiased">
@@ -226,6 +234,22 @@
             </button>
         </div>
     </section>
+
+    <!-- Poster Modal -->
+    <div id="poster-modal" class="modal-overlay" onclick="closePosterModal(event)">
+        <div class="modal-card max-w-sm mx-auto w-full relative p-6 flex flex-col items-center bg-[#1c1c1e] border-t-4 border-white text-white pb-[calc(2rem+env(safe-area-inset-bottom))]">
+            <button class="absolute -top-14 right-0 w-10 h-10 flex items-center justify-center border-2 border-white hover:bg-white hover:text-black transition-colors modal-close font-bold" onclick="closePosterModal()">
+                X
+            </button>
+            <h3 class="text-white text-lg font-bold mb-5 tracking-widest font-mono">
+                [长按车票保存相册]
+            </h3>
+            <div id="poster-img-container" class="w-full min-h-[350px] flex items-center justify-center">
+                <span class="text-white/40 text-sm animate-pulse font-mono font-bold" id="poster-loading">制票机运作中...</span>
+            </div>
+            <p class="text-gray-400 text-xs mt-6 font-mono font-bold">在小红书分享你的心灵车票</p>
+        </div>
+    </div>
 
     <!-- Shared Component -->
     <script src="../test-matrix.js?v=20260621b"></script>
@@ -584,10 +608,12 @@
 
         // 保存截图
         async function saveTicket() {
+            const modal = document.getElementById('poster-modal');
+            const container = document.getElementById('poster-img-container');
             const el = document.getElementById('ticket-capture');
-            const btn = event.currentTarget;
-            const originalText = btn.innerHTML;
-            btn.innerHTML = '正在合成车票...';
+            
+            modal.classList.add('show');
+            container.innerHTML = '<span class="text-white/40 text-sm animate-pulse font-mono font-bold">制票机运作中...</span>';
             
             try {
                 // 等待所有字体加载完毕，防止错位
@@ -598,22 +624,31 @@
                 const dataUrl = await htmlToImage.toPng(el, {
                     pixelRatio: window.devicePixelRatio > 1 ? window.devicePixelRatio : 2,
                     backgroundColor: getComputedStyle(document.body).backgroundColor,
+                    width: el.offsetWidth,
+                    height: el.offsetHeight,
                     style: {
                         transform: 'scale(1)',
-                        transformOrigin: 'top left'
+                        transformOrigin: 'top left',
+                        margin: '0'
                     }
                 });
                 
-                const link = document.createElement('a');
-                link.download = `心灵逃跑车票_${document.getElementById('r-city').textContent}.png`;
-                link.href = dataUrl;
-                link.click();
+                const img = document.createElement('img');
+                img.src = dataUrl;
+                img.className = 'w-full h-auto drop-shadow-2xl touch-callout-default select-all pointer-events-auto';
+                
+                container.innerHTML = '';
+                container.appendChild(img);
             } catch (err) {
                 console.error(err);
-                alert('保存失败，请直接截屏保存');
-            } finally {
-                btn.innerHTML = originalText;
+                container.innerHTML = '<span class="text-red-400 font-mono text-sm">保存失败，请重试或直接截屏</span>';
             }
+        }
+
+        function closePosterModal(e) {
+            const modal = document.getElementById('poster-modal');
+            if (e && e.target !== modal && !e.target.closest('.modal-close')) return;
+            modal.classList.remove('show');
         }
 
         // SPA Routing / Back Button Interception
