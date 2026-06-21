@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>测试流程 & 购买须知</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@700;900&family=Noto+Sans+SC:wght@400;500;700&display=swap');
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background-color: #fdfbf8; /* Warm cream background */
+            color: #2c3e35;
+        }
+        h1, .serif {
+            font-family: 'Noto Serif SC', serif;
+        }
+        .step-card {
+            background-color: #ffffff;
+            border-radius: 20px;
+            box-shadow: 0 4px 20px rgba(44, 62, 53, 0.04);
+            padding: 24px;
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            position: relative;
+        }
+        .number-badge {
+            background-color: #1f3b31;
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 18px;
+            position: absolute;
+            left: 24px;
+        }
+        .icon-box {
+            background-color: #f4efdf;
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: 40px; /* Make room for number badge */
+        }
+        .icon-box svg {
+            width: 36px;
+            height: 36px;
+            color: #1f3b31;
+        }
+        .text-content h3 {
+            font-size: 20px;
+            font-weight: bold;
+            color: #1f3b31;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .text-content p {
+            font-size: 15px;
+            color: #556b60;
+            line-height: 1.6;
+        }
+        .arrow-down {
+            text-align: center;
+            font-size: 24px;
+            color: #2c3e35;
+            margin: 16px 0;
+        }
+        .sparkle {
+            color: #dcb37d;
+        }
+    </style>
+</head>
+<body class="flex justify-center items-center min-h-screen py-10">
+
+    <div id="capture-area" class="w-[900px] h-[1200px] p-16 bg-[#fdfbf8] relative flex flex-col justify-center">
+        <h1 class="text-center text-[46px] font-black tracking-widest text-[#1f3b31] mb-16">
+            测试流程 & 购买须知 <span class="sparkle">✦</span>
+        </h1>
+
+        <!-- Step 1 -->
+        <div class="step-card">
+            <div class="number-badge">1</div>
+            <div class="icon-box">
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+            </div>
+            <div class="text-content">
+                <h3>点击购买链接 <span class="sparkle text-lg">✦</span></h3>
+                <p>选择你想要的测试<br>点击购买，立即拥有</p>
+            </div>
+        </div>
+
+        <div class="arrow-down">↓</div>
+
+        <!-- Step 2 -->
+        <div class="step-card">
+            <div class="number-badge">2</div>
+            <div class="icon-box">
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
+            </div>
+            <div class="text-content">
+                <h3>支付成功后自动发货 <span class="sparkle text-lg">✦</span></h3>
+                <p>支付成功后<br>系统将自动发送测试链接<br>到你的下单账号</p>
+            </div>
+        </div>
+
+        <div class="arrow-down">↓</div>
+
+        <!-- Step 3 -->
+        <div class="step-card">
+            <div class="number-badge">3</div>
+            <div class="icon-box">
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+            </div>
+            <div class="text-content">
+                <h3>点击链接开始测试 <span class="sparkle text-lg">✦</span></h3>
+                <p>点击收到的链接<br>即可开始测试<br>根据自己的真实感受作答</p>
+            </div>
+        </div>
+
+        <div class="arrow-down">↓</div>
+
+        <!-- Step 4 -->
+        <div class="step-card">
+            <div class="number-badge">4</div>
+            <div class="icon-box">
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+            </div>
+            <div class="text-content">
+                <h3>测试完成，查看结果 <span class="sparkle text-lg">✦</span></h3>
+                <p>测试完成后<br>即可获得你的专属报告</p>
+            </div>
+        </div>
+
+        <!-- Warning block -->
+        <div class="mt-12 p-6 border border-dashed border-[#dcb37d] rounded-2xl bg-[#fdfaf3] relative flex items-start gap-4">
+            <div class="w-12 h-12 bg-[#1f3b31] rounded-full flex items-center justify-center flex-shrink-0">
+                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+            </div>
+            <div>
+                <h3 class="font-bold text-[18px] text-[#1f3b31] mb-2">温馨提示 <span class="sparkle">✦</span></h3>
+                <p class="text-[#556b60] text-sm leading-relaxed">由于虚拟产品的特殊性，暂不支持七天无理由退款。<br>购买前请仔细阅读商品详情，如有疑问可咨询客服。</p>
+            </div>
+            <!-- Decorative heart drawing -->
+            <svg class="absolute bottom-4 right-8 w-16 h-16 text-[#dcb37d] opacity-50" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
+        </div>
+    </div>
+
+</body>
+</html>
