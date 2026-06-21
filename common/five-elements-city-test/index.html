@@ -30,8 +30,8 @@
             }
         }
     </script>
-    <!-- html2canvas -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <!-- html-to-image -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html-to-image/1.11.11/html-to-image.min.js"></script>
     
     <style>
         body {
@@ -300,7 +300,13 @@
 
                         <!-- 标签 (滞后渲染使其处于顶层，增加背景发光避免盖住) -->
                         <style>
-                            .label-halo { text-shadow: 0 0 4px #f0ebe1, 0 0 2px #f0ebe1, 1px 1px 0 #f0ebe1, -1px -1px 0 #f0ebe1; }
+                            .label-halo { 
+                                paint-order: stroke fill;
+                                stroke: #f0ebe1;
+                                stroke-width: 2.5px;
+                                stroke-linecap: round;
+                                stroke-linejoin: round;
+                            }
                         </style>
                         <text id="label-fire" x="100" y="24" class="label-halo" font-size="8" font-weight="bold" text-anchor="middle" fill="#1a1a1a" opacity="0.9">火</text>
                         <text id="label-earth" x="168" y="78" class="label-halo" font-size="8" font-weight="bold" text-anchor="middle" fill="#1a1a1a" opacity="0.9">土</text>
@@ -830,21 +836,18 @@
                 await document.fonts.ready;
                 await new Promise(r => setTimeout(r, 100));
 
-                const canvas = await html2canvas(posterArea, {
-                    scale: window.devicePixelRatio > 1 ? window.devicePixelRatio : 2,
-                    useCORS: true,
+                const dataUrl = await htmlToImage.toJpeg(posterArea, {
+                    pixelRatio: window.devicePixelRatio > 1 ? window.devicePixelRatio : 2,
                     backgroundColor: '#f0ebe1',
-                    onclone: (clonedDoc) => {
-                        const cloneEl = clonedDoc.getElementById('poster-area');
-                        if (cloneEl) {
-                            cloneEl.style.width = posterArea.offsetWidth + 'px';
-                        }
+                    style: {
+                        transform: 'scale(1)',
+                        transformOrigin: 'top left'
                     }
                 });
                 
                 const link = document.createElement('a');
                 link.download = `勘探局调令-${document.getElementById('doc-id').innerText}.jpg`;
-                link.href = canvas.toDataURL('image/jpeg', 0.9);
+                link.href = dataUrl;
                 link.click();
             } catch (err) {
                 console.error(err);

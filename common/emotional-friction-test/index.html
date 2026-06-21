@@ -312,8 +312,8 @@
 
     <!-- Shared Component -->
     <script src="../test-matrix.js?v=20260621b"></script>
-    <!-- CDNs -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <!-- html-to-image -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html-to-image/1.11.11/html-to-image.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 
     <script>
@@ -659,32 +659,33 @@
         const targetCard = document.querySelector('#result-page .doppel-shell');
         
         try {
-            const canvas = await html2canvas(targetCard, {
+            // Because emotional-friction uses a cloned doc watermark in html2canvas which html-to-image doesn't support directly,
+            // we will temporarily inject the watermark into the real DOM, render, then remove it.
+            const watermark = document.createElement('div');
+            watermark.id = 'temp-watermark';
+            watermark.className = 'mt-6 pt-4 border-t border-white/10 flex justify-between items-center';
+            watermark.innerHTML = `
+                <span class="text-[10px] text-gray-500 tracking-widest">在小红书搜【测试同款】</span>
+                <span class="text-[10px] text-cyberblue font-mono">深度解析情绪内耗</span>
+            `;
+            const coreCard = targetCard.querySelector('.doppel-core');
+            if (coreCard) coreCard.appendChild(watermark);
+
+            const dataUrl = await htmlToImage.toPng(targetCard, {
                 backgroundColor: '#0a0a0c', 
-                scale: window.devicePixelRatio > 1 ? window.devicePixelRatio : 2,
-                useCORS: true,
-                logging: false,
-                onclone: (clonedDoc) => {
-                    // Inject a watermark in the clone
-                    const cloneCard = clonedDoc.querySelector('.doppel-core');
-                    const cloneShell = clonedDoc.querySelector('.doppel-shell');
-                    if (cloneShell) cloneShell.style.width = targetCard.offsetWidth + 'px';
-                    
-                    if (cloneCard) {
-                        const watermark = clonedDoc.createElement('div');
-                        watermark.className = 'mt-6 pt-4 border-t border-white/10 flex justify-between items-center';
-                        watermark.innerHTML = `
-                            <span class="text-[10px] text-gray-500 tracking-widest">在小红书搜【测试同款】</span>
-                            <span class="text-[10px] text-cyberblue font-mono">深度解析情绪内耗</span>
-                        `;
-                        cloneCard.appendChild(watermark);
-                    }
+                pixelRatio: window.devicePixelRatio > 1 ? window.devicePixelRatio : 2,
+                style: {
+                    transform: 'scale(1)',
+                    transformOrigin: 'top left'
                 }
             });
             
+            // Remove watermark
+            if (coreCard) coreCard.removeChild(watermark);
+            
             const img = document.createElement('img');
-            img.src = canvas.toDataURL('image/png', 0.9);
-            img.className = 'w-full h-full object-contain';
+            img.src = dataUrl;
+            img.className = 'w-full h-auto rounded-lg shadow-2xl doppel-shell touch-callout-default select-all pointer-events-auto';
             
             container.innerHTML = '';
             container.appendChild(img);

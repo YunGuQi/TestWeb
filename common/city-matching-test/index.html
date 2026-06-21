@@ -228,8 +228,8 @@
 
     <!-- Shared Component -->
     <script src="../test-matrix.js?v=20260621b"></script>
-    <!-- html2canvas -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <!-- html-to-image (more reliable than html2canvas for mobile flexbox/SVG) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html-to-image/1.11.11/html-to-image.min.js"></script>
     <script>
         // ----------------------------------------------------------------
         // 34个省级代表城市及映射
@@ -594,39 +594,18 @@
                 // 稍微延时让DOM彻底重绘
                 await new Promise(r => setTimeout(r, 100));
 
-                const canvas = await html2canvas(el, {
-                    scale: window.devicePixelRatio > 1 ? window.devicePixelRatio : 2, // 动态高清
+                const dataUrl = await htmlToImage.toPng(el, {
+                    pixelRatio: window.devicePixelRatio > 1 ? window.devicePixelRatio : 2,
                     backgroundColor: getComputedStyle(document.body).backgroundColor,
-                    useCORS: true,
-                    logging: false,
-                    // 修复移动端 flex 和 absolute 导致的塌陷错位
-                    onclone: (clonedDoc) => {
-                        const cloneEl = clonedDoc.getElementById('ticket-capture');
-                        if (cloneEl) {
-                            // 强制赋予固定宽度，避免弹性盒子被挤压
-                            cloneEl.style.width = el.offsetWidth + 'px';
-                            // 修复目的地标题和Tag重叠：改用 block 布局
-                            const cityFlex = cloneEl.querySelector('div.flex.items-end.gap-3.mb-2');
-                            if (cityFlex) {
-                                cityFlex.style.display = 'block';
-                                cityFlex.querySelector('h2').style.display = 'inline-block';
-                                cityFlex.querySelector('h2').style.lineHeight = '1';
-                                cityFlex.querySelector('span').style.display = 'inline-block';
-                                cityFlex.querySelector('span').style.marginLeft = '12px';
-                            }
-                            // 修复条形码和数字重叠
-                            const barcode = cloneEl.querySelector('.barcode');
-                            if (barcode) {
-                                barcode.style.lineHeight = '1';
-                                barcode.style.height = '48px';
-                            }
-                        }
+                    style: {
+                        transform: 'scale(1)',
+                        transformOrigin: 'top left'
                     }
                 });
                 
                 const link = document.createElement('a');
                 link.download = `心灵逃跑车票_${document.getElementById('r-city').textContent}.png`;
-                link.href = canvas.toDataURL('image/png', 0.9);
+                link.href = dataUrl;
                 link.click();
             } catch (err) {
                 console.error(err);
