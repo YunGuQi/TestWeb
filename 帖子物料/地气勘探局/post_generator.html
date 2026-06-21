@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>小红书图文一键生成器</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;700;900&family=Noto+Serif+SC:wght@700;900&display=swap" rel="stylesheet">
+    <!-- Load barcode font -->
+    <link href="https://fonts.googleapis.com/css2?family=Libre+Barcode+39&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-kraft: #efe9db; /* 牛皮纸底色 */
+            --text-dark: #1a1a1a;
+            --text-red: #d93838;
+        }
+        body {
+            background: #333;
+            padding: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            font-family: 'Noto Sans SC', sans-serif;
+        }
+        .controls {
+            width: 100%;
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        button {
+            background: #fff;
+            padding: 10px 20px;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        /* XHS Vertical Image 3:4 aspect ratio */
+        .post-card {
+            width: 1080px;
+            height: 1440px;
+            background-color: var(--bg-kraft);
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.08'/%3E%3C/svg%3E");
+            position: relative;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            overflow: hidden;
+            transform-origin: top left;
+            transform: scale(0.3); /* scale down for viewing in browser */
+            margin-right: -756px; /* offset the scale */
+            margin-bottom: -1008px;
+            color: var(--text-dark);
+            border: 2px solid #ccc;
+        }
+
+        /* typography */
+        .font-serif-title {
+            font-family: 'Noto Serif SC', serif;
+        }
+        .font-ticket {
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .highlight-red {
+            color: var(--text-red);
+        }
+        
+        /* Layouts */
+        .header-tag {
+            position: absolute;
+            top: 80px;
+            left: 80px;
+            font-size: 32px;
+            font-weight: 900;
+            letter-spacing: 2px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .header-tag::before {
+            content: '';
+            width: 40px;
+            height: 8px;
+            background: var(--text-dark);
+        }
+
+        .cover-title {
+            position: absolute;
+            top: 400px;
+            left: 80px;
+            width: 920px;
+            font-size: 110px;
+            font-weight: 900;
+            line-height: 1.3;
+            letter-spacing: -2px;
+        }
+
+        .cover-sub {
+            position: absolute;
+            top: 250px;
+            right: 80px;
+            font-size: 48px;
+            font-weight: 700;
+            color: var(--text-red);
+            border: 4px solid var(--text-red);
+            padding: 20px 40px;
+            transform: rotate(5deg);
+        }
+
+        .tags-container {
+            position: absolute;
+            bottom: 200px;
+            left: 80px;
+            display: flex;
+            gap: 20px;
+        }
+        .tag {
+            background: rgba(0,0,0,0.05);
+            padding: 16px 32px;
+            font-size: 36px;
+            font-weight: bold;
+            border-radius: 8px;
+        }
+
+        .swipe-hint {
+            position: absolute;
+            bottom: 80px;
+            right: 80px;
+            font-size: 42px;
+            font-weight: 900;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        /* Question Layout */
+        .q-number {
+            position: absolute;
+            top: 100px;
+            left: 80px;
+            font-size: 48px;
+            font-weight: 900;
+            color: var(--text-red);
+            letter-spacing: 2px;
+        }
+        
+        .content-wrapper {
+            position: absolute;
+            top: 260px;
+            left: 80px;
+            width: 920px;
+            display: flex;
+            flex-direction: column;
+            gap: 60px;
+        }
+        .q-text {
+            font-size: 64px;
+            font-weight: 900;
+            line-height: 1.5;
+        }
+        .options-container {
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+        }
+        .option {
+            display: flex;
+            align-items: flex-start;
+            gap: 30px;
+            font-size: 48px;
+            font-weight: 700;
+            line-height: 1.4;
+            background: rgba(255,255,255,0.4);
+            border: 4px solid var(--text-dark);
+            padding: 40px;
+            border-radius: 16px;
+        }
+        .option-letter {
+            font-size: 56px;
+            font-weight: 900;
+            color: var(--text-red);
+        }
+        .page-num {
+            position: absolute;
+            bottom: 80px;
+            right: 80px;
+            font-size: 32px;
+            font-weight: 900;
+            opacity: 0.5;
+            letter-spacing: 4px;
+        }
+
+        /* hand drawn underline */
+        .underline-rough {
+            position: relative;
+            display: inline-block;
+        }
+        .underline-rough::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            width: 100%;
+            height: 16px;
+            background: url('data:image/svg+xml;utf8,<svg preserveAspectRatio="none" viewBox="0 0 100 10" xmlns="http://www.w3.org/2000/svg"><path d="M0 5 Q 25 0, 50 5 T 100 5" stroke="%23d93838" stroke-width="3" fill="transparent"/></svg>');
+            background-size: 100% 100%;
+        }
+
+        /* Ticket Styles */
+        .ticket-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            width: 100%;
+        }
+        .ticket {
+            position: relative;
+            background: #fdfbf7;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+            border: 3px solid #1a1a1a;
+            width: 860px;
+        }
+        .ticket::before, .ticket::after {
+            content: '';
+            position: absolute;
+            top: 55%;
+            width: 60px;
+            height: 60px;
+            background: var(--bg-kraft);
+            border-radius: 50%;
+            transform: translateY(-50%);
+            border: 3px solid #1a1a1a;
+        }
+        .ticket::before { left: -33px; border-right-color: transparent; border-top-color: transparent; transform: translateY(-50%) rotate(45deg); }
+        .ticket::after { right: -33px; border-left-color: transparent; border-bottom-color: transparent; transform: translateY(-50%) rotate(45deg); }
+        
+        .ticket-divider {
+            border-top: 4px dashed #b5b1a3;
+            margin: 0 40px;
+            position: relative;
+        }
+        .stamp {
+            border: 8px solid #d93838;
+            color: #d93838;
+            border-radius: 50%;
+            width: 200px;
+            height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 38px;
+            transform: rotate(-15deg);
+            opacity: 0.9;
+            position: absolute;
+            top: 40px;
+            right: 40px;
+            text-align: center;
+            line-height: 1.2;
+        }
+        .barcode {
+            font-family: 'Libre Barcode 39', cursive, monospace;
+            font-size: 110px;
+            line-height: 1;
+            letter-spacing: -2px;
+        }
+        .ticket-title-large { font-size: 96px; font-weight: 900; letter-spacing: -4px; line-height: 1; }
+        .ticket-prov { font-size: 32px; font-weight: bold; opacity: 0.5; margin-bottom: 8px; }
+        .ticket-tag { background: #1a1a1a; color: white; padding: 12px 24px; font-size: 24px; font-weight: bold; display: inline-block; letter-spacing: 2px; }
+
+    </style>
+</head>
+<body>
+
+    <div class="controls">
+        <button onclick="downloadAll()">一键生成并下载所有图片</button>
+    </div>
+
+    <!-- Cover 1 -->
+    <div id="capture-cover-1" class="post-card">
+        <div class="header-tag">NO.10 | 城市栖息地</div>
+        <div class="cover-sub font-serif-title"># 别让环境埋没了你</div>
+        <div class="cover-title font-serif-title" style="font-size: 85px;">
+            状态越来越差？<br><br>可能你真的<span class="highlight-red">待错了</span><br><br>城市 🛑
+        </div>
+        <div class="tags-container">
+            <div class="tag">5道题</div>
+            <div class="tag">深度解析</div>
+            <div class="tag">环境契合度</div>
+        </div>
+        <div class="swipe-hint highlight-red">
+            左滑开始测试 
+            <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </div>
+    </div>
+
+    <!-- Cover 2 -->
+    <div id="capture-cover-2" class="post-card">
+        <div class="header-tag">NO.10 | 城市栖息地</div>
+        <div class="cover-sub font-serif-title"># 别让环境埋没了你</div>
+        <div class="cover-title font-serif-title" style="font-size: 85px;">
+            别硬卷了！<br><br>有些城市可能天生<br><br><span class="highlight-red">“克”</span>你 🥀
+        </div>
+        <div class="tags-container">
+            <div class="tag">5道题</div>
+            <div class="tag">深度解析</div>
+            <div class="tag">环境契合度</div>
+        </div>
+        <div class="swipe-hint highlight-red">
+            左滑开始测试 
+            <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </div>
+    </div>
+
+    <!-- Cover 3 -->
+    <div id="capture-cover-3" class="post-card">
+        <div class="header-tag">NO.10 | 城市栖息地</div>
+        <div class="cover-sub font-serif-title"># 别让环境埋没了你</div>
+        <div class="cover-title font-serif-title" style="font-size: 85px;">
+            测疯了！据说<span class="highlight-red">90%</span>的人<br><br>都生活在<span class="highlight-red">错误</span>的栖息地 🤯
+        </div>
+        <div class="tags-container">
+            <div class="tag">5道题</div>
+            <div class="tag">深度解析</div>
+            <div class="tag">环境契合度</div>
+        </div>
+        <div class="swipe-hint highlight-red">
+            左滑开始测试 
+            <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </div>
+    </div>
+
+    <!-- Cover 4 -->
+    <div id="capture-cover-4" class="post-card">
+        <div class="header-tag">NO.10 | 城市栖息地</div>
+        <div class="cover-sub font-serif-title"># 别让环境埋没了你</div>
+        <div class="cover-title font-serif-title" style="font-size: 80px;">
+            不知道该留下还是<br><br><span class="highlight-red">换城市</span>？<br><br>做完这篇就懂了 🧭
+        </div>
+        <div class="tags-container">
+            <div class="tag">5道题</div>
+            <div class="tag">深度解析</div>
+            <div class="tag">环境契合度</div>
+        </div>
+        <div class="swipe-hint highlight-red">
+            左滑开始测试 
+            <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </div>
+    </div>
+
+    <!-- Cover 5 -->
+    <div id="capture-cover-5" class="post-card">
+        <div class="header-tag">NO.10 | 城市栖息地</div>
+        <div class="cover-sub font-serif-title"># 别让环境埋没了你</div>
+        <div class="cover-title font-serif-title" style="font-size: 85px;">
+            换了座城市后，<br><br>我的状态<br><br>彻底<span class="highlight-red">拉满了</span> 🛫
+        </div>
+        <div class="tags-container">
+            <div class="tag">5道题</div>
+            <div class="tag">深度解析</div>
+            <div class="tag">环境契合度</div>
+        </div>
+        <div class="swipe-hint highlight-red">
+            左滑开始测试 
+            <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </div>
+    </div>
+
+    <!-- Q1 -->
+    <div id="capture-q1" class="post-card">
+        <div class="header-tag">NO.10 | 城市栖息地</div>
+        <div class="q-number">QUESTION 01</div>
+        <div class="content-wrapper">
+            <div class="q-text">休假时，你更倾向于哪种充电方式？</div>
+            <div class="options-container">
+                <div class="option">
+                    <div class="option-letter">A</div>
+                    <div>去有山有水的地方，亲近自然，安静放空。</div>
+                </div>
+                <div class="option">
+                    <div class="option-letter">B</div>
+                    <div>去繁华的大都市，感受灯火阑珊和快节奏。</div>
+                </div>
+            </div>
+        </div>
+        <div class="page-num">1 / 6</div>
+    </div>
+
+    <!-- Q2 -->
+    <div id="capture-q2" class="post-card">
+        <div class="header-tag">NO.10 | 城市栖息地</div>
+        <div class="q-number">QUESTION 02</div>
+        <div class="content-wrapper">
+            <div class="q-text">面对突如其来的<span class="highlight-red underline-rough">环境变动</span>，你的第一反应是：</div>
+            <div class="options-container">
+                <div class="option">
+                    <div class="option-letter">A</div>
+                    <div>随遇而安，既来之则安之，觉得是新机会。</div>
+                </div>
+                <div class="option">
+                    <div class="option-letter">B</div>
+                    <div>有点焦虑，想要提前规划好所有的应对方案。</div>
+                </div>
+            </div>
+        </div>
+        <div class="page-num">2 / 6</div>
+    </div>
+
+    <!-- Q3 -->
+    <div id="capture-q3" class="post-card">
+        <div class="header-tag">NO.10 | 城市栖息地</div>
+        <div class="q-number">QUESTION 03</div>
+        <div class="content-wrapper">
+            <div class="q-text">你理想中的居住环境周围，绝对不能缺少的是：</div>
+            <div class="options-container">
+                <div class="option">
+                    <div class="option-letter">A</div>
+                    <div>咖啡馆、便利店和24小时灯火通明的商圈。</div>
+                </div>
+                <div class="option">
+                    <div class="option-letter">B</div>
+                    <div>公园绿地、安静的步道和能看到天空的视野。</div>
+                </div>
+            </div>
+        </div>
+        <div class="page-num">3 / 6</div>
+    </div>
+
+    <!-- Q4 -->
+    <div id="capture-q4" class="post-card">
+        <div class="header-tag">NO.10 | 城市栖息地</div>
+        <div class="q-number">QUESTION 04</div>
+        <div class="content-wrapper">
+            <div class="q-text">在人际交往中，你更舒服的状态是：</div>
+            <div class="options-container">
+                <div class="option">
+                    <div class="option-letter">A</div>
+                    <div>和两三知己深度交流，不需要刻意应酬。</div>
+                </div>
+                <div class="option">
+                    <div class="option-letter">B</div>
+                    <div>喜欢热闹，能在各种社交场合中游刃有余。</div>
+                </div>
+            </div>
+        </div>
+        <div class="page-num">4 / 6</div>
+    </div>
+
+    <!-- Q5 -->
+    <div id="capture-q5" class="post-card">
+        <div class="header-tag">NO.10 | 城市栖息地</div>
+        <div class="q-number">QUESTION 05</div>
+        <div class="content-wrapper">
+            <div class="q-text">仔细回想一下，你在什么<span class="highlight-red">天气</span>下效率最高、状态最好？</div>
+            <div class="options-container">
+                <div class="option">
+                    <div class="option-letter">A</div>
+                    <div>阳光明媚，天朗气清的晴朗日子。</div>
+                </div>
+                <div class="option">
+                    <div class="option-letter">B</div>
+                    <div>阴雨绵绵，或者带着一点凉意的阴天。</div>
+                </div>
+            </div>
+        </div>
+        <div class="page-num">5 / 6</div>
+    </div>
+
+    <!-- Result Ticket -->
+    <div id="capture-ticket" class="post-card">
+        <div class="header-tag">NO.10 | 城市栖息地</div>
+        <div class="ticket-wrapper">
+            
+            <div class="text-center mb-10 mt-32">
+                <div class="text-5xl font-black mb-4 tracking-wider">评论区留下 5 个选项字母 <span class="highlight-red">@问一问</span></div>
+                <div class="text-3xl font-bold tracking-widest mb-6">即可获取你的性格基因简版诊断</div>
+                <div class="text-4xl font-bold highlight-red tracking-widest mt-4">主页查看完整版，获取专属异地调令 👇</div>
+            </div>
+
+            <!-- Fake Ticket -->
+            <div class="ticket flex flex-col overflow-hidden pb-10">
+                <div class="p-10 relative">
+                    <div class="stamp">异地<br>调令</div>
+                    <div class="flex justify-between items-start mb-10">
+                        <div>
+                            <div class="font-ticket text-xl opacity-70 mb-2">FLIGHT / TRAIN NO.</div>
+                            <div class="font-bold text-3xl">XHS-2026</div>
+                        </div>
+                        <div class="text-right">
+                            <div class="font-ticket text-xl opacity-70 mb-2">CLASS</div>
+                            <div class="font-bold text-3xl">SOUL</div>
+                        </div>
+                    </div>
+
+                    <div class="font-ticket text-xl opacity-70 mb-2">DESTINATION</div>
+                    <div class="flex items-end gap-4 mb-4">
+                        <div class="ticket-title-large">大理</div>
+                        <div class="ticket-prov">云南</div>
+                    </div>
+                    
+                    <div class="ticket-tag mt-4">旷野里的寻风者</div>
+                </div>
+
+                <div class="ticket-divider"></div>
+
+                <div class="p-10">
+                    <div class="font-ticket text-xl opacity-70 mb-4">DIAGNOSTIC REPORT</div>
+                    <p class="text-[28px] leading-relaxed font-bold border-l-8 border-[#1a1a1a] pl-6">
+                        “你天生属于自然与旷野，钢筋水泥只会让你的灵魂逐渐枯萎。”
+                    </p>
+                    
+                    <div class="mt-10 flex flex-wrap gap-4">
+                        <span class="px-4 py-2 text-xl font-bold font-ticket border-2 border-[#1a1a1a] bg-[#e6e4df]">自然治愈</span>
+                        <span class="px-4 py-2 text-xl font-bold font-ticket border-2 border-[#1a1a1a] bg-[#e6e4df]">极度松弛</span>
+                        <span class="px-4 py-2 text-xl font-bold font-ticket border-2 border-[#1a1a1a] bg-[#e6e4df]">拒绝内卷</span>
+                        <span class="px-4 py-2 text-xl font-bold font-ticket border-2 border-[#1a1a1a] bg-[#e6e4df]">情绪自由</span>
+                    </div>
+                </div>
+
+                <div class="px-10 flex flex-col items-center mt-4">
+                    <div class="barcode text-center opacity-80 select-none">
+                        || | ||| || || | | || | |
+                    </div>
+                    <div class="font-ticket text-[18px] opacity-50 mt-2">NO. 8492039485721</div>
+                </div>
+            </div>
+
+        </div>
+        <div class="page-num">6 / 6</div>
+    </div>
+
+    <script>
+        async function downloadAll() {
+            const ids = ['capture-cover-1', 'capture-cover-2', 'capture-cover-3', 'capture-cover-4', 'capture-cover-5', 'capture-q1', 'capture-q2', 'capture-q3', 'capture-q4', 'capture-q5', 'capture-ticket'];
+            const names = ['0-首图-角度1.png', '0-首图-角度2.png', '0-首图-角度3.png', '0-首图-角度4.png', '0-首图-角度5.png', '1-题1.png', '2-题2.png', '3-题3.png', '4-题4.png', '5-题5.png', '6-车票引导.png'];
+            
+            try {
+                // 弹出文件夹选择框，让用户自己指定存到“帖子物料”目录下
+                const dirHandle = await window.showDirectoryPicker({
+                    mode: 'readwrite'
+                });
+                
+                // 隐藏控制栏避免影响截图排版
+                document.querySelector('.controls').style.display = 'none';
+                const origScrollX = window.scrollX;
+                const origScrollY = window.scrollY;
+
+                for(let i=0; i<ids.length; i++) {
+                    const el = document.getElementById(ids[i]);
+                    
+                    // 克隆节点进行截图，避免原网页布局崩塌和视口裁切引起的黑边/阴影Bug
+                    const clone = el.cloneNode(true);
+                    clone.style.transform = 'none';
+                    clone.style.margin = '0';
+                    clone.style.position = 'absolute';
+                    clone.style.top = '0';
+                    clone.style.left = '0';
+                    clone.style.boxShadow = 'none'; // 去除阴影以避免边缘渲染脏污
+                    clone.style.border = 'none';
+                    clone.style.zIndex = '9999';
+                    document.body.appendChild(clone);
+                    
+                    // 滚动到顶部以确保 html2canvas 从0,0开始截取完整画面
+                    window.scrollTo(0, 0);
+                    await new Promise(r => setTimeout(r, 100)); // 给浏览器渲染时间
+                    
+                    const canvas = await html2canvas(clone, { 
+                        scale: 1, 
+                        width: 1080,
+                        height: 1440,
+                        windowWidth: 1080,
+                        windowHeight: 1440,
+                        backgroundColor: '#efe9db' // 使用底层牛皮纸色兜底，避免透明背景透出黑边
+                    });
+                    
+                    document.body.removeChild(clone);
+
+                    // 将 canvas 转换成 blob 对象 (真正的 png 图片)
+                    const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+                    
+                    // 在用户选择的目录里创建文件
+                    const fileHandle = await dirHandle.getFileHandle(names[i], { create: true });
+                    const writable = await fileHandle.createWritable();
+                    await writable.write(blob);
+                    await writable.close();
+                    
+                    // 稍微停顿一下，防止浏览器卡死
+                    await new Promise(r => setTimeout(r, 200));
+                }
+                
+                // 恢复页面状态
+                window.scrollTo(origScrollX, origScrollY);
+                document.querySelector('.controls').style.display = 'flex';
+
+                alert('所有图片已成功保存到你指定的文件夹中！');
+            } catch (err) {
+                document.querySelector('.controls').style.display = 'flex';
+                console.error(err);
+                if (err.name !== 'AbortError') {
+                    alert('保存失败。请确保你的浏览器(如 Chrome/Edge)支持文件夹写入功能，并且你授予了修改权限。');
+                }
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,6 @@
+2026/06/21-19:43:04.492 a8c0 Reusing MANIFEST e:\AI\Antigravity\小红书\帖子物料\xhs_profile\Default\Local Storage\leveldb/MANIFEST-000001
+2026/06/21-19:43:04.506 a8c0 Recovering log #3
+2026/06/21-19:43:04.520 a8c0 Reusing old log e:\AI\Antigravity\小红书\帖子物料\xhs_profile\Default\Local Storage\leveldb/000003.log 
+2026/06/21-19:44:04.550 660c Level-0 table #5: started
+2026/06/21-19:44:04.561 660c Level-0 table #5: 32879 bytes OK
+2026/06/21-19:44:04.563 660c Delete type=0 #3
