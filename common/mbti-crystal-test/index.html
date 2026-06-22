@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>灵体光谱切片 / 意识结晶提取</title>
+    <!-- 必须使用 html-to-image.min.js 而非 html2canvas -->
+    <script src="https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --bg-color: #050505;
+            --text-primary: #e0e0e0;
+            --text-secondary: #888;
+            --accent-glow: #8a2be2;
+            --border-color: #333;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: "PingFang SC", "Microsoft YaHei", monospace; -webkit-tap-highlight-color: transparent; }
+        body { background-color: var(--bg-color); color: var(--text-primary); min-height: 100vh; overflow-x: hidden; }
+        
+        .app-container { width: 100%; max-width: 500px; margin: 0 auto; min-height: 100vh; position: relative; padding: 20px; overflow-x: hidden; }
+
+        /* Background Noise & Grid */
+        .bg-grid {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
+            background-image: linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+            background-size: 20px 20px;
+            pointer-events: none;
+        }
+
+        /* Views */
+        .view { display: none; width: 100%; min-height: 100%; animation: fadeIn 0.5s ease-out; }
+        .view.active { display: flex; flex-direction: column; align-items: center; justify-content: center; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Typography */
+        .title-main { font-size: 28px; font-weight: bold; letter-spacing: 4px; text-align: center; margin-bottom: 10px; color: #fff; text-shadow: 0 0 10px rgba(255,255,255,0.5); }
+        .title-sub { font-size: 14px; color: var(--text-secondary); text-align: center; letter-spacing: 2px; margin-bottom: 40px; font-family: monospace; }
+        
+        /* Buttons */
+        .btn-primary {
+            width: 100%; padding: 18px; background: transparent; border: 1px solid #555; color: #fff;
+            font-size: 16px; letter-spacing: 2px; cursor: pointer; position: relative; overflow: hidden;
+            transition: all 0.3s; margin-top: 20px; text-transform: uppercase; border-radius: 4px;
+        }
+        .btn-primary:active { transform: scale(0.98); background: rgba(255,255,255,0.1); }
+        .btn-primary::before {
+            content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            animation: sweep 3s infinite;
+        }
+        @keyframes sweep { 0% { left: -100%; } 50% { left: 100%; } 100% { left: 100%; } }
+
+        .btn-text { background: none; border: none; color: var(--text-secondary); text-decoration: underline; font-size: 12px; margin-top: 20px; cursor: pointer; padding: 10px; }
+
+        /* Quiz View */
+        .progress-bar { width: 100%; height: 2px; background: #222; margin-bottom: 40px; position: relative; }
+        .progress-fill { height: 100%; background: #fff; width: 0%; transition: width 0.3s ease; box-shadow: 0 0 10px #fff; }
+        .progress-text { position: absolute; right: 0; top: -25px; font-size: 12px; font-family: monospace; color: var(--text-secondary); }
+        
+        .question-box { width: 100%; flex-grow: 1; display: flex; flex-direction: column; justify-content: center; margin-bottom: 40px;}
+        .q-title { font-size: 20px; line-height: 1.6; margin-bottom: 40px; color: #eee; }
+        .option-btn {
+            width: 100%; padding: 20px; margin-bottom: 15px; border: 1px solid #333; background: rgba(0,0,0,0.5);
+            color: #ddd; text-align: left; font-size: 15px; line-height: 1.5; border-radius: 8px;
+            transition: all 0.2s; position: relative; padding-left: 50px;
+        }
+        .option-btn::before { content: attr(data-letter); position: absolute; left: 20px; top: 50%; transform: translateY(-50%); font-weight: bold; color: #666; font-family: monospace; }
+        .option-btn:active { background: rgba(255,255,255,0.05); border-color: #666; }
+
+        .back-btn { align-self: flex-start; background: none; border: none; color: #666; font-size: 14px; margin-bottom: 20px; cursor: pointer; }
+
+        /* Result View */
+        #capture-wrapper { width: 100%; padding: 20px; background: var(--bg-color); position: relative; }
+        .result-card {
+            border: 1px solid #333; background: #0a0a0c; padding: 30px; position: relative;
+            overflow: hidden;
+        }
+        /* Corner brackets */
+        .result-card::before, .result-card::after { content: ''; position: absolute; width: 20px; height: 20px; border: 2px solid #555; }
+        .result-card::before { top: 10px; left: 10px; border-right: none; border-bottom: none; }
+        .result-card::after { bottom: 10px; right: 10px; border-left: none; border-top: none; }
+        
+        .r-header { border-bottom: 1px solid #222; padding-bottom: 15px; margin-bottom: 30px; }
+        .r-id { font-family: monospace; color: #666; font-size: 12px; margin-bottom: 5px; }
+        .r-title { font-size: 24px; font-weight: bold; color: #fff; letter-spacing: 2px; }
+        .r-mbti { font-family: monospace; font-size: 16px; color: var(--text-secondary); margin-top: 5px;}
+
+        /* Crystal Graphic */
+        .crystal-container {
+            width: 100px; height: 100px; margin: 40px auto; position: relative;
+            display: flex; justify-content: center; align-items: center;
+        }
+        .crystal-shape {
+            width: 80px; height: 80px;
+            background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0));
+            border: 1px solid rgba(255,255,255,0.5);
+            transition: all 0.5s;
+        }
+
+        .r-desc { font-size: 14px; line-height: 1.8; color: #ccc; margin-bottom: 30px; text-align: justify; }
+        .r-tags { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 30px; }
+        .tag { padding: 4px 10px; border: 1px solid #333; font-size: 12px; color: #aaa; border-radius: 4px; font-family: monospace; }
+        
+        .disclaimer { font-size: 10px; color: #444; text-align: center; margin-top: 20px; transform: scale(0.9); }
+
+        /* Modals */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.95); z-index: 1000; display: none;
+            flex-direction: column; align-items: center; justify-content: center;
+        }
+        .modal-overlay.active { display: flex; }
+        .modal-tip { color: #fff; margin-bottom: 15px; font-size: 14px; animation: pulse 1.5s infinite; letter-spacing: 2px;}
+        .result-img { max-width: 90%; max-height: 80vh; object-fit: contain; box-shadow: 0 0 30px rgba(255,255,255,0.1); border-radius: 8px;}
+        .close-modal { background: none; border: 1px solid #555; color: #fff; padding: 10px 30px; margin-top: 20px; border-radius: 4px;}
+
+        @keyframes pulse { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
+
+        /* dummy matrix container */
+        #dummy-matrix-container { display: none; }
+
+        /* History Modal */
+        .history-drawer {
+            position: fixed; top: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 500px; height: 100%;
+            background: rgba(5,5,5,0.98); z-index: 999; display: none;
+            flex-direction: column; padding: 40px 20px; border-left: 1px solid #222; border-right: 1px solid #222;
+        }
+        .history-drawer.active { display: flex; animation: slideUp 0.3s ease-out; }
+        @keyframes slideUp { from { transform: translate(-50%, 100%); } to { transform: translate(-50%, 0); } }
+        .history-title { color: #fff; font-size: 20px; margin-bottom: 20px; letter-spacing: 2px; text-align: center; border-bottom: 1px dashed #333; padding-bottom: 15px;}
+        .history-list { flex-grow: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; }
+        .history-item { background: rgba(255,255,255,0.03); padding: 15px; border: 1px solid #222; border-radius: 4px; border-left: 3px solid var(--accent-glow); }
+        .h-time { font-size: 10px; color: #555; font-family: monospace; margin-bottom: 5px; }
+        .h-result { font-size: 16px; color: #eee; font-weight: bold; letter-spacing: 1px;}
+        .h-mbti { font-size: 12px; color: #888; margin-top: 5px; font-family: monospace;}
+    </style>
+</head>
+<body>
+    <div class="bg-grid"></div>
+    <div class="app-container">
+        
+        <!-- 封面页 -->
+        <div id="landing" class="view active">
+            <div class="crystal-container" style="margin-bottom:60px;">
+                <div class="crystal-shape" style="clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%); box-shadow: 0 0 30px rgba(255,255,255,0.2);"></div>
+            </div>
+            <h1 class="title-main">意识结晶化验单</h1>
+            <p class="title-sub">MBTI SOUL EXTRACT</p>
+            <p style="color:#888; font-size:14px; text-align:center; line-height:1.6; margin-bottom:40px;">
+                正在为您建立安全频段...<br>
+                即将深入您的潜意识光谱，<br>
+                提取最核心的灵魂结晶。
+            </p>
+            <button class="btn-primary" onclick="startQuiz()">[ 开始提取样本 ]</button>
+            <button class="btn-text" id="history-btn" onclick="openHistory()" style="display:none; margin-top: 15px; text-decoration:none; border:1px dashed #333; border-radius:4px;">[ 查看历史观测档案 ]</button>
+        </div>
+
+        <!-- 问答页 -->
+        <div id="quiz" class="view">
+            <button class="back-btn" onclick="prevQuestion()">← 撤销上一步骤</button>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress-fill"></div>
+                <div class="progress-text" id="progress-text">01/16</div>
+            </div>
+            <div class="question-box">
+                <h2 class="q-title" id="q-title">Question</h2>
+                <div id="options-container"></div>
+            </div>
+        </div>
+
+        <!-- 结果加载页 -->
+        <div id="loading" class="view">
+            <div class="crystal-container">
+                <div class="crystal-shape" style="border-radius:50%; animation: pulse 1s infinite; box-shadow: 0 0 20px #fff;"></div>
+            </div>
+            <p style="color:#fff; letter-spacing:2px; font-family:monospace; margin-top:20px;" id="loading-text">正在化验意识切片成分...</p>
+        </div>
+
+        <!-- 结果页 -->
+        <div id="result" class="view" style="padding:0; justify-content:flex-start;">
+            <!-- 必须包裹在这层以防截图溢出 -->
+            <div id="capture-wrapper">
+                <div class="result-card">
+                    <div class="r-header">
+                        <div class="r-id" id="r-id">SAMPLE ID: 0000-0000</div>
+                        <div class="r-mbti" id="r-mbti">INTJ</div>
+                        <div class="r-title" id="r-title">绝对零度·虚空黑曜石</div>
+                    </div>
+                    
+                    <div class="crystal-container">
+                        <div class="crystal-shape" id="r-crystal"></div>
+                    </div>
+
+                    <div class="r-tags" id="r-tags"></div>
+                    <div class="r-desc" id="r-desc"></div>
+
+                    <div style="border-top: 1px dashed #333; padding-top: 15px;">
+                        <p style="font-family:monospace; font-size:12px; color:#666;">[观测结论]</p>
+                        <p style="font-size:14px; color:#aaa; margin-top:5px;" id="r-quote"></p>
+                    </div>
+
+                    <!-- 高维扫描条形码 (视觉印章) -->
+                    <div style="position:absolute; bottom: 25px; right: 25px; text-align:right; opacity:0.5;">
+                        <div style="width: 50px; height: 20px; background: repeating-linear-gradient(90deg, #888 0, #888 2px, transparent 2px, transparent 4px, #888 4px, #888 5px, transparent 5px, transparent 8px); margin-bottom:4px; margin-left:auto;"></div>
+                        <div style="font-family:monospace; font-size:8px; color:#666; letter-spacing:1px; transform: scale(0.8); transform-origin: right center;">AUTHORIZED</div>
+                    </div>
+
+                    <!-- 极度克制的免责声明 -->
+                    <div class="disclaimer">* 本结晶化验单结果仅供娱乐参考，非专业诊断。</div>
+                </div>
+            </div>
+
+            <!-- 底部操作区 (不可截图) -->
+            <div style="width:100%; padding: 20px;">
+                <button class="btn-primary" onclick="generateImage()">[ 封存并导出结晶报告 ]</button>
+                <!-- 自定义样式引流按钮，点击唤出 test-matrix 模态框 -->
+                <button class="btn-primary" style="margin-top:15px; border-color:#444;" onclick="window.openMatrixModal && window.openMatrixModal()">[ 探索更多高维测算 ]</button>
+                <button class="btn-text" onclick="location.reload()" style="display:block; width:100%; text-align:center;">重置意识光谱</button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- 截图全屏遮罩 -->
+    <div class="modal-overlay" id="image-modal">
+        <p class="modal-tip">✨ 长按上方凭证保存到手机 ✨</p>
+        <img id="generated-img" class="result-img" src="" alt="结果海报">
+        <button class="close-modal" onclick="closeImageModal()">关闭</button>
+    </div>
+    
+    <!-- 历史记录抽屉 -->
+    <div class="history-drawer" id="history-drawer">
+        <h2 class="history-title">历史观测档案</h2>
+        <div class="history-list" id="history-list"></div>
+        <button class="btn-primary" style="margin-top:20px; border-color:#333;" onclick="closeHistory()">[ 关闭档案室 ]</button>
+    </div>
+
+    <div id="dummy-matrix-container"></div>
+
+    <script>
+        // ----------------------------------------------------
+        // 1. 题库设计 (E/I, S/N, T/F, J/P 各4题)
+        // ----------------------------------------------------
+        const questions = [
+            // E/I
+            { text: "1. 参加一个满是陌生人的聚会时，你会：", dim: "EI", opts: [ { text: "主动去认识新朋友，在热闹的氛围中如鱼得水", val: "E" }, { text: "找个安静的角落，默默观察或者只跟熟人说话", val: "I" } ] },
+            { text: "2. 经过连续一周的高强度工作或社交后，你周末更想：", dim: "EI", opts: [ { text: "约朋友出去玩，在外界的刺激中回血", val: "E" }, { text: "一个人宅在家里，关闭手机彻底放空", val: "I" } ] },
+            { text: "3. 在日常交流和群聊中，你通常是：", dim: "EI", opts: [ { text: "想到什么就说什么的“高频输出机器”", val: "E" }, { text: "在脑内深思熟虑后才偶尔发言的“暗中观察者”", val: "I" } ] },
+            { text: "4. 遇到非常感兴趣的新鲜事物时，你的第一反应是：", dim: "EI", opts: [ { text: "马上分享出去，拉着朋友一起讨论体验", val: "E" }, { text: "自己先默默潜水研究，搞懂了再说", val: "I" } ] },
+            
+            // S/N
+            { text: "5. 在做重要决定或规划时，你更看重：", dim: "SN", opts: [ { text: "过去的实际经验和具体的客观数据", val: "S" }, { text: "对未来的强烈直觉和各种可能性的畅想", val: "N" } ] },
+            { text: "6. 学习一项新技能或新软件时，你习惯：", dim: "SN", opts: [ { text: "一步步跟着教程，踏踏实实搞懂每个操作细节", val: "S" }, { text: "先抓大局和底层逻辑，细节随缘自己摸索", val: "N" } ] },
+            { text: "7. 回忆过去的一段经历，你脑海里最先浮现的是：", dim: "SN", opts: [ { text: "当时具体的人、说过的原话和环境细节", val: "S" }, { text: "那段经历带给你的整体感受和深层意义", val: "N" } ] },
+            { text: "8. 面对一件大家都在按照常规流程做的事情，你会：", dim: "SN", opts: [ { text: "觉得既然有效，跟着老办法稳妥地做就好", val: "S" }, { text: "觉得无聊，总想着能不能找点新奇的解法", val: "N" } ] },
+
+            // T/F
+            { text: "9. 朋友遇到麻烦找你大吐苦水时，你通常的第一反应是：", dim: "TF", opts: [ { text: "帮TA理清逻辑，提供理性的解决对策", val: "T" }, { text: "先安抚TA的情绪，给予极大的情感共鸣", val: "F" } ] },
+            { text: "10. 评价一部电影或一本书的好坏，你主要看：", dim: "TF", opts: [ { text: "逻辑是否严密，剧情是否有漏洞和硬伤", val: "T" }, { text: "情感是否真挚，能不能深深打动人心", val: "F" } ] },
+            { text: "11. 在团队合作中遇到分歧时，你认为最重要的是：", dim: "TF", opts: [ { text: "不管别人开不开心，找到最正确高效的方案", val: "T" }, { text: "尽量照顾到每个人的感受，维持团队和谐", val: "F" } ] },
+            { text: "12. 如果你要对别人提出批评或反对意见，你会：", dim: "TF", opts: [ { text: "直截了当指出问题，觉得忠言逆耳利于行", val: "T" }, { text: "尽量委婉表达，怕伤了对方的面子和感情", val: "F" } ] },
+
+            // J/P
+            { text: "13. 出门长途旅行前，你的准备状态通常是：", dim: "JP", opts: [ { text: "做好详细攻略，预定好所有的行程和酒店", val: "J" }, { text: "只定个大方向，享受走到哪算哪的随机惊喜", val: "P" } ] },
+            { text: "14. 对于每天的工作和生活安排，你更喜欢：", dim: "JP", opts: [ { text: "凡事都有明确的时间表，按部就班让你有掌控感", val: "J" }, { text: "讨厌被计划框死，喜欢随性而为的松弛感", val: "P" } ] },
+            { text: "15. 面对一个期限快到的重要任务，你会：", dim: "JP", opts: [ { text: "提前规划好进度，不喜欢拖到最后有压迫感", val: "J" }, { text: "靠Deadline带来的焦虑和爆发力在最后一刻狂肝", val: "P" } ] },
+            { text: "16. 你的电脑桌面或生活房间通常是：", dim: "JP", opts: [ { text: "物品分类明确，一切都井井有条", val: "J" }, { text: "看似杂乱无章，但自己总能精准找到想要的东西", val: "P" } ] }
+        ];
+
+        // ----------------------------------------------------
+        // 2. 结果池配置 (16种)
+        // ----------------------------------------------------
+        const resultsData = {
+            "INTJ": {
+                title: "绝对零度·虚空黑曜石",
+                color: "#8a2be2",
+                shadow: "0 0 40px rgba(138,43,226,0.6)",
+                clip: "polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)",
+                tags: ["极致理性", "高维战略", "精神洁癖", "降维打击"],
+                desc: "你拥有极度清醒的头脑，就像一块冰冷的黑曜石。在现实中，你习惯屏蔽无意义的社交内耗，用极致的理性去审视世界。你讨厌愚蠢和低效，擅长在脑内完成无数次推演，是天生的战略家和破局者。",
+                quote: "“不需要外界的光，我自带引力。”"
+            },
+            "INTP": {
+                title: "混沌解析·量子幽灵",
+                color: "#00ced1",
+                shadow: "0 0 40px rgba(0,206,209,0.6)",
+                clip: "polygon(20% 0%, 80% 0%, 100% 20%, 100% 80%, 80% 100%, 20% 100%, 0% 80%, 0% 20%)",
+                tags: ["底层架构师", "知识吞噬者", "概率云", "薛定谔的行动力"],
+                desc: "你的灵魂处于极其随性的叠加态。你对世俗的规矩漠不关心，却对探究事物的底层逻辑有着偏执的热爱。日常世界对你来说太慢了，你的思想早就在未来跑完了一生，但在现实行动上却往往是个极致的拖延症患者。",
+                quote: "“我在这里，也不在这里。”"
+            },
+            "ENTJ": {
+                title: "秩序统御·高维钛核",
+                color: "#ff4500",
+                shadow: "0 0 40px rgba(255,69,0,0.6)",
+                clip: "polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)",
+                tags: ["绝对掌控", "资源聚合", "高效无情", "现实扭曲场"],
+                desc: "你散发着不可抗拒的统治力。你天生就是秩序的建立者和团队的火车头，能将一团散沙重构为高效的战队。在你的世界里，情绪永远要为效率让路，只要目标确立，就没有你推不平的阻碍。",
+                quote: "“法则若不合理，那就重写法则。”"
+            },
+            "ENTP": {
+                title: "逆向崩坏·反物质暗晶",
+                color: "#ff1493",
+                shadow: "0 0 40px rgba(255,20,147,0.6)",
+                clip: "polygon(0 0, 100% 0, 80% 100%, 20% 100%)",
+                tags: ["脑洞黑洞", "规则破坏者", "极限拉扯", "灵感核爆"],
+                desc: "你有着极其活跃的思维火花，最喜欢在与别人的抬杠和辩论中寻找灵感。你的脑洞大到没有边际，总能瞬间在一团乱麻中看到新的出路。你不在乎世俗的输赢，只在乎这件事情够不够有趣。",
+                quote: "“为什么不把所有按钮都按一遍试试？”"
+            },
+            "INFJ": {
+                title: "深空先知·灵感蓝星",
+                color: "#4169e1",
+                shadow: "0 0 40px rgba(65,105,225,0.6)",
+                clip: "polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%)",
+                tags: ["高维预判", "精神洁癖", "极度共情", "人类观察者"],
+                desc: "你的内心像深空一样安静，却对周围人的情绪有着极其敏锐的捕捉力。你能一眼看穿别人的伪装，却往往选择温柔地看破不说破。你对自己有着极高的道德洁癖，一生都在寻找能真正和你灵魂共振的极少数同类。",
+                quote: "“我听到过灵魂的叹息。”"
+            },
+            "INFP": {
+                title: "共情潮汐·幻影紫萤",
+                color: "#dda0dd",
+                shadow: "0 0 40px rgba(221,160,221,0.6)",
+                clip: "polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)",
+                tags: ["灵魂流浪", "极致敏感", "浪漫过敏", "精神内耗区"],
+                desc: "你的灵魂拥有极其柔软的质感，对世界的一切都保持着极致的共情。哪怕是一部电影、一首歌都能在你的内心深海掀起潮汐。虽然你经常精神内耗、容易被现实刺痛，但你绝不妥协，誓死捍卫着心底那份纯粹的理想。",
+                quote: "“哪怕世界全是废墟，我也要种下一朵花。”"
+            },
+            "ENFJ": {
+                title: "频率同化·炽热光曜",
+                color: "#ffd700",
+                shadow: "0 0 40px rgba(255,215,0,0.6)",
+                clip: "polygon(50% 0%, 80% 20%, 100% 50%, 80% 80%, 50% 100%, 20% 80%, 0% 50%, 20% 20%)",
+                tags: ["引路人", "强磁场", "人际中枢", "精神布道者"],
+                desc: "你就像一个散发着光和热的小太阳，天生自带极强的亲和力与感染力。你太擅长照顾别人的感受，总是习惯性地把周围人拉拢在一起，甚至有时会因为过度付出而让自己精疲力尽。你是人群中当之无愧的灵魂导师。",
+                quote: "“来我的频段，带你起飞。”"
+            },
+            "ENFP": {
+                title: "跃迁星火·霓虹星尘",
+                color: "#00ff7f",
+                shadow: "0 0 40px rgba(0,255,127,0.6)",
+                clip: "polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%)",
+                tags: ["情绪永动机", "人型弹幕", "脑洞狂欢", "三分钟热度"],
+                desc: "你是一团充满活力的星尘，永远对未知的世界保持着小狗般的热情。你的感染力极强，总能用天马行空的脑洞点燃周围的人。枯燥和重复是你绝对的克星，你的人生就是一场不断追寻新鲜感的奇幻冒险。",
+                quote: "“那个看起来很好玩！我们去看看！”"
+            },
+            "ISTJ": {
+                title: "永恒锚点·静谧白珀",
+                color: "#e0e6ed",
+                shadow: "0 0 40px rgba(224,230,237,0.6)",
+                clip: "polygon(10% 0, 90% 0, 100% 100%, 0 100%)",
+                tags: ["逻辑堡垒", "现实支柱", "责任极客", "参数强迫症"],
+                desc: "你的内心无比坚定稳固。在现实中，你就是那个最靠谱的执行者，尊崇规矩、逻辑与契约。比起虚无缥缈的大饼，你只相信白纸黑字和时间校验过的事实。你可能不善言辞，但你的行动就是身边人最坚实的锚点。",
+                quote: "“请按流程提交申请。”"
+            },
+            "ISFJ": {
+                title: "绝对温室·柔和辉光",
+                color: "#f0e68c",
+                shadow: "0 0 40px rgba(240,230,140,0.6)",
+                clip: "circle(50% at 50% 50%)",
+                tags: ["细节狂魔", "沉默守护者", "超量付出", "记忆档案馆"],
+                desc: "你散发着极其温和与内敛的光芒。你有着令人惊叹的细节记忆力，总能记住别人随口一提的喜好。你习惯在背后默默付出，为周围人提供最稳定的后勤保障。你虽然不喜欢抢风头，但整个圈子没有你就会散。",
+                quote: "“没关系，我都安排好了。”"
+            },
+            "ESTJ": {
+                title: "矩阵执行·冷钢方碑",
+                color: "#4682b4",
+                shadow: "0 0 40px rgba(70,130,180,0.6)",
+                clip: "polygon(0 0, 100% 0, 100% 100%, 0 100%)",
+                tags: ["现实铁腕", "规则化身", "进度条杀手", "效率机器"],
+                desc: "你是一个有着极致规则感的行动派，字典里没有“内耗”和“拖延”。你擅长把任何混乱的局面切割成具体的任务进度条，然后无情地推进。你对效率有着强迫症般的追求，不喜欢废话，只看最终的结果。",
+                quote: "“别废话，看 KPI。”"
+            },
+            "ESFJ": {
+                title: "能量链接·引力琥珀",
+                color: "#ffa07a",
+                shadow: "0 0 40px rgba(255,160,122,0.6)",
+                clip: "polygon(20% 0, 80% 0, 100% 50%, 80% 100%, 20% 100%, 0% 50%)",
+                tags: ["场控大师", "情绪路由器", "共识促成者", "付出型人格"],
+                desc: "你是当之无愧的社交黏合剂，天生拥有将零散个体聚拢的魔力。你的雷达时刻扫视着周遭的情感生态，绝不允许任何人在聚会中落单。你在照顾他人的付出中确立自己的价值，大家的开心就是你最大的动力。",
+                quote: "“大家开心，我就觉得值得。”"
+            },
+            "ISTP": {
+                title: "机械核心·钨金机括",
+                color: "#708090",
+                shadow: "0 0 40px rgba(112,128,144,0.6)",
+                clip: "polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)",
+                tags: ["操作狂", "冷面修理工", "危机沉着", "无情拆解"],
+                desc: "你平时总是处于极度低调的省电模式，对麻烦的人际交往毫无兴趣。但遇到突发危机时，你又能爆发出令人惊叹的动手能力和极度冷静。你讨厌长篇大论的说教，只关心这件事情到底该怎么运作和解决。",
+                quote: "“让我自己弄。”"
+            },
+            "ISFP": {
+                title: "感官溶解·极光流沙",
+                color: "#20b2aa",
+                shadow: "0 0 40px rgba(32,178,170,0.6)",
+                clip: "polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)",
+                tags: ["美学捕捉器", "隐形叛逆", "当下即永恒", "和平主义"],
+                desc: "你的灵魂没有固定的形状，就像极光一样自由流动。你用最细腻的触角去品尝这个世界的每一丝色彩与声音。你不愿被任何标签和规矩束缚，也不喜欢和人起冲突。你只愿安静地待在自己的舒适区，感受当下的美好。",
+                quote: "“感受风的形状，就够了。”"
+            },
+            "ESTP": {
+                title: "动能风暴·高能赤核",
+                color: "#dc143c",
+                shadow: "0 0 40px rgba(220,20,60,0.6)",
+                clip: "polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)",
+                tags: ["风险猎手", "物理引擎", "控场玩家", "活在当下"],
+                desc: "你是一个浑身散发着动能的风暴中心，需要不断的外部刺激来维持能量。你有着极强的现实感知和强大的心脏，能在瞬息万变的危机中踩下最极限的油门。对你而言，人生就是一场不需要说明书的硬核游戏。",
+                quote: "“规则就是用来被打破的。”"
+            },
+            "ESFP": {
+                title: "狂热聚变·等离子焰心",
+                color: "#ff8c00",
+                shadow: "0 0 40px rgba(255,140,0,0.6)",
+                clip: "polygon(20% 0%, 80% 0%, 100% 100%, 0% 100%)",
+                tags: ["聚光灯", "派对永动机", "情绪点火器", "快乐至上"],
+                desc: "你就是一场永不熄灭的派对狂欢。你走到哪里，哪里就是舞台中心。你的能量完全向外辐射，擅长用最直给的快乐融化所有冰冷的屏障。如果不发光、不闪耀，那对你来说简直是对生命的极大浪费。",
+                quote: "“快来，好戏才刚刚开始！”"
+            }
+        };
+
+        // ----------------------------------------------------
+        // 3. 核心逻辑与流转
+        // ----------------------------------------------------
+        let currentQuestion = 0;
+        let answers = []; 
+        let historyStack = [];
+
+        function setHash(hash) {
+            if(window.location.hash !== hash) {
+                history.pushState(null, null, hash);
+            }
+        }
+
+        window.addEventListener('popstate', function(e) {
+            const hash = window.location.hash;
+            if (hash === '#landing' || hash === '') {
+                showView('landing');
+            } else if (hash === '#quiz') {
+                if(currentQuestion >= questions.length) {
+                    showView('quiz');
+                    currentQuestion = questions.length - 1;
+                    answers.pop();
+                    historyStack.pop();
+                    renderQuestion();
+                } else if(currentQuestion > 0) {
+                    prevQuestion();
+                }
+            } else if (hash === '#result') {
+                showView('result');
+            }
+        });
+
+        function showView(id) {
+            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+        }
+
+        function startQuiz() {
+            currentQuestion = 0;
+            answers = [];
+            historyStack = [];
+            setHash('#quiz');
+            showView('quiz');
+            renderQuestion();
+        }
+
+        function renderQuestion() {
+            const q = questions[currentQuestion];
+            document.getElementById('q-title').innerText = q.text;
+            document.getElementById('progress-fill').style.width = ((currentQuestion + 1) / questions.length * 100) + '%';
+            document.getElementById('progress-text').innerText = `${String(currentQuestion + 1).padStart(2, '0')}/${questions.length}`;
+            
+            let html = '';
+            const letters = ['A', 'B'];
+            q.opts.forEach((opt, idx) => {
+                html += `<button class="option-btn" data-letter="${letters[idx]}" onclick="selectOption('${opt.val}')">${opt.text}</button>`;
+            });
+            document.getElementById('options-container').innerHTML = html;
+        }
+
+        function selectOption(val) {
+            historyStack.push({q: currentQuestion, a: [...answers]});
+            answers.push(val);
+            
+            if (currentQuestion < questions.length - 1) {
+                currentQuestion++;
+                renderQuestion();
+            } else {
+                setHash('#result');
+                calculateResult();
+            }
+        }
+
+        function prevQuestion() {
+            if (historyStack.length > 0) {
+                const lastState = historyStack.pop();
+                currentQuestion = lastState.q;
+                answers = lastState.a;
+                renderQuestion();
+            } else {
+                setHash('#landing');
+                showView('landing');
+            }
+        }
+
+        function calculateResult() {
+            showView('loading');
+            
+            // 统计得分
+            let scores = { E:0, I:0, S:0, N:0, T:0, F:0, J:0, P:0 };
+            
+            answers.forEach((val, index) => {
+                // 每道题加1分。为了防偶数平局，第 2/6/10/14 题 (index 1/5/9/13) 作为核心题赋予 1.1 分权重
+                let weight = (index % 4 === 1) ? 1.1 : 1.0;
+                scores[val] += weight;
+            });
+
+            // 如果万一还有极端情况导致相等（浮点数），默认偏向右侧字母 (I/N/F/P) 作为破局兜底
+            let mbti = "";
+            mbti += (scores.E > scores.I) ? "E" : "I";
+            mbti += (scores.S > scores.N) ? "S" : "N";
+            mbti += (scores.T > scores.F) ? "T" : "F";
+            mbti += (scores.J > scores.P) ? "J" : "P";
+
+            setTimeout(() => {
+                renderResult(mbti);
+            }, 1500); // 假装分析1.5秒
+        }
+
+        function renderResult(mbti, isHistory = false, historyId = null) {
+            const data = resultsData[mbti];
+            
+            // 生成随机防伪编号或使用历史原ID
+            const targetId = historyId ? historyId : Math.random().toString(36).substr(2, 8).toUpperCase();
+            document.getElementById('r-id').innerText = `SAMPLE ID: ${targetId}`;
+            
+            document.getElementById('r-mbti').innerText = `MBTI-TYPE: ${mbti}`;
+            document.getElementById('r-title').innerText = data.title;
+            
+            // 晶体样式
+            const crystal = document.getElementById('r-crystal');
+            crystal.style.background = `linear-gradient(135deg, #111, ${data.color})`;
+            crystal.style.boxShadow = data.shadow;
+            crystal.style.clipPath = data.clip;
+            crystal.style.border = `1px solid ${data.color}`;
+
+            // 为历史记录提供颜色
+            document.documentElement.style.setProperty('--accent-glow', data.color);
+
+            document.getElementById('r-desc').innerText = data.desc;
+            document.getElementById('r-quote').innerText = data.quote;
+
+            // 标签
+            let tagsHtml = '';
+            data.tags.forEach(tag => { tagsHtml += `<span class="tag">#${tag}</span>`; });
+            document.getElementById('r-tags').innerHTML = tagsHtml;
+
+            // 保存到历史记录
+            if (!isHistory) {
+                saveHistory(mbti, data.title, targetId);
+            }
+
+            setHash('#result');
+            showView('result');
+
+            // 矩阵初始化 (渲染到隐藏容器中，由我们自己的 UI 按钮唤出)
+            if(window.initTestMatrix) {
+                window.initTestMatrix({
+                    containerId: 'dummy-matrix-container',
+                    currentId: 'mbti-crystal-test',
+                    theme: 'dark'
+                });
+            }
+        }
+
+        // ----------------------------------------------------
+        // 4. 截图与保存机制
+        // ----------------------------------------------------
+        function generateImage() {
+            const wrapper = document.getElementById('capture-wrapper');
+            // 简单处理确保字体渲染
+            htmlToImage.toPng(wrapper, { quality: 0.95, backgroundColor: '#050505' })
+                .then(function (dataUrl) {
+                    const img = document.getElementById('generated-img');
+                    img.src = dataUrl;
+                    document.getElementById('image-modal').classList.add('active');
+                })
+                .catch(function (error) {
+                    console.error('oops, something went wrong!', error);
+                    alert("报告封存失败，请尝试刷新重试。");
+                });
+        }
+
+        function closeImageModal() {
+            document.getElementById('image-modal').classList.remove('active');
+        }
+
+        // ----------------------------------------------------
+        // 5. 历史记录系统
+        // ----------------------------------------------------
+        function saveHistory(mbti, title, id) {
+            let historyData = JSON.parse(localStorage.getItem('mbti_crystal_history') || '[]');
+            historyData.unshift({
+                mbti: mbti,
+                title: title,
+                id: id,
+                time: new Date().toLocaleString()
+            });
+            // 只保留最近 20 条
+            if (historyData.length > 20) historyData = historyData.slice(0, 20);
+            localStorage.setItem('mbti_crystal_history', JSON.stringify(historyData));
+        }
+
+        function checkHistory() {
+            let historyData = JSON.parse(localStorage.getItem('mbti_crystal_history') || '[]');
+            if(historyData.length > 0) {
+                document.getElementById('history-btn').style.display = 'block';
+            }
+        }
+
+        function openHistory() {
+            let historyData = JSON.parse(localStorage.getItem('mbti_crystal_history') || '[]');
+            let html = '';
+            historyData.forEach(item => {
+                html += `<div class="history-item" style="cursor:pointer;" onclick="closeHistory(); renderResult('${item.mbti}', true, '${item.id}')">
+                    <div class="h-time">${item.time} | ID: ${item.id}</div>
+                    <div class="h-result">${item.title}</div>
+                    <div class="h-mbti">光谱成分: ${item.mbti}</div>
+                </div>`;
+            });
+            document.getElementById('history-list').innerHTML = html;
+            document.getElementById('history-drawer').classList.add('active');
+        }
+
+        function closeHistory() {
+            document.getElementById('history-drawer').classList.remove('active');
+        }
+
+        // Initialize Hash & Check History
+        setHash('#landing');
+        checkHistory();
+
+    </script>
+    <script>
+        // 引入矩阵 JS
+        setTimeout(() => {
+            const script = document.createElement('script');
+            script.src = '../test-matrix.js';
+            script.onload = () => {
+                if(window.initTestMatrix) {
+                    const dummy = document.createElement('div');
+                    dummy.id = 'dummy-matrix-container';
+                    dummy.style.display = 'none';
+                    document.body.appendChild(dummy);
+                    window.initTestMatrix({
+                        containerId: 'dummy-matrix-container',
+                        currentId: 'mbti-crystal-test',
+                        theme: 'dark'
+                    });
+                }
+            };
+            script.onerror = () => console.log('Matrix script not found, running locally.');
+            document.body.appendChild(script);
+        }, 500);
+    </script>
+</body>
+</html>

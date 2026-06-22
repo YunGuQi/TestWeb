@@ -8,14 +8,14 @@ const MATRIX_DATA = [
     { id: 'five-elements-city-test', title: '五行本命城市测算', subtitle: '勘探地气，寻找你的命定之城', tags: ['玄学', '趣味', '生活'], developed: true , previewImg: '../five-elements-city-test/preview.jpg', desc: '<p class="mb-2"><b class="text-white">【测评简介】</b><br>结合性格投射与玄学五行，为你生成一份专属的“异地迁徙调令”。</p><p><b class="text-white">【评估维度】</b><br>金(秩序)、木(生长)、水(包容)、火(激情)、土(安稳)。</p>', price: '0.99', oldPrice: '1.50' },
     { id: 'emotional-friction-test', title: '深度情绪内耗测试', subtitle: '测一测你的精神内耗程度，开出一剂情绪处方', tags: ['心理健康', '专业'], developed: true , previewImg: '../emotional-friction-test/preview.jpg', desc: '<p class="mb-2"><b class="text-white">【测评简介】</b><br>深度解析你的底层心理逻辑，找到内心真实的渴望。</p><p><b class="text-white">【如有期待】</b><br>本测试正在紧锣密鼓开发中，敬请期待。</p>', price: '0.00', oldPrice: '9.90' },
     { id: 'scl90', title: 'SCL-90 心理健康测评', subtitle: '国际通用 · 全面心理体检', tags: ['心理健康', '专业'], developed: false, hot: true , desc: '<p class="mb-2"><b class="text-white">【测评简介】</b><br>国际通用的心理健康“体检表”，广泛应用于医疗与心理咨询领域。</p><p><b class="text-white">【评估维度】</b><br>涵盖躯体化、强迫、人际敏感、抑郁、焦虑、敌对、恐怖、偏执、精神病性等10大核心心理指标。</p>', price: '0.99', oldPrice: '1.50' },
-    { id: 'love_possession', title: '恋爱占有欲测试', subtitle: '你的爱是由于不安还是深情？', tags: ['恋爱', '情感'], developed: false, hot: true , desc: '<p class="mb-2"><b class="text-white">【测评简介】</b><br>爱一个人就想占有TA？适度的占有欲是爱的表现，过度的占有欲则是关系的毒药。</p><p><b class="text-white">【评估维度】</b><br>占有欲强度、情感安全感、控制倾向、独立性需求。</p>', price: '0.99', oldPrice: '1.50' },
-    { id: 'mbti_16', title: 'MBTI 16型人格测试', subtitle: '探索你的核心性格代码', tags: ['人格', 'MBTI'], developed: false , desc: '<p class="mb-2"><b class="text-white">【测评简介】</b><br>全球最流行的性格测试工具，帮你找到自己在生活、工作、恋爱中的“出厂设置”。</p><p><b class="text-white">【评估维度】</b><br>E/I (外向/内向)、S/N (实感/直觉)、T/F (理智/情感)、J/P (判断/感知)。</p>', price: '0.99', oldPrice: '1.50' },
+    { id: 'love-species-test', title: '恋爱物种领养中心', subtitle: '依恋类型 × 心理防御机制测试', tags: ['恋爱', '情感'], developed: true, previewImg: '../love-species-test/preview.jpg', desc: '<p class="mb-2"><b class="text-white">【测评简介】</b><br>每个人在亲密关系中，都隐藏着一种独特的动植物人格。你是带刺内心柔软的“仙人掌”，还是阳光治愈的“金毛”？</p><p><b class="text-white">【评估维度】</b><br>依恋安全感、情感控制、防御机制。</p>', price: '0.99', oldPrice: '1.50' },
+    { id: 'mbti-crystal-test', title: 'MBTI 16型人格测算', subtitle: '提取你的深空意识结晶', tags: ['人格', 'MBTI'], developed: true , previewImg: '../mbti-crystal-test/preview.jpg', desc: '<p class="mb-2"><b class="text-white">【测评简介】</b><br>赛博科技风MBTI测评，提取你的核心光谱与灵魂结晶，找到自己在生活、工作、恋爱中的出厂设置。</p><p><b class="text-white">【评估维度】</b><br>E/I (外向/内向)、S/N (实感/直觉)、T/F (理智/情感)、J/P (判断/感知)。</p>', price: '0.99', oldPrice: '1.50' },
     { id: 'mbti_love', title: 'MBTI 恋爱理想型测试', subtitle: '谁才是你的灵魂伴侣？', tags: ['恋爱', 'MBTI'], developed: false , desc: '<p class="mb-2"><b class="text-white">【测评简介】</b><br>基于MBTI人格理论，精准匹配最适合你的伴侣类型。</p><p><b class="text-white">【如有期待】</b><br>本测试正在紧锣密鼓开发中，将深度解析你的依恋需求与适配人格。</p>', price: '0.99', oldPrice: '1.50' },
     { id: 'childhood', title: '童年创伤测试', subtitle: '疗愈内在小孩的第一步', tags: ['疗愈', '成长'], developed: false , desc: '<p class="mb-2"><b class="text-white">【测评简介】</b><br>看见童年的伤，是疗愈的开始。带你拥抱那个内心深处哭泣的小孩。</p><p><b class="text-white">【如有期待】</b><br>本测试正在开发中，将包含家庭功能评估与情感忽视分析。</p>', price: '0.99', oldPrice: '1.50' },
     { id: 'spiritual', title: '精神需求测试', subtitle: '你灵魂深处真正渴望什么？', tags: ['自我', '探索'], developed: false , desc: '<p class="mb-2"><b class="text-white">【测评简介】</b><br>拨开物质欲望的迷雾，直视灵魂深处的真实渴求。</p><p><b class="text-white">【如有期待】</b><br>本测试正在开发中，敬请期待。</p>', price: '0.99', oldPrice: '1.50' },
     { id: 'adhd', title: 'ADHD 注意力缺陷测试', subtitle: '总是分心？测测专注力', tags: ['健康', '科普'], developed: false , desc: '<p class="mb-2"><b class="text-white">【测评简介】</b><br>这是天赋还是障碍？科学评估你的专注力水平。</p><p><b class="text-white">【如有期待】</b><br>本测试正在开发中，敬请期待。</p>', price: '0.99', oldPrice: '1.50' },
     { id: 'appearance', title: '高颜值测试', subtitle: '你的美学风格属于哪一种？', tags: ['审美', '趣味'], developed: false , desc: '<p class="mb-2"><b class="text-white">【测评简介】</b><br>发现你的独特美学气质，找到最适合你的变美思路。</p><p><b class="text-white">【如有期待】</b><br>本测试正在开发中，敬请期待。</p>', price: '0.99', oldPrice: '1.50' },
-    { id: 'attachment', title: '成人依恋类型测试', subtitle: '回避/焦虑/安全型？', tags: ['关系', '心理'], developed: false , desc: '<p class="mb-2"><b class="text-white">【测评简介】</b><br>深度解析你在亲密关系中的安全感来源与行为模式。</p><p><b class="text-white">【如有期待】</b><br>本测试正在开发中，敬请期待。</p>', price: '0.99', oldPrice: '1.50' },
+    { id: 'attachment-manual', title: '恋爱依恋说明书', subtitle: '生成你的出厂型号与顺毛指南', tags: ['恋爱', '趣味', '关系'], developed: true , previewImg: '../attachment-manual-test/preview.jpg', desc: '<p class="mb-2"><b class="text-white">【测评简介】</b><br>提取你的专属型号与核心成分，排查恋爱系统中的报错日志。</p><p><b class="text-white">【评估维度】</b><br>基于经典成人依恋理论的双维度算法映射。</p>', price: '0.99', oldPrice: '1.50' },
     { id: 'female_type', title: '女性类型测试', subtitle: '探索你的女性力量原型', tags: ['性格', '女性'], developed: false , desc: '<p class="mb-2"><b class="text-white">【测评简介】</b><br>你是雅典娜、赫拉还是阿佛洛狄忒？探索你的原型力量。</p><p><b class="text-white">【如有期待】</b><br>本测试正在开发中，敬请期待。</p>', price: '0.99', oldPrice: '1.50' },
     { id: 'age_love', title: '年上年下恋爱人格', subtitle: '你适合“爹系”还是“奶狗”？', tags: ['恋爱', '趣味'], developed: false , desc: '<p class="mb-2"><b class="text-white">【测评简介】</b><br>测测你在恋爱中更适合扮演照顾者还是被照顾者。</p><p><b class="text-white">【如有期待】</b><br>本测试正在开发中，敬请期待。</p>', price: '0.99', oldPrice: '1.50' },
     { id: 'npd', title: 'NPD 自恋型人格测试', subtitle: '识别身边的“有毒”关系 (测他人)', tags: ['关系', '避坑'], developed: false , desc: '<p class="mb-2"><b class="text-white">【测评简介】</b><br>你的TA是否极度自负、缺乏共情？帮你快速识别危险关系。</p><p><b class="text-white">【如有期待】</b><br>本测试正在开发中，敬请期待。</p>', price: '0.99', oldPrice: '1.50' },
@@ -83,14 +83,11 @@ function initTestMatrix({ containerId, currentId, theme = 'dark' }) {
         const rawDisplayData = MATRIX_DATA.map((test, index) => ({ test, originalIndex: index }));
         
         let currentTest = null;
-        let emotionalTest = null;
         let others = [];
 
         rawDisplayData.forEach(item => {
             if (item.test.id === currentId) {
                 currentTest = item;
-            } else if (item.test.id === 'emotional-friction-test') {
-                emotionalTest = item;
             } else {
                 others.push(item);
             }
@@ -98,7 +95,14 @@ function initTestMatrix({ containerId, currentId, theme = 'dark' }) {
 
         const displayData = [];
         if (currentTest) displayData.push(currentTest);
-        if (emotionalTest) displayData.push(emotionalTest);
+        
+        // Sort others: developed tests first
+        others.sort((a, b) => {
+            if (a.test.developed && !b.test.developed) return -1;
+            if (!a.test.developed && b.test.developed) return 1;
+            return 0;
+        });
+        
         displayData.push(...others);
         
         displayData.forEach((item, displayIdx) => {
@@ -253,6 +257,10 @@ window.openTestDetailModal = function(idx) {
     let btnClass = 'bg-[#3b82f6] hover:bg-[#2563eb] text-white';
     let disabled = false;
     let target = '_blank';
+    const localTests = [
+        'city-matching-test', 'five-elements-city-test', 'emotional-friction-test', 
+        'attachment-manual-test', 'love-species-test', 'mbti-crystal-test'
+    ];
 
     if (isCurrent) {
         url = '#';
@@ -264,7 +272,7 @@ window.openTestDetailModal = function(idx) {
         btnText = '测试开发中 &rarr;';
         btnClass = isLight ? 'bg-[#1e293b] text-gray-400' : 'bg-[#1e293b] text-gray-400';
         disabled = true;
-    } else if (test.id === 'emotional-friction-test') {
+    } else if (localTests.includes(test.id)) {
         url = `../${test.id}/index.html`;
         btnText = '立即测算 &rarr;';
         target = '_self';

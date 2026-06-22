@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>你的恋爱依恋说明书</title>
+    <!-- 引入 Tailwind 以支持引流组件弹窗的样式 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 使用更稳定且与其他测试一致的 html-to-image 替代 html2canvas -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html-to-image/1.11.11/html-to-image.min.js"></script>
+    <style>
+        :root {
+            --bg-color: #FFF0F5; /* 奶粉色背景 */
+            --accent-color: #D81B60; /* 树莓粉/玫瑰红 */
+            --text-color: #2C2C2C; /* 深灰文字，非纯黑 */
+            --border-color: #2C2C2C; /* 工业风深色粗边框 */
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            min-height: 100vh;
+            /* 噪点纹理 */
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
+            display: flex;
+            flex-direction: column;
+            align-items: center; /* 居中整个容器 */
+        }
+
+        .app-container {
+            max-width: 480px;
+            width: 100%;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            margin: 0 auto;
+        }
+
+        /* 页面切换控制 */
+        .page {
+            display: none;
+            width: 100%;
+            min-height: 100vh;
+            padding: 20px;
+            flex-direction: column;
+        }
+        .page.active {
+            display: flex;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ===== 通用组件 ===== */
+        .manual-box {
+            border: 3px solid var(--border-color);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.8);
+            box-shadow: 4px 4px 0px var(--border-color);
+            padding: 20px;
+            margin-bottom: 20px;
+            text-align: center; /* 文本居中 */
+        }
+
+        .btn {
+            background-color: var(--text-color);
+            color: #fff;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            padding: 14px 20px;
+            font-size: 16px;
+            font-weight: bold;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: block;
+            width: 100%;
+            margin-bottom: 12px;
+            box-shadow: 2px 2px 0px var(--border-color);
+        }
+        .btn:active {
+            transform: translate(2px, 2px);
+            box-shadow: 0px 0px 0px var(--border-color);
+        }
+        .btn-primary {
+            background-color: var(--accent-color);
+            border-color: var(--border-color);
+        }
+        .btn-outline {
+            background-color: transparent;
+            color: var(--text-color);
+        }
+
+        /* ===== 首页 ===== */
+        .home-header {
+            text-align: center;
+            margin-bottom: 30px;
+            margin-top: 20px;
+        }
+        .barcode-img {
+            width: 80%;
+            height: 40px;
+            margin: 0 auto 15px;
+            background: repeating-linear-gradient(
+                90deg,
+                var(--text-color),
+                var(--text-color) 2px,
+                transparent 2px,
+                transparent 4px,
+                var(--text-color) 4px,
+                var(--text-color) 8px,
+                transparent 8px,
+                transparent 10px
+            );
+            border-radius: 2px;
+        }
+        .title-box {
+            display: inline-block;
+            border-bottom: 4px solid var(--accent-color);
+            padding-bottom: 5px;
+            margin-bottom: 15px;
+        }
+        .title-box h1 {
+            font-size: 28px;
+            letter-spacing: 2px;
+        }
+        .subtitle {
+            font-size: 14px;
+            color: #666;
+            letter-spacing: 1px;
+        }
+        .cover-desc {
+            font-size: 15px;
+            line-height: 1.8;
+            margin-bottom: 30px;
+            text-align: left; /* 描述文案保持左对齐更好看 */
+            display: inline-block;
+        }
+        .cover-desc p {
+            margin-bottom: 10px;
+            padding-left: 15px;
+            position: relative;
+            font-weight: bold;
+        }
+        .cover-desc p::before {
+            content: "▶";
+            position: absolute;
+            left: 0;
+            color: var(--accent-color);
+            font-size: 12px;
+            top: 2px;
+        }
+
+        /* ===== 答题页 ===== */
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(0,0,0,0.1);
+            border-radius: 4px;
+            margin-bottom: 25px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+        .progress-fill {
+            height: 100%;
+            background-color: var(--accent-color);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        .question-text {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 30px;
+            line-height: 1.5;
+            text-align: left;
+        }
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .option-btn {
+            background: rgba(255, 255, 255, 0.9);
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            padding: 16px 20px;
+            font-size: 15px;
+            font-weight: bold;
+            text-align: left;
+            cursor: pointer;
+            box-shadow: 3px 3px 0px var(--border-color);
+            transition: all 0.1s;
+        }
+        .option-btn:active {
+            transform: translate(3px, 3px);
+            box-shadow: 0px 0px 0px var(--border-color);
+            background: var(--bg-color);
+        }
+        .back-btn {
+            margin-top: 30px;
+            background: none;
+            border: none;
+            color: #888;
+            font-size: 14px;
+            text-decoration: underline;
+            text-align: center;
+            cursor: pointer;
+            padding: 10px;
+        }
+
+        /* ===== 结果页 ===== */
+        #result-capture-area {
+            padding: 20px;
+            background-color: var(--bg-color);
+            position: relative;
+            text-align: center;
+        }
+        .result-stamp {
+            position: absolute;
+            bottom: 20px;
+            right: -10px;
+            font-family: monospace;
+            font-size: 16px;
+            font-weight: 900;
+            color: var(--accent-color);
+            border: 2px solid var(--accent-color);
+            padding: 3px 10px;
+            transform: rotate(-15deg);
+            border-radius: 4px;
+            letter-spacing: 2px;
+            opacity: 0.8;
+            z-index: 10;
+        }
+        .result-header {
+            text-align: center;
+            margin-bottom: 25px;
+            margin-top: 10px;
+        }
+        .result-header h2 {
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 8px;
+            color: var(--text-color);
+        }
+        .result-type-name {
+            font-size: 34px;
+            font-weight: 900;
+            color: var(--accent-color);
+            text-shadow: 1.5px 1.5px 0 var(--border-color);
+            margin-bottom: 8px;
+        }
+        .result-type-sub {
+            font-size: 16px;
+            font-weight: bold;
+            background: var(--border-color);
+            color: #fff;
+            display: inline-block;
+            padding: 4px 16px;
+            border-radius: 20px;
+            letter-spacing: 1px;
+        }
+
+        /* 说明书表格布局 */
+        .info-table {
+            width: 100%;
+            border-collapse: collapse;
+            border: 2px solid var(--border-color);
+            background: #fff;
+            margin-bottom: 20px;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .info-table th, .info-table td {
+            border: 1px solid var(--border-color);
+            padding: 14px 12px;
+            font-size: 14px;
+        }
+        .info-table th {
+            width: 30%;
+            background: var(--bg-color);
+            font-weight: bold;
+            text-align: center;
+            vertical-align: middle;
+        }
+        .info-table td {
+            width: 70%;
+            font-weight: bold;
+            line-height: 1.6;
+            text-align: left;
+        }
+
+        /* 警告框 */
+        .warning-box {
+            border: 2px solid var(--accent-color);
+            background: #fff;
+            position: relative;
+            padding: 22px 15px 15px;
+            margin-top: 25px;
+            border-radius: 4px;
+            text-align: left;
+        }
+        .warning-label {
+            position: absolute;
+            top: -12px;
+            left: 15px;
+            background: var(--accent-color);
+            color: #fff;
+            padding: 2px 10px;
+            font-size: 12px;
+            font-weight: bold;
+            border-radius: 2px;
+        }
+        .warning-text {
+            font-size: 14px;
+            font-weight: bold;
+            color: var(--accent-color);
+            line-height: 1.6;
+        }
+
+        .disclaimer {
+            font-size: 10px;
+            color: rgba(0,0,0,0.3);
+            text-align: center;
+            margin-top: 15px;
+            padding: 5px;
+        }
+
+        .action-area {
+            margin-top: 20px;
+            padding: 0 15px 10px;
+        }
+
+        /* 生成海报弹窗 */
+        #poster-modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 1000;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        #poster-img {
+            max-width: 90%;
+            max-height: 80vh;
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            margin-bottom: 20px;
+        }
+        .close-poster-btn {
+            background: #fff;
+            color: #333;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        /* 历史记录抽屉 */
+        #history-modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .history-card {
+            background: var(--bg-color);
+            border: 3px solid var(--border-color);
+            width: 100%;
+            max-width: 400px;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 6px 6px 0px var(--border-color);
+            max-height: 80vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .history-item {
+            border: 2px solid var(--border-color);
+            padding: 12px;
+            margin-bottom: 12px;
+            border-radius: 6px;
+            background: white;
+            cursor: pointer;
+            text-align: left;
+            transition: transform 0.1s;
+        }
+        .history-item:active {
+            transform: scale(0.98);
+            background: #f9f9f9;
+        }
+        .history-item-title {
+            font-weight: 900;
+            font-size: 16px;
+            color: var(--accent-color);
+            margin-bottom: 4px;
+        }
+        .history-item-date {
+            font-size: 12px;
+            color: #666;
+            font-weight: bold;
+        }
+
+        .matrix-wrap {
+            margin-top: 10px;
+            margin-bottom: 20px;
+            padding: 0 15px;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <!-- 首页 -->
+    <div id="page-home" class="page active">
+        <div class="manual-box" style="margin-top: 20px;">
+            <div class="home-header">
+                <div class="barcode-img"></div>
+                <div class="title-box">
+                    <h1>恋爱依恋说明书</h1>
+                </div>
+                <div class="subtitle">ROMANTIC ATTACHMENT MANUAL</div>
+            </div>
+            
+            <div class="cover-desc">
+                <p>提取你的专属型号与核心成分</p>
+                <p>排查恋爱系统中的报错日志</p>
+                <p>生成仅限伴侣可见的顺毛指南</p>
+            </div>
+
+            <button class="btn btn-primary" onclick="startTest()">拆封测试</button>
+        </div>
+        <div style="display:flex; justify-content:center; gap:20px; font-size:12px; margin-top:10px; font-weight:bold; font-family:monospace;">
+            <span style="color:#888; text-decoration:underline; cursor:pointer;" onclick="if(window.openMatrixModal) openMatrixModal();">[ 探索其他型号 ]</span>
+            <span id="btn-history" style="display:none; color:#888; text-decoration:underline; cursor:pointer;" onclick="openHistory()">[ 历史出厂记录 ]</span>
+        </div>
+    </div>
+
+    <!-- 答题页 -->
+    <div id="page-quiz" class="page">
+        <div class="progress-bar">
+            <div class="progress-fill" id="progress-fill"></div>
+        </div>
+        <div class="manual-box" style="text-align: left;">
+            <div class="question-text" id="question-text">题目加载中...</div>
+            <div class="options-list" id="options-list">
+                <!-- 选项动态渲染 -->
+            </div>
+        </div>
+        <button class="back-btn" id="btn-prev" onclick="prevQuestion()" style="display:none;">&lt;&lt; 上一题（撤回操作）</button>
+    </div>
+
+    <!-- 结果页 -->
+    <div id="page-result" class="page">
+        <!-- 套一层包裹器，专门用于 html2canvas 截图，解决边框/阴影/定位被裁剪的问题 -->
+        <div id="capture-wrapper" style="padding: 15px; background-color: var(--bg-color); width: 100%;">
+            <div class="manual-box" id="result-capture-area" style="margin-top: 0; padding: 30px 20px; position: relative;">
+                <div class="barcode-img" style="height: 25px; margin-bottom: 20px; width: 80%;"></div>
+                <div class="result-stamp">合格品</div>
+            
+            <div class="result-header">
+                <h2>出厂型号识别</h2>
+                <div class="result-type-name" id="res-type-name">加载中</div>
+                <div class="result-type-sub" id="res-type-sub">加载中</div>
+            </div>
+
+            <table class="info-table">
+                <tr>
+                    <th>核心成分</th>
+                    <td id="res-ingredients">加载中...</td>
+                </tr>
+                <tr>
+                    <th>出厂特征</th>
+                    <td id="res-features">加载中...</td>
+                </tr>
+            </table>
+
+            <div class="warning-box">
+                <div class="warning-label">⚠ 严重警告区</div>
+                <div class="warning-text" id="res-warning">加载中...</div>
+            </div>
+
+            <div class="disclaimer" style="margin-top:20px;">
+                本说明书基于成人依恋理论构建 | 仅供娱乐参考，最终解释权归本机所有
+            </div>
+        </div>
+        </div>
+
+        <div class="action-area" style="margin-top: 10px;">
+            <button class="btn btn-primary" onclick="generatePoster()">💾 打印说明书 (截图保存)</button>
+            <button class="btn btn-outline" style="background:#fff;" onclick="if(window.openMatrixModal) openMatrixModal();">探索其他心理测评</button>
+            <div style="text-align:center; margin-top:15px;">
+                <span style="color:#888; text-decoration:underline; cursor:pointer; font-size:12px; font-weight:bold; font-family:monospace;" onclick="location.reload()">[ 重置机器，重新测试 ]</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 海报弹窗 -->
+<div id="poster-modal" style="overflow-y:auto; padding:40px 20px; display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:1000; flex-direction:column; align-items:center;">
+    <div style="color:white; margin-bottom:15px; font-size:15px; font-weight:bold; text-align:center; flex-shrink:0;">长按图片保存，分享到小红书</div>
+    <img id="poster-img" src="" alt="生成的海报" style="flex-shrink:0; max-width:100%; border-radius:8px;">
+    <button class="close-poster-btn" onclick="closePoster()" style="margin-top:20px; flex-shrink:0; width: 80%; max-width: 300px;">关闭弹窗</button>
+</div>
+
+<!-- 历史记录弹窗 -->
+<div id="history-modal">
+    <div class="history-card">
+        <h3 style="font-size:20px; font-weight:900; border-bottom:2px solid var(--accent-color); padding-bottom:10px; margin-bottom:15px; text-align:center;">出厂记录抽屉</h3>
+        <div id="history-list" style="overflow-y:auto; flex-grow:1;">
+            <!-- 历史记录项 -->
+        </div>
+        <button class="btn btn-outline" style="margin-top:15px; margin-bottom:0;" onclick="closeHistory()">收起抽屉</button>
+    </div>
+</div>
+
+<script src="../test-matrix.js"></script>
+<script>
+    // 题库配置 (10题, A: Anxiety, V: Avoidance)
+    const questions = [
+        {
+            text: "1. 如果对方长达半天没有回复消息，你这台机器的内部报错日志是？",
+            options: [
+                { text: "“可能是没网或者在忙吧，去干点别的”", A: 0, V: 0 },
+                { text: "“是不是我哪里做错了？完了完了要被抛弃了”", A: 1, V: 0 },
+                { text: "“不回拉倒，正好落得清静，谁离不开谁啊”", A: 0, V: 1 },
+                { text: "“心里很慌，但表面装作无所谓，甚至想撤回消息”", A: 1, V: 1 }
+            ]
+        },
+        {
+            text: "2. 当你们发生激烈争吵，你的默认防御程序是？",
+            options: [
+                { text: "就事论事，尝试沟通修复", A: 0, V: 0 },
+                { text: "必须马上解决！疯狂夺命连环 Call", A: 1, V: 0 },
+                { text: "直接冷战，拉黑，切断物理连接", A: 0, V: 1 },
+                { text: "想和好但放不下自尊，一边嘴硬一边哭", A: 1, V: 1 }
+            ]
+        },
+        {
+            text: "3. 伴侣突然准备了一个巨大的惊喜，你的传感器第一反应是？",
+            options: [
+                { text: "好开心，热烈回应并感谢", A: 0, V: 0 },
+                { text: "太感动了，甚至有点害怕自己配不上这么好", A: 1, V: 0 },
+                { text: "觉得尴尬、有压力，思考要怎么还人情", A: 0, V: 1 },
+                { text: "开心，但立刻警惕是不是有什么陷阱或所求", A: 1, V: 1 }
+            ]
+        },
+        {
+            text: "4. 对于两人相处的空间，你的理想状态配置是？",
+            options: [
+                { text: "有各自的圈子，但也会留出高质量陪伴时间", A: 0, V: 0 },
+                { text: "恨不得24小时黏在一起成为连体婴", A: 1, V: 0 },
+                { text: "各自安好，最好周末见一面就行了", A: 0, V: 1 },
+                { text: "渴望靠近，但靠得太近又觉得窒息想逃", A: 1, V: 1 }
+            ]
+        },
+        {
+            text: "5. 在感情中，你最害怕触发哪种系统崩坏？",
+            options: [
+                { text: "丧失彼此之间的坦诚与信任", A: 0, V: 0 },
+                { text: "对方突然冷漠，不再秒回，不再说我爱你", A: 1, V: 0 },
+                { text: "失去自我空间，被完全绑定控制", A: 0, V: 1 },
+                { text: "全身心投入后，发现自己像个小丑", A: 1, V: 1 }
+            ]
+        },
+        {
+            text: "6. 如果前任突然发来消息求复合，你的防火墙判断是？",
+            options: [
+                { text: "冷静评估，如果问题已解决可以考虑，否则拒绝", A: 0, V: 0 },
+                { text: "立马心软，之前的伤疤瞬间就忘了", A: 1, V: 0 },
+                { text: "直接无视，甚至觉得恶心反感", A: 0, V: 1 },
+                { text: "疯狂纠结，想回去又怕重蹈覆辙，陷入死循环", A: 1, V: 1 }
+            ]
+        },
+        {
+            text: "7. 和伴侣在一起时，你觉得最舒适的距离是？",
+            options: [
+                { text: "既能亲密无间，也能享受高质量独处", A: 0, V: 0 },
+                { text: "希望对方能时刻关注我，懂我每个眼神", A: 1, V: 0 },
+                { text: "彼此独立，像室友一样互相不干涉", A: 0, V: 1 },
+                { text: "想靠近又怕受伤，总是试探和退缩", A: 1, V: 1 }
+            ]
+        },
+        {
+            text: "8. 当你们面临未来规划时，你的第一反应是？",
+            options: [
+                { text: "共同探讨，理性规划，彼此支持", A: 0, V: 0 },
+                { text: "希望能立刻得到对方肯定的答复和保障", A: 1, V: 0 },
+                { text: "顺其自然，不需要过早承诺，承诺让我有压力", A: 0, V: 1 },
+                { text: "极度渴望一个未来，但总觉得对方会离开我", A: 1, V: 1 }
+            ]
+        },
+        {
+            text: "9. 当伴侣和其他异性朋友互动时，你的内部监控系统会？",
+            options: [
+                { text: "给予基本的信任，有分寸就行", A: 0, V: 0 },
+                { text: "警铃大作，立刻开启福尔摩斯模式", A: 1, V: 0 },
+                { text: "无所谓，大家都有交友的权利", A: 0, V: 1 },
+                { text: "表面装作不在意，其实心里嫉妒得发疯", A: 1, V: 1 }
+            ]
+        },
+        {
+            text: "10. 在你看来，爱情的本质更像是一场？",
+            options: [
+                { text: "结伴旅行，一路上互相扶持", A: 0, V: 0 },
+                { text: "救赎，希望能有一个人永远陪着我", A: 1, V: 0 },
+                { text: "麻烦的交易，容易失去自我和自由", A: 0, V: 1 },
+                { text: "危险的赌博，大概率会输得很难看", A: 1, V: 1 }
+            ]
+        }
+    ];
+
+    // 结果池配置
+    const results = {
+        secure: {
+            name: "安全型",
+            sub: "全天候恒温伴侣",
+            ingredients: "稳定内核 60% | 直球表达 30% | 钝感力 10%",
+            features: "情绪极其稳定，能准确传达自身需求并敏锐感知对方情绪。不会轻易试探，给予伴侣充足的安全感。",
+            warning: "虽然本型号极为耐用且不闹人，但请勿因此将其当成理所当然。日常多抱抱，本机运行将更加流畅。"
+        },
+        anxious: {
+            name: "焦虑型",
+            sub: "超敏雷达型恋人",
+            ingredients: "极速升温模块 50% | 患得患失雷达 40% | 查岗芯片 10%",
+            features: "极度渴望亲密接触，容易胡思乱想，需要高频回应和确认被爱。内心戏极为丰富，一旦爱上就会毫无保留。",
+            warning: "本机电量流失极快，需随时用“亲亲抱抱”和“秒回”充电。断联超过2小时可能引发系统过载甚至核心熔毁！"
+        },
+        avoidant: {
+            name: "回避型",
+            sub: "自走型防空洞",
+            ingredients: "个人空间罩 70% | 情感撤回键 20% | 表面冷酷 10%",
+            features: "极度看重个人空间和独立性，排斥过度的相互依赖。当情感浓度过高时，会本能地想后退和逃跑，常被误认为冷血。",
+            warning: "请勿强行拆解其防御壳或进行高强度情感绑定！遇到故障请退后一步静置处理，强制开机可能导致主板彻底烧毁。"
+        },
+        fearful: {
+            name: "恐惧型",
+            sub: "矛盾聚合体机甲",
+            ingredients: "自尊护甲 45% | 极度缺爱 45% | 推拉战术 10%",
+            features: "既害怕被抛弃，又害怕靠得太近受伤害。经常口是心非，用推开对方的方式来测试对方是否会坚定地留下。",
+            warning: "操作难度 SS 级！需要极大的耐心与极致的偏爱。当其炸毛推开你时，其实是在求救，请千万不要因此真的走开！"
+        }
+    };
+
+    // 答题状态
+    let currentQ = 0;
+    let historyStack = []; // 存储之前的分数状态 [{A, V}]
+    let currentScore = { A: 0, V: 0 };
+
+    // DOM 元素
+    const pages = {
+        home: document.getElementById('page-home'),
+        quiz: document.getElementById('page-quiz'),
+        result: document.getElementById('page-result')
+    };
+    
+    // 初始化
+    window.onload = () => {
+        let historyData = JSON.parse(localStorage.getItem('attachmentTestHistory')) || [];
+        if(historyData.length > 0) {
+            document.getElementById('btn-history').style.display = 'block';
+        }
+        
+        // 挂载全局对象，供 test-matrix.js 读取当前测试信息
+        window.CURRENT_TEST_INFO = {
+            id: 'attachment-manual',
+            title: '恋爱依恋说明书',
+            tag: '经典必测',
+            url: window.location.href
+        };
+        
+        // 为了让弹窗正常工作，需要初始化一次（将按钮注入到一个隐藏容器中）
+        if (typeof initTestMatrix === 'function') {
+            const dummy = document.createElement('div');
+            dummy.id = 'dummy-matrix-container';
+            dummy.style.display = 'none';
+            document.body.appendChild(dummy);
+            initTestMatrix({ containerId: 'dummy-matrix-container', currentId: 'attachment-manual', theme: 'light' });
+        }
+        
+        // Hash 路由拦截
+        window.addEventListener('hashchange', handleHash);
+    };
+
+    function handleHash() {
+        if(location.hash === '#quiz' && pages.home.classList.contains('active')) {
+            showPage('quiz');
+        } else if(location.hash === '' && pages.quiz.classList.contains('active')) {
+            showPage('home');
+        }
+    }
+
+    function showPage(pageId) {
+        Object.values(pages).forEach(p => p.classList.remove('active'));
+        pages[pageId].classList.add('active');
+        window.scrollTo(0,0);
+    }
+
+    function startTest() {
+        currentQ = 0;
+        historyStack = [];
+        currentScore = { A: 0, V: 0 };
+        location.hash = 'quiz';
+        showPage('quiz');
+        renderQuestion();
+    }
+
+    function renderQuestion() {
+        const q = questions[currentQ];
+        document.getElementById('question-text').innerText = q.text;
+        
+        const optionsList = document.getElementById('options-list');
+        optionsList.innerHTML = '';
+        
+        q.options.forEach((opt) => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.innerText = opt.text;
+            btn.onclick = () => selectOption(opt);
+            optionsList.appendChild(btn);
+        });
+
+        // 进度条
+        const progress = ((currentQ) / questions.length) * 100;
+        document.getElementById('progress-fill').style.width = `${progress}%`;
+
+        // 上一题按钮
+        document.getElementById('btn-prev').style.display = currentQ > 0 ? 'block' : 'none';
+    }
+
+    function selectOption(opt) {
+        // 保存当前状态入栈
+        historyStack.push({ A: currentScore.A, V: currentScore.V });
+        
+        // 累加分数
+        currentScore.A += opt.A;
+        currentScore.V += opt.V;
+
+        currentQ++;
+        if (currentQ < questions.length) {
+            renderQuestion();
+        } else {
+            calculateResult();
+        }
+    }
+
+    function prevQuestion() {
+        if (currentQ > 0) {
+            currentQ--;
+            // 弹出上一个状态恢复
+            const prevState = historyStack.pop();
+            currentScore.A = prevState.A;
+            currentScore.V = prevState.V;
+            renderQuestion();
+        }
+    }
+
+    function calculateResult() {
+        // 阈值判断：总分10分，>=5 算高
+        const isAnxious = currentScore.A >= 5;
+        const isAvoidant = currentScore.V >= 5;
+
+        let typeKey = 'secure';
+        if (isAnxious && !isAvoidant) typeKey = 'anxious';
+        if (!isAnxious && isAvoidant) typeKey = 'avoidant';
+        if (isAnxious && isAvoidant) typeKey = 'fearful';
+
+        const resultData = results[typeKey];
+        
+        // 保存到历史数组
+        let historyData = JSON.parse(localStorage.getItem('attachmentTestHistory')) || [];
+        const record = {
+            date: new Date().toLocaleString('zh-CN', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }),
+            result: resultData
+        };
+        historyData.unshift(record); // 插入到最前
+        localStorage.setItem('attachmentTestHistory', JSON.stringify(historyData));
+        
+        displayResult(resultData);
+    }
+
+    // 历史记录弹窗逻辑
+    function openHistory() {
+        const historyData = JSON.parse(localStorage.getItem('attachmentTestHistory')) || [];
+        const listDiv = document.getElementById('history-list');
+        listDiv.innerHTML = '';
+        
+        historyData.forEach((record, index) => {
+            const item = document.createElement('div');
+            item.className = 'history-item';
+            item.innerHTML = `
+                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                    <div>
+                        <div class="history-item-title">${record.result.name} - ${record.result.sub}</div>
+                        <div class="history-item-date">${record.date}</div>
+                    </div>
+                    <div style="font-size:12px; font-weight:bold; background:var(--border-color); color:white; padding:2px 6px; border-radius:4px;">
+                        #${historyData.length - index}
+                    </div>
+                </div>
+            `;
+            item.onclick = () => {
+                closeHistory();
+                displayResult(record.result);
+            };
+            listDiv.appendChild(item);
+        });
+        
+        document.getElementById('history-modal').style.display = 'flex';
+    }
+
+    function closeHistory() {
+        document.getElementById('history-modal').style.display = 'none';
+    }
+
+    function displayResult(data) {
+        document.getElementById('res-type-name').innerText = data.name;
+        document.getElementById('res-type-sub').innerText = data.sub;
+        document.getElementById('res-ingredients').innerText = data.ingredients;
+        document.getElementById('res-features').innerText = data.features;
+        document.getElementById('res-warning').innerText = data.warning;
+        
+        location.hash = 'result';
+        showPage('result');
+    }
+
+    function generatePoster() {
+        const captureWrapper = document.getElementById('capture-wrapper');
+        
+        // 使用 htmlToImage 保证 100% 还原 CSS 渲染，避免任何裁剪问题
+        htmlToImage.toPng(captureWrapper, {
+            pixelRatio: window.devicePixelRatio > 1 ? window.devicePixelRatio : 2,
+            backgroundColor: '#FFF0F5',
+            style: {
+                margin: '0',
+                transform: 'scale(1)',
+                transformOrigin: 'top left'
+            }
+        }).then(dataUrl => {
+            document.getElementById('poster-img').src = dataUrl;
+            document.getElementById('poster-modal').style.display = 'flex';
+        }).catch(err => {
+            console.error('截图生成失败', err);
+            alert('生成失败，请直接使用手机系统截图');
+        });
+    }
+
+    function closePoster() {
+        document.getElementById('poster-modal').style.display = 'none';
+    }
+</script>
+
+</body>
+</html>

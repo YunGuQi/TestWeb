@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>恋爱物种领养中心</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html-to-image/1.11.11/html-to-image.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&display=swap');
+
+        :root {
+            --bg-color: #FDFBF7;
+            --primary-text: #4A4036;
+            --accent-color: #8EA980; /* 柔和植物绿 */
+            --accent-secondary: #D4A373; /* 温暖棕橘 */
+            --card-border: #EAE3D9;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--primary-text);
+            font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", STHeiti, "Microsoft Yahei", Tahoma, Simsun, sans-serif;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            overflow-x: hidden;
+            background-image: url('data:image/svg+xml;utf8,<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><filter id="noiseFilter"><feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch"/></filter><rect width="100%" height="100%" filter="url(%23noiseFilter)" opacity="0.04"/></svg>');
+        }
+
+        .app-container {
+            max-width: 500px;
+            margin: 0 auto;
+            min-height: 100vh;
+            position: relative;
+            background: rgba(253, 251, 247, 0.9);
+            box-shadow: 0 0 20px rgba(0,0,0,0.03);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .page {
+            display: none;
+            flex: 1;
+            flex-direction: column;
+            padding: 24px;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        .page.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .title-font {
+            font-family: 'ZCOOL KuaiLe', cursive, "PingFang SC", sans-serif;
+        }
+
+        /* 治愈系卡片风格 */
+        .cute-card {
+            background: #FFFFFF;
+            border: 2px solid var(--card-border);
+            border-radius: 20px;
+            box-shadow: 0 8px 24px rgba(74, 64, 54, 0.06);
+            position: relative;
+        }
+
+        .cute-card::before {
+            content: '';
+            position: absolute;
+            top: 4px; left: 4px; right: -4px; bottom: -4px;
+            border: 2px dashed #D4A373;
+            border-radius: 20px;
+            z-index: -1;
+            opacity: 0.3;
+        }
+
+        .btn-option {
+            background: #FFFFFF;
+            border: 2px solid var(--card-border);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 16px;
+            text-align: left;
+            transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
+            width: 100%;
+        }
+
+        .btn-option:active {
+            transform: scale(0.98);
+            background: #FAFAFA;
+        }
+
+        .btn-option.selected {
+            border-color: var(--accent-color);
+            background: rgba(142, 169, 128, 0.1);
+            color: #2D3A26;
+            font-weight: 600;
+        }
+
+        .btn-primary {
+            background: var(--accent-color);
+            color: #FFF;
+            border-radius: 100px;
+            padding: 14px 32px;
+            font-weight: bold;
+            font-size: 16px;
+            border: none;
+            box-shadow: 0 4px 12px rgba(142, 169, 128, 0.4);
+            transition: transform 0.2s;
+            width: 100%;
+        }
+        
+        .btn-primary:active {
+            transform: scale(0.95);
+        }
+        
+        .btn-black {
+            background: #2D3A26;
+            color: #FFF;
+            border-radius: 100px;
+            padding: 14px 32px;
+            font-weight: bold;
+            font-size: 16px;
+            border: none;
+            box-shadow: 0 4px 12px rgba(45, 58, 38, 0.3);
+            width: 100%;
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: #999;
+            border: 2px solid #EAE3D9;
+            border-radius: 100px;
+            padding: 12px 32px;
+            font-weight: bold;
+            font-size: 14px;
+            width: 100%;
+        }
+
+        .btn-history {
+            display: none;
+            background: transparent;
+            color: var(--accent-secondary);
+            border: 2px dashed var(--accent-secondary);
+            border-radius: 100px;
+            padding: 10px 24px;
+            font-weight: bold;
+            font-size: 14px;
+            width: 100%;
+            margin-top: 12px;
+        }
+
+        /* 印章样式 */
+        .stamp {
+            position: absolute;
+            top: 20px;
+            right: 15px;
+            border: 3px solid #E63946;
+            color: #E63946;
+            font-weight: 900;
+            font-size: 18px;
+            padding: 6px 14px;
+            border-radius: 8px;
+            transform: rotate(15deg);
+            opacity: 0.8;
+            font-family: "PingFang SC", sans-serif;
+            letter-spacing: 2px;
+            z-index: 10;
+        }
+
+        .stamp.blue {
+            border-color: #457B9D;
+            color: #457B9D;
+            transform: rotate(-10deg);
+        }
+
+        /* 进度条 */
+        .progress-bar-container {
+            width: 100%;
+            height: 8px;
+            background: #EAE3D9;
+            border-radius: 4px;
+            margin-bottom: 24px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: var(--accent-color);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        /* 撤回按钮 */
+        .back-btn {
+            color: #999;
+            font-size: 14px;
+            display: inline-flex;
+            align-items: center;
+            padding: 8px 0;
+            margin-bottom: 10px;
+            cursor: pointer;
+        }
+        
+        .back-btn svg {
+            width: 16px; height: 16px; margin-right: 4px;
+        }
+
+        /* 结果页特殊包装器，为截图预留 Padding */
+        #capture-wrapper {
+            padding: 20px;
+            background: var(--bg-color);
+            background-image: url('data:image/svg+xml;utf8,<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><filter id="noiseFilter"><feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch"/></filter><rect width="100%" height="100%" filter="url(%23noiseFilter)" opacity="0.04"/></svg>');
+        }
+        
+        .emoji-avatar {
+            font-size: 72px;
+            line-height: 1;
+            text-align: center;
+            margin: 10px 0;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1));
+        }
+
+        .info-label {
+            font-size: 12px;
+            color: #999;
+            margin-bottom: 4px;
+        }
+        
+        .info-content {
+            font-size: 14px;
+            font-weight: 500;
+            line-height: 1.5;
+            color: #4A4036;
+        }
+
+        .tag-pill {
+            display: inline-block;
+            background: rgba(142, 169, 128, 0.15);
+            color: #2D3A26;
+            padding: 4px 12px;
+            border-radius: 100px;
+            font-size: 13px;
+            font-weight: bold;
+            margin: 0 4px 8px 0;
+        }
+
+        .disclaimer {
+            font-size: 10px;
+            color: #CCC;
+            text-align: center;
+            margin-top: 20px;
+            opacity: 0.6;
+        }
+
+        /* 图片保存弹窗 */
+        #image-modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.85);
+            z-index: 9999;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        #image-modal.show {
+            display: flex;
+            opacity: 1;
+        }
+
+        .modal-img-container {
+            width: 100%;
+            max-width: 400px;
+            max-height: 80vh;
+            overflow-y: auto;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+            margin-bottom: 20px;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+        .modal-img-container::-webkit-scrollbar {
+            display: none;
+        }
+
+        #generated-img {
+            width: 100%;
+            display: block;
+        }
+
+        .modal-tip {
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            animation: bounce 2s infinite;
+        }
+
+        .modal-close {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.4);
+            border-radius: 100px;
+            padding: 8px 32px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    
+    <!-- 1. 封面页 -->
+    <div id="start-page" class="page active justify-center items-center text-center">
+        <div class="mb-8">
+            <div class="text-8xl mb-4">🐾</div>
+            <h1 class="text-3xl font-bold title-font mb-2 text-[#4A4036]">恋爱物种领养中心</h1>
+            <p class="text-[#D4A373] font-medium tracking-widest text-sm mb-6">依恋类型 × 心理防御机制测试</p>
+        </div>
+        
+        <div class="cute-card p-6 mb-8 text-left w-full">
+            <p class="text-sm leading-relaxed text-[#6B5E55] mb-2">
+                每个人在亲密关系中，都隐藏着一种独特的动植物人格。<br><br>
+                你是表面带刺内心柔软的“仙人掌”，还是阳光治愈的“金毛”？<br>
+                完成 15 道深度情绪题档案建档，领取你的专属「物种领养证书」。
+            </p>
+        </div>
+        
+        <div class="w-full max-w-[280px]">
+            <button onclick="showPage('status-page')" class="btn-primary title-font text-lg">开始建档</button>
+            <button onclick="showHistory()" id="btn-history" class="btn-history">查看历史档案</button>
+        </div>
+    </div>
+
+    <!-- 1.5 状态选择页 -->
+    <div id="status-page" class="page justify-center items-center">
+        <h2 class="text-2xl font-bold title-font mb-8 text-[#4A4036] text-center leading-snug">进入建档前<br>请确认您当前的状态</h2>
+        <div class="w-full max-w-[300px] flex flex-col gap-4">
+            <button onclick="selectState('SINGLE')" class="btn-option text-center text-lg font-bold py-6 !mb-0 shadow-sm hover:shadow-md">
+                ✨ 单身，独自美丽
+            </button>
+            <button onclick="selectState('IN_LOVE')" class="btn-option text-center text-lg font-bold py-6 !mb-0 shadow-sm hover:shadow-md">
+                💕 恋爱中，已有归属
+            </button>
+        </div>
+        <div class="mt-8">
+            <button class="back-btn" onclick="showPage('start-page')">返回封面</button>
+        </div>
+    </div>
+
+    <!-- 2. 答题页 -->
+    <div id="question-page" class="page">
+        <div class="flex items-center justify-between mb-4">
+            <div class="back-btn" onclick="prevQuestion()" id="btn-back" style="visibility: hidden;">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                上一题
+            </div>
+            <div class="text-sm text-[#999] font-medium">
+                <span id="q-current">1</span> / <span id="q-total">15</span>
+            </div>
+        </div>
+        
+        <div class="progress-bar-container">
+            <div class="progress-bar" id="progress-bar" style="width: 0%;"></div>
+        </div>
+
+        <div class="cute-card p-6 mb-8 flex-1 flex flex-col justify-center">
+            <h2 id="question-text" class="text-[17px] font-bold mb-8 leading-snug title-font text-[#4A4036]"></h2>
+            <div id="options-container" class="flex flex-col">
+                <!-- 选项由 JS 动态渲染 -->
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. 结果页 -->
+    <div id="result-page" class="page bg-[#FDFBF7]" style="padding: 0;">
+        <!-- 截图区域包装 -->
+        <div id="capture-wrapper">
+            <div class="cute-card p-6" style="background-image: url('https://img.alicdn.com/tfs/TB1.cO.QXXXXXb1XpXXXXXXXXXX-2-2.png'); background-repeat: repeat;">
+                
+                <!-- 动态印章 -->
+                <div id="status-stamp" class="stamp">待领养</div>
+                
+                <div class="text-center mb-6 border-b-2 border-dashed border-[#EAE3D9] pb-6 relative">
+                    <p class="text-xs text-[#999] mb-1 font-mono">No. <span id="cert-id"></span></p>
+                    <h2 class="text-sm font-bold text-[#D4A373] tracking-widest mb-4">【恋爱物种领养证书】</h2>
+                    <div id="res-emoji" class="emoji-avatar">🦦</div>
+                    <h1 id="res-name" class="text-3xl font-bold title-font mt-2 mb-2 text-[#4A4036]">水豚恋人</h1>
+                    <div id="res-tags">
+                        <span class="tag-pill">情绪稳定</span>
+                        <span class="tag-pill">绝对松弛</span>
+                    </div>
+                </div>
+
+                <div class="space-y-4">
+                    <div>
+                        <div class="info-label">📋 物种档案</div>
+                        <div id="res-desc" class="info-content text-[#6B5E55]">这里是描述内容。</div>
+                    </div>
+                    
+                    <div class="bg-[#FDFBF7] p-3 rounded-lg border border-[#EAE3D9]">
+                        <div class="info-label">🛡️ 核心防御机制</div>
+                        <div id="res-defense" class="info-content text-sm text-[#8EA980]">松弛感/升华</div>
+                    </div>
+
+                    <div class="flex gap-2 pt-2">
+                        <div class="flex-1 bg-green-50 p-3 rounded-lg border border-green-100">
+                            <div class="info-label">✨ 天作之合</div>
+                            <div id="res-best" class="info-content text-sm text-green-800 font-bold">金毛恋人</div>
+                        </div>
+                        <div class="flex-1 bg-red-50 p-3 rounded-lg border border-red-100">
+                            <div class="info-label">⚠️ 极度相克</div>
+                            <div id="res-toxic" class="info-content text-sm text-red-800 font-bold">猫薄荷恋人</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="disclaimer">本证书基于心理学防御机制模型生成，仅供娱乐参考</div>
+            </div>
+        </div>
+
+        <div class="p-6 flex flex-col gap-4">
+            <button onclick="saveImage()" id="btn-save" class="btn-primary flex items-center justify-center">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                <span id="save-text">保存专属领养证书</span>
+            </button>
+            
+            <button onclick="exploreOtherTests()" class="btn-black flex items-center justify-center">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                探索更多心理测试
+            </button>
+            
+            <button onclick="location.reload()" class="btn-secondary">重新建档</button>
+        </div>
+
+        <!-- 底部矩阵容器（隐藏注入模式） -->
+    </div>
+</div>
+
+<!-- 图片生成模态框 -->
+<div id="image-modal">
+    <div class="modal-tip">✨ 档案生成成功！长按图片保存 ✨</div>
+    <div class="modal-img-container">
+        <img id="generated-img" src="" alt="您的专属领养证书" />
+    </div>
+    <button class="modal-close" onclick="closeModal()">关闭</button>
+</div>
+
+<!-- 历史记录抽屉 -->
+<div id="history-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:1000; align-items:center; justify-content:center; padding:20px;">
+    <div class="cute-card w-full max-w-[360px] flex flex-col p-6 max-h-[80vh]">
+        <h3 class="title-font text-xl text-center text-[#4A4036] mb-4 border-b-2 border-dashed border-[#EAE3D9] pb-4">历史领养档案</h3>
+        <div id="history-list" class="overflow-y-auto flex-grow flex flex-col gap-3" style="scrollbar-width: none;"></div>
+        <button class="btn-secondary mt-4 w-full" onclick="closeHistory()">收起抽屉</button>
+    </div>
+</div>
+
+<script>
+    // 注册全局信息给 matrix
+    window.CURRENT_TEST_INFO = {
+        id: "love-species",
+        title: "恋爱物种领养测试",
+        tag: "恋爱心理",
+        url: location.href,
+        type: "psychology"
+    };
+
+    // 引入矩阵 JS
+    setTimeout(() => {
+        const script = document.createElement('script');
+        script.src = '../test-matrix.js';
+        script.onload = () => {
+            if(window.initTestMatrix) {
+                const dummy = document.createElement('div');
+                dummy.id = 'dummy-matrix-container';
+                dummy.style.display = 'none';
+                document.body.appendChild(dummy);
+                window.initTestMatrix({
+                    containerId: 'dummy-matrix-container',
+                    currentId: 'love-species',
+                    theme: 'light'
+                });
+            }
+        };
+        script.onerror = () => console.log('Matrix script not found, running locally.');
+        document.body.appendChild(script);
+    }, 500);
+
+    // ================== 数据定义 (15题) ==================
+    const questions = [
+        {
+            text: "1. 周末难得的空闲时光，你更倾向于怎么度过？",
+            options: [
+                { text: "自己窝着充电，或者只和极少量的熟人呆着", score: { AV: 2 } },
+                { text: "和朋友出去玩，或者希望能有人陪着我", score: { A: 2 } },
+                { text: "看心情，一个人很爽，有朋友约也开心", score: { S: 2 } }
+            ]
+        },
+        {
+            text: "2. 如果对方突然几个小时没有回消息，你内心的第一反应是？",
+            options: [
+                { text: "完了，是不是我做错什么了？还是TA不爱我了？", score: { A: 2 } },
+                { text: "估计在忙吧，我先做自己的事情。", score: { S: 2 } },
+                { text: "表面装作不在乎，其实心里很烦躁。", score: { F: 2 } },
+                { text: "不回就不回，搞得谁好像很闲一样。", score: { AV: 2 } }
+            ]
+        },
+        {
+            text: "3. 在一段关系里，你最害怕发生什么？",
+            options: [
+                { text: "彻底失去自我，私人边界被完全侵入。", score: { AV: 2 } },
+                { text: "被抛弃，发现自己其实没有那么重要。", score: { A: 2 } },
+                { text: "沟通不畅，明明有事却非要憋在心里。", score: { S: 2 } },
+                { text: "渴望靠近，但又害怕靠近后对方会离开我。", score: { F: 2 } }
+            ]
+        },
+        {
+            text: "4. 当你们之间产生激烈的争吵时，你通常会怎么应对？",
+            options: [
+                { text: "不想吵了，觉得很累，直接冷战或者躲起来。", score: { AV: 2 } },
+                { text: "必须立刻把问题说清楚，TA不说话我就更生气。", score: { A: 2 } },
+                { text: "先冷静一下，等双方情绪平稳了再理性沟通。", score: { S: 2 } },
+                { text: "先说一些狠话刺伤对方，然后自己又后悔得要命。", score: { F: 2 } }
+            ]
+        },
+        {
+            text: "5. 对于承诺（比如同居、结婚、买房等），你的态度是？",
+            options: [
+                { text: "极度渴望，这能带给我巨大的安全感。", score: { A: 2 } },
+                { text: "顺其自然，只要感情到位了就水到渠成。", score: { S: 2 } },
+                { text: "本能地想逃，觉得承诺意味着被束缚。", score: { AV: 2 } },
+                { text: "既想要又害怕，觉得承诺也许只是镜花水月。", score: { F: 2 } }
+            ]
+        },
+        {
+            text: "6. 你觉得对你来说，理想的亲密关系最像什么？",
+            options: [
+                { text: "两棵并排的树，根在地下交错，枝叶在云端相触。", score: { AV: 1, S: 1 } },
+                { text: "一个绝对安全的避风港，无论如何都不会赶我走。", score: { A: 2 } },
+                { text: "一场势均力敌的探险，彼此成就互相支撑。", score: { S: 2 } },
+                { text: "一团迷雾，我想要靠近但又害怕迷失自己。", score: { F: 2 } }
+            ]
+        },
+        {
+            text: "7. 刚确立关系时，如果对方突然对你非常热情和粘人，你的感受是？",
+            options: [
+                { text: "很有安全感，立刻热情回应。", score: { A: 2 } },
+                { text: "挺开心的，自然地享受这份亲密。", score: { S: 2 } },
+                { text: "本能地想退缩，觉得有压力和被侵犯空间。", score: { AV: 2 } },
+                { text: "既开心又害怕，开始怀疑自己配不上这份好。", score: { F: 2 } }
+            ]
+        },
+        {
+            text: "8. 当你感觉到伴侣情绪低落（但没说原因）时，你的内部雷达会？",
+            options: [
+                { text: "立刻开始反思是不是自己做错什么惹到TA了。", score: { A: 2 } },
+                { text: "过去关心询问，如果TA不想说就给足空间。", score: { S: 2 } },
+                { text: "当作没看见，等TA自己消化完了再说。", score: { AV: 2 } },
+                { text: "变得异常烦躁，甚至觉得TA在故意对自己摆脸色。", score: { F: 2 } }
+            ]
+        },
+        {
+            text: "9. 如果对方提出想看你的手机，你的第一防线是？",
+            options: [
+                { text: "可以看，但我心里会觉得不舒服，感觉不被信任。", score: { S: 1, AV: 1 } },
+                { text: "坚决不行，这是我的绝对隐私底线。", score: { AV: 2 } },
+                { text: "随便看，甚至希望两人互换手机证明爱。", score: { A: 2 } },
+                { text: "表面给TA看，心里已经开始生气和开启防御状态。", score: { F: 2 } }
+            ]
+        },
+        {
+            text: "10. 发现两人的生活习惯有很多摩擦，你会怎么处理？",
+            options: [
+                { text: "委屈自己去迎合对方，怕对方不高兴离开自己。", score: { A: 2 } },
+                { text: "平和沟通，寻找双方都能接受的折中方案。", score: { S: 2 } },
+                { text: "觉得太烦了，想一个人呆着，甚至产生分手的念头。", score: { AV: 2 } },
+                { text: "用发脾气或者冷战的方式逼对方妥协。", score: { F: 2 } }
+            ]
+        },
+        {
+            text: "11. 对于“过去的感情经历 / 前任”，你的真实态度是？",
+            options: [
+                { text: "彻底翻篇，尘封起来，从不主动提起。", score: { AV: 2 } },
+                { text: "就像普通往事一样，可以坦然交流和放下。", score: { S: 2 } },
+                { text: "经常会拿自己和对方的前任比较，暗自较劲不安。", score: { A: 2 } },
+                { text: "会用前任的事情去刺痛对方，或者对这事过度敏感。", score: { F: 2 } }
+            ]
+        },
+        {
+            text: "12. 在人群密集的聚会中，如果伴侣突然对你做出亲密举动（如拥抱），你会？",
+            options: [
+                { text: "坦然接受，甚至觉得很甜蜜骄傲。", score: { S: 2 } },
+                { text: "极度开心，这高调地证明了TA属于我。", score: { A: 2 } },
+                { text: "身体僵硬，本能地想要推开或躲避。", score: { AV: 2 } },
+                { text: "会迎合但内心觉得极其尴尬、不自在。", score: { F: 2 } }
+            ]
+        },
+        {
+            text: "13. 如果可以给这段关系加装一个“超能力组件”，你希望是？",
+            options: [
+                { text: "【测谎仪】能100%知道对方是不是真的只爱我。", score: { A: 2 } },
+                { text: "【透明斗篷】觉得累想消失的时候，随时能一个人躲起来。", score: { AV: 2 } },
+                { text: "【情绪同步器】能毫无阻碍地传递爱与理解。", score: { S: 2 } },
+                { text: "【读心术】想知道对方到底在想什么，但我绝不先开口说。", score: { F: 2 } }
+            ]
+        },
+        {
+            text: "14. 当你要向伴侣表达情感需求时，最常见的方式是？",
+            options: [
+                { text: "直接、清晰地说出自己想要什么和不舒服的地方。", score: { S: 2 } },
+                { text: "用暗示、抱怨、或者发脾气作闹的方式来表达。", score: { F: 2 } },
+                { text: "极少表达，觉得对方如果真的爱我就应该懂我。", score: { A: 2 } },
+                { text: "把需求压抑下去，告诉自己“算了，我也不需要”。", score: { AV: 2 } }
+            ]
+        },
+        {
+            text: "15. 如果要把你们的感情比作一种天气，你最渴望的是？",
+            options: [
+                { text: "永不落幕的盛夏艳阳，炙热浓烈，没有杂质。", score: { A: 2 } },
+                { text: "温度适宜的晴天，偶尔微风吹过，平和安稳。", score: { S: 2 } },
+                { text: "自己一个人的阴天，不需要打伞也不会被晒到。", score: { AV: 2 } },
+                { text: "暴风雨后的彩虹，虽然危险刺激，但极致美丽。", score: { F: 2 } }
+            ]
+        }
+    ];
+
+    const resultsPool = {
+        "S_HIGH": { 
+            name: "水豚恋人", tag: "情绪稳定 / 绝对松弛", emoji: "🦦", color: "#8EA980",
+            desc: "你的内核极其稳固，万物皆可佛。在感情中不内耗也不折腾，能提供极高的情绪价值，但也需要对方绝对尊重你的边界。",
+            defense: "松弛感/升华。面对矛盾不激化，天然的钝感力化解一切。",
+            best: "金毛恋人、含羞草恋人", toxic: "猫薄荷恋人"
+        },
+        "S_LOW": { 
+            name: "金毛恋人", tag: "阳光纯爱 / 毫无保留", emoji: "🐶", color: "#D4A373",
+            desc: "给点阳光就灿烂！你拥有治愈人心的力量，总是毫无保留地偏爱对方。真诚是你永远的必杀技，好养活且粘人得刚好。",
+            defense: "利他/热情。用温暖和真诚直接融化对方的防御。",
+            best: "树袋熊恋人、寄居蟹恋人", toxic: "变色龙恋人"
+        },
+        "A_HIGH": { 
+            name: "树袋熊恋人", tag: "终极黏人 / 情绪挂件", emoji: "🐨", color: "#A8D0E6",
+            desc: "一谈恋爱就化身对方的专属挂件，需要超高浓度的情绪价值和身体接触。极度专一，但也容易因为对方的冷落而陷入深渊。",
+            defense: "过度依附/退行。一有危机就紧紧抱住，害怕被抛弃。",
+            best: "金毛恋人、水豚恋人", toxic: "含羞草恋人、寄居蟹恋人"
+        },
+        "A_LOW": { 
+            name: "猫薄荷恋人", tag: "患得患失 / 索取试探", emoji: "🌿", color: "#B8E0D2",
+            desc: "看似高冷实则内心极度渴望被偏爱。你总是用不断试探和作闹来证明自己被爱，只要对方通过考验，你就会展现极度的柔软。",
+            defense: "索取/投射。用试探来掩饰内心的极度不安。",
+            best: "水豚恋人", toxic: "刺猬恋人"
+        },
+        "AV_HIGH": { 
+            name: "含羞草恋人", tag: "极度慢热 / 边界守护", emoji: "🌱", color: "#95B8D1",
+            desc: "你的边界感极强，稍微过度的热情就会让你立刻“卷起来”自我保护。需要极大的耐心慢慢打开，内心柔软只对一人展现。",
+            defense: "退缩/压抑。一有风吹草动就立刻封闭自己。",
+            best: "水豚恋人", toxic: "树袋熊恋人"
+        },
+        "AV_LOW": { 
+            name: "寄居蟹恋人", tag: "忽冷忽热 / 壳里试探", emoji: "🐚", color: "#E8D8C3",
+            desc: "一靠近就想缩回壳里，需要极大的安全感才敢探出头。你习惯性逃避冲突，认为只要不抱期待就不会受到伤害。",
+            defense: "隔离/逃避。遇到问题先躲进坚硬的壳里再说。",
+            best: "金毛恋人", toxic: "树袋熊恋人"
+        },
+        "F_HIGH": { 
+            name: "刺猬恋人", tag: "嘴硬心软 / 渴望拥抱", emoji: "🦔", color: "#C4A484",
+            desc: "渴望拥抱却因为害怕受伤而长满了一身刺。你总是用推开对方的方式来测试对方是否会留下，典型的嘴硬心软惹人疼。",
+            defense: "攻击性防御。用尖锐的外表掩盖脆弱的内心。",
+            best: "水豚恋人、金毛恋人", toxic: "猫薄荷恋人、变色龙恋人"
+        },
+        "F_LOW": { 
+            name: "变色龙恋人", tag: "敏感伪装 / 捉摸不透", emoji: "🦎", color: "#8EBCB5",
+            desc: "极度敏感，雷达全开。你会根据对方的态度随时调整自己的保护色，让人觉得难以捉摸，但其实这只是你害怕受伤的伪装。",
+            defense: "变形/保护色。隐藏真实需求以迎合或防御对方。",
+            best: "金毛恋人", toxic: "寄居蟹恋人、刺猬恋人"
+        }
+    };
+
+    // ================== 状态管理 ==================
+    let currentIdx = 0;
+    let userState = "SINGLE"; 
+    let historyStack = []; 
+    let scores = { S: 0, A: 0, AV: 0, F: 0 };
+
+    window.onload = function() {
+        // 检查历史记录
+        const savedHistory = localStorage.getItem('love_species_history_v2');
+        if (savedHistory && JSON.parse(savedHistory).length > 0) {
+            document.getElementById('btn-history').style.display = 'block';
+        }
+    };
+
+    // 路由拦截防误触
+    history.pushState(null, null, location.href);
+    window.addEventListener('popstate', function () {
+        history.pushState(null, null, location.href);
+        if (currentIdx > 0 && currentIdx < questions.length) {
+            prevQuestion();
+        }
+    });
+
+    function showPage(pageId) {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.getElementById(pageId).classList.add('active');
+    }
+
+    function showHistory() {
+        const historyData = JSON.parse(localStorage.getItem('love_species_history_v2')) || [];
+        const listContainer = document.getElementById('history-list');
+        listContainer.innerHTML = '';
+        
+        if (historyData.length === 0) {
+            listContainer.innerHTML = '<p class="text-center text-[#999] text-sm my-4">暂无领养档案</p>';
+        } else {
+            historyData.forEach((item) => {
+                const resData = resultsPool[item.resultKey];
+                const div = document.createElement('div');
+                div.className = 'p-3 border-2 border-[#EAE3D9] rounded-lg bg-white cursor-pointer hover:bg-gray-50 active:scale-95 transition-all';
+                div.onclick = () => {
+                    closeHistory();
+                    userState = item.userState;
+                    renderResult(item.resultKey, true);
+                };
+                div.innerHTML = `
+                    <div class="font-bold text-[15px] mb-1" style="color:${resData.color}">${resData.emoji} ${resData.name}</div>
+                    <div class="text-[11px] text-[#999]">${item.date}</div>
+                `;
+                listContainer.appendChild(div);
+            });
+        }
+        document.getElementById('history-modal').style.display = 'flex';
+    }
+
+    function closeHistory() {
+        document.getElementById('history-modal').style.display = 'none';
+    }
+
+    // 状态分流
+    function selectState(state) {
+        userState = state;
+        currentIdx = 0;
+        scores = { S: 0, A: 0, AV: 0, F: 0 };
+        historyStack = [];
+        showPage('question-page');
+        renderQuestion();
+    }
+
+    function renderQuestion() {
+        const q = questions[currentIdx];
+        document.getElementById('q-current').innerText = currentIdx + 1;
+        document.getElementById('progress-bar').style.width = ((currentIdx + 1) / questions.length * 100) + '%';
+        document.getElementById('question-text').innerText = q.text;
+        
+        document.getElementById('btn-back').style.visibility = currentIdx === 0 ? 'hidden' : 'visible';
+
+        const container = document.getElementById('options-container');
+        container.innerHTML = '';
+
+        q.options.forEach((opt) => {
+            const btn = document.createElement('button');
+            btn.className = 'btn-option';
+            btn.innerText = opt.text;
+            btn.onclick = () => selectOption(opt, btn);
+            container.appendChild(btn);
+        });
+    }
+
+    function selectOption(opt, btnEl) {
+        document.querySelectorAll('.btn-option').forEach(b => b.classList.remove('selected'));
+        btnEl.classList.add('selected');
+
+        setTimeout(() => {
+            historyStack.push({
+                scores: { ...scores }
+            });
+
+            if (opt.score) {
+                for (let key in opt.score) {
+                    scores[key] += opt.score[key];
+                }
+            }
+
+            currentIdx++;
+            if (currentIdx < questions.length) {
+                renderQuestion();
+            } else {
+                calculateResult();
+            }
+        }, 250);
+    }
+
+    function prevQuestion() {
+        if (historyStack.length > 0) {
+            const lastState = historyStack.pop();
+            scores = { ...lastState.scores };
+            currentIdx--;
+            renderQuestion();
+        }
+    }
+
+    function calculateResult() {
+        let maxDim = 'S';
+        let maxVal = -1;
+        for (let dim in scores) {
+            if (scores[dim] > maxVal) {
+                maxVal = scores[dim];
+                maxDim = dim;
+            }
+        }
+
+        let resultKey = "";
+        // 根据 15 题重新校准阈值
+        if (maxDim === 'S') {
+            resultKey = scores.S >= 12 ? "S_HIGH" : "S_LOW";
+        } else if (maxDim === 'A') {
+            resultKey = scores.A >= 12 ? "A_HIGH" : "A_LOW";
+        } else if (maxDim === 'AV') {
+            resultKey = scores.AV >= 10 ? "AV_HIGH" : "AV_LOW";
+        } else {
+            resultKey = scores.F >= 10 ? "F_HIGH" : "F_LOW";
+        }
+
+        // 保存历史
+        let historyData = JSON.parse(localStorage.getItem('love_species_history_v2')) || [];
+        const record = {
+            date: new Date().toLocaleString('zh-CN', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }),
+            resultKey: resultKey,
+            userState: userState,
+            timestamp: Date.now()
+        };
+        historyData.unshift(record);
+        localStorage.setItem('love_species_history_v2', JSON.stringify(historyData));
+
+        renderResult(resultKey, false);
+    }
+
+    function renderResult(resultKey, isHistory) {
+        const resData = resultsPool[resultKey];
+
+        document.getElementById('cert-id').innerText = Date.now().toString().slice(-6);
+        document.getElementById('res-emoji').innerText = resData.emoji;
+        document.getElementById('res-name').innerText = resData.name;
+        document.getElementById('res-name').style.color = resData.color;
+        
+        const tagsHtml = resData.tag.split('/').map(t => `<span class="tag-pill">${t.trim()}</span>`).join('');
+        document.getElementById('res-tags').innerHTML = tagsHtml;
+
+        document.getElementById('res-desc').innerText = resData.desc;
+        document.getElementById('res-defense').innerText = resData.defense;
+        document.getElementById('res-best').innerText = resData.best;
+        document.getElementById('res-toxic').innerText = resData.toxic;
+
+        const stamp = document.getElementById('status-stamp');
+        if (userState === "SINGLE") {
+            stamp.innerText = "寻觅饲养员";
+            stamp.className = "stamp blue";
+        } else {
+            stamp.innerText = "已被捕获";
+            stamp.className = "stamp";
+        }
+
+        showPage('result-page');
+    }
+
+    // 截图保存逻辑
+    function saveImage() {
+        const wrapper = document.getElementById('capture-wrapper');
+        const btnText = document.getElementById('save-text');
+        const originalText = btnText.innerText;
+        btnText.innerText = "正在生成档案...";
+
+        htmlToImage.toJpeg(wrapper, { quality: 0.95, pixelRatio: 2, backgroundColor: '#FDFBF7' })
+            .then(function (dataUrl) {
+                const modal = document.getElementById('image-modal');
+                const img = document.getElementById('generated-img');
+                img.src = dataUrl;
+                modal.classList.add('show');
+                
+                btnText.innerText = originalText;
+            })
+            .catch(function (error) {
+                console.error('截图失败!', error);
+                btnText.innerText = "生成失败，请重试";
+                setTimeout(() => btnText.innerText = originalText, 2000);
+            });
+    }
+
+    function closeModal() {
+        document.getElementById('image-modal').classList.remove('show');
+    }
+
+    function exploreOtherTests() {
+        if(window.openMatrixModal) {
+            window.openMatrixModal();
+        } else {
+            alert('更多测试正在紧锣密鼓开发中！');
+        }
+    }
+</script>
+</body>
+</html>
