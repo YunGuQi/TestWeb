@@ -8,22 +8,42 @@
     <!-- Tailwind -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
+        :root {
+            --theme-bg: #e6e4df;
+            --theme-text: #1a1a1a;
+            --theme-border: #d1cdc1;
+            --theme-ticket: #fdfbf7;
+            --theme-stamp: #d93838;
+            --theme-div: #b5b1a3;
+            --theme-tag-bg: #1a1a1a;
+            --theme-tag-text: #fdfbf7;
+            --theme-dim: #e6e4df;
+        }
+        body.theme-ocean { --theme-bg: #e0f2fe; --theme-text: #082f49; --theme-border: #bae6fd; --theme-ticket: #f0f9ff; --theme-stamp: #0284c7; --theme-div: #7dd3fc; --theme-tag-bg: #082f49; --theme-tag-text: #f0f9ff; --theme-dim: #e0f2fe; }
+        body.theme-forest { --theme-bg: #dcfce7; --theme-text: #064e3b; --theme-border: #bbf7d0; --theme-ticket: #f0fdf4; --theme-stamp: #059669; --theme-div: #86efac; --theme-tag-bg: #064e3b; --theme-tag-text: #f0fdf4; --theme-dim: #dcfce7; }
+        body.theme-night { --theme-bg: #171717; --theme-text: #f5f5f5; --theme-border: #404040; --theme-ticket: #262626; --theme-stamp: #f87171; --theme-div: #525252; --theme-tag-bg: #f5f5f5; --theme-tag-text: #171717; --theme-dim: #171717; }
+        body.theme-sunset { --theme-bg: #ffedd5; --theme-text: #7c2d12; --theme-border: #fed7aa; --theme-ticket: #fff7ed; --theme-stamp: #ea580c; --theme-div: #fdba74; --theme-tag-bg: #7c2d12; --theme-tag-text: #fff7ed; --theme-dim: #ffedd5; }
+        body.theme-rose { --theme-bg: #ffe4e6; --theme-text: #881337; --theme-border: #fecdd3; --theme-ticket: #fff1f2; --theme-stamp: #e11d48; --theme-div: #fda4af; --theme-tag-bg: #881337; --theme-tag-text: #fff1f2; --theme-dim: #ffe4e6; }
+        
         body {
-            background-color: #e6e4df; /* textured paper feel */
-            color: #1a1a1a;
+            background-color: var(--theme-bg);
+            color: var(--theme-text);
             font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
             overflow-x: hidden;
             background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
+            transition: background-color 0.5s, color 0.5s;
         }
         .font-ticket {
             font-family: 'Courier New', Courier, monospace;
         }
         .ticket {
             position: relative;
-            background: #fdfbf7;
+            background: var(--theme-ticket);
+            color: var(--theme-text);
             border-radius: 4px;
             box-shadow: 0 10px 40px rgba(0,0,0,0.06);
-            border: 1px solid #d1cdc1;
+            border: 1px solid var(--theme-border);
+            transition: background-color 0.5s, color 0.5s, border-color 0.5s;
         }
         /* Perforated edges */
         .ticket::before, .ticket::after {
@@ -32,19 +52,21 @@
             top: 60%;
             width: 30px;
             height: 30px;
-            background: #e6e4df;
+            background: var(--theme-bg);
             border-radius: 50%;
             transform: translateY(-50%);
             box-shadow: inset 0px 2px 4px rgba(0,0,0,0.05);
-            border: 1px solid var(--ticket-border, #d1cdc1);
+            border: 1px solid var(--theme-border);
+            transition: background-color 0.5s, border-color 0.5s;
         }
         .ticket::before { left: -16px; border-right-color: transparent; border-top-color: transparent; transform: translateY(-50%) rotate(45deg); }
         .ticket::after { right: -16px; border-left-color: transparent; border-bottom-color: transparent; transform: translateY(-50%) rotate(45deg); }
         
         .ticket-divider {
-            border-top: 2px dashed var(--ticket-div, #b5b1a3);
+            border-top: 2px dashed var(--theme-div);
             margin: 0 16px;
             position: relative;
+            transition: border-color 0.5s;
         }
         .page-section {
             display: none;
@@ -58,8 +80,8 @@
             display: flex;
         }
         .stamp {
-            border: 3px solid #d93838;
-            color: #d93838;
+            border: 3px solid var(--theme-stamp);
+            color: var(--theme-stamp);
             border-radius: 50%;
             width: 80px;
             height: 80px;
@@ -75,6 +97,17 @@
             right: 20px;
             text-align: center;
             line-height: 1.2;
+            transition: border-color 0.5s, color 0.5s;
+        }
+        #r-tag {
+            background-color: var(--theme-tag-bg);
+            color: var(--theme-tag-text);
+            transition: background-color 0.5s, color 0.5s;
+        }
+        .dim-tag {
+            background-color: var(--theme-dim);
+            border-color: var(--theme-border);
+            transition: background-color 0.5s, border-color 0.5s;
         }
         .barcode {
             font-family: 'Libre Barcode 39', cursive, monospace;
@@ -191,7 +224,7 @@
                     <span id="r-province" class="text-lg font-bold opacity-50 mb-1">北京</span>
                 </div>
                 
-                <div id="r-tag" class="transition-colors duration-500 inline-block bg-black text-white text-xs font-bold px-3 py-1 mt-2 uppercase tracking-widest">冰冷的齿轮驱动者</div>
+                <div id="r-tag" class="inline-block text-xs font-bold px-3 py-1 mt-2 uppercase tracking-widest">冰冷的齿轮驱动者</div>
             </div>
 
             <div class="ticket-divider"></div>
@@ -255,6 +288,7 @@
     <script src="../test-matrix.js?v=20260621b"></script>
     <!-- html-to-image (more reliable than html2canvas for mobile flexbox/SVG) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html-to-image/1.11.11/html-to-image.min.js"></script>
+    <script src="../test-engine.js?v=1"></script>
     <script>
         // ----------------------------------------------------------------
         // 34个省级代表城市及映射
@@ -447,15 +481,11 @@
             const resultCity = matchedCities[Math.floor(Math.random() * matchedCities.length)];
 
             // Save to localStorage
-            let history = JSON.parse(localStorage.getItem('cityMatchHistory') || '[]');
-            history.unshift({
+            TestEngine.History.save('cityMatchHistory', {
                 date: new Date().toLocaleString(),
                 city: resultCity,
                 dims: {p: finalP, b: finalB, r: finalR, t: finalT}
             });
-            // Keep top 5
-            if (history.length > 5) history = history.slice(0, 5);
-            localStorage.setItem('cityMatchHistory', JSON.stringify(history));
 
             renderResultPage(resultCity, {p: finalP, b: finalB, r: finalR, t: finalT});
         }
@@ -503,22 +533,10 @@
         }
 
         function applyTheme(themeKey) {
-            const theme = themes[themeKey];
-            const ticket = document.getElementById('ticket-capture');
-            ticket.style.backgroundColor = theme.bg;
-            ticket.style.color = theme.text;
-            ticket.style.borderColor = theme.border;
-            
-            document.documentElement.style.setProperty('--ticket-bg', theme.bg);
-            document.documentElement.style.setProperty('--ticket-border', theme.border);
-            document.documentElement.style.setProperty('--ticket-div', theme.div);
-            
-            document.getElementById('stamp-mark').style.borderColor = theme.stamp;
-            document.getElementById('stamp-mark').style.color = theme.stamp;
-            
-            const tagEl = document.getElementById('r-tag');
-            tagEl.style.backgroundColor = theme.tagBg;
-            tagEl.style.color = theme.tagText;
+            document.body.className = document.body.className.replace(/\btheme-[a-z]+\b/g, '').trim();
+            if (themeKey !== 'industrial') {
+                document.body.classList.add(`theme-${themeKey}`);
+            }
 
             const dimLabels = [
                 currentResultDims.p === 1 ? '快节奏' : '慢摇摆',
@@ -527,7 +545,7 @@
                 currentResultDims.t === 1 ? '冷峻现实' : '温情理想'
             ];
 
-            const dimsHtml = dimLabels.map(l => `<span style="background-color:${theme.dimBg}; border-color:${theme.border}; transition: background-color 0.5s, border-color 0.5s;" class="px-2 py-1 text-xs font-bold font-ticket border">${l}</span>`).join('');
+            const dimsHtml = dimLabels.map(l => `<span class="dim-tag px-2 py-1 text-xs font-bold font-ticket border">${l}</span>`).join('');
             document.getElementById('r-dimensions').innerHTML = dimsHtml;
             
             document.getElementById('theme-indicator').textContent = themeNames[themeKey];
@@ -540,17 +558,15 @@
 
         // History functions
 
-        
-
         function loadHistory() {
-            const history = JSON.parse(localStorage.getItem('cityMatchHistory') || '[]');
-            if (history.length > 0) {
+            const history = TestEngine.History.get('cityMatchHistory');
+            if (history && history.length > 0) {
                 document.getElementById('history-btn').classList.remove('hidden');
             }
         }
 
         function openHistoryModal() {
-            const history = JSON.parse(localStorage.getItem('cityMatchHistory') || '[]');
+            const history = TestEngine.History.get('cityMatchHistory');
             const list = document.getElementById('history-list');
             list.innerHTML = history.map((item, index) => `
                 <button onclick="viewHistory(${index})" class="w-full text-left bg-white border border-[#d1cdc1] p-3 rounded text-[#1a1a1a] hover:bg-[#e6e4df] shadow-sm flex justify-between items-center active:scale-[0.98] transition-colors">
@@ -566,7 +582,7 @@
         }
 
         function viewHistory(index) {
-            const history = JSON.parse(localStorage.getItem('cityMatchHistory') || '[]');
+            const history = TestEngine.History.get('cityMatchHistory');
             const item = history[index];
             if(item) {
                 closeHistoryModal();
@@ -607,42 +623,14 @@
         }
 
         // 保存截图
-        async function saveTicket() {
-            const modal = document.getElementById('poster-modal');
-            const container = document.getElementById('poster-img-container');
-            const el = document.getElementById('ticket-capture');
-            
-            modal.classList.add('show');
-            container.innerHTML = '<div class="m-auto"><span class="text-white/40 text-sm animate-pulse font-mono font-bold">制票机运作中...</span></div>';
-            
-            try {
-                // 等待所有字体加载完毕，防止错位
-                await document.fonts.ready;
-                // 稍微延时让DOM彻底重绘
-                await new Promise(r => setTimeout(r, 100));
-
-                const dataUrl = await htmlToImage.toPng(el, {
-                    pixelRatio: window.devicePixelRatio > 1 ? window.devicePixelRatio : 2,
-                    backgroundColor: getComputedStyle(document.body).backgroundColor,
-                    width: el.offsetWidth,
-                    height: el.offsetHeight,
-                    style: {
-                        transform: 'scale(1)',
-                        transformOrigin: 'top left',
-                        margin: '0'
-                    }
-                });
-                
-                const img = document.createElement('img');
-                img.src = dataUrl;
-                img.className = 'w-full h-auto drop-shadow-2xl touch-callout-default select-all pointer-events-auto';
-                
-                container.innerHTML = '';
-                container.appendChild(img);
-            } catch (err) {
-                console.error(err);
-                container.innerHTML = '<div class="m-auto"><span class="text-red-400 font-mono text-sm">保存失败，请重试或直接截屏</span></div>';
-            }
+        function saveTicket() {
+            if (!window.TestEngine) return console.error('Missing TestEngine');
+            TestEngine.generatePoster({
+                targetElementId: 'ticket-capture',
+                modalId: 'poster-modal',
+                containerId: 'poster-img-container',
+                loadingText: '制票机运作中...'
+            });
         }
 
         function closePosterModal(e) {
@@ -651,36 +639,22 @@
             modal.classList.remove('show');
         }
 
-        // SPA Routing / Back Button Interception
-        window.addEventListener('DOMContentLoaded', () => {
-            if (!window.location.hash) {
-                history.replaceState(null, '', '#landing');
-            }
-        });
-
-        window.addEventListener('popstate', (e) => {
-            const hash = window.location.hash;
-            // 矩阵弹窗的 hash 由 test-matrix.js 自行处理，页面级不干预
-            if (hash === '#matrix' || hash === '#matrix-detail') return;
-            const quizPage = document.getElementById('quiz-page');
-            const resultPage = document.getElementById('result-page');
-            
-            if (quizPage && quizPage.classList.contains('active')) {
-                // If on quiz page and pressed back
-                if (currentIndex > 0) {
-                    prevQuestion();
-                    // Trap the user in quiz page hash
-                    history.pushState(null, '', '#quiz');
-                } else {
+        if (window.TestEngine) {
+            TestEngine.initRouter({
+                isQuizActive: () => document.getElementById('quiz-page').classList.contains('active'),
+                isResultActive: () => document.getElementById('result-page').classList.contains('active'),
+                onQuizBack: () => {
+                    if (currentIndex > 0) {
+                        prevQuestion();
+                        return true;
+                    }
+                    return false;
+                },
+                onReturnHome: () => {
                     switchPage('landing-page');
                 }
-            } else if (resultPage && resultPage.classList.contains('active')) {
-                // If on result page and pressed back
-                switchPage('landing-page');
-            } else {
-                switchPage('landing-page');
-            }
-        });
+            });
+        }
     </script>
 </body>
 </html>

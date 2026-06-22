@@ -6,6 +6,12 @@
       "sourceType": "github",
       "skillPath": "SKILL.md",
       "computedHash": "c9dd3d311539d483df91c558a7925dccdd73ad004b7120bf0bc163d8ea5e63e5"
+    },
+    "xiaohongshu-note-analyzer": {
+      "source": "softbread/xiaohongshu-doctor",
+      "sourceType": "github",
+      "skillPath": "skill_extracted/xiaohongshu-note-analyzer/SKILL.md",
+      "computedHash": "5d5027d2d62b69dc7590bcd272ae25ce90e80ecdcb753161cb9023048ccf8255"
     }
   }
 }

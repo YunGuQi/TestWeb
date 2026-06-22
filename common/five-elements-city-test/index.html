@@ -33,6 +33,7 @@
     </script>
     <!-- html-to-image -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html-to-image/1.11.11/html-to-image.min.js"></script>
+    <script src="../test-engine.js?v=1"></script>
     
     <style>
         body {
@@ -487,7 +488,7 @@
 
         // 历史记录逻辑（支持多个）
         window.addEventListener('DOMContentLoaded', () => {
-            const histList = JSON.parse(localStorage.getItem('diqi_history_list') || '[]');
+            const histList = TestEngine.History.get('diqi_history_list');
             if(histList.length > 0) {
                 document.getElementById('history-entry').classList.remove('hidden');
             }
@@ -503,15 +504,14 @@
         });
 
         function openHistoryModal() {
-            const histList = JSON.parse(localStorage.getItem('diqi_history_list') || '[]');
+            const histList = TestEngine.History.get('diqi_history_list');
             const container = document.getElementById('history-list-container');
             container.innerHTML = '';
             
             if(histList.length === 0) {
                 container.innerHTML = '<div class="text-center text-ink/50 py-4 text-sm">暂无历史档案</div>';
             } else {
-                // 倒序显示，最新在前
-                histList.reverse().forEach(hist => {
+                histList.forEach((hist, originalIndex) => {
                     const btn = document.createElement('button');
                     btn.className = 'w-full text-left p-4 border border-ink/20 hover:border-ink transition-colors group flex justify-between items-center';
                     
@@ -655,6 +655,12 @@
             const day = parseInt(document.getElementById('bazi-day').value);
             const timeRaw = document.getElementById('bazi-time').value;
             let time = timeRaw;
+
+            // 每次重新开始时，必须重置全局状态，避免 SPA 路由返回导致的进度残留和记录冲突
+            currentQuestion = 0;
+            scores = { '金': 0, '木': 0, '水': 0, '火': 0, '土': 0 };
+            selectedHistory = [];
+            document.getElementById('doc-id').innerText = `XHS-${Math.floor(Math.random()*10000).toString().padStart(4,'0')}`;
 
             // 保存用户输入的八字记录，下次自动回显
             localStorage.setItem('diqi_bazi_state', JSON.stringify({
@@ -800,19 +806,18 @@
 
             // 保存历史记录列表
             const docId = document.getElementById('doc-id').innerText;
-            const histList = JSON.parse(localStorage.getItem('diqi_history_list') || '[]');
+            const histList = TestEngine.History.get('diqi_history_list');
             
             // 避免完全相同的记录重复存
-            const isDuplicate = histList.length > 0 && histList[histList.length-1].docId === docId;
+            const isDuplicate = histList.length > 0 && histList[0].docId === docId;
             if(!isDuplicate) {
-                histList.push({
+                TestEngine.History.save('diqi_history_list', {
                     timestamp: Date.now(),
                     scores: scores,
                     desc: result.desc,
                     city: displayCity,
                     docId: docId
                 });
-                localStorage.setItem('diqi_history_list', JSON.stringify(histList));
             }
 
             drawRadarChart();
@@ -852,40 +857,16 @@
             }, 100);
         }
 
-        async function savePoster() {
-            const modal = document.getElementById('poster-modal');
-            const container = document.getElementById('poster-img-container');
-            const posterArea = document.getElementById('poster-area');
-            
-            modal.classList.add('show');
-            container.innerHTML = '<div class="m-auto"><span class="text-[#1a1a1a]/40 text-sm animate-pulse font-sans font-bold">制卷中...</span></div>';
-            
-            try {
-                await document.fonts.ready;
-                await new Promise(r => setTimeout(r, 100));
-
-                const dataUrl = await htmlToImage.toJpeg(posterArea, {
-                    pixelRatio: window.devicePixelRatio > 1 ? window.devicePixelRatio : 2,
-                    backgroundColor: '#f0ebe1',
-                    width: posterArea.offsetWidth,
-                    height: posterArea.offsetHeight,
-                    style: {
-                        transform: 'scale(1)',
-                        transformOrigin: 'top left',
-                        margin: '0'
-                    }
-                });
-                
-                const img = document.createElement('img');
-                img.src = dataUrl;
-                img.className = 'w-full h-auto drop-shadow-2xl touch-callout-default select-all pointer-events-auto';
-                
-                container.innerHTML = '';
-                container.appendChild(img);
-            } catch (err) {
-                console.error(err);
-                container.innerHTML = '<div class="m-auto"><span class="text-[#ab2828] font-sans text-sm">制卷失败，请重试或直接截屏</span></div>';
-            }
+        function savePoster() {
+            if (!window.TestEngine) return console.error('Missing TestEngine');
+            TestEngine.generatePoster({
+                targetElementId: 'poster-area',
+                modalId: 'poster-modal',
+                containerId: 'poster-img-container',
+                loadingText: '制卷中...',
+                useJpeg: true,
+                backgroundColor: '#f0ebe1'
+            });
         }
 
         function closePosterModal(e) {
@@ -894,36 +875,22 @@
             modal.classList.remove('show');
         }
 
-        // SPA Routing / Back Button Interception
-        window.addEventListener('DOMContentLoaded', () => {
-            if (!window.location.hash) {
-                history.replaceState(null, '', '#landing');
-            }
-        });
-
-        window.addEventListener('popstate', (e) => {
-            const hash = window.location.hash;
-            // 矩阵弹窗的 hash 由 test-matrix.js 自行处理，页面级不干预
-            if (hash === '#matrix' || hash === '#matrix-detail') return;
-            const quizPage = document.getElementById('quiz-page');
-            const resultPage = document.getElementById('result-page');
-            
-            if (quizPage && !quizPage.classList.contains('hidden')) {
-                // If on quiz page and pressed back
-                if (currentQuestion > 0) {
-                    prevQuestion();
-                    // Trap the user in quiz page hash
-                    history.pushState(null, '', '#quiz');
-                } else {
+        if (window.TestEngine) {
+            TestEngine.initRouter({
+                isQuizActive: () => !document.getElementById('quiz-page').classList.contains('hidden'),
+                isResultActive: () => !document.getElementById('result-page').classList.contains('hidden'),
+                onQuizBack: () => {
+                    if (currentQuestion > 0) {
+                        prevQuestion();
+                        return true;
+                    }
+                    return false;
+                },
+                onReturnHome: () => {
                     navTo('landing-page');
                 }
-            } else if (resultPage && !resultPage.classList.contains('hidden')) {
-                // If on result page and pressed back
-                navTo('landing-page');
-            } else {
-                navTo('landing-page');
-            }
-        });
+            });
+        }
     </script>
 
     <!-- 矩阵引流模块 -->

@@ -341,6 +341,7 @@
     </div>
 
     <!-- Shared Component -->
+    <script src="../test-engine.js?v=1"></script>
     <script src="../test-matrix.js?v=20260621c"></script>
     <!-- html-to-image -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html-to-image/1.11.11/html-to-image.min.js"></script>
@@ -600,14 +601,12 @@
         // 记录历史
         if (isNewRun) {
             try {
-                let history = JSON.parse(localStorage.getItem('emotional_receipt_history') || '[]');
-                history.unshift({
+                TestEngine.History.save('emotional_receipt_history', {
                     score: totalScore,
                     key: resultKey,
                     items: selectedHistory,
                     date: new Date().toLocaleString('zh-CN', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })
                 });
-                localStorage.setItem('emotional_receipt_history', JSON.stringify(history));
             } catch(e) {}
         }
 
@@ -683,8 +682,7 @@
         historyList.innerHTML = '';
         
         try {
-            const historyStr = localStorage.getItem('emotional_receipt_history');
-            let historyData = historyStr ? JSON.parse(historyStr) : [];
+            let historyData = TestEngine.History.get('emotional_receipt_history');
             
             if (!Array.isArray(historyData) && historyData.score) {
                 historyData = [historyData];
@@ -729,17 +727,8 @@
     // Load History
     document.addEventListener('DOMContentLoaded', () => {
         try {
-            // Migration logic for old users
-            const oldHistoryStr = localStorage.getItem('emotional_friction_history');
-            if (oldHistoryStr && !localStorage.getItem('emotional_receipt_history')) {
-                // Migrate to new key
-                localStorage.setItem('emotional_receipt_history', oldHistoryStr);
-                // Optionally clear old, but let's keep it just in case
-            }
-
-            const historyStr = localStorage.getItem('emotional_receipt_history');
-            if (historyStr) {
-                let historyData = JSON.parse(historyStr);
+            let historyData = TestEngine.History.get('emotional_receipt_history');
+            if (historyData) {
                 // 兼容老版本单条对象记录
                 if (!Array.isArray(historyData) && historyData.score) {
                     historyData = [historyData];
@@ -753,45 +742,24 @@
     });
 
     // Poster Generation
-    async function generatePoster() {
-        const modal = document.getElementById('poster-modal');
-        const container = document.getElementById('poster-img-container');
+    function generatePoster() {
+        if (!window.TestEngine) return console.error('Missing TestEngine');
+        const target = document.querySelector('.receipt-container');
+        if (!target.id) target.id = 'receipt-capture-target';
         
-        modal.classList.add('show');
-        container.innerHTML = '<div class="m-auto"><span class="text-white/40 text-sm animate-pulse font-mono font-bold">制卷中...</span></div>';
-        
-        document.getElementById('result-bottom-bar').style.display = 'none';
-        await document.fonts.ready;
-        
-        // Capture the target (container containing the jagged edges)
-        const targetCard = document.querySelector('.receipt-container');
-        
-        try {
-            const dataUrl = await htmlToImage.toPng(targetCard, {
-                backgroundColor: 'transparent', 
-                pixelRatio: window.devicePixelRatio > 1 ? window.devicePixelRatio : 2,
-                width: targetCard.offsetWidth,
-                height: targetCard.offsetHeight,
-                style: {
-                    transform: 'scale(1)',
-                    transformOrigin: 'top left',
-                    filter: 'none', // remove drop-shadow for cleaner PNG output
-                    margin: '0'
-                }
-            });
-            
-            const img = document.createElement('img');
-            img.src = dataUrl;
-            img.className = 'w-full h-auto drop-shadow-2xl touch-callout-default select-all pointer-events-auto';
-            
-            container.innerHTML = '';
-            container.appendChild(img);
-        } catch (e) {
-            console.error(e);
-            container.innerHTML = '<div class="m-auto"><span class="text-red-400 font-mono text-sm">制卷失败，请重试或直接截屏</span></div>';
-        } finally {
-            document.getElementById('result-bottom-bar').style.display = 'block';
-        }
+        TestEngine.generatePoster({
+            targetElementId: target.id,
+            modalId: 'poster-modal',
+            containerId: 'poster-img-container',
+            loadingText: '打印机运作中...',
+            backgroundColor: 'transparent',
+            onBeforeCapture: async () => {
+                document.getElementById('result-bottom-bar').style.display = 'none';
+            },
+            onAfterCapture: async () => {
+                document.getElementById('result-bottom-bar').style.display = 'block';
+            }
+        });
     }
 
     function closePosterModal(e) {
@@ -801,32 +769,26 @@
     }
 
     // Routing
-    window.addEventListener('DOMContentLoaded', () => {
-        if (!window.location.hash) {
-            history.replaceState(null, '', '#landing');
-        }
-    });
-
-    window.addEventListener('popstate', (e) => {
-        const hash = window.location.hash;
-        if (hash === '#matrix' || hash === '#matrix-detail') return;
-        const quizPage = document.getElementById('quiz-page');
-        const resultPage = document.getElementById('result-page');
-        
-        if (quizPage && quizPage.classList.contains('active')) {
-            if (currentQuestionIndex > 0) {
-                prevQuestion();
-                history.pushState(null, '', '#quiz');
-            } else {
-                transitionPage('quiz', 'landing');
+    if (window.TestEngine) {
+        TestEngine.initRouter({
+            isQuizActive: () => document.getElementById('quiz-page').classList.contains('active'),
+            isResultActive: () => document.getElementById('result-page').classList.contains('active'),
+            onQuizBack: () => {
+                if (currentQuestionIndex > 0) {
+                    prevQuestion();
+                    return true;
+                }
+                return false;
+            },
+            onReturnHome: () => {
+                const quizPage = document.getElementById('quiz-page');
+                const resultPage = document.getElementById('result-page');
+                if (quizPage.classList.contains('active')) transitionPage('quiz', 'landing');
+                else if (resultPage.classList.contains('active')) transitionPage('result', 'landing');
+                else transitionPage('result', 'landing'); // fallback
             }
-        } else if (resultPage && resultPage.classList.contains('active')) {
-            transitionPage('result', 'landing');
-        } else {
-            if (quizPage.classList.contains('active')) transitionPage('quiz', 'landing');
-            else if (resultPage.classList.contains('active')) transitionPage('result', 'landing');
-        }
-    });
+        });
+    }
     </script>
 </body>
 </html>
