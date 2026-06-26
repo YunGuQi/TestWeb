@@ -531,6 +531,59 @@
     </div>
 
     <script>
+        window.applyAntiDup = function(version) {
+            // version: 'A', 'B', 'C', 'D', 'E'
+            const cards = document.querySelectorAll('.post-card');
+            cards.forEach(card => {
+                if (version === 'A') {
+                    card.style.backgroundColor = '#efe9db'; 
+                    card.style.boxShadow = '0 10px 40px rgba(0,0,0,0.1)';
+                } else if (version === 'B') {
+                    card.style.backgroundColor = '#f2ece0'; 
+                    card.style.boxShadow = '0 12px 35px rgba(10,0,0,0.12)';
+                    const title = card.querySelector('.cover-title, .q-text');
+                    if(title) title.style.transform = 'translateY(2px)';
+                } else if (version === 'C') {
+                    card.style.backgroundColor = '#ebe5d7'; 
+                    card.style.boxShadow = '0 8px 45px rgba(0,10,0,0.08)';
+                    const title = card.querySelector('.cover-title, .q-text');
+                    if(title) title.style.transform = 'translateY(-2px) translateX(2px)';
+                } else if (version === 'D') {
+                    card.style.backgroundColor = '#f0ebe0'; 
+                    card.style.boxShadow = '0 15px 30px rgba(0,0,10,0.15)';
+                    const tags = card.querySelector('.tags-container, .options-container');
+                    if(tags) tags.style.transform = 'translateX(3px)';
+                } else if (version === 'E') {
+                    card.style.backgroundColor = '#f4eedf'; 
+                    card.style.boxShadow = '0 9px 50px rgba(10,10,0,0.09)';
+                    const title = card.querySelector('.cover-title, .q-text');
+                    if(title) title.style.letterSpacing = '0.5px';
+                }
+            });
+            
+            let noise = document.getElementById('anti-dup-noise');
+            if(!noise) {
+                noise = document.createElement('div');
+                noise.id = 'anti-dup-noise';
+                noise.style.position = 'fixed';
+                noise.style.top = '0';
+                noise.style.left = '0';
+                noise.style.width = '100vw';
+                noise.style.height = '100vh';
+                noise.style.pointerEvents = 'none';
+                noise.style.zIndex = '9999';
+                document.body.appendChild(noise);
+            }
+            let freq = 0.6;
+            if(version==='B') freq = 0.65;
+            if(version==='C') freq = 0.55;
+            if(version==='D') freq = 0.7;
+            if(version==='E') freq = 0.8;
+            
+            const svgNoise = `<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><filter id="noiseFilter"><feTurbulence type="fractalNoise" baseFrequency="${freq}" numOctaves="3" stitchTiles="stitch"/></filter><rect width="100%" height="100%" filter="url(#noiseFilter)" opacity="0.04"/></svg>`;
+            noise.style.backgroundImage = `url("data:image/svg+xml;base64,${btoa(svgNoise)}")`;
+        };
+
         async function downloadAll() {
             const ids = ['capture-cover-1', 'capture-cover-2', 'capture-cover-3', 'capture-cover-4', 'capture-cover-5', 'capture-q1', 'capture-q2', 'capture-q3', 'capture-q4', 'capture-q5', 'capture-ticket'];
             const names = ['0-首图-角度1.png', '0-首图-角度2.png', '0-首图-角度3.png', '0-首图-角度4.png', '0-首图-角度5.png', '1-题1.png', '2-题2.png', '3-题3.png', '4-题4.png', '5-题5.png', '6-车票引导.png'];

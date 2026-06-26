@@ -14,7 +14,10 @@ async def generate_images(html_path, output_dir):
         page = await browser.new_page(viewport={"width": 1920, "height": 1080})
         
         file_uri = f"file:///{html_path.replace('\\', '/')}"
-        await page.goto(file_uri)
+        try:
+            await page.goto(file_uri, wait_until="domcontentloaded", timeout=60000)
+        except Exception as e:
+            print(f"⚠️ 页面加载超时或出错: {e}，但将继续尝试截图")
         
         # 等待字体加载完毕
         await page.evaluate("document.fonts.ready")
@@ -33,26 +36,37 @@ async def generate_images(html_path, output_dir):
             document.body.style.display = 'block';
         """)
         
-        ids = ['capture-cover-1', 'capture-cover-2', 'capture-cover-3', 'capture-cover-4', 'capture-cover-5', 'capture-q1', 'capture-q2', 'capture-q3', 'capture-q4', 'capture-q5', 'capture-ticket', 'capture-result-high', 'capture-result-mid', 'capture-result-low']
-        names = ['0-首图-角度1.png', '0-首图-角度2.png', '0-首图-角度3.png', '0-首图-角度4.png', '0-首图-角度5.png', '1-题1.png', '2-题2.png', '3-题3.png', '4-题4.png', '5-题5.png', '6-引导图.png', '7-结果-严重透支.png', '8-结果-收支平衡.png', '9-结果-一毛不拔.png']
+        versions = ['A', 'B', 'C', 'D', 'E']
+        ids = ['capture-cover-1', 'capture-cover-2', 'capture-cover-3', 'capture-cover-4', 'capture-cover-5']
         
-        for ele_id, name in zip(ids, names):
-            loc = page.locator(f"#{ele_id}")
-            if await loc.count() > 0:
-                print(f"📸 正在截取: {name}")
-                await loc.screenshot(path=os.path.join(output_dir, name))
-            else:
-                # 兼容只有一个首图的情况
-                if ele_id == 'capture-cover-1':
-                    fallback_loc = page.locator("#capture-cover")
-                    if await fallback_loc.count() > 0:
-                        print(f"📸 正在截取: 0-首图.png (兼容单首图模式)")
-                        await fallback_loc.screenshot(path=os.path.join(output_dir, '0-首图.png'))
-                        continue
-                print(f"⚠️ 未找到元素 #{ele_id}，跳过 {name}")
+        common_ids = ['capture-q1', 'capture-q2', 'capture-q3', 'capture-q4', 'capture-q5', 'capture-ticket']
+        common_names = ['1-题1.png', '2-题2.png', '3-题3.png', '4-题4.png', '5-题5.png', '6-引导图.png']
+        
+        for idx, version in enumerate(versions):
+            print(f"\n--- 正在生成 {version} 版防重图片 ---")
+            
+            try:
+                await page.evaluate(f"if(window.applyAntiDup) window.applyAntiDup('{version}')")
+                await page.wait_for_timeout(300)
+            except Exception as e:
+                print(f"⚠️ 无法应用防重脚本: {e}")
+            
+            cover_id = ids[idx]
+            cover_loc = page.locator(f"#{cover_id}")
+            if await cover_loc.count() > 0:
+                cover_name = f"{version}-0-首图.png"
+                print(f"📸 正在截取: {cover_name}")
+                await cover_loc.screenshot(path=os.path.join(output_dir, cover_name))
+                
+            for q_id, q_name in zip(common_ids, common_names):
+                q_loc = page.locator(f"#{q_id}")
+                if await q_loc.count() > 0:
+                    ver_q_name = f"{version}-{q_name}"
+                    print(f"📸 正在截取: {ver_q_name}")
+                    await q_loc.screenshot(path=os.path.join(output_dir, ver_q_name))
                 
         await browser.close()
-        print(f"✅ 截图完成！图片已保存至: {output_dir}\n")
+        print(f"\n✅ 截图完成！共生成5套防重图片。保存至: {output_dir}\n")
 
 async def main():
     if len(sys.argv) < 2:

@@ -48,42 +48,42 @@ async def publish_draft(images, title, content):
         print("⏳ 等待图片上传并渲染编辑器输入框...")
         await page.wait_for_timeout(3000) # 简单等待3秒，确保前端渲染出标题和正文框
         
-        # ==========================================
-        # 3. 物理剪贴板防风控注入文案
-        # ==========================================
+        # 终极安全复制函数：利用原生 Chromium 的 textarea 实现物理复制，完美避开 Python 剪贴板 Bug
+        async def safe_copy(text_to_copy):
+            temp_page = await browser.new_page()
+            await temp_page.set_content('<!DOCTYPE html><html><body><textarea id="t"></textarea></body></html>')
+            await temp_page.locator('#t').fill(text_to_copy)
+            await temp_page.locator('#t').click()
+            await temp_page.keyboard.press("Control+A")
+            await temp_page.keyboard.press("Control+C")
+            await temp_page.close()
+
         print("✍️ 正在注入标题与正文...")
         
-        # 注入标题 (小红书会自动把文件名截断填入标题，所以必须先清空)
+        # 注入标题
         title_loc = page.locator('input[placeholder*="标题"], .c-input_inner').first
         await title_loc.click()
         await page.keyboard.press("Control+A")
         await page.keyboard.press("Backspace")
-        pyperclip.copy(title)
+        await safe_copy(title)
         await page.keyboard.press("Control+V")
         await page.wait_for_timeout(500)
         
-        # 注入正文 (小红书用的是富文本编辑器，直接点内容区全选粘贴最稳妥)
+        # 注入正文
         content_loc = page.locator('[contenteditable="true"], #post-textarea, .ql-editor').first
         await content_loc.click()
         await page.keyboard.press("Control+A")
         await page.keyboard.press("Backspace")
-        pyperclip.copy(content)
-        await page.keyboard.press("Control+V")
-        await page.wait_for_timeout(500)
         
-        # ==========================================
-        # 4. 高级选项与保存
-        # ==========================================
-        print("🛡️ 正在尝试开启【原创声明】...")
-        try:
-            # 原创声明的 checkbox 通常是隐藏的，必须用 force=True 强行点击
-            original_switch = page.locator('text="原创声明"').locator("xpath=../..").locator('.css-switch, .switch-container, input[type="checkbox"]')
-            if await original_switch.count() > 0:
-                await original_switch.first.click(force=True, timeout=5000)
-            else:
-                print("⚠️ 没找到原创声明开关，跳过。")
-        except Exception as e:
-            print(f"⚠️ 开启原创声明失败: {e}")
+        # 物理粘贴大段正文，触发完整的 onPaste 事件，防止富文本编辑器异步渲染错乱
+        await safe_copy(content)
+        await page.keyboard.press("Control+V")
+        await page.wait_for_timeout(2000)
+        
+        # 下滑页面确保底部按钮可见
+        await page.evaluate("window.scrollTo(0, document.body.scrollHeight)")
+        
+
 
         print("💾 正在点击保存草稿...")
         try:

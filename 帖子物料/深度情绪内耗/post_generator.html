@@ -238,12 +238,12 @@
         <button onclick="downloadAll()">一键生成并下载所有图片</button>
     </div>
 
-    <!-- Cover 1 -->
+    <!-- Cover 1 (A版：第一人称职场) -->
     <div id="capture-cover-1" class="post-card">
         <div class="header-tag">NO.09 | 心灵诊断</div>
         <div class="cover-sub font-serif-title"># 停止无意识的自我攻击</div>
-        <div class="cover-title font-serif-title">
-            为什么明明<br><br><span class="highlight-red">什么都没干</span>，<br><br>却感觉<span class="highlight-red">那么累</span>？
+        <div class="cover-title font-serif-title" style="font-size: 85px; top: 380px;">
+            终于想通了！<br><br>原来我不是懒，<br><br>是<span class="highlight-red">情绪破产</span>了
         </div>
         <div class="tags-container">
             <div class="tag">深度内耗测评</div>
@@ -256,12 +256,12 @@
         </div>
     </div>
 
-    <!-- Cover 2 -->
+    <!-- Cover 2 (B版：第三人称吃瓜) -->
     <div id="capture-cover-2" class="post-card">
         <div class="header-tag">NO.09 | 心灵诊断</div>
         <div class="cover-sub font-serif-title"># 停止无意识的自我攻击</div>
-        <div class="cover-title font-serif-title" style="font-size: 95px; top: 380px;">
-            看似<span class="highlight-red">情绪稳定</span>的人，<br><br>其实内心早<br><br><span class="highlight-red">千疮百孔</span>了🥀
+        <div class="cover-title font-serif-title" style="font-size: 80px; top: 380px;">
+            卷王闺蜜突然<br><br><span class="highlight-red">要分手</span>，原因<br><br>居然是<span class="highlight-red">太累了？</span>
         </div>
         <div class="tags-container">
             <div class="tag">深度内耗测评</div>
@@ -274,12 +274,12 @@
         </div>
     </div>
 
-    <!-- Cover 3 -->
+    <!-- Cover 3 (C版：第一人称社交) -->
     <div id="capture-cover-3" class="post-card">
         <div class="header-tag">NO.09 | 心灵诊断</div>
         <div class="cover-sub font-serif-title"># 停止无意识的自我攻击</div>
-        <div class="cover-title font-serif-title" style="font-size: 85px; top: 380px;">
-            ⚠️超准心理学：<br><br>你的<span class="highlight-red">内耗</span>到底<br><br>到了<span class="highlight-red">第几级</span>？
+        <div class="cover-title font-serif-title" style="font-size: 80px; top: 380px;">
+            把朋友圈设为<br><br><span class="highlight-red">三天可见</span>后，我<br><br>治好了<span class="highlight-red">精神内耗</span>
         </div>
         <div class="tags-container">
             <div class="tag">深度内耗测评</div>
@@ -292,12 +292,12 @@
         </div>
     </div>
 
-    <!-- Cover 4 -->
+    <!-- Cover 4 (D版：讨好型人格) -->
     <div id="capture-cover-4" class="post-card">
         <div class="header-tag">NO.09 | 心灵诊断</div>
         <div class="cover-sub font-serif-title"># 停止无意识的自我攻击</div>
-        <div class="cover-title font-serif-title" style="font-size: 90px; top: 380px;">
-            <span class="highlight-red">停止内耗！</span><br><br>把这句话设为屏保<br><br>每天<span class="highlight-red">看百遍</span>🚨
+        <div class="cover-title font-serif-title" style="font-size: 80px; top: 380px;">
+            终于决定做个<br><br><span class="highlight-red">“自私”</span>的人，<br><br>我瞬间<span class="highlight-red">活过来了</span>
         </div>
         <div class="tags-container">
             <div class="tag">深度内耗测评</div>
@@ -310,12 +310,12 @@
         </div>
     </div>
 
-    <!-- Cover 5 -->
+    <!-- Cover 5 (E版：睡前焦虑) -->
     <div id="capture-cover-5" class="post-card">
         <div class="header-tag">NO.09 | 心灵诊断</div>
         <div class="cover-sub font-serif-title"># 停止无意识的自我攻击</div>
-        <div class="cover-title font-serif-title" style="font-size: 90px; top: 380px;">
-            给所有<span class="highlight-red">“想太多”</span>星人<br><br>的一张<br><br><span class="highlight-red">心灵逃跑车票</span>🎫
+        <div class="cover-title font-serif-title" style="font-size: 80px; top: 380px;">
+            熬夜不是<span class="highlight-red">不困</span>，<br><br>是脑子又在开<br><br><span class="highlight-red">“批斗大会”</span>了
         </div>
         <div class="tags-container">
             <div class="tag">深度内耗测评</div>
@@ -630,6 +630,60 @@
     </div>
 
     <script>
+        window.applyAntiDup = function(version) {
+            // version: 'A', 'B', 'C', 'D', 'E'
+            const cards = document.querySelectorAll('.post-card');
+            cards.forEach(card => {
+                if (version === 'A') {
+                    card.style.backgroundColor = '#FAF8F5'; 
+                    card.style.boxShadow = '0 10px 40px rgba(0,0,0,0.1)';
+                } else if (version === 'B') {
+                    card.style.backgroundColor = '#FDF9F6'; 
+                    card.style.boxShadow = '0 12px 35px rgba(10,0,0,0.12)';
+                    const title = card.querySelector('.cover-title, .question-text');
+                    if(title) title.style.transform = 'translateY(2px)';
+                } else if (version === 'C') {
+                    card.style.backgroundColor = '#F8FAF9'; 
+                    card.style.boxShadow = '0 8px 45px rgba(0,10,0,0.08)';
+                    const title = card.querySelector('.cover-title, .question-text');
+                    if(title) title.style.transform = 'translateY(-2px) translateX(2px)';
+                } else if (version === 'D') {
+                    card.style.backgroundColor = '#F9F8FD'; 
+                    card.style.boxShadow = '0 15px 30px rgba(0,0,10,0.15)';
+                    const tags = card.querySelector('.tags-container, .options-container');
+                    if(tags) tags.style.transform = 'translateX(3px)';
+                } else if (version === 'E') {
+                    card.style.backgroundColor = '#FCFBF8'; 
+                    card.style.boxShadow = '0 9px 50px rgba(10,10,0,0.09)';
+                    const title = card.querySelector('.cover-title, .question-text');
+                    if(title) title.style.letterSpacing = '0.5px';
+                }
+            });
+            
+            // 加入SVG全局噪点，打破特征哈希值
+            let noise = document.getElementById('anti-dup-noise');
+            if(!noise) {
+                noise = document.createElement('div');
+                noise.id = 'anti-dup-noise';
+                noise.style.position = 'fixed';
+                noise.style.top = '0';
+                noise.style.left = '0';
+                noise.style.width = '100vw';
+                noise.style.height = '100vh';
+                noise.style.pointerEvents = 'none';
+                noise.style.zIndex = '9999';
+                document.body.appendChild(noise);
+            }
+            let freq = 0.6;
+            if(version==='B') freq = 0.65;
+            if(version==='C') freq = 0.55;
+            if(version==='D') freq = 0.7;
+            if(version==='E') freq = 0.8;
+            
+            const svgNoise = `<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><filter id="noiseFilter"><feTurbulence type="fractalNoise" baseFrequency="${freq}" numOctaves="3" stitchTiles="stitch"/></filter><rect width="100%" height="100%" filter="url(#noiseFilter)" opacity="0.04"/></svg>`;
+            noise.style.backgroundImage = `url("data:image/svg+xml;base64,${btoa(svgNoise)}")`;
+        };
+
         async function downloadAll() {
             const ids = ['capture-cover-1', 'capture-cover-2', 'capture-cover-3', 'capture-cover-4', 'capture-cover-5', 'capture-q1', 'capture-q2', 'capture-q3', 'capture-q4', 'capture-q5', 'capture-ticket', 'capture-result-high', 'capture-result-mid', 'capture-result-low'];
             const names = ['0-首图-角度1.png', '0-首图-角度2.png', '0-首图-角度3.png', '0-首图-角度4.png', '0-首图-角度5.png', '1-题1.png', '2-题2.png', '3-题3.png', '4-题4.png', '5-题5.png', '6-引导图.png', '7-结果-严重透支.png', '8-结果-收支平衡.png', '9-结果-一毛不拔.png'];
