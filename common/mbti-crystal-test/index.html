@@ -124,6 +124,9 @@
             font-family: 'Inter', sans-serif;
             display: flex;
             flex-direction: column;
+            --theme-light1: #f8fafc;
+            --theme-light2: #e2e8f0;
+            --theme-dark: #b829ff;
         }
         
         /* Boarding pass cutouts */
@@ -133,14 +136,14 @@
         .result-card::before { left: -16px; }
         .result-card::after { right: -16px; }
         
-        .rc-top { padding: 32px 32px 24px; background: linear-gradient(135deg, #f8fafc, #e2e8f0); border-bottom: 2px dashed #cbd5e1; position: relative;}
-        .rc-airline { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+        .rc-top { padding: 32px 32px 24px; background: linear-gradient(135deg, var(--theme-light1), var(--theme-light2)); border-bottom: 2px dashed #cbd5e1; position: relative;}
+        .rc-airline { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
         .rc-logo { font-weight: 900; font-size: 18px; letter-spacing: -0.5px; color: #334155; }
         .rc-barcode { font-family: 'JetBrains Mono', monospace; font-size: 24px; letter-spacing: -2px; color: #0f172a; opacity: 0.6; }
         
         .rc-route { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
         .route-code { font-size: 36px; font-weight: 900; color: #0f172a; }
-        .route-plane { font-size: 24px; color: var(--accent-purple); transform: rotate(45deg); opacity: 0.8;}
+        .route-plane { font-size: 24px; color: var(--theme-dark); transform: rotate(45deg); opacity: 0.8;}
         
         .rc-places { display: flex; justify-content: space-between; font-size: 13px; font-weight: 700; color: #64748b; text-transform: uppercase;}
         
@@ -148,7 +151,7 @@
         .rc-passenger { margin-bottom: 24px; }
         .rc-label { font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 1px; }
         .rc-name { font-size: 22px; font-weight: 800; color: #0f172a; letter-spacing: -0.5px; }
-        .rc-mbti { font-family: 'JetBrains Mono', monospace; color: var(--accent-purple); font-weight: 800; font-size: 18px; }
+        .rc-mbti { font-family: 'JetBrains Mono', monospace; color: var(--theme-dark); font-weight: 800; font-size: 18px; }
 
         .rc-details { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
         .detail-val { font-size: 16px; font-weight: 800; color: #1e293b; }
@@ -161,11 +164,11 @@
         .dim-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
         .dim-text { font-size: 11px; font-weight: 800; color: #334155; width: 45px; }
         .dim-text.right { text-align: right; }
-        .dim-bar-bg { flex-grow: 1; height: 6px; background: #e2e8f0; border-radius: 3px; margin: 0 8px; position: relative; overflow: hidden; }
-        .dim-fill { position: absolute; top: 0; left: 0; height: 100%; background: linear-gradient(90deg, var(--accent-purple), var(--accent-cyan)); border-radius: 3px; transition: width 0.8s var(--ease-spring); }
+        .dim-bar-bg { flex-grow: 1; height: 6px; background: linear-gradient(90deg, rgba(184,41,255,0.1), rgba(0,255,209,0.15)); border-radius: 3px; margin: 0 8px; position: relative; overflow: hidden; }
+        .dim-fill { position: absolute; top: 0; left: 0; height: 100%; background: linear-gradient(90deg, var(--theme-dark), var(--accent-cyan)); border-radius: 3px; transition: width 0.8s var(--ease-spring), left 0.8s var(--ease-spring), right 0.8s var(--ease-spring); }
         .dim-val { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #64748b; width: 30px; text-align: center; }
 
-        .rc-quote { font-style: normal; font-weight: 600; color: #334155; font-size: 12px; text-align: left; padding: 12px 14px; background: #f8fafc; border-radius: 8px; border-left: 3px solid var(--accent-purple); line-height: 1.6; letter-spacing: 0.5px; }
+        .rc-quote { font-style: normal; font-weight: 600; color: #334155; font-size: 12px; text-align: left; padding: 12px 14px; background: #f8fafc; border-radius: 8px; border-left: 3px solid var(--theme-dark); line-height: 1.6; letter-spacing: 0.5px; }
 
         .rc-bottom { padding: 16px; background: #0f172a; color: #fff; text-align: center; font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 2px; }
 
@@ -259,11 +262,14 @@
                     </div>
                     
                     <div class="rc-mid">
-                        <div class="rc-passenger">
-                            <div class="rc-label">乘客 PASSENGER</div>
-                            <div style="display: flex; justify-content: space-between; align-items: flex-end;">
-                                <div class="rc-name">时空旅人</div>
-                                <div class="rc-mbti" id="r-mbti">INTJ</div>
+                        <div class="rc-passenger" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-items: flex-start;">
+                            <div>
+                                <div class="rc-label">乘客 PASSENGER</div>
+                                <div class="rc-name" id="r-name" style="margin-top: 4px;">时空旅人</div>
+                            </div>
+                            <div>
+                                <div class="rc-label">候机厅 TERMINAL</div>
+                                <div class="detail-val" id="r-faction-badge" style="margin-top: 4px; color: var(--theme-dark);">紫人专属厅 NT</div>
                             </div>
                         </div>
                         
@@ -303,6 +309,16 @@
                                 <div class="dim-bar-bg"><div class="dim-fill" id="bar-JP" style="width: 50%;"></div></div>
                                 <div class="dim-val" id="val-P">0%</div><div class="dim-text right">P 灵活</div>
                             </div>
+                            <div class="dim-row" style="margin-top: 12px; opacity: 0.85;">
+                                <div class="dim-text">果断 A</div><div class="dim-val" id="val-A">0%</div>
+                                <div class="dim-bar-bg"><div class="dim-fill" id="bar-AO" style="width: 50%;"></div></div>
+                                <div class="dim-val" id="val-O">0%</div><div class="dim-text right">O 纠结</div>
+                            </div>
+                            <div class="dim-row" style="opacity: 0.85;">
+                                <div class="dim-text">温暖 H</div><div class="dim-val" id="val-H">0%</div>
+                                <div class="dim-bar-bg"><div class="dim-fill" id="bar-HC" style="width: 50%;"></div></div>
+                                <div class="dim-val" id="val-C">0%</div><div class="dim-text right">C 高冷</div>
+                            </div>
                         </div>
                         
                         <div class="rc-label" style="margin-bottom:8px; margin-top:24px;">航司档案评估 ASSESSMENT</div>
@@ -340,110 +356,206 @@
 
     <script>
         const questions = [
-            // E/I
-            { text: "参加一个满是陌生人的聚会时，你会：", dim: "EI", opts: [ { text: "主动去认识新朋友，在热闹的氛围中如鱼得水", val: "E" }, { text: "找个安静的角落，默默观察或者只跟熟人说话", val: "I" } ] },
-            { text: "经过连续一周的高强度工作或社交后，你周末更想：", dim: "EI", opts: [ { text: "约朋友出去玩，在外界的刺激中回血", val: "E" }, { text: "一个人宅在家里，关闭手机彻底放空", val: "I" } ] },
-            { text: "在日常交流和群聊中，你通常是：", dim: "EI", opts: [ { text: "想到什么就说什么的“高频输出机器”", val: "E" }, { text: "在脑内深思熟虑后才偶尔发言的“暗中观察者”", val: "I" } ] },
-            { text: "遇到非常感兴趣的新鲜事物时，你的第一反应是：", dim: "EI", opts: [ { text: "马上分享出去，拉着朋友一起讨论体验", val: "E" }, { text: "自己先默默潜水研究，搞懂了再说", val: "I" } ] },
+            // E/I 能量获取
+            { text: "下了一周暴雨终于在傍晚停了，看着窗外积水倒映的霓虹灯，此刻的你：", dim: "EI", opts: [ 
+                { text: "抓起钥匙往外冲：憋死老子了，今晚必须找人燥起来！", val: "E", weight: 2 }, 
+                { text: "翻开通讯录：这天气挺适合喝一杯，看谁有空出来吃个饭。", val: "E", weight: 1 },
+                { text: "默默泡杯热茶窝回沙发，看外面的人湿鞋也是种幸福。", val: "I", weight: 1 },
+                { text: "拉上窗帘戴上降噪耳机：外面的世界与我无关，只想原地躺尸。", val: "I", weight: 2 }
+            ] },
+            { text: "去网红咖啡馆不小心把冰美式洒在了衣服上，此时你会：", dim: "EI", opts: [ 
+                { text: "大声自嘲“今天水逆！”，顺便跟旁边递纸巾的人聊了起来。", val: "E", weight: 2 }, 
+                { text: "尴尬地笑笑，接过店员纸巾道谢，试图化解周围的目光。", val: "E", weight: 1 },
+                { text: "默默低头疯狂拿纸巾擦，希望没有任何人注意到这个插曲。", val: "I", weight: 1 },
+                { text: "默默压低帽子：只要我不尴尬地球就是平的。并决定再也不来这店。", val: "I", weight: 2 }
+            ] },
+            { text: "晚上失眠，翻到了五年前自己发的一条极度矫情的朋友圈，你会：", dim: "EI", opts: [ 
+                { text: "截图重发一条公开处刑自己：当年我到底在发什么疯哈哈！", val: "E", weight: 2 }, 
+                { text: "觉得好笑，顺手发给几个死党一起“欣赏”这段黑历史。", val: "E", weight: 1 },
+                { text: "在被窝里尴尬地抠出三室一厅，然后默默设为“仅自己可见”。", val: "I", weight: 1 },
+                { text: "立刻删除，祈祷没人存过截图，假装这一切从未发生。", val: "I", weight: 2 }
+            ] },
+            { text: "被朋友强拉去桌游局，发现全是不认识的高玩，你的反应是：", dim: "EI", opts: [ 
+                { text: "迅速进入状态：“大家别怕我来带飞！”，直接全场飙戏控场。", val: "E", weight: 2 }, 
+                { text: "先观察两局熟悉规则，碰到聊得来的玩家就多互动两句。", val: "E", weight: 1 },
+                { text: "拿边缘角色也无所谓，只要能缩在角落默默吃零食看戏就行。", val: "I", weight: 1 },
+                { text: "浑身紧绷，每次发言前脑内打几十遍草稿，狂喊“什么时候结束”。", val: "I", weight: 2 }
+            ] },
             
-            // S/N
-            { text: "在做重要决定或规划时，你更看重：", dim: "SN", opts: [ { text: "过去的实际经验和具体的客观数据", val: "S" }, { text: "对未来的强烈直觉和各种可能性的畅想", val: "N" } ] },
-            { text: "学习一项新技能或新软件时，你习惯：", dim: "SN", opts: [ { text: "一步步跟着教程，踏踏实实搞懂每个操作细节", val: "S" }, { text: "先抓大局和底层逻辑，细节随缘自己摸索", val: "N" } ] },
-            { text: "回忆过去的一段经历，你脑海里最先浮现的是：", dim: "SN", opts: [ { text: "当时具体的人、说过的原话和环境细节", val: "S" }, { text: "那段经历带给你的整体感受和深层意义", val: "N" } ] },
-            { text: "面对一件大家都在按照常规流程做的事情，你会：", dim: "SN", opts: [ { text: "觉得既然有效，跟着老办法稳妥地做就好", val: "S" }, { text: "觉得无聊，总想着能不能找点新奇的解法", val: "N" } ] },
+            // S/N 信息收集
+            { text: "在街上偶遇极其像你前任/曾经暗恋对象背影的人，擦肩那刻你会：", dim: "SN", opts: [ 
+                { text: "迅速扫视对方的鞋和外套确认身高，得出结论：只是长得像。", val: "S", weight: 2 }, 
+                { text: "回头确认了一下，然后在群里八卦：“刚碰到个人长得巨像那谁！”", val: "S", weight: 1 },
+                { text: "一阵强烈情绪翻涌，哪怕明知不是TA，一天的心情也被带跑偏了。", val: "N", weight: 1 },
+                { text: "感叹命运安排，脑内自动播放如果平行时空重逢的狗血虐恋连续剧。", val: "N", weight: 2 }
+            ] },
+            { text: "刚买了一个“能极大提升幸福感”的复杂智能设备，拆开包装后：", dim: "SN", opts: [ 
+                { text: "找出最厚的多国语言说明书，严格对照图纸一步一步组装。", val: "S", weight: 2 }, 
+                { text: "先去搜个“三分钟开箱评测”视频，照葫芦画瓢把基础功能搞懂。", val: "S", weight: 1 },
+                { text: "随便翻翻搞懂原理，剩下隐藏功能准备日后当盲盒慢慢摸索。", val: "N", weight: 1 },
+                { text: "说明书连膜都没撕就扔垃圾桶。插上电全凭直觉一通瞎按：坏了再说！", val: "N", weight: 2 }
+            ] },
+            { text: "下班路上偶然听到一首很久没听过的老歌，你脑海最先闪过的是：", dim: "SN", opts: [ 
+                { text: "当时听这首歌时周围空气的温度，以及那年夏天具体发生了什么事。", val: "S", weight: 2 }, 
+                { text: "想起了当年很流行的一段经历，或者几件客观发生过的大事。", val: "S", weight: 1 },
+                { text: "并不是某个具体画面，而是一股强烈的怀旧氛围感瞬间击中了你。", val: "N", weight: 1 },
+                { text: "突然感叹时间流逝，在脑内自动播放一部关于自己人生的伤痛文艺片。", val: "N", weight: 2 }
+            ] },
+            { text: "老板让你接手一个大家都在用老旧模板做的常规项目，你会：", dim: "SN", opts: [ 
+                { text: "既然老办法没出过大错，直接调出前人的文件“复制粘贴”最稳妥。", val: "S", weight: 2 }, 
+                { text: "整体框架沿用，但在自己负责的那几页里，把排版稍微弄好看点。", val: "S", weight: 1 },
+                { text: "看着老表格觉得索然无味，忍不住想：完全推翻换个新视角会怎样？", val: "N", weight: 1 },
+                { text: "哪怕加班到凌晨，也要硬着头皮创造绝美新框架，不能容忍丑东西。", val: "N", weight: 2 }
+            ] },
 
-            // T/F
-            { text: "朋友遇到麻烦找你大吐苦水时，你通常的第一反应是：", dim: "TF", opts: [ { text: "帮TA理清逻辑，提供理性的解决对策", val: "T" }, { text: "先安抚TA的情绪，给予极大的情感共鸣", val: "F" } ] },
-            { text: "评价一部电影或一本书的好坏，你主要看：", dim: "TF", opts: [ { text: "逻辑是否严密，剧情是否有漏洞和硬伤", val: "T" }, { text: "情感是否真挚，能不能深深打动人心", val: "F" } ] },
-            { text: "在团队合作中遇到分歧时，你认为最重要的是：", dim: "TF", opts: [ { text: "不管别人开不开心，找到最正确高效的方案", val: "T" }, { text: "尽量照顾到每个人的感受，维持团队和谐", val: "F" } ] },
-            { text: "如果你要对别人提出批评或反对意见，你会：", dim: "TF", opts: [ { text: "直截了当指出问题，觉得忠言逆耳利于行", val: "T" }, { text: "尽量委婉表达，怕伤了对方的面子和感情", val: "F" } ] },
+            // T/F 决策依据
+            { text: "百人群聊里，老板正疯狂痛批同组平时关系不错的同事，此时的你：", dim: "TF", opts: [ 
+                { text: "像机器一样快速复盘，并在心里拉好Excel算出了这次事故的止损方案。", val: "T", weight: 2 }, 
+                { text: "觉得老板态度差但骂得在理，最好在这时保持沉默明哲保身。", val: "T", weight: 1 },
+                { text: "默默在私聊小窗给同事发“抱抱”，觉得当众这样羞辱人太恶心了。", val: "F", weight: 1 },
+                { text: "气得浑身发抖，比挨骂的人还憋屈，满脑子都是“这破公司待不下去了！”", val: "F", weight: 2 }
+            ] },
+            { text: "一起通宵的朋友突然在凌晨三点因为网抑云音乐崩溃大哭，你的反应是：", dim: "TF", opts: [
+                { text: "递上纸巾并开始帮TA分析这件事的底层逻辑和解决方案。", val: "T", weight: 2 },
+                { text: "安静地陪在旁边等TA哭完，顺便确认一下明天的行程是否需要取消。", val: "T", weight: 1 },
+                { text: "立刻抱住TA疯狂安慰，什么都不问先给足情绪价值。", val: "F", weight: 1 },
+                { text: "被TA的情绪感染，跟着一起嗷嗷大哭，最后两人抱头痛哭。", val: "F", weight: 2 }
+            ] },
+            { text: "面对一个非常丰厚但违背你个人价值观的合作机会，你会：", dim: "TF", opts: [
+                { text: "在商言商，只要不违法，利益最大化才是成年人的法则。", val: "T", weight: 2 },
+                { text: "虽然心里有些膈应，但看着银行卡余额还是说服了自己。", val: "T", weight: 1 },
+                { text: "非常纠结，如果接了会内耗很久，需要找朋友疯狂开导自己。", val: "F", weight: 1 },
+                { text: "果断拒绝，甚至觉得对方找上门来是对自己灵魂的一种侮辱。", val: "F", weight: 2 }
+            ] },
+            { text: "看了一部结局极度悲惨但逻辑严密的烧脑悬疑片，走出影院后：", dim: "TF", opts: [
+                { text: "疯狂跟朋友盘逻辑漏洞，感叹导演在第三幕的线索铺垫太绝了。", val: "T", weight: 2 },
+                { text: "觉得剧情很精彩，不过也就是一部电影而已，看完就去吃夜宵了。", val: "T", weight: 1 },
+                { text: "沉浸在悲惨的结局中久久走不出来，甚至觉得这几天都不想看悬疑片了。", val: "F", weight: 1 },
+                { text: "在社交平台写下一篇千字感性小作文，为主角的命运感到撕心裂肺。", val: "F", weight: 2 }
+            ] },
 
-            // J/P
-            { text: "出门长途旅行前，你的准备状态通常是：", dim: "JP", opts: [ { text: "做好详细攻略，预定好所有的行程和酒店", val: "J" }, { text: "只定个大方向，享受走到哪算哪的随机惊喜", val: "P" } ] },
-            { text: "对于每天的工作和生活安排，你更喜欢：", dim: "JP", opts: [ { text: "凡事都有明确的时间表，按部就班让你有掌控感", val: "J" }, { text: "讨厌被计划框死，喜欢随性而为的松弛感", val: "P" } ] },
-            { text: "面对一个期限快到的重要任务，你会：", dim: "JP", opts: [ { text: "提前规划好进度，不喜欢拖到最后有压迫感", val: "J" }, { text: "靠Deadline带来的焦虑和爆发力在最后一刻狂肝", val: "P" } ] },
-            { text: "你的电脑桌面或生活房间通常是：", dim: "JP", opts: [ { text: "物品分类明确，一切都井井有条", val: "J" }, { text: "看似杂乱无章，但自己总能精准找到想要的东西", val: "P" } ] }
+            // J/P 生活方式
+            { text: "即将开启一场期待已久的七天海外长途旅行，你的行李箱状态是：", dim: "JP", opts: [
+                { text: "提前一周列好Excel清单，甚至把每天要穿的衣服打包好分装。", val: "J", weight: 2 },
+                { text: "提前两天把必需品塞进去，剩下的只要带上护照和钱就行。", val: "J", weight: 1 },
+                { text: "出发前一晚才开始收拾，大概率会忘记带充电线或牙刷。", val: "P", weight: 1 },
+                { text: "出发前三小时极限打包，到了机场才想起来好像没定落地第一晚的酒店。", val: "P", weight: 2 }
+            ] },
+            { text: "关于手机上的未读消息红点，你通常的习惯是：", dim: "JP", opts: [
+                { text: "绝对的强迫症，哪怕是系统通知也要点掉，不然浑身难受。", val: "J", weight: 2 },
+                { text: "重要的群和私聊会清空，剩下的广告推送就随它去吧。", val: "J", weight: 1 },
+                { text: "只有想看的时候才会点开，未读数过百也是常有的事。", val: "P", weight: 1 },
+                { text: "未读消息常年保持999+，找人全靠搜索，红点已经成为了手机壁纸的一部分。", val: "P", weight: 2 }
+            ] },
+            { text: "接到了一个死线在两周后的重要任务，你的工作节奏是：", dim: "JP", opts: [
+                { text: "当天就拆解成每天的进度表，绝不允许自己拖到最后一刻。", val: "J", weight: 2 },
+                { text: "前几天先做个大致框架，后面再按部就班地填补细节。", val: "J", weight: 1 },
+                { text: "前十天都在摸鱼或被其他事情吸引，最后四天开启疯狂赶工模式。", val: "P", weight: 1 },
+                { text: "Deadline才是第一生产力，在最后24小时靠着肾上腺素和咖啡极限交差。", val: "P", weight: 2 }
+            ] },
+            { text: "周末原本打算在家大扫除，结果朋友突然喊你出去喝酒，此时：", dim: "JP", opts: [
+                { text: "果断拒绝，计划被打乱的感觉比不喝酒还要难受一百倍。", val: "J", weight: 2 },
+                { text: "犹豫了一下，跟朋友商量能不能改到晚上，先让自己扫完地。", val: "J", weight: 1 },
+                { text: "把打扫计划秒抛脑后，心想反正衣服明天可以洗，穿上鞋就冲下楼。", val: "P", weight: 1 },
+                { text: "没等对方说完已经在问“去哪喝？我再叫几个人！”老子最喜欢没计划的惊喜。", val: "P", weight: 2 }
+            ] }
         ];
 
         const resultsData = {
             "INTJ": {
-                destCode: "OBS-9", destName: "绝对零度空间站", seatClass: "战略指挥舱",
-                tags: ["精神洁癖", "逻辑强迫症", "人类观察员", "降维打击"],
+                role: "高冷操盘手",
+                destCode: "OBS-9", destName: "降智打击黑洞", seatClass: "幕后操盘手专座",
+                tags: ["逻辑强迫症", "人类观察员", "降维打击", "毒舌大师"],
                 quote: "具备上帝视角的孤独领航员。极度追求高效与真理，不需要外界的光源，因为其强大的逻辑引力足以扭曲周围的现实。"
             },
             "INTP": {
-                destCode: "QT-X", destName: "量子游离态空间", seatClass: "概率观测舱",
-                tags: ["间歇性摆烂", "知识囤积狂", "毫无边界感过敏", "薛定谔的行动力"],
+                role: "慵懒科学怪人",
+                destCode: "QT-X", destName: "薛定谔摸鱼虫洞", seatClass: "脑洞研究舱",
+                tags: ["知识囤积狂", "薛定谔的行动力", "毫无边界感过敏", "拖延症晚期"],
                 quote: "游走在规则边缘的系统拆解者。对已知的一切保持怀疑，比起抵达终点，更享受破解宇宙底层代码的纯粹思辨。"
             },
             "ENTJ": {
-                destCode: "TI-1", destName: "钛核霸权星港", seatClass: "元帅统御舱",
-                tags: ["效率机器", "天生领导者", "进度条杀手", "慕强但更强"],
+                role: "霸总卷王",
+                destCode: "TI-1", destName: "24h效率暴政基地", seatClass: "舰长指挥座",
+                tags: ["天生领导者", "进度条杀手", "慕强但更强", "没感情的赚钱机器"],
                 quote: "天生的星际拓荒者与规则制定人。拥有粉碎一切阻碍的绝对意志，若宇宙法则不合理，便会毫不犹豫地重写它。"
             },
             "ENTP": {
-                destCode: "AM-7", destName: "混沌脉冲星云", seatClass: "混沌引擎舱",
-                tags: ["抬杠十级学者", "脑洞黑洞", "三分钟热度", "无情推翻机"],
+                role: "混沌乐子人",
+                destCode: "AM-7", destName: "宇宙吃瓜空间站", seatClass: "反骨玩家舱",
+                tags: ["骨折眉毛杠精", "三分钟热度", "无情推翻机", "诡辩奇才"],
                 quote: "拒绝被航线定义的反骨玩家。灵感如同超新星随时爆发，以极强的发散思维在混乱中寻找破局的薛定谔解法。"
             },
             "INFJ": {
-                destCode: "PR-3", destName: "深空观测站", seatClass: "意识锚点舱",
-                tags: ["极度共情", "外热内冷", "精神乌托邦", "内耗王者"],
+                role: "精神乌托邦",
+                destCode: "PR-3", destName: "精神内耗避难港", seatClass: "先知观测舱",
+                tags: ["提灯绿老头", "外热内冷", "内耗王者", "伪装正常人"],
                 quote: "携带深空静默基因的理想主义者。能敏锐捕捉到微小的灵子波动，在喧嚣的宇宙中默默守护着某种神圣的使命感。"
             },
             "INFP": {
-                destCode: "PL-0", destName: "琉璃星尘带", seatClass: "流浪观测舱",
-                tags: ["流泪猫猫头", "浪漫过敏", "宇宙级心软", "永远在神游"],
+                role: "敏感小蝴蝶",
+                destCode: "PL-0", destName: "EMO流泪陨石带", seatClass: "流泪猫猫头等舱",
+                tags: ["流泪猫猫头", "宇宙级心软", "永远在神游", "间歇性自闭"],
                 quote: "游离于主流航道之外的浪漫流浪者。以感性雷达感知世界，哪怕身处最冷酷的真空中，也能培育出最柔软的精神星云。"
             },
             "ENFJ": {
-                destCode: "LU-8", destName: "光曜双星系统", seatClass: "能量聚合舱",
-                tags: ["人类小太阳", "操心命", "情绪价值拉满", "天生布道者"],
+                role: "治愈系太阳",
+                destCode: "LU-8", destName: "情绪价值充电塔", seatClass: "小太阳发光舱",
+                tags: ["全能男妈/女妈", "情绪价值拉满", "天生布道者", "护犊子狂魔"],
                 quote: "自带能量辐射场的人际中枢。拥有极强的共情与领导力，像恒星一样源源不断地为同航线的旅伴提供情绪升力。"
             },
             "ENFP": {
-                destCode: "ST-4", destName: "霓虹星云游乐园", seatClass: "超光速跃迁舱",
-                tags: ["社交悍匪", "快乐小狗", "脑洞满天飞", "永远热爱"],
+                role: "快乐小狗",
+                destCode: "ST-4", destName: "多巴胺喷泉象限", seatClass: "快乐小狗VIP座",
+                tags: ["社交悍匪", "脑洞满天飞", "永远热爱", "气氛组担当"],
                 quote: "拒绝枯燥的脑洞超新星。情绪与灵感随时可以超光速跃迁，对宇宙中未知的陨石坑永远保持着三分钟的热烈与狂欢。"
             },
             "ISTJ": {
-                destCode: "AN-2", destName: "绝对防御星港", seatClass: "坐标校准舱",
-                tags: ["没有感情的KPI", "规矩就是规矩", "计划狂魔", "靠谱天花板"],
+                role: "无情蓝老头",
+                destCode: "AN-2", destName: "强迫症狂喜网格", seatClass: "KPI执行舱",
+                tags: ["规矩就是规矩", "计划狂魔", "靠谱天花板", "细节扫描仪"],
                 quote: "航线得以安全运转的绝对基石。极度理性且严谨，对参数与流程有着强迫症般的执着，是混乱宇宙中最可靠的锚点。"
             },
             "ISFJ": {
-                destCode: "GH-6", destName: "辉光庇护卫星", seatClass: "生态维持舱",
-                tags: ["老好人", "细节捕手", "默默付出", "防御性社交"],
+                role: "贴心大白",
+                destCode: "GH-6", destName: "全天候后勤补给船", seatClass: "老好人专属舱",
+                tags: ["细节捕手", "默默付出", "防御性社交", "讨好型人格"],
                 quote: "不动声色的全舰生态维系者。默默记录着航行中的每一个细节，以惊人的耐力和温和，为同伴构建起最坚不可摧的庇护所。"
             },
             "ESTJ": {
-                destCode: "MS-5", destName: "秩序巨构星", seatClass: "矩阵执行舱",
-                tags: ["现实主义铁腕", "别废话看结果", "执行力爆表", "反矫情达人"],
+                role: "铁面判官",
+                destCode: "MS-5", destName: "KPI无情督察局", seatClass: "卷王头等舱",
+                tags: ["无情包工头", "执行力爆表", "反矫情达人", "计划强迫症"],
                 quote: "坚定不移的秩序构建者。排斥一切低效与模糊地带，比起欣赏虚无缥缈的繁星，更倾向于确保每一台引擎都在最高功率运转。"
             },
             "ESFJ": {
-                destCode: "GR-9", destName: "引力牵引星港", seatClass: "生态中枢舱",
-                tags: ["端水大师", "气氛组组长", "无法拒绝别人", "社交雷达"],
+                role: "热心交际花",
+                destCode: "GR-9", destName: "星际八卦集散中心", seatClass: "气氛组长专座",
+                tags: ["端水大师", "无法拒绝别人", "社交雷达", "行走的备忘录"],
                 quote: "掌控全舰情绪气候的社交枢纽。擅长调配能量与促成共识，只要有他们在场，最冰冷的深空航行也能变成一场温暖的派对。"
             },
             "ISTP": {
-                destCode: "MC-X", destName: "钨金废土星", seatClass: "机械师改装舱",
-                tags: ["手工硬汉", "冷面笑匠", "讨厌大道理", "人狠话不多"],
+                role: "冷酷孤狼",
+                destCode: "MC-X", destName: "莫挨老子静音舱", seatClass: "孤狼驾驶舱",
+                tags: ["冷酷电钻哥", "讨厌大道理", "人狠话不多", "极限修理工"],
                 quote: "绝对冷静的技术操作狂。讨厌被理论束缚，更喜欢用双手拆解与重构一切，在突发危机前拥有令人惊叹的肌肉记忆。"
             },
             "ISFP": {
-                destCode: "AU-3", destName: "极光气态行星", seatClass: "全息景观舱",
-                tags: ["佛系本佛", "颜控晚期", "艺术感知力", "拒绝画大饼"],
+                role: "摸鱼艺术家",
+                destCode: "AU-3", destName: "随地大小躺坐标", seatClass: "躺平观景舱",
+                tags: ["佛系本佛", "颜控晚期", "拒绝画大饼", "随地大小躺"],
                 quote: "活在当下的星云体验派。拥有极其敏锐的美学雷达，不关心宏大的战略，只想在反重力漂流中安静感受超新星爆发的浪漫。"
             },
             "ESTP": {
-                destCode: "KD-1", destName: "高能赤核赛道", seatClass: "反重力推进舱",
-                tags: ["极限运动家", "活在当下", "风险爱好者", "控场玩家"],
+                role: "高能海王",
+                destCode: "KD-1", destName: "极限作死飞行轨", seatClass: "极限飙船舱",
+                tags: ["极限运动家", "活在当下", "风险爱好者", "刺激瘾者"],
                 quote: "在陨石群中极限穿梭的动能风暴。拒绝被安全带束缚，极速反应与控场能力堪称一绝，永远活在刺激与挑战的最前线。"
             },
             "ESFP": {
-                destCode: "PL-7", destName: "等离子狂欢星", seatClass: "聚变舞池舱",
-                tags: ["派对永动机", "人来疯", "行走的表情包", "快乐大过天"],
+                role: "派对永动机",
+                destCode: "PL-7", destName: "24h野生蹦迪甲板", seatClass: "派对永动机专座",
+                tags: ["抓马交际花", "人来疯", "快乐大过天", "随时随地开麦"],
                 quote: "天生的聚光灯捕捉器。拒绝无聊与平庸，自带情绪点火器属性，能瞬间将枯燥的漫长航行转变为一场沸腾的等离子狂欢。"
             }
         };
@@ -482,33 +594,50 @@
             document.getElementById(id).classList.add('active');
         }
 
+        let displayQuestions = [];
+
         function startQuiz() {
             currentQuestion = 0;
             answers = [];
             historyStack = [];
+            // 深拷贝并使用Fisher-Yates洗牌算法打乱题目顺序
+            displayQuestions = JSON.parse(JSON.stringify(questions));
+            for (let i = displayQuestions.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [displayQuestions[i], displayQuestions[j]] = [displayQuestions[j], displayQuestions[i]];
+            }
+            
+            // 打乱每一道题内部的选项
+            displayQuestions.forEach(q => {
+                for (let i = q.opts.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [q.opts[i], q.opts[j]] = [q.opts[j], q.opts[i]];
+                }
+            });
+
             setHash('#quiz');
             showView('quiz');
             renderQuestion();
         }
 
         function renderQuestion() {
-            const q = questions[currentQuestion];
+            const q = displayQuestions[currentQuestion];
             document.getElementById('q-title').innerText = q.text;
-            document.getElementById('progress-fill').style.width = ((currentQuestion + 1) / questions.length * 100) + '%';
-            document.getElementById('progress-text').innerText = `STEP ${String(currentQuestion + 1).padStart(2, '0')}/${questions.length}`;
+            document.getElementById('progress-fill').style.width = ((currentQuestion + 1) / displayQuestions.length * 100) + '%';
+            document.getElementById('progress-text').innerText = `STEP ${String(currentQuestion + 1).padStart(2, '0')}/${displayQuestions.length}`;
             
             let html = '';
             q.opts.forEach((opt) => {
-                html += `<button class="option-btn" onclick="selectOption('${opt.val}')">${opt.text}</button>`;
+                html += `<button class="option-btn" onclick="selectOption('${opt.val}', ${opt.weight})">${opt.text}</button>`;
             });
             document.getElementById('options-container').innerHTML = html;
         }
 
-        function selectOption(val) {
+        function selectOption(val, weight) {
             historyStack.push({q: currentQuestion, a: [...answers]});
-            answers.push(val);
+            answers.push({ val, weight });
             
-            if (currentQuestion < questions.length - 1) {
+            if (currentQuestion < displayQuestions.length - 1) {
                 currentQuestion++;
                 renderQuestion();
             } else {
@@ -534,29 +663,43 @@
             
             let rawScores = { E:0, I:0, S:0, N:0, T:0, F:0, J:0, P:0 };
             
-            answers.forEach((val, index) => {
-                let weight = (index % 4 === 1) ? 1.1 : 1.0;
-                rawScores[val] += weight;
+            answers.forEach((ans) => {
+                rawScores[ans.val] += ans.weight;
             });
 
+            // 依据分值判定，如果遇到极小概率的平分，使用随机数决定偏向
             let mbti = "";
-            mbti += (rawScores.E > rawScores.I) ? "E" : "I";
-            mbti += (rawScores.S > rawScores.N) ? "S" : "N";
-            mbti += (rawScores.T > rawScores.F) ? "T" : "F";
-            mbti += (rawScores.J > rawScores.P) ? "J" : "P";
+            mbti += (rawScores.E > rawScores.I || (rawScores.E === rawScores.I && Math.random() > 0.5)) ? "E" : "I";
+            mbti += (rawScores.S > rawScores.N || (rawScores.S === rawScores.N && Math.random() > 0.5)) ? "S" : "N";
+            mbti += (rawScores.T > rawScores.F || (rawScores.T === rawScores.F && Math.random() > 0.5)) ? "T" : "F";
+            mbti += (rawScores.J > rawScores.P || (rawScores.J === rawScores.P && Math.random() > 0.5)) ? "J" : "P";
 
             let displayScores = {};
             ['E','I','S','N','T','F','J','P'].forEach(k => {
-                displayScores[k] = rawScores[k] + 2.5 + (Math.random() * 0.8);
+                // 原维度满分是8。放大分数基数并加上底分，避免出现0%
+                displayScores[k] = (rawScores[k] * 12) + 20 + (Math.random() * 5);
             });
+            
+            // 为主导性格添加胜者光环加成
             ['EI', 'SN', 'TF', 'JP'].forEach(pair => {
                 let k1 = pair[0], k2 = pair[1];
-                if (rawScores[k1] > rawScores[k2]) {
-                    displayScores[k1] += 1.5;
-                } else if (rawScores[k2] > rawScores[k1]) {
-                    displayScores[k2] += 1.5;
+                if (mbti.includes(k1)) {
+                    displayScores[k1] += 15;
+                } else {
+                    displayScores[k2] += 15;
                 }
             });
+
+            // 随机生成 64型附加维度 A/O 和 H/C 的分数
+            const genSubScore = () => {
+                let a = Math.floor(Math.random() * 30) + 10; // 基础分
+                if (Math.random() > 0.5) a += 50; // 放大优势面
+                return { s1: a, s2: 100 - a };
+            };
+            let aoScores = genSubScore();
+            displayScores['A'] = aoScores.s1; displayScores['O'] = aoScores.s2;
+            let hcScores = genSubScore();
+            displayScores['H'] = hcScores.s1; displayScores['C'] = hcScores.s2;
 
             setTimeout(() => {
                 renderResult(mbti, false, null, displayScores);
@@ -571,16 +714,54 @@
         function renderResult(mbti, isHistory = false, historyId = null, scores = null) {
             const data = resultsData[mbti];
             
-            const targetId = historyId ? historyId : Math.random().toString(36).substr(2, 8).toUpperCase();
+            // 根据分数生成 A/O (果断/纠结) 和 H/C (温暖/高冷) 的后缀
+            const getSubtypeFromScores = () => {
+                if(scores && scores['A'] !== undefined) {
+                    return `${scores['A'] > scores['O'] ? 'A' : 'O'}-${scores['H'] > scores['C'] ? 'H' : 'C'}`;
+                }
+                const ao = Math.random() > 0.5 ? 'A' : 'O';
+                const hc = Math.random() > 0.5 ? 'H' : 'C';
+                return `${ao}-${hc}`;
+            };
+            const targetId = historyId ? historyId : `${mbti}-${getSubtypeFromScores()}`;
+            
             document.getElementById('r-id').innerText = targetId;
-            document.getElementById('r-mbti').innerText = mbti;
+            document.getElementById('r-name').innerText = data.role;
             
             document.getElementById('r-dest-code').innerText = data.destCode;
             document.getElementById('r-dest-name').innerText = data.destName;
             document.getElementById('r-class').innerText = data.seatClass;
 
+            let badgeText = "";
+            let themeLight1 = "#f8fafc", themeLight2 = "#e2e8f0", themeDark = "#b829ff";
+
+            if (mbti.includes("N") && mbti.includes("F")) {
+                badgeText = "绿人专属厅 NF";
+                themeLight1 = "#ecfdf5"; themeLight2 = "#d1fae5"; themeDark = "#10b981";
+            } else if (mbti.includes("N") && mbti.includes("T")) {
+                badgeText = "紫人专属厅 NT";
+                themeLight1 = "#f5f3ff"; themeLight2 = "#ede9fe"; themeDark = "#8b5cf6";
+            } else if (mbti.includes("S") && mbti.includes("J")) {
+                badgeText = "蓝人专属厅 SJ";
+                themeLight1 = "#eff6ff"; themeLight2 = "#dbeafe"; themeDark = "#3b82f6";
+            } else if (mbti.includes("S") && mbti.includes("P")) {
+                badgeText = "黄人专属厅 SP";
+                themeLight1 = "#fffbeb"; themeLight2 = "#fef3c7"; themeDark = "#f59e0b";
+            }
+
+            const rcCard = document.querySelector('.result-card');
+            rcCard.style.setProperty('--theme-light1', themeLight1);
+            rcCard.style.setProperty('--theme-light2', themeLight2);
+            rcCard.style.setProperty('--theme-dark', themeDark);
+            
+            document.getElementById('r-faction-badge').innerText = badgeText;
+
             let tagsHtml = '';
-            data.tags.forEach(tag => { tagsHtml += `<span class="r-tag">#${tag}</span>`; });
+            data.tags.forEach(tag => { 
+                if (tag !== data.role) {
+                    tagsHtml += `<span class="r-tag">#${tag}</span>`; 
+                }
+            });
             document.getElementById('r-tags').innerHTML = tagsHtml;
             document.getElementById('r-quote').innerText = data.quote;
 
@@ -595,13 +776,27 @@
                     
                     document.getElementById(`val-${leftKey}`).innerText = `${leftPct}%`;
                     document.getElementById(`val-${rightKey}`).innerText = `${rightPct}%`;
-                    document.getElementById(`bar-${barId}`).style.width = `${leftPct}%`;
+                    
+                    let bar = document.getElementById(`bar-${barId}`);
+                    if (leftPct >= 50) {
+                        bar.style.left = '0';
+                        bar.style.right = 'auto';
+                        bar.style.width = `${leftPct}%`;
+                        bar.style.background = 'linear-gradient(90deg, var(--theme-dark), var(--accent-cyan))';
+                    } else {
+                        bar.style.right = '0';
+                        bar.style.left = 'auto';
+                        bar.style.width = `${rightPct}%`;
+                        bar.style.background = 'linear-gradient(270deg, var(--theme-dark), var(--accent-cyan))';
+                    }
                 };
                 
                 updateDim('E', 'I', 'EI');
                 updateDim('S', 'N', 'SN');
                 updateDim('T', 'F', 'TF');
                 updateDim('J', 'P', 'JP');
+                updateDim('A', 'O', 'AO');
+                updateDim('H', 'C', 'HC');
             } else {
                 document.getElementById('rc-dims').style.display = 'none';
             }
@@ -622,18 +817,37 @@
             }
         }
 
-        function generateImage() {
+        async function generateImage() {
             const wrapper = document.getElementById('capture-wrapper');
-            htmlToImage.toPng(wrapper, { quality: 0.95, backgroundColor: '#09090b' })
-                .then(function (dataUrl) {
-                    const img = document.getElementById('generated-img');
-                    img.src = dataUrl;
-                    document.getElementById('image-modal').classList.add('active');
-                })
-                .catch(function (error) {
-                    console.error('oops, something went wrong!', error);
-                    alert("登机牌打印失败，请重试。");
+            const modal = document.getElementById('image-modal');
+            const img = document.getElementById('generated-img');
+            const tip = document.querySelector('.modal-tip');
+            
+            // Show modal early in loading state
+            modal.classList.add('active');
+            img.style.display = 'none';
+            tip.innerText = "⏳ 正在打印登机牌，请稍候...";
+            
+            try {
+                // Ensure fonts and DOM are ready (critical for mobile)
+                await document.fonts.ready;
+                await new Promise(r => setTimeout(r, 150));
+                
+                const dataUrl = await htmlToImage.toPng(wrapper, { 
+                    quality: 0.95, 
+                    backgroundColor: '#09090b',
+                    pixelRatio: window.devicePixelRatio > 1 ? window.devicePixelRatio : 2,
+                    style: { transform: 'scale(1)', transformOrigin: 'top left' }
                 });
+                
+                img.src = dataUrl;
+                img.style.display = 'block';
+                tip.innerText = "✨ 长按图片保存到手机 ✨";
+            } catch (error) {
+                console.error('Capture failed!', error);
+                tip.innerText = "❌ 登机牌生成失败，请重试或直接手机截屏";
+                img.style.display = 'none';
+            }
         }
 
         function closeImageModal() {
