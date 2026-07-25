@@ -27,7 +27,7 @@ export default function LandingPage() {
   }, []);
 
   return (
-    <section className="min-h-[100dvh] flex flex-col items-center justify-center p-8 max-w-md mx-auto">
+    <section className="min-h-[100dvh] w-full flex flex-col items-center justify-center p-8 max-w-md mx-auto">
       <div className="relative bg-[#fdfbf7] text-[#1a1a1a] w-full p-8 text-center flex flex-col items-center rounded shadow-[0_10px_40px_rgba(0,0,0,0.06)] border border-[#d1cdc1] before:content-[''] before:absolute before:top-1/2 before:-translate-y-1/2 before:-left-4 before:w-8 before:h-8 before:bg-[#e6e4df] before:rounded-full before:shadow-[inset_0_2px_4px_rgba(0,0,0,0.05)] before:border before:border-[#d1cdc1] before:border-r-transparent before:border-t-transparent before:rotate-45 after:content-[''] after:absolute after:top-1/2 after:-translate-y-1/2 after:-right-4 after:w-8 after:h-8 after:bg-[#e6e4df] after:rounded-full after:shadow-[inset_0_2px_4px_rgba(0,0,0,0.05)] after:border after:border-[#d1cdc1] after:border-l-transparent after:border-b-transparent after:rotate-45">
         <h1 className="text-4xl font-black tracking-tight mb-2">心灵逃跑车票</h1>
         <p className="font-mono text-sm opacity-70 mb-6 uppercase tracking-widest">ONE-WAY TICKET TO YOUR SOUL</p>
@@ -77,10 +77,8 @@ export default function LandingPage() {
                     key={record.id + index}
                     onClick={() => {
                       setAnswers(record.answers);
-                      // Move directly to result view which is step 20 (index 20) in this context,
-                      // But wait, QuizInterface expects currentStep to control logic.
-                      // The easiest way is to let useQuizStore go to ResultView if currentStep >= 20.
                       setCurrentStep(20);
+                      useQuizStore.getState().setHasGenerated(true);
                       setShowHistory(false);
                     }}
                     className="w-full text-left p-4 bg-white border border-[#d1cdc1] shadow-sm hover:-translate-y-1 hover:shadow-md transition-all flex items-center justify-between mb-3 rounded"

@@ -15,7 +15,7 @@ interface QuizState {
   historyStackCoords: number[][]; // For "undo" feature
   
   startQuiz: () => void;
-  nextStep: (coordsDelta: number[], selectedOptIndex: number) => void;
+  nextStep: (coordsDelta: number[], selectedOptIndex: number, isLast?: boolean) => void;
   prevStep: () => void;
   setDeviceId: (id: string) => void;
   reset: () => void;
@@ -45,10 +45,10 @@ export const useQuizStore = create<QuizState>()(
         hasGenerated: false 
       }),
       
-      nextStep: (coordsDelta, selectedOptIndex) => set((state) => {
+      nextStep: (coordsDelta, selectedOptIndex, isLast = false) => set((state) => {
         const newCoords = state.userCoords.map((v, i) => v + coordsDelta[i]);
         return {
-          currentStep: state.currentStep + 1,
+          currentStep: isLast ? state.currentStep : state.currentStep + 1,
           userCoords: newCoords,
           answers: [...state.answers, selectedOptIndex],
           historyStackCoords: [...state.historyStackCoords, [...state.userCoords]]

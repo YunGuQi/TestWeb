@@ -74,7 +74,7 @@ export default function ResultView() {
   };
 
   return (
-    <section className="page-section max-w-md mx-auto py-8 min-h-screen flex flex-col items-center justify-center px-4">
+    <section className="page-section w-full max-w-md mx-auto py-8 min-h-screen flex flex-col items-center justify-center px-4">
       <div className="w-full flex justify-between items-center mb-4 px-2 select-none">
         <button className="text-gray-400 hover:text-black font-bold p-2 text-xl active:scale-90 transition-transform">&lsaquo;</button>
         <div className="flex flex-col items-center">
