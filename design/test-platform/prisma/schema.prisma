@@ -4,8 +4,7 @@ generator client {
 
 datasource db {
   provider  = "postgresql"
-  url       = env("POSTGRES_PRISMA_URL") // Vercel Postgres 默认会注入这个变量
-  directUrl = env("POSTGRES_URL_NON_POOLING") // 针对 Serverless 的直连地址
+  url       = env("DATABASE_URL") // Prisma Postgres 注入的是 DATABASE_URL
 }
 
 model Question {
