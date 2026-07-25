@@ -1,0 +1,57 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Question {
+  id      Int      @id @default(autoincrement())
+  order   Int
+  text    String
+  options Option[]
+}
+
+model Option {
+  id         Int      @id @default(autoincrement())
+  text       String
+  scores     String   // 存储分数字典的 JSON 字符串，例如 {"sen":2, "rum":0}
+  question   Question @relation(fields: [questionId], references: [id])
+  questionId Int
+}
+
+model ResultConfig {
+  id        Int      @id @default(autoincrement())
+  title     String
+  desc      String
+  quote     String
+  imageUrl  String
+  condition String   // 存储触发条件，如结果的 ID 或 tag
+}
+
+model GlobalConfig {
+  id             Int      @id @default(autoincrement())
+  baseCount      Int      @default(0)
+  danmakuSpeed   Int      @default(50)   // 速度百分比
+  danmakuOpacity Int      @default(70)   // 透明度百分比
+  danmakuContent String   @default("{}") // 包含各结果类型弹幕的 JSON 字符串
+}
+
+model TestRecord {
+  id        String   @id @default(cuid())
+  deviceId  String?
+  answers   String   // 用户所有答题记录的 JSON 字符串
+  resultId  Int?     // 最终测出的 ResultConfig 的 ID
+  createdAt DateTime @default(now())
+}
+
+model ActivationCode {
+  id         Int      @id @default(autoincrement())
+  code       String   @unique
+  maxUses    Int      @default(3)
+  isDisabled Boolean  @default(false)
+  devices    String   @default("[]") // 已绑定的设备列表 JSON
+  createdAt  DateTime @default(now())
+}

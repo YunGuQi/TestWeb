@@ -1,0 +1,84 @@
+@import "tailwindcss";
+@import "tailwindcss/utilities";
+@layer base {
+  body {
+    background-color: #fdfdfd;
+    color: #000;
+    overflow-x: hidden;
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+@layer utilities {
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* Background Layers */
+.bg-layer {
+  position: fixed; inset: 0; z-index: -1; pointer-events: none;
+}
+.bg-barcode {
+  background-image: repeating-linear-gradient(90deg, 
+      #000 0px, #000 2px, transparent 2px, transparent 8px,
+      #000 8px, #000 14px, transparent 14px, transparent 16px,
+      #000 16px, #000 20px, transparent 20px, transparent 32px,
+      #000 32px, #000 34px, transparent 34px, transparent 40px
+  );
+  background-size: 200px 100%; 
+  opacity: 0.04;
+  mask-image: radial-gradient(circle, #000 20%, transparent 80%);
+  -webkit-mask-image: radial-gradient(circle, #000 20%, transparent 80%);
+}
+.laser-line {
+  position: fixed; top: 0; left: 0; right: 0; height: 2px;
+  background: #ff0000; box-shadow: 0 0 10px 2px rgba(255,0,0,0.5);
+  opacity: 0.3; z-index: -1; pointer-events: none;
+  animation: scan 4s ease-in-out infinite;
+}
+
+@keyframes scan { 0% { top: -10%; } 100% { top: 110%; } }
+@keyframes scan-progress { 0% { transform: translateX(-100%); } 100% { transform: translateX(500%); } }
+
+.animate-scan-progress {
+  animation: scan-progress 2s ease-in-out infinite;
+}
+
+@keyframes danmaku-slide {
+  0% { transform: translateX(100vw); }
+  100% { transform: translateX(-100vw); }
+}
+.animate-danmaku {
+  animation: danmaku-slide linear forwards;
+}
+
+/* Brutalist UI */
+.brutalist-btn {
+  position: relative; display: flex; align-items: center; justify-content: center;
+  width: 100%; padding: 1rem 1.5rem; background-color: white; color: black;
+  font-weight: bold; font-size: 1.125rem; border: 2px solid black;
+  transition: all 0.1s; box-shadow: 4px 4px 0px #000; cursor: pointer;
+}
+.brutalist-btn:active { box-shadow: 0px 0px 0px #000; transform: translate(4px, 4px); }
+
+.brutalist-card { border: 2px solid black; background-color: white; color: black; box-shadow: 8px 8px 0px #000; }
+
+.option-btn {
+  width: 100%; text-align: left; cursor: pointer; transition: all 0.1s;
+  background-color: white; color: black; border: 2px solid black;
+  padding: 1rem; box-shadow: 4px 4px 0px #000;
+}
+.option-btn:active { box-shadow: 0px 0px 0px #000; transform: translate(4px, 4px); }
+.option-btn.selected { background-color: black; color: white; }
+
+/* Receipt UI */
+.receipt-container { 
+  filter: drop-shadow(-2px 0 0 #000) drop-shadow(2px 0 0 #000) drop-shadow(0 -2px 0 #000) drop-shadow(0 2px 0 #000) drop-shadow(8px 8px 0 #000); 
+}
+.receipt-paper {
+  background-color: #fdfdfd; color: #000; position: relative;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.03'/%3E%3C/svg%3E");
+}
+.receipt-top { height: 10px; background: radial-gradient(circle at 50% 0%, transparent 5px, #fff 6px); background-size: 12px 10px; width: 100%; border-bottom: 2px solid #000; }
+.receipt-bottom { height: 10px; background: radial-gradient(circle at 50% 100%, transparent 5px, #fff 6px); background-size: 12px 10px; width: 100%; border-top: 2px solid #000; }
