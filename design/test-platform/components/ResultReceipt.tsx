@@ -206,7 +206,7 @@ export default function ResultReceipt({ answers, onRestart }: ResultReceiptProps
         />
         <div className="flex-1 overflow-y-auto px-4 hide-scrollbar flex flex-col items-center pb-8 relative z-10">
 
-            <div ref={receiptRef} id="poster-container" className="w-[85%] max-w-[320px] mx-auto flex flex-col bg-[#fdfdfd] receipt-container relative z-20 mb-8 pt-4">
+            <div ref={receiptRef} id="poster-container" className="w-[85%] max-w-[320px] mx-auto flex flex-col receipt-container relative z-20 mb-8 mt-6 pt-0">
                 <div className="receipt-top shrink-0"></div>
                 <div className="receipt-paper px-6 py-4 flex-1 flex flex-col relative overflow-hidden">
                     <div className="text-center font-mono mb-4 shrink-0">
