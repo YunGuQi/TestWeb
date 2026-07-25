@@ -5,11 +5,21 @@ import { useRouter } from 'next/navigation';
 
 export default function LobbyPage() {
   const [clickCount, setClickCount] = useState(0);
+  const [lastClickTime, setLastClickTime] = useState(0);
   const router = useRouter();
 
   const handleTitleClick = () => {
-    const newCount = clickCount + 1;
+    const now = Date.now();
+    let newCount = 1;
+
+    // If the interval is less than or equal to 1s (1000ms), increment the count
+    if (now - lastClickTime <= 1000) {
+      newCount = clickCount + 1;
+    }
+
     setClickCount(newCount);
+    setLastClickTime(now);
+
     if (newCount >= 5) {
       setClickCount(0);
       router.push('/admin/login');
