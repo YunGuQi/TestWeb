@@ -63,33 +63,50 @@ export default function QuizInterface() {
       </div>
 
       <AnimatePresence mode="wait">
-        <motion.div 
-          key={currentStep}
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: -20 }}
-          transition={{ duration: 0.3 }}
-          className="w-full flex flex-col gap-6"
-        >
-          <div className="relative bg-[#fdfbf7] text-[#1a1a1a] w-full p-8 rounded shadow-[0_10px_40px_rgba(0,0,0,0.06)] border border-[#d1cdc1] before:content-[''] before:absolute before:top-1/2 before:-translate-y-1/2 before:-left-4 before:w-8 before:h-8 before:bg-[#e6e4df] before:rounded-full before:shadow-[inset_0_2px_4px_rgba(0,0,0,0.05)] before:border before:border-[#d1cdc1] before:border-r-transparent before:border-t-transparent before:rotate-45 after:content-[''] after:absolute after:top-1/2 after:-translate-y-1/2 after:-right-4 after:w-8 after:h-8 after:bg-[#e6e4df] after:rounded-full after:shadow-[inset_0_2px_4px_rgba(0,0,0,0.05)] after:border after:border-[#d1cdc1] after:border-l-transparent after:border-b-transparent after:rotate-45">
-            <h2 className="text-xl font-bold leading-relaxed mb-2 text-current">{currentQ.text}</h2>
-          </div>
+        {currentStep < questions.length ? (
+          <motion.div 
+            key={currentStep}
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            transition={{ duration: 0.3 }}
+            className="w-full flex flex-col gap-6"
+          >
+            <div className="relative bg-[#fdfbf7] text-[#1a1a1a] w-full p-8 rounded shadow-[0_10px_40px_rgba(0,0,0,0.06)] border border-[#d1cdc1] before:content-[''] before:absolute before:top-1/2 before:-translate-y-1/2 before:-left-4 before:w-8 before:h-8 before:bg-[#e6e4df] before:rounded-full before:shadow-[inset_0_2px_4px_rgba(0,0,0,0.05)] before:border before:border-[#d1cdc1] before:border-r-transparent before:border-t-transparent before:rotate-45 after:content-[''] after:absolute after:top-1/2 after:-translate-y-1/2 after:-right-4 after:w-8 after:h-8 after:bg-[#e6e4df] after:rounded-full after:shadow-[inset_0_2px_4px_rgba(0,0,0,0.05)] after:border after:border-[#d1cdc1] after:border-l-transparent after:border-b-transparent after:rotate-45">
+              <h2 className="text-xl font-bold leading-relaxed mb-2 text-current">{currentQ.text}</h2>
+            </div>
 
-          <div className="w-full flex flex-col gap-4">
-            {currentQ.opts.map((opt, idx) => {
-              const abcd = ['A', 'B', 'C', 'D'];
-              return (
-                <button
-                  key={idx}
-                  onClick={() => handleOptionClick(idx)}
-                  className="w-full text-left bg-white border border-[#1a1a1a] p-4 rounded text-[#1a1a1a] shadow-sm font-medium leading-relaxed hover:bg-gray-50 active:scale-[0.98] transition-transform"
-                >
-                  {abcd[idx]}. {opt.t}
-                </button>
-              );
-            })}
-          </div>
-        </motion.div>
+            <div className="w-full flex flex-col gap-4">
+              {currentQ.opts.map((opt, idx) => {
+                const abcd = ['A', 'B', 'C', 'D'];
+                return (
+                  <button
+                    key={idx}
+                    onClick={() => handleOptionClick(idx)}
+                    className="w-full text-left bg-white border border-[#1a1a1a] p-4 rounded text-[#1a1a1a] shadow-sm font-medium leading-relaxed hover:bg-gray-50 active:scale-[0.98] transition-transform"
+                  >
+                    {abcd[idx]}. {opt.t}
+                  </button>
+                );
+              })}
+            </div>
+          </motion.div>
+        ) : (
+          <motion.div 
+            key="submit"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="w-full flex flex-col items-center justify-center py-20 gap-8"
+          >
+             <h2 className="text-2xl font-bold tracking-widest text-black">答题完成</h2>
+             <button 
+               onClick={() => useQuizStore.getState().setHasGenerated(true)} 
+               className="bg-black text-white px-8 py-4 font-bold tracking-widest shadow-[4px_4px_0px_rgba(0,0,0,0.2)] hover:bg-gray-800 transition-colors"
+             >
+               获取性格城市车票
+             </button>
+          </motion.div>
+        )}
       </AnimatePresence>
 
       <div className="mt-8 flex justify-between items-center w-full min-h-[24px]">

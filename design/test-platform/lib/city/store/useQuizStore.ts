@@ -21,6 +21,8 @@ interface QuizState {
   reset: () => void;
   setAnswers: (answers: number[]) => void;
   setCurrentStep: (step: number) => void;
+  hasGenerated: boolean;
+  setHasGenerated: (val: boolean) => void;
 }
 
 export const useQuizStore = create<QuizState>()(
@@ -32,13 +34,15 @@ export const useQuizStore = create<QuizState>()(
       answers: [],
       deviceId: null,
       historyStackCoords: [],
+      hasGenerated: false,
 
       startQuiz: () => set({ 
         hasStarted: true, 
         currentStep: 0, 
         userCoords: [5, 5, 0, 5, 5],
         answers: [],
-        historyStackCoords: [] 
+        historyStackCoords: [],
+        hasGenerated: false 
       }),
       
       nextStep: (coordsDelta, selectedOptIndex) => set((state) => {
@@ -69,10 +73,12 @@ export const useQuizStore = create<QuizState>()(
         currentStep: 0, 
         userCoords: [5, 5, 0, 5, 5], 
         answers: [], 
-        historyStackCoords: [] 
+        historyStackCoords: [],
+        hasGenerated: false
       }),
       setAnswers: (answers) => set({ answers }),
-      setCurrentStep: (step) => set({ currentStep: step, hasStarted: true })
+      setCurrentStep: (step) => set({ currentStep: step, hasStarted: true }),
+      setHasGenerated: (val) => set({ hasGenerated: val })
     }),
     {
       name: 'city-personality-storage',

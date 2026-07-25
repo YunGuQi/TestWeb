@@ -122,7 +122,7 @@ export default function App() {
                   <div className="flex flex-col items-center gap-2">
                       <div className="flex items-center justify-center gap-8 font-mono font-bold">
                           <button onClick={() => setShowHistory(true)} className="text-xs text-gray-600 hover:text-black transition-colors underline underline-offset-4">[ 查看历史消费单 ]</button>
-                          <a href="#" className="text-xs text-gray-600 hover:text-black transition-colors underline underline-offset-4">[ 探索其他专柜 ]</a>
+                          <a href="/" className="text-xs text-gray-600 hover:text-black transition-colors underline underline-offset-4">[ 探索其他专柜 ]</a>
                       </div>
                   </div>
               </div>

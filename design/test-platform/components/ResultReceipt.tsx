@@ -227,7 +227,7 @@ export default function ResultReceipt({ answers, onRestart }: ResultReceiptProps
                     </div>
                     <div className="flex flex-wrap justify-center gap-2 mb-6" id="res-tags">
                         {result.tags.split(',').map(tag => (
-                          <span key={tag} className="text-xs font-bold border border-black px-2 py-1 bg-white">{tag}</span>
+                          <span key={tag} className="text-[10px] bg-black text-white px-2 py-1 font-bold">{tag}</span>
                         ))}
                     </div>
                     <div className="border-b-2 border-dashed border-gray-400 mb-6"></div>
@@ -249,11 +249,11 @@ export default function ResultReceipt({ answers, onRestart }: ResultReceiptProps
                               <div className="text-[10px] text-gray-500 mb-2">ITEM ................................. AMOUNT</div>
                               <div id="details-list" className="flex flex-col gap-3">
                                 {Object.values(answers).map((opt: any, i) => {
-                                  if (!opt || !opt.billName) return null;
-                                  const cost = (opt.senScore || 0)*300 + (opt.rumScore || 0)*250 + (opt.plsScore || 0)*280;
+                                  if (!opt || !opt.scores?.billName) return null;
+                                  const cost = (opt.scores.sen || 0)*300 + (opt.scores.rum || 0)*250 + (opt.scores.pls || 0)*280;
                                   if (cost === 0) return null;
                                   return (
-                                    <div key={i} className="flex justify-between items-center"><span className="truncate pr-2">{opt.billName}</span><span className="shrink-0">¥ {cost.toLocaleString()}</span></div>
+                                    <div key={i} className="flex justify-between items-center"><span className="truncate pr-2">{opt.scores.billName}</span><span className="shrink-0">¥ {cost.toLocaleString()}</span></div>
                                   )
                                 })}
                                 {Object.values(answers).length === 0 && <div className="text-xs text-gray-500 italic">暂无消费记录</div>}
@@ -357,7 +357,7 @@ export default function ResultReceipt({ answers, onRestart }: ResultReceiptProps
             </button>
             <div className="flex justify-center gap-6 mt-1 mb-2 font-mono font-bold w-full max-w-[340px] mx-auto">
                 <button onClick={onRestart} id="btn-restart" className="text-xs text-gray-400 hover:text-white underline underline-offset-4 decoration-gray-700 transition-colors">[ 重新打印 ]</button>
-                <a href="#" className="text-xs text-gray-400 hover:text-white underline underline-offset-4 decoration-gray-700 transition-colors">[ 查看更多专柜 ]</a>
+                <a href="/" className="text-xs text-gray-400 hover:text-white underline underline-offset-4 decoration-gray-700 transition-colors">[ 查看更多专柜 ]</a>
             </div>
         </div>
         
