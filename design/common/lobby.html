@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>探索大厅 - 心理测试</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      background-color: #09090b; 
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      overflow-x: hidden;
+    }
+    
+    .glass-card {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+    }
+    
+    .glowing-tag {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      box-shadow: inset 0 0 8px rgba(255, 255, 255, 0.05), 0 0 10px rgba(255, 255, 255, 0.05);
+    }
+
+    @keyframes pulse-slow {
+      0%, 100% { opacity: 0.4; transform: scale(1); }
+      50% { opacity: 0.6; transform: scale(1.05); }
+    }
+    .aurora-orb {
+      animation: pulse-slow 8s infinite ease-in-out;
+    }
+
+    /* 动态抽象几何体 - 专属动画 */
+    @keyframes spin-slow {
+      100% { transform: rotate(360deg); }
+    }
+    .animate-spin-slow {
+      animation: spin-slow 12s linear infinite;
+    }
+    
+    @keyframes spin-reverse-slow {
+      100% { transform: rotate(-360deg); }
+    }
+    .animate-spin-reverse-slow {
+      animation: spin-reverse-slow 8s linear infinite;
+    }
+
+    @keyframes dash-flow {
+      to { stroke-dashoffset: -50; }
+    }
+    .animate-dash {
+      animation: dash-flow 4s linear infinite;
+    }
+    
+    @keyframes ping-soft {
+      75%, 100% { transform: scale(1.5); opacity: 0; }
+    }
+    .animate-ping-soft {
+      animation: ping-soft 2s cubic-bezier(0, 0, 0.2, 1) infinite;
+    }
+  </style>
+</head>
+<body class="text-white min-h-screen relative">
+
+  <!-- ==========================================
+       BACKGROUND: 全息极光网格 (Aurora Mesh)
+       ========================================== -->
+  <div class="fixed inset-0 z-0 overflow-hidden pointer-events-none">
+    <div class="aurora-orb absolute -top-20 -left-20 w-96 h-96 bg-purple-600/30 rounded-full blur-[100px]"></div>
+    <div class="aurora-orb absolute top-1/3 -right-32 w-[30rem] h-[30rem] bg-indigo-600/30 rounded-full blur-[120px]" style="animation-delay: 2s;"></div>
+    <div class="aurora-orb absolute -bottom-20 -left-10 w-80 h-80 bg-rose-600/20 rounded-full blur-[90px]" style="animation-delay: 4s;"></div>
+  </div>
+
+
+  <!-- ==========================================
+       MAIN CONTENT: 卡片列表
+       ========================================== -->
+  <div class="relative z-10 pb-24 px-4 pt-10 max-w-md mx-auto">
+    
+    <div class="mb-10 text-center">
+      <h2 class="text-2xl font-black tracking-widest bg-clip-text text-transparent bg-gradient-to-r from-blue-300 via-purple-300 to-rose-300">EXPLORE</h2>
+      <p class="text-xs text-gray-400 mt-2 tracking-widest uppercase">探索更多心理深潜</p>
+    </div>
+
+    <div class="space-y-6">
+      
+      <!-- Card 1: 深度情绪内耗测试 -->
+      <a href="https://xjlin.qzz.io/common/emotional-friction-test/prototype.html" target="_top" class="block group overflow-hidden rounded-3xl p-5 glass-card hover:bg-white/10 transition-all duration-300 hover:scale-[1.02]">
+        <div class="flex gap-4">
+          <div class="w-24 h-24 shrink-0 rounded-[1.25rem] bg-gradient-to-br from-[#1E1B4B] to-[#312E81] flex items-center justify-center relative shadow-[0_8px_16px_rgba(49,46,129,0.4)] overflow-hidden border border-indigo-500/30">
+            <svg class="w-16 h-16 text-indigo-300 absolute animate-spin-slow" viewBox="0 0 100 100" fill="none">
+              <circle cx="50" cy="50" r="42" stroke="currentColor" stroke-width="1.5" stroke-dasharray="10 15" class="opacity-60 animate-dash" />
+            </svg>
+            <svg class="w-10 h-10 text-purple-400 absolute animate-spin-reverse-slow" viewBox="0 0 100 100" fill="none">
+              <circle cx="50" cy="50" r="40" stroke="currentColor" stroke-width="2" stroke-dasharray="20 10" class="opacity-80" />
+            </svg>
+            <div class="w-2 h-2 bg-white rounded-full animate-pulse shadow-[0_0_10px_#fff]"></div>
+            <div class="absolute top-0 right-0 bg-gradient-to-r from-orange-500 to-red-500 text-white text-[9px] font-bold px-2 py-0.5 rounded-bl-lg shadow-lg">🔥 HOT</div>
+          </div>
+          <div class="flex-1">
+            <h3 class="font-bold text-base mb-1.5 text-white/95 tracking-wide">深度情绪内耗测试</h3>
+            <p class="text-xs text-white/60 leading-relaxed line-clamp-2 mb-3">定位你的情绪黑洞。基于认知行为学，深度拆解你的防御机制，告别精神内耗。</p>
+            <div class="flex flex-wrap items-center gap-2 text-[10px] text-white/80">
+              <div class="glowing-tag rounded-full px-2 py-1 flex items-center gap-1">✨ 钝感力</div>
+              <div class="glowing-tag rounded-full px-2 py-1 flex items-center gap-1">🔮 反刍指数</div>
+            </div>
+          </div>
+        </div>
+        <div class="mt-4 border-t border-white/10 pt-3 flex justify-between items-center text-xs">
+          <span class="text-white/40 font-mono">120K+ Users</span>
+          <span class="bg-white/10 text-white/90 px-4 py-1.5 rounded-full font-bold group-hover:bg-white/20 transition">Start →</span>
+        </div>
+      </a>
+
+      <!-- Card 2: 恋爱物种测试 -->
+      <a href="https://xjlin.qzz.io/common/love-species-test/prototype.html" target="_top" class="block group overflow-hidden rounded-3xl p-5 glass-card hover:bg-white/10 transition-all duration-300 hover:scale-[1.02]">
+        <div class="flex gap-4">
+          <div class="w-24 h-24 shrink-0 rounded-[1.25rem] bg-gradient-to-br from-[#4C1D95] to-[#701A75] flex items-center justify-center relative shadow-[0_8px_16px_rgba(112,26,117,0.4)] overflow-hidden border border-fuchsia-500/30">
+            <div class="relative w-14 h-14">
+              <div class="absolute inset-0 border-[1.5px] border-pink-300/80 rounded-full translate-x-3 shadow-[0_0_8px_rgba(244,114,182,0.5)]"></div>
+              <div class="absolute inset-0 border-[1.5px] border-rose-300/80 rounded-full -translate-x-3 shadow-[0_0_8px_rgba(251,113,133,0.5)] animate-pulse" style="animation-duration: 3s;"></div>
+              <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3 h-3 bg-white/90 rounded-full blur-[2px]"></div>
+            </div>
+            <div class="absolute top-0 right-0 bg-gradient-to-r from-yellow-400 to-amber-500 text-amber-900 text-[9px] font-bold px-2 py-0.5 rounded-bl-lg shadow-lg">NEW</div>
+          </div>
+          <div class="flex-1">
+            <h3 class="font-bold text-base mb-1.5 text-white/95 tracking-wide">恋爱物种测试</h3>
+            <p class="text-xs text-white/60 leading-relaxed line-clamp-2 mb-3">揭秘你的亲密关系底色，看看你在爱情里到底是什么动物，找到你的天命伴侣。</p>
+            <div class="flex flex-wrap items-center gap-2 text-[10px] text-white/80">
+              <div class="glowing-tag rounded-full px-2 py-1 flex items-center gap-1">🔗 依赖感</div>
+              <div class="glowing-tag rounded-full px-2 py-1 flex items-center gap-1">🛡️ 边界</div>
+            </div>
+          </div>
+        </div>
+        <div class="mt-4 border-t border-white/10 pt-3 flex justify-between items-center text-xs">
+          <span class="text-white/40 font-mono">89K+ Users</span>
+          <span class="bg-white/10 text-white/90 px-4 py-1.5 rounded-full font-bold group-hover:bg-white/20 transition">Start →</span>
+        </div>
+      </a>
+
+      <!-- Card 3: 依恋类型使用说明书 -->
+      <a href="https://xjlin.qzz.io/common/attachment-manual-test/prototype.html" target="_top" class="block group overflow-hidden rounded-3xl p-5 glass-card hover:bg-white/10 transition-all duration-300 hover:scale-[1.02]">
+        <div class="flex gap-4">
+          <div class="w-24 h-24 shrink-0 rounded-[1.25rem] bg-gradient-to-br from-[#9D174D] to-[#BE185D] flex items-center justify-center relative shadow-[0_8px_16px_rgba(190,24,93,0.4)] overflow-hidden border border-pink-500/30">
+            <svg class="w-14 h-14 text-pink-200" viewBox="0 0 100 100" fill="none">
+              <circle cx="35" cy="50" r="25" stroke="currentColor" stroke-width="2" class="opacity-80 animate-pulse" />
+              <circle cx="65" cy="50" r="25" stroke="currentColor" stroke-width="2" class="opacity-80 animate-pulse" style="animation-delay: 1s;" />
+              <path d="M 50 30 Q 50 50 50 70" stroke="currentColor" stroke-width="2" class="opacity-50" />
+            </svg>
+          </div>
+          <div class="flex-1">
+            <h3 class="font-bold text-base mb-1.5 text-white/95 tracking-wide">依恋类型使用说明书</h3>
+            <p class="text-xs text-white/60 leading-relaxed line-clamp-2 mb-3">深度剖析你的安全感来源。你是焦虑型还是回避型？获取专属依恋自救指南。</p>
+            <div class="flex flex-wrap items-center gap-2 text-[10px] text-white/80">
+              <div class="glowing-tag rounded-full px-2 py-1 flex items-center gap-1">🧲 安全感</div>
+              <div class="glowing-tag rounded-full px-2 py-1 flex items-center gap-1">🫂 亲密度</div>
+            </div>
+          </div>
+        </div>
+        <div class="mt-4 border-t border-white/10 pt-3 flex justify-between items-center text-xs">
+          <span class="text-white/40 font-mono">152K+ Users</span>
+          <span class="bg-white/10 text-white/90 px-4 py-1.5 rounded-full font-bold group-hover:bg-white/20 transition">Start →</span>
+        </div>
+      </a>
+
+      <!-- Card 4: 隐藏欲望测试 -->
+      <a href="https://xjlin.qzz.io/common/hidden-desires-test/prototype.html" target="_top" class="block group overflow-hidden rounded-3xl p-5 glass-card hover:bg-white/10 transition-all duration-300 hover:scale-[1.02]">
+        <div class="flex gap-4">
+          <div class="w-24 h-24 shrink-0 rounded-[1.25rem] bg-gradient-to-br from-[#18181B] to-[#27272A] flex items-center justify-center relative shadow-[0_8px_16px_rgba(39,39,42,0.4)] overflow-hidden border border-zinc-500/30">
+            <svg class="w-14 h-14 text-zinc-300" viewBox="0 0 100 100" fill="none">
+              <polygon points="50,15 90,80 10,80" stroke="currentColor" stroke-width="1.5" class="opacity-40 animate-ping-soft" />
+              <polygon points="50,25 80,75 20,75" stroke="currentColor" stroke-width="2" class="opacity-60" />
+              <polygon points="50,40 65,65 35,65" stroke="currentColor" stroke-width="2" fill="currentColor" class="opacity-90 animate-pulse" />
+            </svg>
+          </div>
+          <div class="flex-1">
+            <h3 class="font-bold text-base mb-1.5 text-white/95 tracking-wide">隐藏欲望潜意识测算</h3>
+            <p class="text-xs text-white/60 leading-relaxed line-clamp-2 mb-3">直面潜意识深处的贪婪与恐惧。你真正渴望的，也许连你自己都不知道。</p>
+            <div class="flex flex-wrap items-center gap-2 text-[10px] text-white/80">
+              <div class="glowing-tag rounded-full px-2 py-1 flex items-center gap-1">👁️ 潜意识</div>
+              <div class="glowing-tag rounded-full px-2 py-1 flex items-center gap-1">🔥 掌控欲</div>
+            </div>
+          </div>
+        </div>
+        <div class="mt-4 border-t border-white/10 pt-3 flex justify-between items-center text-xs">
+          <span class="text-white/40 font-mono">203K+ Users</span>
+          <span class="bg-white/10 text-white/90 px-4 py-1.5 rounded-full font-bold group-hover:bg-white/20 transition">Start →</span>
+        </div>
+      </a>
+
+      <!-- Card 5: 性格城市匹配测试 -->
+      <a href="https://xjlin.qzz.io/common/city-personality-test/prototype.html" target="_top" class="block group overflow-hidden rounded-3xl p-5 glass-card hover:bg-white/10 transition-all duration-300 hover:scale-[1.02]">
+        <div class="flex gap-4">
+          <div class="w-24 h-24 shrink-0 rounded-[1.25rem] bg-gradient-to-br from-[#064E3B] to-[#065F46] flex items-center justify-center relative shadow-[0_8px_16px_rgba(6,95,70,0.4)] overflow-hidden border border-teal-500/30">
+            <svg class="w-14 h-14 text-teal-200" viewBox="0 0 100 100" fill="none">
+              <path d="M10 50 L90 50 M50 10 L50 90 M20 20 L80 80 M20 80 L80 20" stroke="currentColor" stroke-width="0.5" class="opacity-30" />
+              <circle cx="50" cy="50" r="4" fill="currentColor" class="shadow-[0_0_10px_currentColor]" />
+              <circle cx="20" cy="20" r="3" fill="currentColor" class="opacity-80" />
+              <circle cx="80" cy="20" r="2.5" fill="currentColor" class="opacity-60" />
+              <circle cx="20" cy="80" r="2" fill="currentColor" class="opacity-50" />
+              <circle cx="80" cy="80" r="3.5" fill="currentColor" class="opacity-90" />
+              <circle cx="50" cy="50" r="10" stroke="currentColor" stroke-width="1" class="animate-ping-soft" />
+            </svg>
+          </div>
+          <div class="flex-1">
+            <h3 class="font-bold text-base mb-1.5 text-white/95 tracking-wide">性格城市匹配测试</h3>
+            <p class="text-xs text-white/60 leading-relaxed line-clamp-2 mb-3">测试你的精神老家在哪里。你的生活节奏最契合世界上哪一座城市？</p>
+            <div class="flex flex-wrap items-center gap-2 text-[10px] text-white/80">
+              <div class="glowing-tag rounded-full px-2 py-1 flex items-center gap-1">☕ 节奏感</div>
+              <div class="glowing-tag rounded-full px-2 py-1 flex items-center gap-1">👥 社交度</div>
+            </div>
+          </div>
+        </div>
+        <div class="mt-4 border-t border-white/10 pt-3 flex justify-between items-center text-xs">
+          <span class="text-white/40 font-mono">214K+ Users</span>
+          <span class="bg-white/10 text-white/90 px-4 py-1.5 rounded-full font-bold group-hover:bg-white/20 transition">Start →</span>
+        </div>
+      </a>
+
+      <!-- Card 6: 五行城市测试 -->
+      <a href="https://xjlin.qzz.io/common/five-elements-city-test/prototype.html" target="_top" class="block group overflow-hidden rounded-3xl p-5 glass-card hover:bg-white/10 transition-all duration-300 hover:scale-[1.02]">
+        <div class="flex gap-4">
+          <div class="w-24 h-24 shrink-0 rounded-[1.25rem] bg-gradient-to-br from-[#B45309] to-[#D97706] flex items-center justify-center relative shadow-[0_8px_16px_rgba(217,119,6,0.4)] overflow-hidden border border-amber-500/30">
+            <svg class="w-14 h-14 text-amber-200 animate-spin-slow" viewBox="0 0 100 100" fill="none">
+              <polygon points="50,10 90,38 75,85 25,85 10,38" stroke="currentColor" stroke-width="1.5" class="opacity-60" />
+              <circle cx="50" cy="10" r="4" fill="currentColor" class="shadow-[0_0_8px_#FCD34D]" />
+              <circle cx="90" cy="38" r="4" fill="currentColor" class="shadow-[0_0_8px_#FCD34D]" />
+              <circle cx="75" cy="85" r="4" fill="currentColor" class="shadow-[0_0_8px_#FCD34D]" />
+              <circle cx="25" cy="85" r="4" fill="currentColor" class="shadow-[0_0_8px_#FCD34D]" />
+              <circle cx="10" cy="38" r="4" fill="currentColor" class="shadow-[0_0_8px_#FCD34D]" />
+            </svg>
+          </div>
+          <div class="flex-1">
+            <h3 class="font-bold text-base mb-1.5 text-white/95 tracking-wide">五行命理城市风水局</h3>
+            <p class="text-xs text-white/60 leading-relaxed line-clamp-2 mb-3">金木水火土，测算你命格最旺盛的方向。用东方玄学找到你的风水宝地。</p>
+            <div class="flex flex-wrap items-center gap-2 text-[10px] text-white/80">
+              <div class="glowing-tag rounded-full px-2 py-1 flex items-center gap-1">☯️ 五行</div>
+              <div class="glowing-tag rounded-full px-2 py-1 flex items-center gap-1">🧭 方位</div>
+            </div>
+          </div>
+        </div>
+        <div class="mt-4 border-t border-white/10 pt-3 flex justify-between items-center text-xs">
+          <span class="text-white/40 font-mono">98K+ Users</span>
+          <span class="bg-white/10 text-white/90 px-4 py-1.5 rounded-full font-bold group-hover:bg-white/20 transition">Start →</span>
+        </div>
+      </a>
+
+      <!-- Card 7: 城市羁绊测试 -->
+      <a href="https://xjlin.qzz.io/common/city-matching-test/prototype.html" target="_top" class="block group overflow-hidden rounded-3xl p-5 glass-card hover:bg-white/10 transition-all duration-300 hover:scale-[1.02]">
+        <div class="flex gap-4">
+          <div class="w-24 h-24 shrink-0 rounded-[1.25rem] bg-gradient-to-br from-[#0F766E] to-[#0D9488] flex items-center justify-center relative shadow-[0_8px_16px_rgba(13,148,136,0.4)] overflow-hidden border border-teal-500/30">
+            <svg class="w-14 h-14 text-teal-200 animate-spin-reverse-slow" viewBox="0 0 100 100" fill="none">
+              <circle cx="50" cy="50" r="40" stroke="currentColor" stroke-width="1" class="opacity-50" />
+              <ellipse cx="50" cy="50" rx="40" ry="15" stroke="currentColor" stroke-width="1" class="opacity-50" />
+              <ellipse cx="50" cy="50" rx="15" ry="40" stroke="currentColor" stroke-width="1" class="opacity-50" />
+              <circle cx="50" cy="50" r="3" fill="#fff" class="shadow-[0_0_10px_#fff] animate-pulse" />
+            </svg>
+          </div>
+          <div class="flex-1">
+            <h3 class="font-bold text-base mb-1.5 text-white/95 tracking-wide">全球旅居倾向测试</h3>
+            <p class="text-xs text-white/60 leading-relaxed line-clamp-2 mb-3">如果不用工作，你该去哪里流浪？测算你灵魂最深处的数字游民坐标。</p>
+            <div class="flex flex-wrap items-center gap-2 text-[10px] text-white/80">
+              <div class="glowing-tag rounded-full px-2 py-1 flex items-center gap-1">🌍 探索域</div>
+              <div class="glowing-tag rounded-full px-2 py-1 flex items-center gap-1">✈️ 自由度</div>
+            </div>
+          </div>
+        </div>
+        <div class="mt-4 border-t border-white/10 pt-3 flex justify-between items-center text-xs">
+          <span class="text-white/40 font-mono">67K+ Users</span>
+          <span class="bg-white/10 text-white/90 px-4 py-1.5 rounded-full font-bold group-hover:bg-white/20 transition">Start →</span>
+        </div>
+      </a>
+
+      <!-- Card 8: MBTI 水晶人格 -->
+      <a href="https://xjlin.qzz.io/common/mbti-crystal-test/prototype.html" target="_top" class="block group overflow-hidden rounded-3xl p-5 glass-card hover:bg-white/10 transition-all duration-300 hover:scale-[1.02]">
+        <div class="flex gap-4">
+          <div class="w-24 h-24 shrink-0 rounded-[1.25rem] bg-gradient-to-br from-[#082F49] to-[#0C4A6E] flex items-center justify-center relative shadow-[0_8px_16px_rgba(12,74,110,0.4)] overflow-hidden border border-sky-500/30">
+            <svg class="w-14 h-14 text-sky-300 animate-pulse" style="animation-duration: 4s;" viewBox="0 0 100 100" fill="none">
+              <polygon points="50,5 95,45 50,95 5,45" stroke="currentColor" stroke-width="1" fill="currentColor" class="opacity-10" />
+              <polygon points="50,5 95,45 50,95 5,45" stroke="currentColor" stroke-width="1.5" class="opacity-80" />
+              <polygon points="50,5 75,45 50,95 25,45" stroke="currentColor" stroke-width="1" class="opacity-50" />
+              <line x1="5" y1="45" x2="95" y2="45" stroke="currentColor" stroke-width="1.5" class="opacity-60" />
+              <circle cx="50" cy="45" r="4" fill="#fff" class="shadow-[0_0_15px_#fff]" />
+            </svg>
+          </div>
+          <div class="flex-1">
+            <h3 class="font-bold text-base mb-1.5 text-white/95 tracking-wide">MBTI 水晶人格</h3>
+            <p class="text-xs text-white/60 leading-relaxed line-clamp-2 mb-3">你是哪种稀缺的自然宝石？发掘你独一无二的性格能量场与共鸣原石。</p>
+            <div class="flex flex-wrap items-center gap-2 text-[10px] text-white/80">
+              <div class="glowing-tag rounded-full px-2 py-1 flex items-center gap-1">💫 能量场</div>
+              <div class="glowing-tag rounded-full px-2 py-1 flex items-center gap-1">⚖️ 秩序感</div>
+            </div>
+          </div>
+        </div>
+        <div class="mt-4 border-t border-white/10 pt-3 flex justify-between items-center text-xs">
+          <span class="text-white/40 font-mono">45K+ Users</span>
+          <span class="bg-white/10 text-white/90 px-4 py-1.5 rounded-full font-bold group-hover:bg-white/20 transition">Start →</span>
+        </div>
+      </a>
+
+    </div>
+
+    <!-- Bottom text -->
+    <div class="mt-12 text-center flex items-center justify-center gap-3 opacity-30">
+      <div class="h-[1px] w-8 bg-white"></div>
+      <span class="text-[10px] tracking-widest uppercase">到底啦</span>
+      <div class="h-[1px] w-8 bg-white"></div>
+    </div>
+
+  </div>
+
+</body>
+</html>
