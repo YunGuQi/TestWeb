@@ -40,7 +40,7 @@
 
 /* Background Layers */
 .bg-layer {
-  position: fixed; inset: 0; z-index: -1; pointer-events: none;
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
 }
 .bg-barcode {
   background-image: repeating-linear-gradient(90deg, 
@@ -57,7 +57,7 @@
 .laser-line {
   position: fixed; top: 0; left: 0; right: 0; height: 2px;
   background: #ff0000; box-shadow: 0 0 10px 2px rgba(255,0,0,0.5);
-  opacity: 0.3; z-index: -1; pointer-events: none;
+  opacity: 0.3; z-index: 0; pointer-events: none;
   animation: scan 4s ease-in-out infinite;
 }
 

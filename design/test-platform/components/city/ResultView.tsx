@@ -84,7 +84,7 @@ export default function ResultView() {
         <button className="text-gray-400 hover:text-black font-bold p-2 text-xl active:scale-90 transition-transform">&rsaquo;</button>
       </div>
 
-      <div ref={ticketRef} className="relative bg-[#fdfbf7] text-[#1a1a1a] w-full flex flex-col overflow-hidden pb-6 rounded shadow-[0_10px_40px_rgba(0,0,0,0.06)] border border-[#d1cdc1]">
+      <div ref={ticketRef} className="relative bg-[#fdfbf7] text-[#1a1a1a] w-[85%] max-w-[320px] mx-auto flex flex-col overflow-hidden pb-6 rounded shadow-[0_10px_40px_rgba(0,0,0,0.06)] border border-[#d1cdc1]">
         
         {!isUnlocked && <OrderOverlay testId="city-personality" onSuccess={() => setIsUnlocked(true)} />}
 

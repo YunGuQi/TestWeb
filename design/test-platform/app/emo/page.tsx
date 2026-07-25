@@ -12,6 +12,7 @@ export default function App() {
   const [historyRecords, setHistoryRecords] = useState<any[]>([]);
 
   const [isEntering, setIsEntering] = useState(false);
+  const [queueCount, setQueueCount] = useState(42);
 
   useEffect(() => {
     // 初始化唯一设备 ID（首次生成后持久保存）
@@ -23,6 +24,12 @@ export default function App() {
       const saved = JSON.parse(localStorage.getItem('quiz_history_emotional') || '[]');
       setHistoryRecords(saved);
     } catch (e) {}
+
+    const intervalId = setInterval(() => {
+      setQueueCount(Math.floor(Math.random() * 101));
+    }, 5000);
+
+    return () => clearInterval(intervalId);
   }, []);
 
   const handleFinishTest = (finalAnswers: Record<string, any>) => {
@@ -109,7 +116,7 @@ export default function App() {
                   
                   <div className="flex items-center justify-center gap-2 text-[10px] text-black/60 font-mono font-bold mb-8 mx-auto px-4 select-none">
                       <div className="w-1 h-1 bg-green-500 rounded-full animate-pulse"></div>
-                      当前排队结账人数：<span>12,543</span> 人
+                      当前排队结账人数：<span>{queueCount}</span> 人
                   </div>
                   
                   <div className="flex flex-col items-center gap-2">

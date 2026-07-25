@@ -13,11 +13,17 @@ export default function LandingPage() {
   const [historyRecords, setHistoryRecords] = useState<any[]>([]);
 
   useEffect(() => {
-    setOnlineCount(1400 + Math.floor(Math.random() * 500));
+    setOnlineCount(Math.floor(Math.random() * 101));
+    const intervalId = setInterval(() => {
+      setOnlineCount(Math.floor(Math.random() * 101));
+    }, 5000);
+    
     try {
       const saved = JSON.parse(localStorage.getItem('quiz_history_city') || '[]');
       setHistoryRecords(saved);
     } catch (e) {}
+    
+    return () => clearInterval(intervalId);
   }, []);
 
   return (
