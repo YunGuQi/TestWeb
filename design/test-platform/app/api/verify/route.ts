@@ -23,10 +23,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, error: '该激活码已被禁用' });
     }
 
-    // CODE-JIE is a master code that bypasses device binding limits entirely
-    if (code === 'CODE-JIE') {
-      return NextResponse.json({ success: true, message: '万能测试码通过' });
-    }
+
 
     let devices: string[] = [];
     try {
