@@ -13,6 +13,11 @@ export default function App() {
   const [historyRecords, setHistoryRecords] = useState<any[]>([]);
 
   useEffect(() => {
+    // 初始化唯一设备 ID（首次生成后持久保存）
+    if (!localStorage.getItem('deviceId')) {
+      const newId = 'dev-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8);
+      localStorage.setItem('deviceId', newId);
+    }
     try {
       const saved = JSON.parse(localStorage.getItem('quiz_history_emotional') || '[]');
       setHistoryRecords(saved);
