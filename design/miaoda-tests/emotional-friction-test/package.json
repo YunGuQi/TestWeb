@@ -26,6 +26,6 @@
   "devDependencies": {
     "eslint": "latest",
     "eslint-config-next": "latest",
-    "typescript": "7.0.2"
+    "typescript": "^5.0.0"
   }
 }
