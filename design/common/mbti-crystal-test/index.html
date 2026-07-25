@@ -1,0 +1,917 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>平行宇宙航线测算 / 灵魂航班</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@700&display=swap');
+        
+        :root {
+            --bg-dark: #09090b;
+            --bg-space: #1e1b4b;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --accent-cyan: #00ffd1;
+            --accent-purple: #b829ff;
+            --accent-pink: #ff0055;
+            
+            --card-bg: rgba(30, 41, 59, 0.6);
+            --card-border: rgba(148, 163, 184, 0.1);
+            
+            --radius-xl: 24px;
+            --radius-lg: 16px;
+            --radius-md: 12px;
+            --radius-sm: 8px;
+            
+            --ease-spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            --ease-smooth: cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        ::-webkit-scrollbar { display: none; }
+        html, body { scrollbar-width: none; -ms-overflow-style: none; }
+        body { 
+            background-color: var(--bg-dark); 
+            color: var(--text-primary); 
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            min-height: 100vh; 
+            overflow-x: hidden; 
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        .bg-ambient {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
+            background: radial-gradient(circle at 50% 0%, #2e1065 0%, #09090b 80%);
+            pointer-events: none;
+        }
+        .bg-ambient::after {
+            content: ''; position: absolute; top:0; left:0; width:100%; height:100%;
+            background-image: url('data:image/svg+xml,%3Csvg width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"%3E%3Ccircle cx="2" cy="2" r="1" fill="rgba(255,255,255,0.05)"/%3E%3C/svg%3E');
+        }
+
+        .app-container { width: 100%; max-width: 480px; margin: 0 auto; min-height: 100vh; position: relative; padding: 24px; overflow-x: hidden; display: flex; flex-direction: column; }
+
+        .view { display: none; width: 100%; flex-grow: 1; animation: slideIn 0.5s var(--ease-spring) forwards; opacity: 0; transform: translateY(20px); }
+        .view.active { display: flex; flex-direction: column; align-items: center; justify-content: center; opacity: 1; transform: translateY(0); }
+        
+        @keyframes slideIn { 
+            0% { opacity: 0; transform: translateY(30px); } 
+            100% { opacity: 1; transform: translateY(0); } 
+        }
+
+        .title-main { font-size: 38px; font-weight: 900; letter-spacing: -1px; text-align: center; margin-bottom: 8px; color: #fff; line-height: 1.2; text-shadow: 0 0 20px rgba(0, 255, 209, 0.4); }
+        .title-sub { font-family: 'JetBrains Mono', monospace; font-size: 14px; color: var(--accent-cyan); text-align: center; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 40px; }
+        
+        .btn-primary {
+            width: 100%; padding: 20px; 
+            background: linear-gradient(135deg, var(--accent-purple), var(--accent-cyan)); 
+            border: none; 
+            color: #FFFFFF;
+            font-size: 18px; font-weight: 800; letter-spacing: 1px; 
+            cursor: pointer; position: relative; overflow: hidden;
+            transition: all 0.3s var(--ease-spring); margin-top: 24px; 
+            border-radius: var(--radius-lg);
+            box-shadow: 0 10px 30px rgba(184, 41, 255, 0.3);
+            text-transform: uppercase;
+        }
+        .btn-primary:active { transform: scale(0.94); box-shadow: 0 4px 10px rgba(184, 41, 255, 0.2); }
+        .btn-primary::before {
+            content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            animation: shine 3s infinite;
+        }
+        @keyframes shine { 0% { left: -100%; } 20% { left: 100%; } 100% { left: 100%; } }
+
+        .btn-text { background: none; border: none; color: var(--text-secondary); font-size: 15px; margin-top: 24px; cursor: pointer; padding: 10px; font-weight: 600; transition: color 0.2s; }
+        .btn-text:active { color: #fff; }
+
+        .progress-bar { width: 100%; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; margin-bottom: 40px; position: relative; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--accent-cyan); width: 0%; transition: width 0.6s var(--ease-spring); border-radius: 2px; box-shadow: 0 0 10px var(--accent-cyan);}
+        .progress-text { position: absolute; right: 0; top: -28px; font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 700; color: var(--accent-cyan); letter-spacing: 1px; }
+        
+        .question-box { width: 100%; flex-grow: 1; display: flex; flex-direction: column; justify-content: center; margin-bottom: 40px;}
+        .q-title { font-size: 24px; font-weight: 700; line-height: 1.4; margin-bottom: 40px; color: #fff; letter-spacing: 0; }
+        
+        .option-btn {
+            width: 100%; padding: 20px; margin-bottom: 16px; 
+            background: var(--card-bg);
+            border: 1px solid var(--card-border); 
+            color: var(--text-primary); text-align: left; 
+            font-size: 16px; font-weight: 500; line-height: 1.5; 
+            border-radius: var(--radius-md);
+            transition: all 0.3s var(--ease-spring);
+            backdrop-filter: blur(10px);
+        }
+        .option-btn:active { background: rgba(255,255,255,0.1); border-color: var(--accent-cyan); transform: scale(0.96) translateY(2px); color: var(--accent-cyan); box-shadow: inset 0 0 20px rgba(0,255,209,0.1); }
+
+        .back-btn { align-self: flex-start; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: var(--text-secondary); font-size: 14px; font-weight: 600; margin-bottom: 24px; cursor: pointer; padding: 8px 16px; border-radius: 99px; transition: all 0.2s; backdrop-filter: blur(5px);}
+        .back-btn:active { transform: scale(0.9); color:#fff;}
+
+        /* Boarding Pass Result Card */
+        #capture-wrapper { width: 100%; padding: 20px 0; position: relative; display: flex; justify-content: center; }
+        
+        .result-card {
+            width: 100%;
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            position: relative;
+            overflow: hidden;
+            color: #0f172a;
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            flex-direction: column;
+            --theme-light1: #f8fafc;
+            --theme-light2: #e2e8f0;
+            --theme-dark: #b829ff;
+        }
+        
+        /* Boarding pass cutouts */
+        .result-card::before, .result-card::after {
+            content: ''; position: absolute; width: 32px; height: 32px; background: var(--bg-dark); border-radius: 50%; top: 120px; z-index: 10; box-shadow: inset 0 4px 10px rgba(0,0,0,0.5);
+        }
+        .result-card::before { left: -16px; }
+        .result-card::after { right: -16px; }
+        
+        .rc-top { padding: 32px 32px 24px; background: linear-gradient(135deg, var(--theme-light1), var(--theme-light2)); border-bottom: 2px dashed #cbd5e1; position: relative;}
+        .rc-airline { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+        .rc-logo { font-weight: 900; font-size: 18px; letter-spacing: -0.5px; color: #334155; }
+        .rc-barcode { font-family: 'JetBrains Mono', monospace; font-size: 24px; letter-spacing: -2px; color: #0f172a; opacity: 0.6; }
+        
+        .rc-route { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .route-code { font-size: 36px; font-weight: 900; color: #0f172a; }
+        .route-plane { font-size: 24px; color: var(--theme-dark); transform: rotate(45deg); opacity: 0.8;}
+        
+        .rc-places { display: flex; justify-content: space-between; font-size: 13px; font-weight: 700; color: #64748b; text-transform: uppercase;}
+        
+        .rc-mid { padding: 32px; background: #ffffff; flex-grow: 1; }
+        .rc-passenger { margin-bottom: 24px; }
+        .rc-label { font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 1px; }
+        .rc-name { font-size: 22px; font-weight: 800; color: #0f172a; letter-spacing: -0.5px; }
+        .rc-mbti { font-family: 'JetBrains Mono', monospace; color: var(--theme-dark); font-weight: 800; font-size: 18px; }
+
+        .rc-details { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+        .detail-val { font-size: 16px; font-weight: 800; color: #1e293b; }
+        
+        .rc-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 24px; width: 100%; justify-content: flex-start; }
+        .r-tag { padding: 5px 8px; background: #f1f5f9; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 11px; font-weight: 700; color: #475569; flex-shrink: 1; text-overflow: ellipsis; }
+        
+        /* Dimensions UI */
+        .rc-dims { margin-bottom: 24px; }
+        .dim-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+        .dim-text { font-size: 11px; font-weight: 800; color: #334155; width: 45px; }
+        .dim-text.right { text-align: right; }
+        .dim-bar-bg { flex-grow: 1; height: 6px; background: linear-gradient(90deg, rgba(184,41,255,0.1), rgba(0,255,209,0.15)); border-radius: 3px; margin: 0 8px; position: relative; overflow: hidden; }
+        .dim-fill { position: absolute; top: 0; left: 0; height: 100%; background: linear-gradient(90deg, var(--theme-dark), var(--accent-cyan)); border-radius: 3px; transition: width 0.8s var(--ease-spring), left 0.8s var(--ease-spring), right 0.8s var(--ease-spring); }
+        .dim-val { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #64748b; width: 30px; text-align: center; }
+
+        .rc-quote { font-style: normal; font-weight: 600; color: #334155; font-size: 12px; text-align: left; padding: 12px 14px; background: #f8fafc; border-radius: 8px; border-left: 3px solid var(--theme-dark); line-height: 1.6; letter-spacing: 0.5px; }
+
+        .rc-bottom { padding: 16px; background: #0f172a; color: #fff; text-align: center; font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 2px; }
+
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(9, 9, 11, 0.95); backdrop-filter: blur(10px);
+            z-index: 1000; display: none;
+            flex-direction: column; align-items: center; justify-content: center;
+        }
+        .modal-overlay.active { display: flex; animation: fadeIn 0.3s forwards; }
+        @keyframes fadeIn { from{opacity:0;} to{opacity:1;} }
+        .modal-tip { color: var(--accent-cyan); margin-bottom: 24px; font-size: 16px; font-weight: 700; letter-spacing: 1px; }
+        .result-img { max-width: 90%; max-height: 75vh; object-fit: contain; box-shadow: 0 20px 40px rgba(0,255,209,0.2); border-radius: 16px;}
+        .close-modal { background: #fff; color: #000; padding: 14px 40px; margin-top: 32px; border-radius: 99px; font-size: 16px; font-weight: 800; cursor: pointer; border: none; box-shadow: 0 8px 24px rgba(255,255,255,0.2);}
+        .close-modal:active { transform: scale(0.95); }
+
+        .history-drawer {
+            position: fixed; bottom: 0; left: 50%; transform: translateX(-50%) translateY(100%); width: 100%; max-width: 480px; height: 85%;
+            background: #1e293b; z-index: 999; display: flex;
+            flex-direction: column; padding: 40px 24px; border-top-left-radius: 24px; border-top-right-radius: 24px;
+            box-shadow: 0 -10px 40px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); border-bottom: none;
+            transition: transform 0.4s var(--ease-spring);
+        }
+        .history-drawer.active { transform: translateX(-50%) translateY(0); }
+        .history-title { color: #fff; font-size: 22px; font-weight: 800; margin-bottom: 24px; text-align: center; }
+        .history-list { flex-grow: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; padding-bottom: 40px;}
+        .history-item { background: #0f172a; padding: 16px; border-radius: var(--radius-md); border-left: 4px solid var(--accent-purple); transition: transform 0.2s; border: 1px solid rgba(255,255,255,0.05); border-left-width: 4px; }
+        .history-item:active { transform: scale(0.98); background: #1e1b4b; }
+        .h-time { font-size: 11px; color: #64748b; font-weight: 600; margin-bottom: 6px; font-family: 'JetBrains Mono', monospace;}
+        .h-result { font-size: 16px; color: #f8fafc; font-weight: 700; letter-spacing: -0.5px;}
+        .h-mbti { font-size: 13px; color: var(--accent-cyan); margin-top: 4px; font-weight: 700;}
+        
+        #dummy-matrix-container { display: none; }
+    </style>
+</head>
+<body>
+
+    <div class="bg-ambient"></div>
+    <div class="app-container">
+        
+        <div id="landing" class="view active">
+            <div style="font-size: 64px; margin-bottom: 24px; filter: drop-shadow(0 0 20px rgba(184, 41, 255, 0.5));">🎫</div>
+            <h1 class="title-main">平行宇宙<br>航线测算</h1>
+            <p class="title-sub">BOARDING PASS TO SOUL</p>
+            <p style="color:var(--text-secondary); font-size:16px; text-align:center; line-height:1.6; margin-bottom:48px; font-weight:500;">
+                抛开现实世界的引力<br>领取属于你精神频率的专属登机牌
+            </p>
+            <button class="btn-primary" onclick="startQuiz()">连接星际轨道</button>
+            <div style="display: flex; gap: 16px; width: 100%; justify-content: center; margin-top: 8px;">
+                <button class="btn-text" id="history-btn" onclick="openHistory()" style="display:none; margin-top: 0; padding: 10px 0;">查看过往航班记录</button>
+                <button class="btn-text" onclick="if(window.openMatrixModal) openMatrixModal()" style="margin-top: 0; padding: 10px 0; color: var(--accent-cyan);">🌟 探索更多航线测算</button>
+            </div>
+        </div>
+
+        <div id="quiz" class="view">
+            <button class="back-btn" onclick="prevQuestion()">← 取消操作</button>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress-fill"></div>
+                <div class="progress-text" id="progress-text">01/16</div>
+            </div>
+            <div class="question-box">
+                <p style="color:var(--accent-purple); font-weight:700; font-size:14px; margin-bottom:12px; letter-spacing: 1px;">[ 登机安检系统 ]</p>
+                <h2 class="q-title" id="q-title">Question</h2>
+                <div id="options-container"></div>
+            </div>
+        </div>
+
+        <div id="loading" class="view">
+            <div style="width: 80px; height: 80px; border-radius: 50%; border: 4px solid rgba(0, 255, 209, 0.2); border-top-color: var(--accent-cyan); animation: spin 1s linear infinite; margin-bottom: 32px;"></div>
+            <style>@keyframes spin { 100% { transform: rotate(360deg); } }</style>
+            <p style="color:#fff; font-size:18px; font-weight:800; font-family: 'JetBrains Mono', monospace; letter-spacing: 2px;" id="loading-text">正在打印登机牌...</p>
+        </div>
+
+        <div id="result" class="view" style="padding:0; justify-content:flex-start;">
+            <div id="capture-wrapper">
+                <div class="result-card">
+                    <div class="rc-top">
+                        <div class="rc-airline">
+                            <div class="rc-logo">INTERSTELLAR FLIGHT</div>
+                            <div class="rc-barcode">||||| || ||| | |||</div>
+                        </div>
+                        <div class="rc-route">
+                            <div class="route-code">EARTH</div>
+                            <div class="route-plane">✈</div>
+                            <div class="route-code" id="r-dest-code">XXXX</div>
+                        </div>
+                        <div class="rc-places">
+                            <div>始发: 现实地球</div>
+                            <div>目的: <span id="r-dest-name">未知星球</span></div>
+                        </div>
+                    </div>
+                    
+                    <div class="rc-mid">
+                        <div class="rc-passenger" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-items: flex-start;">
+                            <div>
+                                <div class="rc-label">乘客 PASSENGER</div>
+                                <div class="rc-name" id="r-name" style="margin-top: 4px;">时空旅人</div>
+                            </div>
+                            <div>
+                                <div class="rc-label">候机厅 TERMINAL</div>
+                                <div class="detail-val" id="r-faction-badge" style="margin-top: 4px; color: var(--theme-dark);">紫人专属厅 NT</div>
+                            </div>
+                        </div>
+                        
+                        <div class="rc-details">
+                            <div>
+                                <div class="rc-label">舱位 CLASS</div>
+                                <div class="detail-val" id="r-class">头等舱</div>
+                            </div>
+                            <div>
+                                <div class="rc-label">航班编号 FLIGHT NO.</div>
+                                <div class="detail-val" id="r-id" style="font-family: 'JetBrains Mono', monospace;">00000000</div>
+                            </div>
+                        </div>
+                        
+                        <div class="rc-label" style="margin-bottom:8px;">乘客性格扫描 PASSENGER TAGS</div>
+                        <div class="rc-tags" id="r-tags"></div>
+
+                        <div class="rc-dims" id="rc-dims" style="display:none;">
+                            <div class="rc-label">航线参数 DIMENSIONS</div>
+                            <div class="dim-row">
+                                <div class="dim-text">外向 E</div><div class="dim-val" id="val-E">0%</div>
+                                <div class="dim-bar-bg"><div class="dim-fill" id="bar-EI" style="width: 50%;"></div></div>
+                                <div class="dim-val" id="val-I">0%</div><div class="dim-text right">I 内向</div>
+                            </div>
+                            <div class="dim-row">
+                                <div class="dim-text">实感 S</div><div class="dim-val" id="val-S">0%</div>
+                                <div class="dim-bar-bg"><div class="dim-fill" id="bar-SN" style="width: 50%;"></div></div>
+                                <div class="dim-val" id="val-N">0%</div><div class="dim-text right">N 直觉</div>
+                            </div>
+                            <div class="dim-row">
+                                <div class="dim-text">思考 T</div><div class="dim-val" id="val-T">0%</div>
+                                <div class="dim-bar-bg"><div class="dim-fill" id="bar-TF" style="width: 50%;"></div></div>
+                                <div class="dim-val" id="val-F">0%</div><div class="dim-text right">F 情感</div>
+                            </div>
+                            <div class="dim-row">
+                                <div class="dim-text">计划 J</div><div class="dim-val" id="val-J">0%</div>
+                                <div class="dim-bar-bg"><div class="dim-fill" id="bar-JP" style="width: 50%;"></div></div>
+                                <div class="dim-val" id="val-P">0%</div><div class="dim-text right">P 灵活</div>
+                            </div>
+                            <div class="dim-row" style="margin-top: 12px; opacity: 0.85;">
+                                <div class="dim-text">果断 A</div><div class="dim-val" id="val-A">0%</div>
+                                <div class="dim-bar-bg"><div class="dim-fill" id="bar-AO" style="width: 50%;"></div></div>
+                                <div class="dim-val" id="val-O">0%</div><div class="dim-text right">O 纠结</div>
+                            </div>
+                            <div class="dim-row" style="opacity: 0.85;">
+                                <div class="dim-text">温暖 H</div><div class="dim-val" id="val-H">0%</div>
+                                <div class="dim-bar-bg"><div class="dim-fill" id="bar-HC" style="width: 50%;"></div></div>
+                                <div class="dim-val" id="val-C">0%</div><div class="dim-text right">C 高冷</div>
+                            </div>
+                        </div>
+                        
+                        <div class="rc-label" style="margin-bottom:8px; margin-top:24px;">航司档案评估 ASSESSMENT</div>
+                        <div class="rc-quote" id="r-quote"></div>
+                    </div>
+                    
+                    <div class="rc-bottom">
+                        BOARDING PASS • ONLY FOR ENTERTAINMENT
+                    </div>
+                </div>
+            </div>
+            <button class="btn-primary" onclick="generateImage()" style="margin: 24px 0 12px; width:100%;">领取专属登机牌</button>
+            <div style="display: flex; gap: 16px; width: 100%; justify-content: center; margin-top: 8px;">
+                <button class="btn-text" onclick="if(window.openMatrixModal) openMatrixModal()" style="margin-top:0; padding: 10px 0; color: var(--accent-cyan); font-weight: 800; font-size: 15px;">🌟 探索更多航线</button>
+                <button class="btn-text" onclick="resetQuiz()" style="margin-top:0; padding: 10px 0; font-size: 15px;">重新测算</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 弹窗 -->
+    <div class="modal-overlay" id="image-modal">
+        <p class="modal-tip">✨ 长按图片保存到手机 ✨</p>
+        <img id="generated-img" class="result-img" alt="Boarding Pass Image">
+        <button class="close-modal" onclick="closeImageModal()">返回候机厅</button>
+    </div>
+
+    <!-- 历史抽屉 -->
+    <div class="history-drawer" id="history-drawer">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 24px;">
+            <h2 class="history-title" style="margin:0;">过往航班记录</h2>
+            <button onclick="closeHistory()" style="background:none; border:none; font-size:24px; font-weight:800; color:var(--text-secondary); cursor:pointer;">×</button>
+        </div>
+        <div class="history-list" id="history-list"></div>
+    </div>
+
+    <script>
+        const questions = [
+            // E/I 能量获取
+            { text: "下了一周暴雨终于在傍晚停了，看着窗外积水倒映的霓虹灯，此刻的你：", dim: "EI", opts: [ 
+                { text: "抓起钥匙往外冲：憋死老子了，今晚必须找人燥起来！", val: "E", weight: 2 }, 
+                { text: "翻开通讯录：这天气挺适合喝一杯，看谁有空出来吃个饭。", val: "E", weight: 1 },
+                { text: "默默泡杯热茶窝回沙发，看外面的人湿鞋也是种幸福。", val: "I", weight: 1 },
+                { text: "拉上窗帘戴上降噪耳机：外面的世界与我无关，只想原地躺尸。", val: "I", weight: 2 }
+            ] },
+            { text: "去网红咖啡馆不小心把冰美式洒在了衣服上，此时你会：", dim: "EI", opts: [ 
+                { text: "大声自嘲“今天水逆！”，顺便跟旁边递纸巾的人聊了起来。", val: "E", weight: 2 }, 
+                { text: "尴尬地笑笑，接过店员纸巾道谢，试图化解周围的目光。", val: "E", weight: 1 },
+                { text: "默默低头疯狂拿纸巾擦，希望没有任何人注意到这个插曲。", val: "I", weight: 1 },
+                { text: "默默压低帽子：只要我不尴尬地球就是平的。并决定再也不来这店。", val: "I", weight: 2 }
+            ] },
+            { text: "晚上失眠，翻到了五年前自己发的一条极度矫情的朋友圈，你会：", dim: "EI", opts: [ 
+                { text: "截图重发一条公开处刑自己：当年我到底在发什么疯哈哈！", val: "E", weight: 2 }, 
+                { text: "觉得好笑，顺手发给几个死党一起“欣赏”这段黑历史。", val: "E", weight: 1 },
+                { text: "在被窝里尴尬地抠出三室一厅，然后默默设为“仅自己可见”。", val: "I", weight: 1 },
+                { text: "立刻删除，祈祷没人存过截图，假装这一切从未发生。", val: "I", weight: 2 }
+            ] },
+            { text: "被朋友强拉去桌游局，发现全是不认识的高玩，你的反应是：", dim: "EI", opts: [ 
+                { text: "迅速进入状态：“大家别怕我来带飞！”，直接全场飙戏控场。", val: "E", weight: 2 }, 
+                { text: "先观察两局熟悉规则，碰到聊得来的玩家就多互动两句。", val: "E", weight: 1 },
+                { text: "拿边缘角色也无所谓，只要能缩在角落默默吃零食看戏就行。", val: "I", weight: 1 },
+                { text: "浑身紧绷，每次发言前脑内打几十遍草稿，狂喊“什么时候结束”。", val: "I", weight: 2 }
+            ] },
+            
+            // S/N 信息收集
+            { text: "在街上偶遇极其像你前任/曾经暗恋对象背影的人，擦肩那刻你会：", dim: "SN", opts: [ 
+                { text: "迅速扫视对方的鞋和外套确认身高，得出结论：只是长得像。", val: "S", weight: 2 }, 
+                { text: "回头确认了一下，然后在群里八卦：“刚碰到个人长得巨像那谁！”", val: "S", weight: 1 },
+                { text: "一阵强烈情绪翻涌，哪怕明知不是TA，一天的心情也被带跑偏了。", val: "N", weight: 1 },
+                { text: "感叹命运安排，脑内自动播放如果平行时空重逢的狗血虐恋连续剧。", val: "N", weight: 2 }
+            ] },
+            { text: "刚买了一个“能极大提升幸福感”的复杂智能设备，拆开包装后：", dim: "SN", opts: [ 
+                { text: "找出最厚的多国语言说明书，严格对照图纸一步一步组装。", val: "S", weight: 2 }, 
+                { text: "先去搜个“三分钟开箱评测”视频，照葫芦画瓢把基础功能搞懂。", val: "S", weight: 1 },
+                { text: "随便翻翻搞懂原理，剩下隐藏功能准备日后当盲盒慢慢摸索。", val: "N", weight: 1 },
+                { text: "说明书连膜都没撕就扔垃圾桶。插上电全凭直觉一通瞎按：坏了再说！", val: "N", weight: 2 }
+            ] },
+            { text: "下班路上偶然听到一首很久没听过的老歌，你脑海最先闪过的是：", dim: "SN", opts: [ 
+                { text: "当时听这首歌时周围空气的温度，以及那年夏天具体发生了什么事。", val: "S", weight: 2 }, 
+                { text: "想起了当年很流行的一段经历，或者几件客观发生过的大事。", val: "S", weight: 1 },
+                { text: "并不是某个具体画面，而是一股强烈的怀旧氛围感瞬间击中了你。", val: "N", weight: 1 },
+                { text: "突然感叹时间流逝，在脑内自动播放一部关于自己人生的伤痛文艺片。", val: "N", weight: 2 }
+            ] },
+            { text: "老板让你接手一个大家都在用老旧模板做的常规项目，你会：", dim: "SN", opts: [ 
+                { text: "既然老办法没出过大错，直接调出前人的文件“复制粘贴”最稳妥。", val: "S", weight: 2 }, 
+                { text: "整体框架沿用，但在自己负责的那几页里，把排版稍微弄好看点。", val: "S", weight: 1 },
+                { text: "看着老表格觉得索然无味，忍不住想：完全推翻换个新视角会怎样？", val: "N", weight: 1 },
+                { text: "哪怕加班到凌晨，也要硬着头皮创造绝美新框架，不能容忍丑东西。", val: "N", weight: 2 }
+            ] },
+
+            // T/F 决策依据
+            { text: "百人群聊里，老板正疯狂痛批同组平时关系不错的同事，此时的你：", dim: "TF", opts: [ 
+                { text: "像机器一样快速复盘，并在心里拉好Excel算出了这次事故的止损方案。", val: "T", weight: 2 }, 
+                { text: "觉得老板态度差但骂得在理，最好在这时保持沉默明哲保身。", val: "T", weight: 1 },
+                { text: "默默在私聊小窗给同事发“抱抱”，觉得当众这样羞辱人太恶心了。", val: "F", weight: 1 },
+                { text: "气得浑身发抖，比挨骂的人还憋屈，满脑子都是“这破公司待不下去了！”", val: "F", weight: 2 }
+            ] },
+            { text: "一起通宵的朋友突然在凌晨三点因为网抑云音乐崩溃大哭，你的反应是：", dim: "TF", opts: [
+                { text: "递上纸巾并开始帮TA分析这件事的底层逻辑和解决方案。", val: "T", weight: 2 },
+                { text: "安静地陪在旁边等TA哭完，顺便确认一下明天的行程是否需要取消。", val: "T", weight: 1 },
+                { text: "立刻抱住TA疯狂安慰，什么都不问先给足情绪价值。", val: "F", weight: 1 },
+                { text: "被TA的情绪感染，跟着一起嗷嗷大哭，最后两人抱头痛哭。", val: "F", weight: 2 }
+            ] },
+            { text: "面对一个非常丰厚但违背你个人价值观的合作机会，你会：", dim: "TF", opts: [
+                { text: "在商言商，只要不违法，利益最大化才是成年人的法则。", val: "T", weight: 2 },
+                { text: "虽然心里有些膈应，但看着银行卡余额还是说服了自己。", val: "T", weight: 1 },
+                { text: "非常纠结，如果接了会内耗很久，需要找朋友疯狂开导自己。", val: "F", weight: 1 },
+                { text: "果断拒绝，甚至觉得对方找上门来是对自己灵魂的一种侮辱。", val: "F", weight: 2 }
+            ] },
+            { text: "看了一部结局极度悲惨但逻辑严密的烧脑悬疑片，走出影院后：", dim: "TF", opts: [
+                { text: "疯狂跟朋友盘逻辑漏洞，感叹导演在第三幕的线索铺垫太绝了。", val: "T", weight: 2 },
+                { text: "觉得剧情很精彩，不过也就是一部电影而已，看完就去吃夜宵了。", val: "T", weight: 1 },
+                { text: "沉浸在悲惨的结局中久久走不出来，甚至觉得这几天都不想看悬疑片了。", val: "F", weight: 1 },
+                { text: "在社交平台写下一篇千字感性小作文，为主角的命运感到撕心裂肺。", val: "F", weight: 2 }
+            ] },
+
+            // J/P 生活方式
+            { text: "即将开启一场期待已久的七天海外长途旅行，你的行李箱状态是：", dim: "JP", opts: [
+                { text: "提前一周列好Excel清单，甚至把每天要穿的衣服打包好分装。", val: "J", weight: 2 },
+                { text: "提前两天把必需品塞进去，剩下的只要带上护照和钱就行。", val: "J", weight: 1 },
+                { text: "出发前一晚才开始收拾，大概率会忘记带充电线或牙刷。", val: "P", weight: 1 },
+                { text: "出发前三小时极限打包，到了机场才想起来好像没定落地第一晚的酒店。", val: "P", weight: 2 }
+            ] },
+            { text: "关于手机上的未读消息红点，你通常的习惯是：", dim: "JP", opts: [
+                { text: "绝对的强迫症，哪怕是系统通知也要点掉，不然浑身难受。", val: "J", weight: 2 },
+                { text: "重要的群和私聊会清空，剩下的广告推送就随它去吧。", val: "J", weight: 1 },
+                { text: "只有想看的时候才会点开，未读数过百也是常有的事。", val: "P", weight: 1 },
+                { text: "未读消息常年保持999+，找人全靠搜索，红点已经成为了手机壁纸的一部分。", val: "P", weight: 2 }
+            ] },
+            { text: "接到了一个死线在两周后的重要任务，你的工作节奏是：", dim: "JP", opts: [
+                { text: "当天就拆解成每天的进度表，绝不允许自己拖到最后一刻。", val: "J", weight: 2 },
+                { text: "前几天先做个大致框架，后面再按部就班地填补细节。", val: "J", weight: 1 },
+                { text: "前十天都在摸鱼或被其他事情吸引，最后四天开启疯狂赶工模式。", val: "P", weight: 1 },
+                { text: "Deadline才是第一生产力，在最后24小时靠着肾上腺素和咖啡极限交差。", val: "P", weight: 2 }
+            ] },
+            { text: "周末原本打算在家大扫除，结果朋友突然喊你出去喝酒，此时：", dim: "JP", opts: [
+                { text: "果断拒绝，计划被打乱的感觉比不喝酒还要难受一百倍。", val: "J", weight: 2 },
+                { text: "犹豫了一下，跟朋友商量能不能改到晚上，先让自己扫完地。", val: "J", weight: 1 },
+                { text: "把打扫计划秒抛脑后，心想反正衣服明天可以洗，穿上鞋就冲下楼。", val: "P", weight: 1 },
+                { text: "没等对方说完已经在问“去哪喝？我再叫几个人！”老子最喜欢没计划的惊喜。", val: "P", weight: 2 }
+            ] }
+        ];
+
+        const resultsData = {
+            "INTJ": {
+                role: "高冷操盘手",
+                destCode: "OBS-9", destName: "降智打击黑洞", seatClass: "幕后操盘手专座",
+                tags: ["逻辑强迫症", "人类观察员", "降维打击", "毒舌大师"],
+                quote: "具备上帝视角的孤独领航员。极度追求高效与真理，不需要外界的光源，因为其强大的逻辑引力足以扭曲周围的现实。"
+            },
+            "INTP": {
+                role: "慵懒科学怪人",
+                destCode: "QT-X", destName: "薛定谔摸鱼虫洞", seatClass: "脑洞研究舱",
+                tags: ["知识囤积狂", "薛定谔的行动力", "毫无边界感过敏", "拖延症晚期"],
+                quote: "游走在规则边缘的系统拆解者。对已知的一切保持怀疑，比起抵达终点，更享受破解宇宙底层代码的纯粹思辨。"
+            },
+            "ENTJ": {
+                role: "霸总卷王",
+                destCode: "TI-1", destName: "24h效率暴政基地", seatClass: "舰长指挥座",
+                tags: ["天生领导者", "进度条杀手", "慕强但更强", "没感情的赚钱机器"],
+                quote: "天生的星际拓荒者与规则制定人。拥有粉碎一切阻碍的绝对意志，若宇宙法则不合理，便会毫不犹豫地重写它。"
+            },
+            "ENTP": {
+                role: "混沌乐子人",
+                destCode: "AM-7", destName: "宇宙吃瓜空间站", seatClass: "反骨玩家舱",
+                tags: ["骨折眉毛杠精", "三分钟热度", "无情推翻机", "诡辩奇才"],
+                quote: "拒绝被航线定义的反骨玩家。灵感如同超新星随时爆发，以极强的发散思维在混乱中寻找破局的薛定谔解法。"
+            },
+            "INFJ": {
+                role: "精神乌托邦",
+                destCode: "PR-3", destName: "精神内耗避难港", seatClass: "先知观测舱",
+                tags: ["提灯绿老头", "外热内冷", "内耗王者", "伪装正常人"],
+                quote: "携带深空静默基因的理想主义者。能敏锐捕捉到微小的灵子波动，在喧嚣的宇宙中默默守护着某种神圣的使命感。"
+            },
+            "INFP": {
+                role: "敏感小蝴蝶",
+                destCode: "PL-0", destName: "EMO流泪陨石带", seatClass: "流泪猫猫头等舱",
+                tags: ["流泪猫猫头", "宇宙级心软", "永远在神游", "间歇性自闭"],
+                quote: "游离于主流航道之外的浪漫流浪者。以感性雷达感知世界，哪怕身处最冷酷的真空中，也能培育出最柔软的精神星云。"
+            },
+            "ENFJ": {
+                role: "治愈系太阳",
+                destCode: "LU-8", destName: "情绪价值充电塔", seatClass: "小太阳发光舱",
+                tags: ["全能男妈/女妈", "情绪价值拉满", "天生布道者", "护犊子狂魔"],
+                quote: "自带能量辐射场的人际中枢。拥有极强的共情与领导力，像恒星一样源源不断地为同航线的旅伴提供情绪升力。"
+            },
+            "ENFP": {
+                role: "快乐小狗",
+                destCode: "ST-4", destName: "多巴胺喷泉象限", seatClass: "快乐小狗VIP座",
+                tags: ["社交悍匪", "脑洞满天飞", "永远热爱", "气氛组担当"],
+                quote: "拒绝枯燥的脑洞超新星。情绪与灵感随时可以超光速跃迁，对宇宙中未知的陨石坑永远保持着三分钟的热烈与狂欢。"
+            },
+            "ISTJ": {
+                role: "无情蓝老头",
+                destCode: "AN-2", destName: "强迫症狂喜网格", seatClass: "KPI执行舱",
+                tags: ["规矩就是规矩", "计划狂魔", "靠谱天花板", "细节扫描仪"],
+                quote: "航线得以安全运转的绝对基石。极度理性且严谨，对参数与流程有着强迫症般的执着，是混乱宇宙中最可靠的锚点。"
+            },
+            "ISFJ": {
+                role: "贴心大白",
+                destCode: "GH-6", destName: "全天候后勤补给船", seatClass: "老好人专属舱",
+                tags: ["细节捕手", "默默付出", "防御性社交", "讨好型人格"],
+                quote: "不动声色的全舰生态维系者。默默记录着航行中的每一个细节，以惊人的耐力和温和，为同伴构建起最坚不可摧的庇护所。"
+            },
+            "ESTJ": {
+                role: "铁面判官",
+                destCode: "MS-5", destName: "KPI无情督察局", seatClass: "卷王头等舱",
+                tags: ["无情包工头", "执行力爆表", "反矫情达人", "计划强迫症"],
+                quote: "坚定不移的秩序构建者。排斥一切低效与模糊地带，比起欣赏虚无缥缈的繁星，更倾向于确保每一台引擎都在最高功率运转。"
+            },
+            "ESFJ": {
+                role: "热心交际花",
+                destCode: "GR-9", destName: "星际八卦集散中心", seatClass: "气氛组长专座",
+                tags: ["端水大师", "无法拒绝别人", "社交雷达", "行走的备忘录"],
+                quote: "掌控全舰情绪气候的社交枢纽。擅长调配能量与促成共识，只要有他们在场，最冰冷的深空航行也能变成一场温暖的派对。"
+            },
+            "ISTP": {
+                role: "冷酷孤狼",
+                destCode: "MC-X", destName: "莫挨老子静音舱", seatClass: "孤狼驾驶舱",
+                tags: ["冷酷电钻哥", "讨厌大道理", "人狠话不多", "极限修理工"],
+                quote: "绝对冷静的技术操作狂。讨厌被理论束缚，更喜欢用双手拆解与重构一切，在突发危机前拥有令人惊叹的肌肉记忆。"
+            },
+            "ISFP": {
+                role: "摸鱼艺术家",
+                destCode: "AU-3", destName: "随地大小躺坐标", seatClass: "躺平观景舱",
+                tags: ["佛系本佛", "颜控晚期", "拒绝画大饼", "随地大小躺"],
+                quote: "活在当下的星云体验派。拥有极其敏锐的美学雷达，不关心宏大的战略，只想在反重力漂流中安静感受超新星爆发的浪漫。"
+            },
+            "ESTP": {
+                role: "高能海王",
+                destCode: "KD-1", destName: "极限作死飞行轨", seatClass: "极限飙船舱",
+                tags: ["极限运动家", "活在当下", "风险爱好者", "刺激瘾者"],
+                quote: "在陨石群中极限穿梭的动能风暴。拒绝被安全带束缚，极速反应与控场能力堪称一绝，永远活在刺激与挑战的最前线。"
+            },
+            "ESFP": {
+                role: "派对永动机",
+                destCode: "PL-7", destName: "24h野生蹦迪甲板", seatClass: "派对永动机专座",
+                tags: ["抓马交际花", "人来疯", "快乐大过天", "随时随地开麦"],
+                quote: "天生的聚光灯捕捉器。拒绝无聊与平庸，自带情绪点火器属性，能瞬间将枯燥的漫长航行转变为一场沸腾的等离子狂欢。"
+            }
+        };
+
+        let currentQuestion = 0;
+        let answers = []; 
+        let historyStack = [];
+
+        function setHash(hash) {
+            if(window.location.hash !== hash) {
+                history.pushState(null, null, hash);
+            }
+        }
+
+        window.addEventListener('popstate', function(e) {
+            const hash = window.location.hash;
+            if (hash === '#landing' || hash === '') {
+                showView('landing');
+            } else if (hash === '#quiz') {
+                if(currentQuestion >= questions.length) {
+                    showView('quiz');
+                    currentQuestion = questions.length - 1;
+                    answers.pop();
+                    historyStack.pop();
+                    renderQuestion();
+                } else if(currentQuestion > 0) {
+                    prevQuestion();
+                }
+            } else if (hash === '#result') {
+                showView('result');
+            }
+        });
+
+        function showView(id) {
+            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+        }
+
+        let displayQuestions = [];
+
+        function startQuiz() {
+            currentQuestion = 0;
+            answers = [];
+            historyStack = [];
+            // 深拷贝并使用Fisher-Yates洗牌算法打乱题目顺序
+            displayQuestions = JSON.parse(JSON.stringify(questions));
+            for (let i = displayQuestions.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [displayQuestions[i], displayQuestions[j]] = [displayQuestions[j], displayQuestions[i]];
+            }
+            
+            // 打乱每一道题内部的选项
+            displayQuestions.forEach(q => {
+                for (let i = q.opts.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [q.opts[i], q.opts[j]] = [q.opts[j], q.opts[i]];
+                }
+            });
+
+            setHash('#quiz');
+            showView('quiz');
+            renderQuestion();
+        }
+
+        function renderQuestion() {
+            const q = displayQuestions[currentQuestion];
+            document.getElementById('q-title').innerText = q.text;
+            document.getElementById('progress-fill').style.width = ((currentQuestion + 1) / displayQuestions.length * 100) + '%';
+            document.getElementById('progress-text').innerText = `STEP ${String(currentQuestion + 1).padStart(2, '0')}/${displayQuestions.length}`;
+            
+            let html = '';
+            q.opts.forEach((opt) => {
+                html += `<button class="option-btn" onclick="selectOption('${opt.val}', ${opt.weight})">${opt.text}</button>`;
+            });
+            document.getElementById('options-container').innerHTML = html;
+        }
+
+        function selectOption(val, weight) {
+            historyStack.push({q: currentQuestion, a: [...answers]});
+            answers.push({ val, weight });
+            
+            if (currentQuestion < displayQuestions.length - 1) {
+                currentQuestion++;
+                renderQuestion();
+            } else {
+                setHash('#result');
+                calculateResult();
+            }
+        }
+
+        function prevQuestion() {
+            if (historyStack.length > 0) {
+                const lastState = historyStack.pop();
+                currentQuestion = lastState.q;
+                answers = lastState.a;
+                renderQuestion();
+            } else {
+                setHash('#landing');
+                showView('landing');
+            }
+        }
+
+        function calculateResult() {
+            showView('loading');
+            
+            let rawScores = { E:0, I:0, S:0, N:0, T:0, F:0, J:0, P:0 };
+            
+            answers.forEach((ans) => {
+                rawScores[ans.val] += ans.weight;
+            });
+
+            // 依据分值判定，如果遇到极小概率的平分，使用随机数决定偏向
+            let mbti = "";
+            mbti += (rawScores.E > rawScores.I || (rawScores.E === rawScores.I && Math.random() > 0.5)) ? "E" : "I";
+            mbti += (rawScores.S > rawScores.N || (rawScores.S === rawScores.N && Math.random() > 0.5)) ? "S" : "N";
+            mbti += (rawScores.T > rawScores.F || (rawScores.T === rawScores.F && Math.random() > 0.5)) ? "T" : "F";
+            mbti += (rawScores.J > rawScores.P || (rawScores.J === rawScores.P && Math.random() > 0.5)) ? "J" : "P";
+
+            let displayScores = {};
+            ['E','I','S','N','T','F','J','P'].forEach(k => {
+                // 原维度满分是8。放大分数基数并加上底分，避免出现0%
+                displayScores[k] = (rawScores[k] * 12) + 20 + (Math.random() * 5);
+            });
+            
+            // 为主导性格添加胜者光环加成
+            ['EI', 'SN', 'TF', 'JP'].forEach(pair => {
+                let k1 = pair[0], k2 = pair[1];
+                if (mbti.includes(k1)) {
+                    displayScores[k1] += 15;
+                } else {
+                    displayScores[k2] += 15;
+                }
+            });
+
+            // 随机生成 64型附加维度 A/O 和 H/C 的分数
+            const genSubScore = () => {
+                let a = Math.floor(Math.random() * 30) + 10; // 基础分
+                if (Math.random() > 0.5) a += 50; // 放大优势面
+                return { s1: a, s2: 100 - a };
+            };
+            let aoScores = genSubScore();
+            displayScores['A'] = aoScores.s1; displayScores['O'] = aoScores.s2;
+            let hcScores = genSubScore();
+            displayScores['H'] = hcScores.s1; displayScores['C'] = hcScores.s2;
+
+            setTimeout(() => {
+                renderResult(mbti, false, null, displayScores);
+            }, 1500); 
+        }
+
+        function resetQuiz() {
+            setHash('#landing');
+            showView('landing');
+        }
+
+        function renderResult(mbti, isHistory = false, historyId = null, scores = null) {
+            const data = resultsData[mbti];
+            
+            // 根据分数生成 A/O (果断/纠结) 和 H/C (温暖/高冷) 的后缀
+            const getSubtypeFromScores = () => {
+                if(scores && scores['A'] !== undefined) {
+                    return `${scores['A'] > scores['O'] ? 'A' : 'O'}-${scores['H'] > scores['C'] ? 'H' : 'C'}`;
+                }
+                const ao = Math.random() > 0.5 ? 'A' : 'O';
+                const hc = Math.random() > 0.5 ? 'H' : 'C';
+                return `${ao}-${hc}`;
+            };
+            const targetId = historyId ? historyId : `${mbti}-${getSubtypeFromScores()}`;
+            
+            document.getElementById('r-id').innerText = targetId;
+            document.getElementById('r-name').innerText = data.role;
+            
+            document.getElementById('r-dest-code').innerText = data.destCode;
+            document.getElementById('r-dest-name').innerText = data.destName;
+            document.getElementById('r-class').innerText = data.seatClass;
+
+            let badgeText = "";
+            let themeLight1 = "#f8fafc", themeLight2 = "#e2e8f0", themeDark = "#b829ff";
+
+            if (mbti.includes("N") && mbti.includes("F")) {
+                badgeText = "绿人专属厅 NF";
+                themeLight1 = "#ecfdf5"; themeLight2 = "#d1fae5"; themeDark = "#10b981";
+            } else if (mbti.includes("N") && mbti.includes("T")) {
+                badgeText = "紫人专属厅 NT";
+                themeLight1 = "#f5f3ff"; themeLight2 = "#ede9fe"; themeDark = "#8b5cf6";
+            } else if (mbti.includes("S") && mbti.includes("J")) {
+                badgeText = "蓝人专属厅 SJ";
+                themeLight1 = "#eff6ff"; themeLight2 = "#dbeafe"; themeDark = "#3b82f6";
+            } else if (mbti.includes("S") && mbti.includes("P")) {
+                badgeText = "黄人专属厅 SP";
+                themeLight1 = "#fffbeb"; themeLight2 = "#fef3c7"; themeDark = "#f59e0b";
+            }
+
+            const rcCard = document.querySelector('.result-card');
+            rcCard.style.setProperty('--theme-light1', themeLight1);
+            rcCard.style.setProperty('--theme-light2', themeLight2);
+            rcCard.style.setProperty('--theme-dark', themeDark);
+            
+            document.getElementById('r-faction-badge').innerText = badgeText;
+
+            let tagsHtml = '';
+            data.tags.forEach(tag => { 
+                if (tag !== data.role) {
+                    tagsHtml += `<span class="r-tag">#${tag}</span>`; 
+                }
+            });
+            document.getElementById('r-tags').innerHTML = tagsHtml;
+            document.getElementById('r-quote').innerText = data.quote;
+
+            if (scores) {
+                document.getElementById('rc-dims').style.display = 'block';
+                const updateDim = (leftKey, rightKey, barId) => {
+                    let leftScore = scores[leftKey] || 0;
+                    let rightScore = scores[rightKey] || 0;
+                    let total = leftScore + rightScore;
+                    let leftPct = total > 0 ? Math.round((leftScore / total) * 100) : 50;
+                    let rightPct = 100 - leftPct;
+                    
+                    document.getElementById(`val-${leftKey}`).innerText = `${leftPct}%`;
+                    document.getElementById(`val-${rightKey}`).innerText = `${rightPct}%`;
+                    
+                    let bar = document.getElementById(`bar-${barId}`);
+                    if (leftPct >= 50) {
+                        bar.style.left = '0';
+                        bar.style.right = 'auto';
+                        bar.style.width = `${leftPct}%`;
+                        bar.style.background = 'linear-gradient(90deg, var(--theme-dark), var(--accent-cyan))';
+                    } else {
+                        bar.style.right = '0';
+                        bar.style.left = 'auto';
+                        bar.style.width = `${rightPct}%`;
+                        bar.style.background = 'linear-gradient(270deg, var(--theme-dark), var(--accent-cyan))';
+                    }
+                };
+                
+                updateDim('E', 'I', 'EI');
+                updateDim('S', 'N', 'SN');
+                updateDim('T', 'F', 'TF');
+                updateDim('J', 'P', 'JP');
+                updateDim('A', 'O', 'AO');
+                updateDim('H', 'C', 'HC');
+            } else {
+                document.getElementById('rc-dims').style.display = 'none';
+            }
+
+            if (!isHistory) {
+                saveHistory(mbti, data.destName, targetId, scores);
+            }
+
+            setHash('#result');
+            showView('result');
+
+            if(window.initTestMatrix) {
+                window.initTestMatrix({
+                    containerId: 'dummy-matrix-container',
+                    currentId: 'mbti-crystal-test',
+                    theme: 'dark'
+                });
+            }
+        }
+
+        async function generateImage() {
+            const wrapper = document.getElementById('capture-wrapper');
+            const modal = document.getElementById('image-modal');
+            const img = document.getElementById('generated-img');
+            const tip = document.querySelector('.modal-tip');
+            
+            // Show modal early in loading state
+            modal.classList.add('active');
+            img.style.display = 'none';
+            tip.innerText = "⏳ 正在打印登机牌，请稍候...";
+            
+            try {
+                // Ensure fonts and DOM are ready (critical for mobile)
+                await document.fonts.ready;
+                await new Promise(r => setTimeout(r, 150));
+                
+                const dataUrl = await htmlToImage.toPng(wrapper, { 
+                    quality: 0.95, 
+                    backgroundColor: '#09090b',
+                    pixelRatio: window.devicePixelRatio > 1 ? window.devicePixelRatio : 2,
+                    style: { transform: 'scale(1)', transformOrigin: 'top left' }
+                });
+                
+                img.src = dataUrl;
+                img.style.display = 'block';
+                tip.innerText = "✨ 长按图片保存到手机 ✨";
+            } catch (error) {
+                console.error('Capture failed!', error);
+                tip.innerText = "❌ 登机牌生成失败，请重试或直接手机截屏";
+                img.style.display = 'none';
+            }
+        }
+
+        function closeImageModal() {
+            document.getElementById('image-modal').classList.remove('active');
+        }
+
+        let currentHistoryData = [];
+
+        function saveHistory(mbti, title, id, scores) {
+            let historyData = JSON.parse(localStorage.getItem('mbti_crystal_history') || '[]');
+            historyData.unshift({ mbti, title, id, time: new Date().toLocaleString(), scores: scores });
+            if (historyData.length > 20) historyData = historyData.slice(0, 20);
+            localStorage.setItem('mbti_crystal_history', JSON.stringify(historyData));
+        }
+
+        function checkHistory() {
+            let historyData = JSON.parse(localStorage.getItem('mbti_crystal_history') || '[]');
+            if(historyData.length > 0) {
+                document.getElementById('history-btn').style.display = 'block';
+            }
+        }
+
+        function openHistory() {
+            currentHistoryData = JSON.parse(localStorage.getItem('mbti_crystal_history') || '[]');
+            let html = '';
+            currentHistoryData.forEach((item, idx) => {
+                html += `<div class="history-item" style="cursor:pointer;" onclick="closeHistory(); renderResult('${item.mbti}', true, '${item.id}', currentHistoryData[${idx}].scores)">
+                    <div class="h-time">${item.time} | NO. ${item.id}</div>
+                    <div class="h-result">${item.title}</div>
+                    <div class="h-mbti">FLIGHT: ${item.mbti}</div>
+                </div>`;
+            });
+            document.getElementById('history-list').innerHTML = html;
+            document.getElementById('history-drawer').classList.add('active');
+        }
+
+        function closeHistory() {
+            document.getElementById('history-drawer').classList.remove('active');
+        }
+
+        setHash('#landing');
+        checkHistory();
+
+    </script>
+    <script>
+        setTimeout(() => {
+            const script = document.createElement('script');
+            script.src = '../test-matrix.js';
+            script.onload = () => {
+                if(window.initTestMatrix) {
+                    const dummy = document.createElement('div');
+                    dummy.id = 'dummy-matrix-container';
+                    dummy.style.display = 'none';
+                    document.body.appendChild(dummy);
+                    window.initTestMatrix({
+                        containerId: 'dummy-matrix-container',
+                        currentId: 'mbti-crystal-test',
+                        theme: 'dark'
+                    });
+                }
+            };
+            script.onerror = () => console.log('Matrix script not found');
+            document.body.appendChild(script);
+        }, 500);
+    </script>
+</body>
+</html>

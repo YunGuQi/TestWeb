@@ -1,0 +1,1158 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>隐藏的欲望测试</title>
+  
+  <!-- 必须引入 Tailwind CSS 以支持 test-matrix.js 矩阵弹窗 -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- 引入 html-to-image 替代 html2canvas -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html-to-image/1.11.11/html-to-image.min.js"></script>
+
+  <style>
+    :root {
+      --bg-color: #0d0d0f;
+      --text-main: #f0f0f5;
+      --text-sub: #888896;
+      --accent-color: #e53935;
+      --accent-hover: #b71c1c;
+      --card-bg: rgba(255, 255, 255, 0.05);
+      --border-color: rgba(255, 255, 255, 0.1);
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'PingFang SC', -apple-system, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      overflow-x: hidden;
+    }
+
+    /* 通用容器 */
+    .app-container {
+      width: 100%;
+      max-width: 500px;
+      margin: 0 auto;
+      min-height: 100vh;
+      display: none;
+      flex-direction: column;
+      position: relative;
+    }
+    .app-container.active {
+      display: flex;
+    }
+
+    /* 封面页 */
+    .cover-content {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 40px 20px;
+      text-align: center;
+      margin-top: 15vh;
+    }
+    .cover-title {
+      font-size: 36px;
+      font-weight: 900;
+      letter-spacing: 2px;
+      margin-bottom: 16px;
+      background: linear-gradient(135deg, #fff, #ff5252);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .cover-subtitle {
+      font-size: 15px;
+      color: var(--text-sub);
+      margin-bottom: 60px;
+      line-height: 1.6;
+    }
+    .btn-main {
+      background-color: var(--accent-color);
+      color: white;
+      border: none;
+      border-radius: 30px;
+      padding: 16px 40px;
+      font-size: 18px;
+      font-weight: bold;
+      box-shadow: 0 4px 20px rgba(229, 57, 53, 0.4);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-main:active {
+      transform: scale(0.95);
+      background-color: var(--accent-hover);
+    }
+    
+    /* 底部双按钮 Flex 布局（防堆叠规范） */
+    .bottom-actions-flex {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      padding: 20px;
+      width: 100%;
+    }
+    .btn-secondary {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      border-radius: 20px;
+      padding: 12px 24px;
+      font-size: 14px;
+      cursor: pointer;
+      backdrop-filter: blur(10px);
+    }
+    .btn-secondary:active {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    /* 问答页 */
+    .quiz-header {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .progress-bar-bg {
+      width: 100%;
+      height: 6px;
+      background-color: var(--card-bg);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      background-color: var(--accent-color);
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+    .quiz-top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: var(--text-sub);
+      font-size: 14px;
+    }
+    .btn-back {
+      color: var(--text-sub);
+      background: none;
+      border: none;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    
+    /* 深度报告滑动卡片 */
+    .deep-dive-report-swipe {
+      display: flex;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+      padding: 0 20px 20px 20px;
+      gap: 16px;
+      scrollbar-width: none;
+      margin-top: 10px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    .deep-dive-report-swipe::-webkit-scrollbar {
+      display: none;
+    }
+    .report-card-item {
+      flex: 0 0 calc(100% - 60px);
+      scroll-snap-align: center;
+      background-color: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 24px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+    }
+    .report-card-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--accent-color);
+      font-size: 16px;
+      font-weight: 800;
+      letter-spacing: 1px;
+    }
+    .report-card-body {
+      color: var(--text-sub);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+    .swipe-hint {
+      text-align: center;
+      font-size: 12px;
+      color: var(--text-sub);
+      opacity: 0.6;
+      margin-top: 15px;
+      margin-bottom: 5px;
+      letter-spacing: 1px;
+    }
+    
+    .question-box {
+      padding: 20px;
+      font-size: 18px;
+      font-weight: 600;
+      line-height: 1.5;
+      text-align: center;
+      min-height: 100px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: fadeIn 0.4s ease;
+    }
+    .options-box {
+      padding: 0 20px 40px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px; /* 4个选项稍微减小间距 */
+    }
+    .option-btn {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 16px;
+      color: var(--text-main);
+      font-size: 15px;
+      text-align: left;
+      cursor: pointer;
+      transition: all 0.2s;
+      animation: slideUp 0.4s ease forwards;
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    .option-btn:nth-child(1) { animation-delay: 0.1s; }
+    .option-btn:nth-child(2) { animation-delay: 0.2s; }
+    .option-btn:nth-child(3) { animation-delay: 0.3s; }
+    .option-btn:nth-child(4) { animation-delay: 0.4s; }
+    .option-btn:active {
+      background-color: rgba(255, 255, 255, 0.1);
+      transform: scale(0.98);
+    }
+
+    /* 结果页 - 海报区 */
+    .result-container {
+      padding: 20px;
+    }
+    /* #capture-wrapper 作为滑动容器 */
+    #capture-wrapper {
+      padding: 10px 20px 30px 20px;
+      background-color: var(--bg-color);
+      position: relative;
+      display: flex;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+      gap: 16px;
+      scrollbar-width: none;
+    }
+    #capture-wrapper::-webkit-scrollbar {
+      display: none;
+    }
+    .poster-card {
+      flex: 0 0 calc(100% - 20px);
+      scroll-snap-align: center;
+      background: linear-gradient(180deg, #1a1a24 0%, #111116 100%);
+      border: 1px solid rgba(229, 57, 53, 0.3);
+      border-radius: 20px;
+      padding: 30px;
+      position: relative;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5), inset 0 0 20px rgba(229, 57, 53, 0.05);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    /* 滑动画廊导航栏 */
+    .carousel-nav {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 10px;
+      margin-bottom: 5px;
+      padding: 0 10px;
+      user-select: none;
+    }
+    .nav-btn {
+      color: var(--text-sub);
+      background: none;
+      border: none;
+      font-size: 28px;
+      font-weight: 300;
+      padding: 0 15px;
+      cursor: pointer;
+      transition: transform 0.2s, color 0.2s;
+    }
+    .nav-btn:active {
+      transform: scale(0.9);
+      color: #fff;
+    }
+    .nav-indicator {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .nav-hint {
+      font-size: 10px;
+      color: var(--text-sub);
+      opacity: 0.6;
+      margin-bottom: 4px;
+      letter-spacing: 1px;
+    }
+    .nav-title {
+      font-size: 15px;
+      font-weight: bold;
+      color: var(--text-main);
+      letter-spacing: 2px;
+    }
+    
+    .poster-header {
+      font-size: 14px;
+      color: var(--text-sub);
+      margin-bottom: 24px;
+      display: flex;
+      justify-content: space-between;
+    }
+    .poster-title-label {
+      font-size: 14px;
+      color: var(--accent-color);
+      font-weight: bold;
+      letter-spacing: 1px;
+    }
+    .poster-title {
+      font-size: 36px;
+      font-weight: 900;
+      margin: 10px 0 20px;
+      color: #fff;
+    }
+    .poster-desc {
+      font-size: 15px;
+      color: #aaa;
+      line-height: 1.7;
+      margin-bottom: 30px;
+    }
+    .tags-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 30px;
+    }
+    .tag-item {
+      background: rgba(229, 57, 53, 0.1);
+      border: 1px solid rgba(229, 57, 53, 0.3);
+      color: #ff5252;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+    }
+    /* 危险印章绝对定位，注意：不能同时设 top 和 bottom */
+    .stamp {
+      position: absolute;
+      top: 20px;
+      right: -20px;
+      width: 100px;
+      height: 100px;
+      border: 3px solid rgba(229, 57, 53, 0.4);
+      color: rgba(229, 57, 53, 0.4);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      font-weight: 900;
+      transform: rotate(25deg);
+      pointer-events: none;
+    }
+    .poster-footer {
+      border-top: 1px dashed var(--border-color);
+      padding-top: 16px;
+      font-size: 10px;
+      color: var(--text-sub);
+      text-align: center;
+    }
+    .disclaimer {
+      font-size: 9px;
+      opacity: 0.5;
+      margin-top: 8px;
+    }
+    
+    /* 结果页 - 操作区 */
+    .result-actions {
+      padding: 0 20px 40px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+
+    /* 历史记录抽屉 */
+    .history-modal {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.8);
+      z-index: 50;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .history-modal.active { display: flex; }
+    .history-content {
+      background: linear-gradient(180deg, #1a1a24 0%, #111116 100%);
+      border: 1px solid rgba(229, 57, 53, 0.3);
+      width: 100%;
+      max-width: 400px;
+      max-height: 75vh;
+      border-radius: 24px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+    }
+    .history-close {
+      text-align: center;
+      padding: 12px;
+      color: #fff;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      margin-top: 20px;
+      cursor: pointer;
+    }
+    #history-list {
+      overflow-y: auto;
+      flex-grow: 1;
+    }
+    .history-item {
+      background: var(--card-bg);
+      padding: 16px;
+      border-radius: 12px;
+      margin-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .history-item span {
+      color: #fff;
+    }
+
+    /* 长按保存遮罩 */
+    .capture-mask {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.9);
+      z-index: 100;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .capture-mask.active { display: flex; }
+    .capture-img {
+      max-width: 90%;
+      max-height: 80vh;
+      border-radius: 20px;
+      box-shadow: 0 0 30px rgba(0,0,0,0.8);
+      pointer-events: auto;
+    }
+    .capture-tip {
+      color: white;
+      margin-top: 20px;
+      font-size: 16px;
+      font-weight: bold;
+      animation: pulse 1.5s infinite;
+    }
+
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes slideUp { to { opacity: 1; transform: translateY(0); } }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+
+  </style>
+</head>
+<body>
+
+  <!-- 隐藏的引流矩阵容器 -->
+  <div id="dummy-matrix-container" style="display: none;"></div>
+
+  <!-- 封面页 -->
+  <div id="page-start" class="app-container active">
+    <div class="cover-content">
+      <div class="cover-title">潜意识档案室</div>
+      <div class="cover-subtitle">18次直觉拷问<br>测出你最原始的本能欲望</div>
+      <button class="btn-main" onclick="startQuiz()">开始解剖</button>
+    </div>
+    
+    <!-- 防堆叠规范：使用 flex 并排 -->
+    <div class="bottom-actions-flex">
+      <button class="btn-secondary" id="btn-history" onclick="showHistory()" style="display:none;">我的档案</button>
+      <button class="btn-secondary" onclick="window.openMatrixModal && window.openMatrixModal()">探索更多欲望</button>
+    </div>
+  </div>
+
+  <!-- 问答页 -->
+  <div id="page-quiz" class="app-container">
+    <div class="quiz-header">
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill" id="progress-bar"></div>
+      </div>
+      <div class="quiz-top-bar">
+        <button class="btn-back" onclick="prevQuestion()">← 上一题</button>
+        <span id="progress-text">1 / 18</span>
+      </div>
+    </div>
+    <div class="question-box" id="question-text">问题加载中...</div>
+    <div class="options-box" id="options-container">
+      <!-- 选项按钮动态生成 -->
+    </div>
+  </div>
+
+  <!-- 结果页 -->
+  <div id="page-result" class="app-container">
+    <div class="carousel-nav">
+      <button onclick="switchPoster(-1)" class="nav-btn">&lsaquo;</button>
+      <div class="nav-indicator">
+        <span class="nav-hint">滑动或点击查阅报告档案</span>
+        <span id="poster-indicator" class="nav-title">核心潜意识档案</span>
+      </div>
+      <button onclick="switchPoster(1)" class="nav-btn">&rsaquo;</button>
+    </div>
+    <div id="capture-wrapper">
+      <!-- ================= 海报卡片 1：核心报告 ================= -->
+      <div class="poster-card" id="poster-card-0">
+        <div class="stamp">DANGER</div>
+        <div class="poster-header">
+          <span>实验对象: <span id="poster-id"></span></span>
+          <span>纯度: <span id="poster-purity"></span></span>
+        </div>
+        <div class="poster-title-label">检测到你潜意识中最高的本能是</div>
+        <div class="poster-title" id="res-title">加载中</div>
+        <div class="tags-container" id="res-tags">
+          <!-- Tags -->
+        </div>
+        <div class="poster-desc" id="res-desc">
+          解析加载中...
+        </div>
+        
+        <div style="margin-top: auto; border-top: 1px dashed rgba(255,255,255,0.15); padding-top: 20px;">
+          <div style="font-size:12px; color:var(--text-sub); margin-bottom:15px; text-align:center; letter-spacing:1px;">潜意识欲望分布图谱</div>
+          <div id="res-bars" style="display:flex; flex-direction:column; gap:12px;">
+            <!-- 进度条由 JS 动态渲染 -->
+          </div>
+        </div>
+
+        <div class="poster-footer" style="margin-top: 25px;">
+          <div>扫码透视你的“潜意识欲望”</div>
+          <div class="disclaimer">仅供娱乐体验，非专业心理诊断</div>
+        </div>
+      </div>
+      
+      <!-- ================= 海报卡片 2：深度解析 ================= -->
+      <div class="poster-card" id="poster-card-1" style="padding-bottom: 30px; overflow-y: auto; display: block;">
+        <div class="stamp" style="font-size: 40px; top: 50px; right: 10px; opacity: 0.03; transform: rotate(-15deg);">REPORT</div>
+        
+        <div class="poster-header" style="margin-bottom: 25px;">
+          <span>附属档案: 深度解析</span>
+          <span>密级: S级</span>
+        </div>
+        
+        <div style="margin-bottom: 16px;">
+          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px;">
+            <div style="width: 3px; height: 14px; background-color: var(--accent-color); border-radius: 2px; box-shadow: 0 0 8px rgba(229, 57, 53, 0.6);"></div>
+            <div class="poster-title-label" style="font-size: 14px; color: #fff; letter-spacing: 1px;">核心欲望解析</div>
+          </div>
+          <div class="poster-desc" id="dd-diagnosis" style="color: var(--text-sub); font-size: 13px; margin-bottom: 0; line-height: 1.7; text-align: justify;"></div>
+        </div>
+
+        <div style="width: 100%; height: 1px; border-top: 1px dashed rgba(255,255,255,0.1); margin: 16px 0;"></div>
+
+        <div style="margin-bottom: 16px;">
+          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px;">
+            <div style="width: 3px; height: 14px; background-color: var(--accent-color); border-radius: 2px; box-shadow: 0 0 8px rgba(229, 57, 53, 0.6);"></div>
+            <div class="poster-title-label" style="font-size: 14px; color: #fff; letter-spacing: 1px;">欲望投射效应</div>
+          </div>
+          <div class="poster-desc" id="dd-interpretation" style="color: var(--text-sub); font-size: 13px; margin-bottom: 0; line-height: 1.7; text-align: justify;"></div>
+        </div>
+
+        <div style="width: 100%; height: 1px; border-top: 1px dashed rgba(255,255,255,0.1); margin: 16px 0;"></div>
+
+        <div style="margin-bottom: 16px;">
+          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px;">
+            <div style="width: 3px; height: 14px; background-color: var(--accent-color); border-radius: 2px; box-shadow: 0 0 8px rgba(229, 57, 53, 0.6);"></div>
+            <div class="poster-title-label" style="font-size: 14px; color: #fff; letter-spacing: 1px;">潜意识假面画像</div>
+          </div>
+          <div class="poster-desc" id="dd-audience" style="color: var(--text-sub); font-size: 13px; margin-bottom: 0; line-height: 1.7; text-align: justify;"></div>
+        </div>
+
+        <div style="width: 100%; height: 1px; border-top: 1px dashed rgba(255,255,255,0.1); margin: 16px 0;"></div>
+
+        <div style="margin-bottom: 16px;">
+          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px;">
+            <div style="width: 3px; height: 14px; background-color: var(--accent-color); border-radius: 2px; opacity: 0.6;"></div>
+            <div class="poster-title-label" style="font-size: 14px; color: var(--accent-color); letter-spacing: 1px;">失控危险阈值</div>
+          </div>
+          <div class="poster-desc" id="dd-risk" style="color: var(--text-sub); font-size: 13px; margin-bottom: 0; line-height: 1.7; text-align: justify;"></div>
+        </div>
+
+        <div style="width: 100%; height: 1px; border-top: 1px dashed rgba(255,255,255,0.1); margin: 16px 0;"></div>
+
+        <div>
+          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px;">
+            <div style="width: 3px; height: 14px; background-color: var(--accent-color); border-radius: 2px; box-shadow: 0 0 8px rgba(229, 57, 53, 0.6);"></div>
+            <div class="poster-title-label" style="font-size: 14px; color: var(--accent-color); letter-spacing: 1px;">欲望纾解指南</div>
+          </div>
+          <div class="poster-desc" id="dd-advice" style="color: var(--text-main); font-size: 13px; margin-bottom: 0; line-height: 1.7; text-align: justify; font-weight: 500;"></div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="result-actions">
+      <button class="btn-main" style="width: 100%;" onclick="generatePoster()">保存我的专属档案</button>
+    </div>
+    
+    <div class="bottom-actions-flex" style="padding-top:0; margin-top: 10px;">
+      <button class="btn-secondary" onclick="resetQuiz()">重新建档</button>
+      <button class="btn-secondary" onclick="window.openMatrixModal && window.openMatrixModal()">探索更多欲望</button>
+    </div>
+  </div>
+
+  <!-- 历史记录弹窗 -->
+  <div id="history-modal" class="history-modal">
+    <div class="history-content">
+      <h3 style="font-size:18px; font-weight:800; color:var(--accent-color); margin-bottom:20px; text-align:center;">潜意识档案记录</h3>
+      <div id="history-list"></div>
+      <div class="history-close" onclick="closeHistory()">收起档案</div>
+    </div>
+  </div>
+
+  <!-- 截图生成弹窗 -->
+  <div id="capture-modal" class="capture-mask">
+    <div style="width: 100%; max-width: 400px; display: flex; flex-direction: column; align-items: center;">
+      <div style="display:flex; justify-content:space-between; align-items:center; width:100%; margin-bottom:15px; padding:0 20px;">
+        <button onclick="switchModalPoster(-1)" style="background:none; border:none; font-size:24px; color:var(--accent-color); font-weight:bold; cursor:pointer;">&lt;</button>
+        <div class="capture-tip" style="margin:0;">✨ 长按图片保存 ✨</div>
+        <button onclick="switchModalPoster(1)" style="background:none; border:none; font-size:24px; color:var(--accent-color); font-weight:bold; cursor:pointer;">&gt;</button>
+      </div>
+      <img id="capture-image" class="capture-img" src="" alt="长按保存" />
+      <button onclick="document.getElementById('capture-modal').classList.remove('active')" style="margin-top:20px; padding:10px 40px; background:transparent; border:1px solid var(--accent-color); color:var(--accent-color); border-radius:20px; font-weight:bold; letter-spacing:2px;">关闭预览</button>
+    </div>
+  </div>
+
+  <!-- 尝试加载公共矩阵引流组件 -->
+  <script src="../test-matrix.js" onerror="console.log('Matrix script not found, fallback enabled.')"></script>
+
+  <script>
+    /*
+      维度的代号：
+      A: 【占有欲】 Possessiveness
+      B: 【情欲】 Lust/Sensuality
+      C: 【禁欲】 Asceticism/Restraint
+      D: 【破坏欲】 Destructiveness
+      E: 【窥探欲】 Voyeurism
+      F: 【逃避欲】 Escapism
+    */
+    const quizData = [
+      { q: "看到喜欢的人和别人聊得火热，你的第一反应是？", options: [
+        { t: "直接走过去打断，宣誓主权", v: "A" },
+        { t: "内心冷笑，转头去找更好看的", v: "B" },
+        { t: "觉得心烦，默默退群或离开现场", v: "F" },
+        { t: "偷偷翻看对方社交账号，查出那人是谁", v: "E" }
+      ]},
+      { q: "深夜突然感到情绪崩溃，你最想做的事是？", options: [
+        { t: "把房间里看得见的东西全部砸烂", v: "D" },
+        { t: "找个人发生点亲密接触，感受体温", v: "B" },
+        { t: "关掉手机，假装明天永远不会到来", v: "F" },
+        { t: "开始冥想或看晦涩的书强行压抑", v: "C" }
+      ]},
+      { q: "如果有一种超能力只能用一次，你选哪个？", options: [
+        { t: "绝对控制：让一个人死心塌地听你的", v: "A" },
+        { t: "隐身透视：无伤吃瓜，看尽世间隐秘", v: "E" },
+        { t: "记忆消除：删掉那些让你不爽的人和事", v: "D" },
+        { t: "瞬间移动：随时能躲进没人的乌托邦", v: "F" }
+      ]},
+      { q: "面对极度繁重且不想做的工作，你会？", options: [
+        { t: "摆烂到底，大不了一起完蛋", v: "F" },
+        { t: "强迫自己进入无感情的机器模式做完", v: "C" },
+        { t: "故意拖延或在细节里埋点“雷”", v: "D" },
+        { t: "利用自己的魅力或手腕甩锅给别人", v: "B" }
+      ]},
+      { q: "在一段关系里，什么事情会让你最没有安全感？", options: [
+        { t: "对方有我不知道的小号和秘密", v: "A" },
+        { t: "身体上失去了干柴烈火的新鲜感", v: "B" },
+        { t: "我发现自己开始对TA产生严重的依赖", v: "C" },
+        { t: "对方强行介入并打乱我的生活节奏", v: "F" }
+      ]},
+      { q: "看到别人因为做错事被全网群嘲，你的内心OS是？", options: [
+        { t: "觉得很吵，世俗的狂欢令人厌倦", v: "C" },
+        { t: "饶有兴致地扒他们的黑料吃瓜", v: "E" },
+        { t: "觉得活该，甚至想踩上一脚加速毁灭", v: "D" },
+        { t: "如果这人是我的，我绝对不会让他出这种丑", v: "A" }
+      ]},
+      { q: "去了一个完全陌生的城市，晚上你会去哪里？", options: [
+        { t: "去当地最乱最嗨的酒吧寻找刺激", v: "B" },
+        { t: "把自己锁在酒店房间里点外卖", v: "F" },
+        { t: "去偏僻无人的街道一个人放空", v: "C" },
+        { t: "坐在暗处观察形形色色的路人", v: "E" }
+      ]},
+      { q: "如果你有一项极度珍爱的收藏品，你会怎么处理？", options: [
+        { t: "锁进保险箱，不让任何人看一眼", v: "A" },
+        { t: "时刻带在身边把玩，享受它的质感", v: "B" },
+        { t: "把它最高光的状态拍下来，然后亲手砸碎", v: "D" },
+        { t: "为了断绝物欲，咬牙把它送人", v: "C" }
+      ]},
+      { q: "朋友向你倾诉伴侣出轨，你会怎么回应？", options: [
+        { t: "刨根问底，想知道出轨的所有露骨细节", v: "E" },
+        { t: "劝朋友赶紧分手，切断一切联系", v: "F" },
+        { t: "教朋友怎么夺回控制权或让对方净身出户", v: "A" },
+        { t: "觉得情理之中，人类本来就被肉欲支配", v: "B" }
+      ]},
+      { q: "逛街时，看到货架上摆得完美对称的商品，你会？", options: [
+        { t: "有一种冲动想一把将它们全部推倒", v: "D" },
+        { t: "觉得很治愈，内心的秩序感得到了满足", v: "C" },
+        { t: "想全部买下来据为己有", v: "A" },
+        { t: "站在旁边，看看有没有别人来打乱它", v: "E" }
+      ]},
+      { q: "如果别人说你“是个好人，就是太无趣了”，你的反应？", options: [
+        { t: "无所谓，我不需要凡人的评价", v: "C" },
+        { t: "当晚就去放纵一次，证明自己", v: "B" },
+        { t: "心里暗骂，想立刻把对方拉黑", v: "F" },
+        { t: "顺手查查对方到底有什么有趣的底细", v: "E" }
+      ]},
+      { q: "你最受不了哪种类型的烂片？", options: [
+        { t: "剧情拖沓，男女主一直在逃避不解决问题", v: "F" },
+        { t: "全程清水，连一点暧昧和激情都没有", v: "B" },
+        { t: "坏人最后竟然被感化了，没有毁灭", v: "D" },
+        { t: "主角失去了一切，被人肆意摆布", v: "A" }
+      ]},
+      { q: "如果你发现室友或同事的日记本没锁，你会？", options: [
+        { t: "毫不犹豫地打开看，掌握对方的把柄", v: "E" },
+        { t: "碰都不碰，我对别人的破事没兴趣", v: "C" },
+        { t: "觉得麻烦，干脆装作没看见走开", v: "F" },
+        { t: "趁机在里面悄悄撕掉两页，制造混乱", v: "D" }
+      ]},
+      { q: "当你对某人产生好感时，你最典型的行为是？", options: [
+        { t: "想方设法掌控TA的行踪和社交圈", v: "A" },
+        { t: "产生强烈的肢体接触渴望", v: "B" },
+        { t: "强迫自己转移注意力，扼杀好感", v: "C" },
+        { t: "把TA过去几年的动态全部扒个底朝天", v: "E" }
+      ]},
+      { q: "如果不考虑后果，你最想体验的一件事是？", options: [
+        { t: "一场极致放纵、醒来即忘的狂欢", v: "B" },
+        { t: "按下核按钮，看着旧世界崩塌", v: "D" },
+        { t: "在深山老林出家，与世隔绝", v: "C" },
+        { t: "像造物主一样，完全操纵某个人的思想", v: "A" }
+      ]},
+      { q: "前任突然发消息说“我好想你”，你会？", options: [
+        { t: "回复‘可是我已经有别人了’，气死他", v: "D" },
+        { t: "直接无视或拉黑，拒绝情绪内耗", v: "F" },
+        { t: "点进朋友圈，分析他最近过得有多惨", v: "E" },
+        { t: "如果对方颜值还在，不介意再来一次", v: "B" }
+      ]},
+      { q: "看到一场极其壮观的暴风雨或海啸视频，你会觉得？", options: [
+        { t: "感到莫名兴奋，大自然的破坏力真美", v: "D" },
+        { t: "觉得很危险，想躲进安全的被窝里", v: "F" },
+        { t: "内心毫无波澜，甚至觉得吵闹", v: "C" },
+        { t: "想亲身站在风暴中心感受那种冲击", v: "B" }
+      ]},
+      { q: "最后，你觉得自己之所以来做这个测试，是因为？", options: [
+        { t: "想确切知道自己是什么类型，好掌控自己", v: "A" },
+        { t: "太无聊了，随便找点刺激的打发时间", v: "B" },
+        { t: "只是想看看题库还能挖出什么人性阴暗面", v: "E" },
+        { t: "现实太累了，借测试逃避一下", v: "F" }
+      ]}
+    ];
+
+    const resultsPool = {
+      A: {
+        title: "【顶级占有欲】",
+        tags: ["病娇潜质", "绝对控制", "主权宣誓"],
+        desc: "你的潜意识深处藏着一头名为“占有”的野兽。你极度缺乏安全感，因此只要是你认定的人或事，你都渴望100%的绝对掌控。你受不了失控、受不了背叛，更受不了别人触碰你的专属领地。在你的字典里，爱等同于吞噬与独占。",
+        diagnosis: "极度缺乏安全感的具象化。你的占有欲本质上是对“被抛弃”的深度恐惧。你试图用绝对的控制来换取确定性，因为只有100%属于你，你才敢稍微放下戒备。",
+        interpretation: "图谱中极高的占有欲压制了其他欲望，说明你在人际关系中处于高度紧绷状态，领地意识极强。",
+        audience: "在外人眼里可能是“极度靠谱、甚至有点控制狂”的角色。伴侣或密友偶尔会感到窒息。你往往通过物质上的付出或工作上的包揽，来换取对方的绝对依赖。",
+        risk: "如果得不到100%的回应，你的心态极易崩盘，甚至走向极端的多疑和自我折磨，最终亲手毁掉你最想留住的关系。",
+        advice: "尝试将注意力从“控制别人”转移到“建立自身不可替代的边界”上。学会接受适当的失控，爱不是囚禁，而是引力。"
+      },
+      B: {
+        title: "【极致情欲】",
+        tags: ["荷尔蒙引擎", "感官动物", "危险诱惑"],
+        desc: "你对这个世界的感知是充满温度与触感的。比起枯燥的道理和虚幻的承诺，你更相信纯粹的感官刺激、心跳加速的浪漫和身体的吸引。你是一团行走的人间烟火，比起克制，你更愿意在危险边缘体验生命的热烈。",
+        diagnosis: "高频的感官需求和多巴胺依赖。你用强烈的感官体验来对抗内心的虚无，你需要被渴望、被触碰，通过危险的边缘试探来证明自己还鲜活地活着。",
+        interpretation: "情欲一骑绝尘，意味着你目前处于生命力极其旺盛，但也极度渴求外界强烈反馈的阶段。",
+        audience: "天生的发光体，极其擅长散发魅力。在社交场上如鱼得水，但在建立深度、长期的契约关系时却容易退缩，更迷恋那种“似有若无的拉扯感”。",
+        risk: "持续追求感官阈值的提升，会导致严重的“情感耐受”，越来越难以被简单的快乐满足，最终陷入沉溺和深度的自我消耗中。",
+        advice: "在追求刺激的边缘，建立一个安全的“情感锚点”，避免在过度消耗和频繁的新鲜感中彻底迷失真实的自我。"
+      },
+      C: {
+        title: "【绝对禁欲】",
+        tags: ["理智苦行僧", "封心锁爱", "低级欲望免疫"],
+        desc: "世俗的喧嚣和肉体的狂欢在你看来不过是低级的多巴胺。你的潜意识里有一种冷酷的“禁欲”倾向。你本能地排斥过度亲密、厌恶失控的情绪，习惯用理智扼杀冲动。你像一座冰山，拒绝任何人轻易靠近。",
+        diagnosis: "极度的自我压抑与防御机制。你试图通过切断七情六欲，来避免因为失去或失控而带来的痛苦。你的冷漠，其实是一层厚厚的装甲。",
+        interpretation: "禁欲指数爆表，说明你潜意识里正在进行一场巨大的“自我清洗”，强行压抑着可能爆发的其他原始欲望（如破坏欲或占有欲）。",
+        audience: "在外人看来是“清冷、疏离、高智感”的代名词。极少展露软弱，生活规律得像一台精密的机器，对那些情绪外放的人抱有一丝难以察觉的优越感。",
+        risk: "弹簧压得越紧，反弹越致命。长期的“禁欲”极易引发代偿性的心理扭曲，一旦这层防御被打破，可能会迎来最彻底的崩溃与堕落。",
+        advice: "不需要每时每刻都保持完美和清醒。允许自己偶尔搞砸，允许自己展现出世俗和脆弱的一面，别让理智杀死了你的生命力。"
+      },
+      D: {
+        title: "【隐性破坏欲】",
+        tags: ["掀桌达人", "重启狂魔", "混沌爱好者"],
+        desc: "表面情绪稳定，内心随时在盘算怎么把一切砸个稀巴烂。当事情不按预期发展，或是生活过于一成不变时，你不会选择修补，而是想直接毁掉现状、撕裂关系，在废墟上感受那种“不破不立”的变态爽感。",
+        diagnosis: "被强行压抑的愤怒与攻击性。你对现有的虚伪规则和枯燥日常感到极度厌倦，潜意识里渴望一场巨大的混乱来重新洗牌。",
+        interpretation: "高破坏欲往往伴随着低逃避欲，说明你不想躲藏，你想直面并撕碎那些让你不爽的事物。你是一颗随时可能引爆的定时炸弹。",
+        audience: "平时可能表现得很正常甚至很温和，但在某些特定的细节上会展现出令人毛骨悚然的偏执或冷酷。对“绝对完美”的事物有一种本能的毁灭冲动。",
+        risk: "如果不加控制，这种破坏欲会从“向外攻击”转为“向内攻击”（自毁）。你可能会在人生最关键的时刻，故意搞砸一切。",
+        advice: "找一个合法且安全的渠道去释放这种攻击性，比如极高强度的竞技体育，或者在一场完全沉浸的虚拟游戏里扮演大反派。不要在现实中玩火。"
+      },
+      E: {
+        title: "【深度窥探欲】",
+        tags: ["人形雷达", "暗中视奸", "吃瓜第一线"],
+        desc: "比起做舞台上的主角，你更喜欢待在阴影里充当“观察者”。你对人性的幽暗面、别人的隐私和秘密有着近乎痴迷的好奇心。掌握了别人的底牌，却不暴露自己，这种“敌明我暗”的窥探欲是你获取优越感和安全感的方式。",
+        diagnosis: "对未知和隐秘的病态渴求。你无法忍受信息差，潜意识里认为“掌握他人的秘密”就等于掌握了权力和安全感。",
+        interpretation: "窥探欲过高，意味着你在现实中可能处于边缘或旁观者的位置，试图通过“全知视角”来弥补自己不敢下场参与的遗憾。",
+        audience: "吃瓜第一线，朋友圈的资深潜水员。你极少暴露自己的真实生活，却像个雷达一样时刻收集着周围人的动向，心思极度缜密且敏感。",
+        risk: "长期沉迷于窥探他人，会让你彻底丧失经营自己真实生活的能力，最终变成一个活在别人阴影里的影子，深陷阴谋论和多疑之中。",
+        advice: "把这种可怕的信息收集能力和洞察力用在你的事业或学习上，而不是八卦上。试着主动走到聚光灯下，去经历，而不是永远在暗处观察。"
+      },
+      F: {
+        title: "【终极逃避欲】",
+        tags: ["人间失踪", "隐形人格", "乌托邦患者"],
+        desc: "你实在是太累了。你潜意识里最大的愿望就是立刻消失、断联，退化成一个不需要负责任的废物或宠物。面对麻烦和压力，你的第一反应永远是“惹不起我还躲不起吗”。在乌托邦里独自摆烂，是你最后的温柔。",
+        diagnosis: "极度的精神疲劳与现实抗拒。你的心理承载力已经达到了极限，潜意识正在疯狂拉响警报，强制要求你切断一切连接来保护自己。",
+        interpretation: "强烈的逃避欲通常掩盖了其他所有欲望，这是一种底层的求生本能。说明你当前的现实环境对你来说已经是“有毒”的了。",
+        audience: "习惯性已读不回，一遇到冲突或压力就想消失。手机常年静音，甚至觉得连呼吸都是一种负担，极度向往与世隔绝的乌托邦。",
+        risk: "逃避虽然可耻但暂时有用，但长期的逃避会导致社会功能的彻底退化。当退无可退时，现实的重压会让你瞬间粉碎。",
+        advice: "不要逼着自己立刻振作，允许自己短暂地“断电”。但请设定一个明确的期限（比如三天），然后先从最微小的事情开始，慢慢重建与现实的连接。"
+      }
+    };
+
+    let currentQ = 0;
+    let scores = []; // 用于记录每题选择的维度
+
+    // 画廊交互逻辑
+    const posterTitles = [
+      "核心潜意识档案",
+      "深度解析与建议"
+    ];
+    let currentPosterIndex = 0;
+
+    function switchPoster(dir) {
+      const wrapper = document.getElementById("capture-wrapper");
+      if (!wrapper) return;
+      
+      const cardWidth = wrapper.offsetWidth;
+      currentPosterIndex += dir;
+      if (currentPosterIndex < 0) currentPosterIndex = 0;
+      if (currentPosterIndex > 1) currentPosterIndex = 1;
+      
+      wrapper.scrollTo({
+        left: currentPosterIndex * cardWidth,
+        behavior: 'smooth'
+      });
+      document.getElementById("poster-indicator").innerText = posterTitles[currentPosterIndex];
+    }
+
+    // 初始化矩阵弹窗
+    document.addEventListener("DOMContentLoaded", () => {
+      window.CURRENT_TEST_INFO = {
+        id: 'hidden-desires',
+        title: '潜意识档案室',
+        tag: '深层潜意识',
+        url: window.location.href
+      };
+      
+      if (typeof initTestMatrix === 'function') {
+        initTestMatrix({ containerId: 'dummy-matrix-container', currentId: 'hidden-desires', theme: 'dark' });
+      }
+      checkHistory();
+      
+      // 监听滑动事件，同步更新导航栏标题
+      const wrapper = document.getElementById("capture-wrapper");
+      if (wrapper) {
+        wrapper.addEventListener('scroll', () => {
+          const card = document.querySelector('.poster-card');
+          if (!card) return;
+          const snapWidth = card.offsetWidth + 16; // card width + gap
+          const index = Math.round(wrapper.scrollLeft / snapWidth);
+          if (index !== currentPosterIndex && index >= 0 && index <= 1) {
+            currentPosterIndex = index;
+            document.getElementById("poster-indicator").innerText = posterTitles[currentPosterIndex];
+          }
+        });
+      }
+      
+      // Hash 路由防误触
+      window.addEventListener("popstate", (e) => {
+        if(document.getElementById("page-result").classList.contains("active")) {
+          // 如果用户在结果页点后退，为了防止丢失结果，强制留在结果页
+          window.history.pushState(null, null, '#result');
+        }
+      });
+    });
+
+    function showPage(pageId) {
+      document.querySelectorAll('.app-container').forEach(el => el.classList.remove('active'));
+      document.getElementById(pageId).classList.add('active');
+    }
+
+    function checkHistory() {
+      const history = JSON.parse(localStorage.getItem('hiddenDesiresHistory') || '[]');
+      if (history.length > 0) {
+        document.getElementById('btn-history').style.display = 'block';
+      }
+    }
+
+    function startQuiz() {
+      currentQ = 0;
+      scores = [];
+      
+      // 题目与选项随机乱序
+      quizData.sort(() => Math.random() - 0.5);
+      quizData.forEach(q => q.options.sort(() => Math.random() - 0.5));
+      
+      showPage('page-quiz');
+      renderQuestion();
+      window.history.pushState(null, null, '#quiz');
+    }
+
+    function renderQuestion() {
+      const qData = quizData[currentQ];
+      document.getElementById("question-text").innerText = qData.q;
+      
+      // 更新进度
+      document.getElementById("progress-text").innerText = `${currentQ + 1} / ${quizData.length}`;
+      document.getElementById("progress-bar").style.width = `${((currentQ + 1) / quizData.length) * 100}%`;
+      
+      const optContainer = document.getElementById("options-container");
+      optContainer.innerHTML = "";
+      
+      qData.options.forEach(opt => {
+        const btn = document.createElement("button");
+        btn.className = "option-btn";
+        btn.innerText = opt.t;
+        btn.onclick = () => selectOption(opt.v);
+        optContainer.appendChild(btn);
+      });
+    }
+
+    function selectOption(val) {
+      scores.push(val);
+      if (currentQ < quizData.length - 1) {
+        currentQ++;
+        setTimeout(renderQuestion, 150);
+      } else {
+        calculateResult();
+      }
+    }
+
+    function prevQuestion() {
+      if (currentQ > 0) {
+        currentQ--;
+        scores.pop();
+        renderQuestion();
+      } else {
+        showPage('page-start');
+        window.history.pushState(null, null, '');
+      }
+    }
+
+    function calculateResult() {
+      const counts = {A:0, B:0, C:0, D:0, E:0, F:0};
+      scores.forEach(v => counts[v]++);
+      
+      let maxDim = 'A';
+      let maxScore = -1;
+      
+      for (const dim of ['A', 'B', 'C', 'D', 'E', 'F']) {
+        if (counts[dim] > maxScore) {
+          maxScore = counts[dim];
+          maxDim = dim;
+        }
+      }
+      
+      // 动态计算纯度：除以该维度的最大可能得分
+      const maxCounts = {A:0, B:0, C:0, D:0, E:0, F:0};
+      quizData.forEach(q => q.options.forEach(opt => maxCounts[opt.v]++));
+      let basePurity = (maxScore / maxCounts[maxDim]) * 100;
+      
+      // 算法放大：为主导欲望增加75%的保底，让结果看起来更极端、更有冲击力
+      basePurity = 75 + (basePurity * 0.24);
+      
+      let finalPurity = basePurity >= 99 ? "99.9" : (basePurity + Math.random() * 1).toFixed(1);
+      if (parseFloat(finalPurity) > 99.9) finalPurity = "99.9";
+      finalPurity += "%";
+      
+      const resId = Date.now().toString(36).toUpperCase() + Math.floor(Math.random()*1000);
+      renderResultPage(maxDim, resId, false, finalPurity, counts);
+    }
+
+    function renderResultPage(resKey, resId, isHistory = false, purityStr = "99.9%", counts = null) {
+      const data = resultsPool[resKey];
+      
+      document.getElementById("poster-id").innerText = resId;
+      document.getElementById("poster-purity").innerText = purityStr;
+      document.getElementById("res-title").innerText = data.title;
+      document.getElementById("res-desc").innerText = data.desc;
+      
+      const tagsHtml = data.tags.map(t => `<div class="tag-item"># ${t}</div>`).join('');
+      document.getElementById("res-tags").innerHTML = tagsHtml;
+      
+      if (counts) {
+        // 计算每个维度的最大可能得分
+        const maxCounts = {A:0, B:0, C:0, D:0, E:0, F:0};
+        quizData.forEach(q => {
+          q.options.forEach(opt => maxCounts[opt.v]++);
+        });
+        
+        const sortedDims = ['A', 'B', 'C', 'D', 'E', 'F'].sort((a, b) => counts[b] - counts[a]);
+        const dimNames = { A: "占有欲", B: "情欲", C: "禁欲", D: "破坏欲", E: "窥探欲", F: "逃避欲" };
+        
+        let barsHtml = '';
+        sortedDims.forEach(dim => {
+          // 这里将得分除以该维度的最大可能得分，计算出“各自的百分比”
+          let percentage = ((counts[dim] / maxCounts[dim]) * 100);
+          
+          // 增加一点小随机数让数据显得更真实，并确保封顶在 99.9%
+          let finalPercent = percentage >= 99 ? "99.9" : (percentage + (Math.random() * 2)).toFixed(1);
+          if (parseFloat(finalPercent) > 99.9) finalPercent = "99.9";
+          
+          // 如果是主导维度，强制与右上角的纯度保持完全一致，避免随机小数导致的差异
+          if (dim === resKey && purityStr) {
+            finalPercent = purityStr.replace('%', '');
+          }
+          
+          barsHtml += `
+            <div style="display: flex; align-items: center; justify-content: space-between; font-size: 12px;">
+              <div style="width: 50px; color: var(--text-main); text-align: right; margin-right: 10px;">${dimNames[dim]}</div>
+              <div style="flex-grow: 1; height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; overflow: hidden;">
+                <div style="height: 100%; width: ${finalPercent}%; background: ${dim === resKey ? 'var(--accent-color)' : 'rgba(255,255,255,0.5)'}; border-radius: 3px;"></div>
+              </div>
+              <div style="width: 40px; text-align: right; color: ${dim === resKey ? 'var(--accent-color)' : 'var(--text-sub)'}; margin-left: 10px;">${finalPercent}%</div>
+            </div>
+          `;
+        });
+        document.getElementById('res-bars').innerHTML = barsHtml;
+      } else {
+        document.getElementById('res-bars').innerHTML = '';
+      }
+      
+      // 填充深度报告
+      if(data.diagnosis)      document.getElementById('dd-diagnosis').innerText = data.diagnosis;
+      document.getElementById('dd-interpretation').innerText = data.interpretation;
+      document.getElementById('dd-audience').innerText = data.audience;
+      document.getElementById('dd-risk').innerText = data.risk;
+      document.getElementById('dd-advice').innerText = data.advice;
+      // 重置滚动位置到最左边
+      const swipeContainer = document.getElementById("capture-wrapper");
+      if (swipeContainer) swipeContainer.scrollLeft = 0;
+      currentPosterIndex = 0;
+      document.getElementById("poster-indicator").innerText = posterTitles[0];
+
+      showPage('page-result');
+      
+      window.history.pushState(null, null, '#result');
+      
+      if (!isHistory) {
+        saveHistory(resKey, resId, purityStr, counts);
+      }
+    }
+
+    function toggleAccordion(element) {
+      // 切换当前项的状态
+      element.classList.toggle('active');
+    }
+
+    function saveHistory(resKey, resId, purityStr, counts) {
+      const history = JSON.parse(localStorage.getItem('hiddenDesiresHistory') || '[]');
+      const date = new Date().toLocaleString();
+      history.unshift({ resKey, resId, date, purityStr, counts });
+      if (history.length > 10) history.pop();
+      localStorage.setItem('hiddenDesiresHistory', JSON.stringify(history));
+    }
+
+    function showHistory() {
+      const history = JSON.parse(localStorage.getItem('hiddenDesiresHistory') || '[]');
+      const listDiv = document.getElementById("history-list");
+      listDiv.innerHTML = "";
+      
+      history.forEach(item => {
+        const data = resultsPool[item.resKey];
+        const div = document.createElement("div");
+        div.className = "history-item";
+        div.innerHTML = `
+          <div>
+            <div style="font-weight:bold; color:var(--text-main); margin-bottom:4px;">${data.title}</div>
+            <div style="font-size:12px; color:var(--text-sub);">${item.date}</div>
+          </div>
+          <button style="background:var(--accent-color);border:none;padding:6px 12px;border-radius:12px;color:white;cursor:pointer;">查看</button>
+        `;
+        div.onclick = () => {
+          closeHistory();
+          const historyCounts = item.counts || {A:0, B:0, C:0, D:0, E:0, F:0};
+          renderResultPage(item.resKey, item.resId, true, item.purityStr || "99.9%", historyCounts);
+        };
+        listDiv.appendChild(div);
+      });
+      
+      document.getElementById("history-modal").classList.add("active");
+    }
+
+    function closeHistory() {
+      document.getElementById("history-modal").classList.remove("active");
+    }
+
+    function resetQuiz() {
+      currentQ = 0;
+      scores = [];
+      showPage('page-start');
+      window.history.pushState(null, null, '');
+      checkHistory();
+    }
+
+    let currentModalPosterIndex = 0;
+
+    function generatePoster(index = currentPosterIndex) {
+      currentModalPosterIndex = index;
+      const targetId = 'poster-card-' + index;
+      const wrapper = document.getElementById(targetId);
+      if(!wrapper) return;
+      const originalBg = wrapper.style.backgroundColor;
+      wrapper.style.backgroundColor = '#0d0d0f'; 
+      
+      const img = document.getElementById('capture-image');
+      const oldSrc = img.src;
+      img.src = ''; // show empty during generation if re-generating
+      document.getElementById('capture-modal').classList.add('active');
+
+      htmlToImage.toPng(wrapper, { quality: 0.95 })
+        .then(function (dataUrl) {
+          wrapper.style.backgroundColor = originalBg;
+          img.src = dataUrl;
+        })
+        .catch(function (error) {
+          console.error('oops, something went wrong!', error);
+          wrapper.style.backgroundColor = originalBg;
+          img.src = oldSrc;
+          alert('生成图片失败，请截图保存');
+        });
+    }
+
+    function switchModalPoster(dir) {
+      let nextIndex = currentModalPosterIndex + dir;
+      if (nextIndex < 0) nextIndex = 1;
+      if (nextIndex > 1) nextIndex = 0;
+      generatePoster(nextIndex);
+    }
+
+  </script>
+</body>
+</html>

@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>UI Prototype - Hidden Desires Test</title>
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['PingFang SC', '-apple-system', 'sans-serif'],
+            mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', '"Liberation Mono"', '"Courier New"', 'monospace'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    /* Reset & Base */
+    body { margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    /* Hide scrollbar for clean UI prototype */
+    ::-webkit-scrollbar { display: none; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+
+    // --- Mock Data ---
+    const MOCK_QUESTION = {
+      text: "当你置身于一个完全陌生的黑暗房间，你的第一反应是？",
+      options: [
+        "寻找光亮的来源",
+        "靠墙站立，感受周围的温度",
+        "大声呼喊，试探回音",
+        "闭上眼睛，让心跳慢下来"
+      ]
+    };
+    
+    // ==========================================
+    // VARIANT A: Current Baseline (Dark Archive)
+    // ==========================================
+    const VariantA = ({ step, setStep }) => {
+      return (
+        <div className="min-h-screen bg-[#0d0d0f] text-[#f0f0f5] flex flex-col items-center">
+          {step === 'cover' && (
+            <div className="flex-1 flex flex-col justify-center items-center p-8 text-center mt-[10vh]">
+              <h1 className="text-4xl font-black tracking-widest mb-4 bg-gradient-to-br from-white to-[#ff5252] bg-clip-text text-transparent">潜意识档案室</h1>
+              <p className="text-[#888896] text-sm mb-16 leading-relaxed">
+                18次直觉拷问<br/>测出你最原始的本能欲望
+              </p>
+              <button 
+                onClick={() => setStep('quiz')}
+                className="bg-[#e53935] text-white rounded-full px-10 py-4 text-lg font-bold shadow-[0_4px_20px_rgba(229,57,53,0.4)] active:scale-95 transition-transform">
+                开始解剖
+              </button>
+              <div className="flex gap-4 mt-12 w-full justify-center">
+                <button className="bg-white/5 border border-white/10 text-sm px-6 py-3 rounded-full backdrop-blur-md">探索更多欲望</button>
+              </div>
+            </div>
+          )}
+
+          {step === 'quiz' && (
+            <div className="w-full max-w-[500px] flex flex-col min-h-screen">
+              <div className="p-5 flex flex-col gap-3">
+                <div className="w-full h-1.5 bg-white/5 rounded-full overflow-hidden">
+                  <div className="h-full bg-[#e53935] w-1/3"></div>
+                </div>
+                <div className="flex justify-between text-[#888896] text-sm">
+                  <button onClick={() => setStep('cover')}>← 上一题</button>
+                  <span>1 / 18</span>
+                </div>
+              </div>
+              <div className="p-5 text-lg font-semibold text-center min-h-[120px] flex items-center justify-center">
+                {MOCK_QUESTION.text}
+              </div>
+              <div className="p-5 flex flex-col gap-3">
+                {MOCK_QUESTION.options.map((opt, i) => (
+                  <button key={i} onClick={() => setStep('result')} className="bg-white/5 border border-white/10 rounded-2xl p-4 text-left text-sm active:bg-white/10 transition-colors">
+                    {opt}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {step === 'result' && (
+            <div className="w-full max-w-[500px] p-5">
+              <div className="flex justify-between items-center text-[#888896] text-sm mb-4">
+                <span>滑动查阅档案</span>
+                <span className="font-bold text-white tracking-widest">核心潜意识档案</span>
+              </div>
+              <div className="bg-gradient-to-b from-[#1a1a24] to-[#111116] border border-[#e53935]/30 rounded-[20px] p-8 shadow-[0_10px_40px_rgba(0,0,0,0.5)] relative overflow-hidden flex flex-col h-[75vh]">
+                <div className="absolute top-5 -right-5 w-24 h-24 border-4 border-[#e53935]/40 text-[#e53935]/40 rounded-full flex items-center justify-center text-xl font-black rotate-[25deg]">DANGER</div>
+                
+                <div className="text-xs text-[#888896] mb-6 flex justify-between relative z-10">
+                  <span>实验对象: #8972</span>
+                  <span>纯度: 92%</span>
+                </div>
+                
+                <div className="text-[#e53935] text-sm font-bold tracking-widest relative z-10">检测到你潜意识中最高的本能是</div>
+                <h2 className="text-4xl font-black text-white my-3 relative z-10">破坏欲</h2>
+                <div className="flex gap-2 mb-6 relative z-10">
+                  <span className="bg-[#e53935]/10 border border-[#e53935]/30 text-[#ff5252] text-xs px-3 py-1 rounded-md">极具攻击性</span>
+                  <span className="bg-[#e53935]/10 border border-[#e53935]/30 text-[#ff5252] text-xs px-3 py-1 rounded-md">秩序挑战者</span>
+                </div>
+                
+                <p className="text-gray-400 text-sm leading-relaxed mb-auto relative z-10">
+                  你的内心深处燃烧着一团渴望打破现有规则的火焰。你讨厌被定义，更厌恶一成不变的平庸。在别人眼里的安稳，对你来说是令人窒息的牢笼。
+                </p>
+
+                <div className="border-t border-white/10 pt-4 mt-6 text-center">
+                  <p className="text-[10px] text-[#888896]">扫码透视你的“潜意识欲望”</p>
+                  <button onClick={() => setStep('cover')} className="mt-4 text-xs bg-white/10 px-4 py-2 rounded">重测</button>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      );
+    };
+
+    // ==========================================
+    // VARIANT B: Brutalist Terminal
+    // ==========================================
+    const VariantB = ({ step, setStep }) => {
+      return (
+        <div className="min-h-screen bg-[#050505] text-white font-mono flex flex-col relative overflow-hidden">
+          {/* Scanline effect */}
+          <div className="absolute inset-0 pointer-events-none bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0IiBoZWlnaHQ9IjQiPgo8cmVjdCB3aWR0aD0iNCIgaGVpZ2h0PSI0IiBmaWxsPSIjMDAwIiBmaWxsLW9wYWNpdHk9IjAiLz4KPHBhdGggZD0iTTAgMUg0IiBzdHJva2U9InJnYmEoMjU1LDI1NSwyNTUsMC4wMykiIHN0cm9rZS13aWR0aD0iMSIvPgo8L3N2Zz4=')]"></div>
+
+          {step === 'cover' && (
+            <div className="flex-1 flex flex-col p-6 mt-12 z-10 max-w-[500px] mx-auto w-full">
+              <div className="border-l-4 border-[#ff2a00] pl-4 mb-16">
+                <h1 className="text-[2.5rem] font-black leading-none tracking-tighter uppercase break-words mb-2">Hidden<br/>Desires</h1>
+                <p className="text-[10px] text-gray-500 uppercase tracking-widest font-bold">Protocol // Subconscious Extraction v1.0</p>
+              </div>
+              
+              <div className="mb-auto">
+                <p className="text-gray-400 text-xs mb-8 uppercase tracking-wider leading-relaxed border border-gray-800 p-4 bg-black">
+                  [WARNING] This test requires absolute honesty. We will probe 18 instinctive reactions to construct your raw psychological profile.
+                </p>
+              </div>
+
+              <div className="flex flex-col gap-3">
+                <button 
+                  onClick={() => setStep('quiz')}
+                  className="bg-[#ff2a00] text-black w-full p-5 text-xl font-black uppercase tracking-widest hover:bg-white transition-colors flex justify-between items-center group">
+                  <span>Initialize Test</span>
+                  <span className="opacity-50 group-hover:opacity-100 transition-opacity">→</span>
+                </button>
+                <button className="border border-gray-800 text-gray-400 w-full p-4 text-xs uppercase tracking-widest hover:bg-gray-900 transition-colors">
+                  View Database
+                </button>
+              </div>
+            </div>
+          )}
+
+          {step === 'quiz' && (
+            <div className="w-full max-w-[500px] mx-auto flex flex-col min-h-screen p-6 z-10">
+              <div className="flex justify-between items-center border-b border-gray-800 pb-4 mb-8">
+                <span className="text-[#ff2a00] font-black tracking-widest">Q.01 // 18</span>
+                <button onClick={() => setStep('cover')} className="text-xs text-gray-500 uppercase hover:text-white transition-colors">Abort [X]</button>
+              </div>
+              
+              <div className="text-2xl font-bold leading-snug mb-12 uppercase">
+                {MOCK_QUESTION.text}
+              </div>
+              
+              <div className="flex flex-col gap-4 mt-auto mb-10">
+                {MOCK_QUESTION.options.map((opt, i) => (
+                  <button 
+                    key={i} 
+                    onClick={() => setStep('result')} 
+                    className="group flex gap-4 text-left p-4 border border-gray-800 bg-black hover:border-[#ff2a00] transition-colors relative overflow-hidden">
+                    <span className="text-gray-600 font-bold w-6 group-hover:text-[#ff2a00] transition-colors">0{i+1}</span>
+                    <span className="text-sm font-semibold uppercase">{opt}</span>
+                    <div className="absolute top-0 right-0 h-full w-1 bg-[#ff2a00] transform translate-x-full group-hover:translate-x-0 transition-transform"></div>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {step === 'result' && (
+            <div className="w-full max-w-[500px] mx-auto p-4 min-h-[90vh] flex flex-col z-10">
+              <div className="bg-white text-black p-6 flex-1 flex flex-col relative shadow-[0_0_40px_rgba(255,42,0,0.1)]">
+                <div className="absolute top-0 right-0 bg-[#ff2a00] text-white text-[10px] font-black px-2 py-1 uppercase">Classified</div>
+                
+                <div className="flex justify-between items-end border-b-2 border-black pb-2 mb-6 mt-4">
+                  <div className="text-xs font-black uppercase">Subject.ID // 8972</div>
+                  <div className="text-[10px] font-bold">TIMESTAMP: {new Date().toISOString().split('T')[0]}</div>
+                </div>
+
+                <div className="text-[10px] font-bold uppercase mb-1 text-gray-500">Primary Drive Identified:</div>
+                <h2 className="text-5xl font-black uppercase leading-none mb-6 text-[#ff2a00]">Chaos<br/>Affinity</h2>
+                
+                <div className="flex flex-wrap gap-2 mb-8">
+                  <span className="border border-black text-[10px] font-bold uppercase px-2 py-1 bg-black text-white">Aggressive</span>
+                  <span className="border border-black text-[10px] font-bold uppercase px-2 py-1 bg-black text-white">Rule-breaker</span>
+                </div>
+
+                <p className="text-sm font-semibold uppercase leading-relaxed mb-auto border-l-4 border-[#ff2a00] pl-4 text-gray-800">
+                  You possess a deep-seated urge to dismantle established structures. Stagnation feels like suffocation. Where others seek safety, you instinctively search for the fault lines to exploit.
+                </p>
+
+                <div className="mt-8 border-t-2 border-black pt-4 flex justify-between items-center">
+                  <div className="text-[10px] font-black uppercase">Scan to extract profile</div>
+                  <button onClick={() => setStep('cover')} className="bg-black text-white text-[10px] px-4 py-2 uppercase font-bold hover:bg-[#ff2a00] transition-colors">Restart</button>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      );
+    };
+
+    // ==========================================
+    // VARIANT C: Premium Minimalist
+    // ==========================================
+    const VariantC = ({ step, setStep }) => {
+      return (
+        <div className="min-h-screen bg-[#F9F8F6] text-[#2C2C2A] font-sans flex flex-col">
+          {step === 'cover' && (
+            <div className="flex-1 flex flex-col p-10 justify-between items-center text-center max-w-[500px] mx-auto">
+              <div className="mt-20">
+                <p className="text-[11px] uppercase tracking-[0.3em] text-[#8C8C8A] mb-6">Psychological Evaluation</p>
+                <h1 className="text-4xl font-light tracking-wide mb-6">The Hidden<br/>Desires</h1>
+                <p className="text-[14px] text-[#8C8C8A] max-w-[280px] mx-auto leading-relaxed">
+                  A curated exploration into your 18 instinctive reactions to uncover your most primal motivations.
+                </p>
+              </div>
+              
+              <div className="w-full max-w-[300px] flex flex-col gap-4 mb-10">
+                <button 
+                  onClick={() => setStep('quiz')}
+                  className="bg-[#2C2C2A] text-[#F9F8F6] w-full py-4 text-sm tracking-wider rounded-full hover:bg-black transition-colors shadow-lg shadow-black/10">
+                  Begin Exploration
+                </button>
+                <button className="w-full py-4 text-sm tracking-wider text-[#8C8C8A] hover:text-[#2C2C2A] transition-colors">
+                  View Archives
+                </button>
+              </div>
+            </div>
+          )}
+
+          {step === 'quiz' && (
+            <div className="w-full max-w-[500px] flex flex-col min-h-screen p-8 mx-auto">
+              <div className="flex justify-between items-center mb-16 pt-4">
+                <button onClick={() => setStep('cover')} className="text-[#8C8C8A] hover:text-black transition-colors flex items-center justify-center w-8 h-8 rounded-full bg-white shadow-sm">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M15 19l-7-7 7-7" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                </button>
+                <span className="text-[11px] tracking-[0.2em] text-[#8C8C8A]">1 OF 18</span>
+              </div>
+              
+              <div className="text-2xl font-light leading-relaxed mb-16 text-center px-4">
+                {MOCK_QUESTION.text}
+              </div>
+              
+              <div className="flex flex-col gap-3 mt-auto mb-8">
+                {MOCK_QUESTION.options.map((opt, i) => (
+                  <button 
+                    key={i} 
+                    onClick={() => setStep('result')} 
+                    className="p-5 bg-white border border-[#EBEBE8] rounded-2xl text-left text-[15px] text-[#5C5C5A] hover:border-[#2C2C2A] hover:text-black hover:shadow-sm transition-all flex items-center justify-between group">
+                    <span>{opt}</span>
+                    <span className="opacity-0 group-hover:opacity-100 text-[#EBEBE8] group-hover:text-black transition-all">→</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {step === 'result' && (
+            <div className="w-full max-w-[500px] p-6 min-h-[90vh] mx-auto flex flex-col">
+              <div className="bg-white border border-[#EBEBE8] rounded-[32px] p-10 flex-1 flex flex-col shadow-[0_10px_40px_rgba(0,0,0,0.03)]">
+                <div className="text-center mb-12 mt-4">
+                  <p className="text-[10px] uppercase tracking-[0.3em] text-[#8C8C8A] mb-4">Your core archetype</p>
+                  <h2 className="text-3xl font-light tracking-wide text-black">The Architect</h2>
+                </div>
+                
+                <div className="flex justify-center gap-6 mb-12 pb-12 border-b border-[#EBEBE8]">
+                  <div className="text-center">
+                    <p className="text-[10px] uppercase tracking-[0.2em] text-[#8C8C8A] mb-1">Clarity</p>
+                    <p className="text-lg font-medium text-black">92%</p>
+                  </div>
+                  <div className="w-[1px] bg-[#EBEBE8]"></div>
+                  <div className="text-center">
+                    <p className="text-[10px] uppercase tracking-[0.2em] text-[#8C8C8A] mb-1">Traits</p>
+                    <p className="text-sm mt-1 text-[#5C5C5A]">Order, Control</p>
+                  </div>
+                </div>
+
+                <p className="text-[15px] leading-relaxed text-[#5C5C5A] text-center px-2">
+                  You possess an innate desire to structure the world around you. Where others see chaos, you see systems waiting to be optimized. You seek profound control over your environment and narrative.
+                </p>
+
+                <div className="mt-auto pt-10 text-center">
+                  <button onClick={() => setStep('cover')} className="text-[12px] uppercase tracking-widest text-[#8C8C8A] hover:text-black border-b border-transparent hover:border-black transition-all pb-1">
+                    Retake Assessment
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      );
+    };
+
+    // ==========================================
+    // PROTOTYPE SWITCHER (Floating Bottom Bar)
+    // ==========================================
+    const PrototypeSwitcher = ({ currentVariant }) => {
+      const variants = [
+        { key: 'A', name: 'Dark Archive (Current)' },
+        { key: 'B', name: 'Brutalist Terminal' },
+        { key: 'C', name: 'Premium Minimalist' }
+      ];
+      
+      const currentIndex = variants.findIndex(v => v.key === currentVariant);
+      
+      const handleSwitch = (direction) => {
+        let newIndex = currentIndex + direction;
+        if (newIndex < 0) newIndex = variants.length - 1;
+        if (newIndex >= variants.length) newIndex = 0;
+        
+        const urlParams = new URLSearchParams(window.location.search);
+        urlParams.set('variant', variants[newIndex].key);
+        window.history.replaceState(null, '', '?' + urlParams.toString());
+        // Force a re-render
+        window.dispatchEvent(new Event('popstate'));
+      };
+
+      useEffect(() => {
+        const handleKeyDown = (e) => {
+          if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+          if (e.key === 'ArrowLeft') handleSwitch(-1);
+          if (e.key === 'ArrowRight') handleSwitch(1);
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+      });
+
+      return (
+        <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-white text-black px-4 py-2 rounded-full shadow-[0_4px_24px_rgba(0,0,0,0.15)] flex items-center gap-4 border border-gray-200 z-[9999] text-sm font-sans w-[340px] max-w-[90vw] justify-between">
+          <button onClick={() => handleSwitch(-1)} className="p-2 hover:bg-gray-100 rounded-full transition-colors flex-shrink-0">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M15 18l-6-6 6-6"/></svg>
+          </button>
+          <div className="font-semibold text-center truncate flex-1">
+            <span className="text-gray-400 mr-2">{variants[currentIndex].key}</span>
+            {variants[currentIndex].name}
+          </div>
+          <button onClick={() => handleSwitch(1)} className="p-2 hover:bg-gray-100 rounded-full transition-colors flex-shrink-0">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 18l6-6-6-6"/></svg>
+          </button>
+        </div>
+      );
+    };
+
+    // ==========================================
+    // APP CONTAINER
+    // ==========================================
+    const App = () => {
+      const [variant, setVariant] = useState('A');
+      const [step, setStep] = useState('cover');
+
+      useEffect(() => {
+        const checkVariant = () => {
+          const urlParams = new URLSearchParams(window.location.search);
+          const v = urlParams.get('variant') || 'A';
+          if (['A', 'B', 'C'].includes(v)) setVariant(v);
+        };
+        checkVariant();
+        window.addEventListener('popstate', checkVariant);
+        return () => window.removeEventListener('popstate', checkVariant);
+      }, []);
+
+      let VariantComponent = VariantA;
+      if (variant === 'B') VariantComponent = VariantB;
+      if (variant === 'C') VariantComponent = VariantC;
+
+      return (
+        <div className="relative pb-24">
+          <VariantComponent step={step} setStep={setStep} />
+          <PrototypeSwitcher currentVariant={variant} />
+        </div>
+      );
+    };
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
+</body>
+</html>

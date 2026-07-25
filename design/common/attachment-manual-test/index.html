@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>你的恋爱依恋气象站</title>
+    <!-- 引入 Tailwind 以支持引流组件弹窗的样式 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 使用更稳定且与其他测试一致的 html-to-image 替代 html2canvas -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html-to-image/1.11.11/html-to-image.min.js"></script>
+    <style>
+        :root {
+            --bg-gradient: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%);
+            --accent-color: #8c7ae6; /* 柔和紫色 */
+            --accent-light: #9c88ff;
+            --text-color: #4a4a4a;
+            --text-light: #7f8fa6;
+            --card-bg: rgba(255, 255, 255, 0.75);
+            --border-color: rgba(255, 255, 255, 0.5);
+            --card-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background: var(--bg-gradient);
+            background-attachment: fixed;
+            color: var(--text-color);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* 天气背景点缀元素（仅 CSS 实现的简单云朵或光斑） */
+        .weather-bg-element {
+            position: fixed;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.4);
+            filter: blur(40px);
+            z-index: -1;
+            pointer-events: none;
+        }
+        .weather-bg-1 { top: 10%; left: 10%; width: 200px; height: 200px; }
+        .weather-bg-2 { bottom: 20%; right: 10%; width: 250px; height: 250px; background: rgba(142, 197, 252, 0.4); }
+
+        .app-container {
+            max-width: 480px;
+            width: 100%;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            margin: 0 auto;
+        }
+
+        /* 页面切换控制 */
+        .page {
+            display: none;
+            width: 100%;
+            min-height: 100vh;
+            padding: 20px;
+            flex-direction: column;
+        }
+        .page.active {
+            display: flex;
+            animation: fadeIn 0.4s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ===== 玻璃拟态卡片组件 (Glassmorphism) ===== */
+        .glass-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            box-shadow: var(--card-shadow);
+            padding: 25px 20px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .btn {
+            background: rgba(255, 255, 255, 0.6);
+            color: var(--text-color);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            border-radius: 25px;
+            padding: 14px 20px;
+            font-size: 16px;
+            font-weight: bold;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: block;
+            width: 100%;
+            margin-bottom: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+        }
+        .btn:active {
+            transform: scale(0.98);
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%);
+            color: #fff;
+            border: none;
+            box-shadow: 0 4px 15px rgba(161, 140, 209, 0.4);
+            text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+        .btn-outline {
+            background: transparent;
+            color: var(--text-light);
+            box-shadow: none;
+            border: 1px solid rgba(0,0,0,0.1);
+        }
+
+        /* ===== 首页 ===== */
+        .home-header {
+            text-align: center;
+            margin-bottom: 30px;
+            margin-top: 20px;
+        }
+        .weather-icon-img {
+            font-size: 48px;
+            margin-bottom: 15px;
+            display: inline-block;
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
+        }
+        .title-box {
+            display: inline-block;
+            border-bottom: 3px solid var(--accent-light);
+            padding-bottom: 5px;
+            margin-bottom: 15px;
+        }
+        .title-box h1 {
+            font-size: 26px;
+            letter-spacing: 2px;
+            color: var(--text-color);
+        }
+        .subtitle {
+            font-size: 13px;
+            color: var(--text-light);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+        .cover-desc {
+            font-size: 15px;
+            line-height: 1.8;
+            margin-bottom: 30px;
+            text-align: left;
+            display: inline-block;
+            color: #555;
+        }
+        .cover-desc p {
+            margin-bottom: 10px;
+            padding-left: 20px;
+            position: relative;
+            font-weight: 500;
+        }
+        .cover-desc p::before {
+            content: "☁";
+            position: absolute;
+            left: 0;
+            color: var(--accent-color);
+            font-size: 14px;
+            top: 1px;
+        }
+
+        /* ===== 答题页 ===== */
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: rgba(255,255,255,0.4);
+            border-radius: 10px;
+            margin-bottom: 25px;
+            overflow: hidden;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #fbc2eb 0%, #a18cd1 100%);
+            width: 0%;
+            border-radius: 10px;
+            transition: width 0.4s ease;
+        }
+        .question-text {
+            font-size: 19px;
+            font-weight: bold;
+            margin-bottom: 30px;
+            line-height: 1.6;
+            text-align: left;
+            color: #333;
+        }
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .option-btn {
+            background: rgba(255, 255, 255, 0.85);
+            border: 1px solid rgba(255,255,255,0.9);
+            border-radius: 16px;
+            padding: 16px 20px;
+            font-size: 15px;
+            font-weight: 500;
+            text-align: left;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.02);
+            transition: all 0.2s;
+            color: #444;
+        }
+        .option-btn:active {
+            transform: scale(0.98);
+            background: #fff;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .back-btn {
+            margin-top: 30px;
+            background: none;
+            border: none;
+            color: var(--text-light);
+            font-size: 14px;
+            text-decoration: underline;
+            text-align: center;
+            cursor: pointer;
+            padding: 10px;
+        }
+
+        /* ===== 结果页 ===== */
+        #result-capture-area {
+            padding: 20px;
+            position: relative;
+            text-align: center;
+            overflow: hidden;
+        }
+        .result-header {
+            text-align: center;
+            margin-bottom: 25px;
+            margin-top: 10px;
+        }
+        .result-header h2 {
+            font-size: 13px;
+            letter-spacing: 3px;
+            margin-bottom: 12px;
+            color: var(--text-light);
+            font-weight: 600;
+        }
+        .result-type-name {
+            font-size: 32px;
+            font-weight: 900;
+            color: var(--accent-color);
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .result-type-sub {
+            font-size: 15px;
+            font-weight: bold;
+            background: rgba(140, 122, 230, 0.15);
+            color: var(--accent-color);
+            display: inline-block;
+            padding: 6px 18px;
+            border-radius: 20px;
+            letter-spacing: 1px;
+        }
+
+        /* 天气卡片表格布局 */
+        .info-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 10px;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        .info-table th, .info-table td {
+            padding: 15px;
+            font-size: 14px;
+            background: rgba(255,255,255,0.6);
+        }
+        .info-table th {
+            width: 35%;
+            font-weight: bold;
+            color: var(--accent-color);
+            border-radius: 12px 0 0 12px;
+            vertical-align: top;
+        }
+        .info-table td {
+            width: 65%;
+            font-weight: 500;
+            line-height: 1.6;
+            color: #444;
+            border-radius: 0 12px 12px 0;
+        }
+
+        /* 气象预警框 */
+        .warning-box {
+            background: linear-gradient(to right, rgba(255, 118, 117, 0.1), rgba(255, 118, 117, 0.05));
+            border-left: 4px solid #ff7675;
+            padding: 18px 20px;
+            margin-top: 25px;
+            border-radius: 0 12px 12px 0;
+            text-align: left;
+        }
+        .warning-label {
+            color: #d63031;
+            font-size: 13px;
+            font-weight: 800;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .warning-text {
+            font-size: 14px;
+            font-weight: 500;
+            color: #d63031;
+            line-height: 1.6;
+        }
+
+        .disclaimer {
+            font-size: 11px;
+            color: var(--text-light);
+            text-align: center;
+            margin-top: 25px;
+            padding: 5px;
+        }
+
+        .action-area {
+            margin-top: 15px;
+            padding: 0 10px 20px;
+        }
+
+        /* 生成海报弹窗 */
+        #poster-modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        #poster-img {
+            max-width: 90%;
+            max-height: 75vh;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            margin-bottom: 25px;
+        }
+        .close-poster-btn {
+            background: #fff;
+            color: #333;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        /* 历史记录抽屉 */
+        #history-modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .history-card {
+            background: var(--bg-gradient);
+            width: 100%;
+            max-width: 400px;
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            max-height: 80vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+        .history-item {
+            background: rgba(255,255,255,0.7);
+            padding: 15px;
+            margin-bottom: 12px;
+            border-radius: 12px;
+            cursor: pointer;
+            text-align: left;
+            transition: transform 0.1s;
+            border: 1px solid rgba(255,255,255,0.8);
+        }
+        .history-item:active {
+            transform: scale(0.98);
+        }
+        .history-item-title {
+            font-weight: 800;
+            font-size: 16px;
+            color: var(--accent-color);
+            margin-bottom: 4px;
+        }
+        .history-item-date {
+            font-size: 12px;
+            color: var(--text-light);
+            font-weight: 500;
+        }
+
+        .matrix-wrap {
+            margin-top: 10px;
+            margin-bottom: 20px;
+            padding: 0 15px;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+
+<!-- 天气背景点缀 -->
+<div class="weather-bg-element weather-bg-1"></div>
+<div class="weather-bg-element weather-bg-2"></div>
+
+<div class="app-container">
+    <!-- 首页 -->
+    <div id="page-home" class="page active">
+        <div class="glass-card" style="margin-top: 30px;">
+            <div class="home-header">
+                <div class="weather-icon-img">🌤️</div>
+                <br>
+                <div class="title-box">
+                    <h1>恋爱依恋气象站</h1>
+                </div>
+                <div class="subtitle">Romantic Weather Forecast</div>
+            </div>
+            
+            <div class="cover-desc">
+                <p>探测你的专属情感气候类型</p>
+                <p>预警恋爱中的雷暴与冰川期</p>
+                <p>生成仅伴侣可见的适宜气候指南</p>
+            </div>
+
+            <button class="btn btn-primary" onclick="startTest()">启动气象雷达</button>
+        </div>
+        <div style="display:flex; justify-content:center; gap:20px; font-size:13px; margin-top:15px; font-weight:500;">
+            <span style="color:var(--text-light); cursor:pointer;" onclick="if(window.openMatrixModal) openMatrixModal();">探索其他气候区 ☁</span>
+            <span id="btn-history" style="display:none; color:var(--text-light); cursor:pointer;" onclick="openHistory()">历史气象档案 📜</span>
+        </div>
+    </div>
+
+    <!-- 答题页 -->
+    <div id="page-quiz" class="page">
+        <div class="progress-bar">
+            <div class="progress-fill" id="progress-fill"></div>
+        </div>
+        <div class="glass-card" style="text-align: left; padding: 30px 20px;">
+            <div class="question-text" id="question-text">雷达加载中...</div>
+            <div class="options-list" id="options-list">
+                <!-- 选项动态渲染 -->
+            </div>
+        </div>
+        <button class="back-btn" id="btn-prev" onclick="prevQuestion()" style="display:none;">← 返回上一级空域</button>
+    </div>
+
+    <!-- 结果页 -->
+    <div id="page-result" class="page">
+        <!-- 套一层包裹器，专门用于 html2canvas 截图，解决边框/阴影/定位被裁剪的问题 -->
+        <div id="capture-wrapper" style="padding: 15px; background: var(--bg-gradient); width: 100%; border-radius: 10px;">
+            <div class="glass-card" id="result-capture-area" style="margin-top: 0; padding: 35px 20px 25px; border-radius: 20px; background: rgba(255,255,255,0.85);">
+            
+            <div class="result-header">
+                <h2>专属气象播报</h2>
+                <div class="result-type-name" id="res-type-name">加载中</div>
+                <div class="result-type-sub" id="res-type-sub">加载中</div>
+            </div>
+
+            <table class="info-table">
+                <tr>
+                    <th>气候构成</th>
+                    <td id="res-ingredients">加载中...</td>
+                </tr>
+                <tr>
+                    <th>气象表现</th>
+                    <td id="res-features">加载中...</td>
+                </tr>
+            </table>
+
+            <div class="warning-box">
+                <div class="warning-label">⚡ 极端天气预警</div>
+                <div class="warning-text" id="res-warning">加载中...</div>
+            </div>
+
+            <div class="disclaimer">
+                本气象报告基于成人依恋理论构建 | 仅供娱乐参考，请以实际体感为准
+            </div>
+        </div>
+        </div>
+
+        <div class="action-area" style="margin-top: 15px;">
+            <button class="btn btn-primary" onclick="generatePoster()">💾 保存气象预报单</button>
+            <div style="display:flex; justify-content:center; gap:16px; margin-top:15px; font-size:13px; font-weight:500;">
+                <span style="color:var(--text-light); text-decoration:underline; cursor:pointer;" onclick="if(window.openMatrixModal) openMatrixModal();">观测其他心理气象</span>
+                <span style="color:var(--text-light); text-decoration:underline; cursor:pointer;" onclick="location.reload()">重置雷达重新探测</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 海报弹窗 -->
+<div id="poster-modal">
+    <div style="color:white; margin-bottom:15px; font-size:15px; font-weight:500; text-align:center; flex-shrink:0;">长按图片保存，分享到小红书</div>
+    <img id="poster-img" src="" alt="生成的海报">
+    <button class="close-poster-btn" onclick="closePoster()" style="margin-top:15px; flex-shrink:0; width: 80%; max-width: 300px;">关闭弹窗</button>
+</div>
+
+<!-- 历史记录弹窗 -->
+<div id="history-modal">
+    <div class="history-card">
+        <h3 style="font-size:18px; font-weight:800; color:var(--text-color); margin-bottom:20px; text-align:center;">历史气象档案</h3>
+        <div id="history-list" style="overflow-y:auto; flex-grow:1; max-height: 60vh;">
+            <!-- 历史记录项 -->
+        </div>
+        <button class="btn" style="margin-top:20px; margin-bottom:0; background:rgba(255,255,255,0.5);" onclick="closeHistory()">收起档案</button>
+    </div>
+</div>
+
+<script src="../test-matrix.js"></script>
+<script>
+    // 题库配置 (10题, A: Anxiety, V: Avoidance)
+    // 词汇替换：更贴合天气、气象、情感流动
+    const questions = [
+        {
+            text: "1. 如果对方长达半天没有回复消息，你内心的情感雷达是？",
+            options: [
+                { text: "“可能是没网或者在忙吧，去干点别的”", A: 0, V: 0 },
+                { text: "“是不是我哪里做错了？完了完了要被抛弃了”", A: 1, V: 0 },
+                { text: "“不回拉倒，正好落得清静，谁离不开谁啊”", A: 0, V: 1 },
+                { text: "“心里很慌，但表面装作无所谓，甚至想撤回消息”", A: 1, V: 1 }
+            ]
+        },
+        {
+            text: "2. 当你们发生激烈争吵，你的默认气象防御机制是？",
+            options: [
+                { text: "就事论事，尝试沟通等待放晴", A: 0, V: 0 },
+                { text: "必须马上解决！疯狂夺命连环 Call", A: 1, V: 0 },
+                { text: "直接冷战，拉黑，切断一切降水", A: 0, V: 1 },
+                { text: "想和好但放不下自尊，一边嘴硬一边落泪", A: 1, V: 1 }
+            ]
+        },
+        {
+            text: "3. 伴侣突然准备了一个巨大的惊喜，你的第一反应是？",
+            options: [
+                { text: "好开心，热烈回应并感谢", A: 0, V: 0 },
+                { text: "太感动了，甚至有点害怕自己配不上这么好", A: 1, V: 0 },
+                { text: "觉得尴尬、有压力，思考要怎么还人情", A: 0, V: 1 },
+                { text: "开心，但立刻警惕是不是有什么陷阱或所求", A: 1, V: 1 }
+            ]
+        },
+        {
+            text: "4. 对于两人相处的空间，你的理想气候分布是？",
+            options: [
+                { text: "有各自的圈子，但也会留出高质量陪伴时间", A: 0, V: 0 },
+                { text: "恨不得24小时黏在一起成为连体婴", A: 1, V: 0 },
+                { text: "各自安好，最好周末见一面就行了", A: 0, V: 1 },
+                { text: "渴望靠近，但靠得太近又觉得窒息想逃", A: 1, V: 1 }
+            ]
+        },
+        {
+            text: "5. 在感情中，你最害怕遭遇哪种气象灾害？",
+            options: [
+                { text: "丧失彼此之间的坦诚与信任", A: 0, V: 0 },
+                { text: "对方突然冷淡，不再秒回，不再说我爱你", A: 1, V: 0 },
+                { text: "失去自我空间，被完全绑定控制", A: 0, V: 1 },
+                { text: "全身心投入后，发现自己像个小丑", A: 1, V: 1 }
+            ]
+        },
+        {
+            text: "6. 如果前任突然发来消息求复合，你的内心防线判断是？",
+            options: [
+                { text: "冷静评估，如果问题已解决可以考虑，否则拒绝", A: 0, V: 0 },
+                { text: "立马心软，之前的伤疤瞬间就忘了", A: 1, V: 0 },
+                { text: "直接无视，甚至觉得反感", A: 0, V: 1 },
+                { text: "疯狂纠结，想回去又怕重蹈覆辙，陷入死循环", A: 1, V: 1 }
+            ]
+        },
+        {
+            text: "7. 和伴侣在一起时，你觉得最舒适的温度和距离是？",
+            options: [
+                { text: "既能亲密无间，也能享受高质量独处", A: 0, V: 0 },
+                { text: "希望对方能时刻关注我，懂我每个眼神", A: 1, V: 0 },
+                { text: "彼此独立，像室友一样互相不干涉", A: 0, V: 1 },
+                { text: "想靠近又怕受伤，总是试探和退缩", A: 1, V: 1 }
+            ]
+        },
+        {
+            text: "8. 当你们面临未来规划时，你的第一反应是？",
+            options: [
+                { text: "共同探讨，理性规划，彼此支持", A: 0, V: 0 },
+                { text: "希望能立刻得到对方肯定的答复和保障", A: 1, V: 0 },
+                { text: "顺其自然，不需要过早承诺，承诺让我有压力", A: 0, V: 1 },
+                { text: "极度渴望一个未来，但总觉得对方会离开我", A: 1, V: 1 }
+            ]
+        },
+        {
+            text: "9. 当伴侣和其他异性朋友互动时，你的情绪预警系统会？",
+            options: [
+                { text: "给予基本的信任，有分寸就行", A: 0, V: 0 },
+                { text: "警铃大作，立刻开启福尔摩斯模式", A: 1, V: 0 },
+                { text: "无所谓，大家都有交友的权利", A: 0, V: 1 },
+                { text: "表面装作不在意，其实心里嫉妒得发疯", A: 1, V: 1 }
+            ]
+        },
+        {
+            text: "10. 在你看来，爱情的本质更像是一种？",
+            options: [
+                { text: "结伴旅行，一路上互相扶持", A: 0, V: 0 },
+                { text: "救赎，希望能有一个人永远陪着我", A: 1, V: 0 },
+                { text: "麻烦的交易，容易失去自我和自由", A: 0, V: 1 },
+                { text: "危险的赌博，大概率会输得很难看", A: 1, V: 1 }
+            ]
+        }
+    ];
+
+    // 结果池配置：更新为天气预报主题
+    const results = {
+        secure: {
+            name: "安全型",
+            sub: "晴朗微风型恋人 🌤️",
+            ingredients: "恒定阳光 60% | 柔和清风 30% | 过滤阴霾 10%",
+            features: "情感气候极其稳定，能准确传达阳光并敏锐感知对方的阴云。不会轻易掀起风暴试探，给予伴侣充足的安全感。",
+            warning: "虽然本气候区四季如春，极其宜居，但请勿因此当成理所当然。日常多抱抱，晴朗天气将更加持久。"
+        },
+        anxious: {
+            name: "焦虑型",
+            sub: "敏感雷阵雨型恋人 ⛈️",
+            ingredients: "极速升温 50% | 患得患失积雨云 40% | 查岗台风 10%",
+            features: "极度渴望亲密接触，容易胡思乱想，需要高频回应和确认被爱。内心降水丰富，一旦爱上就会毫无保留地倾泻。",
+            warning: "极易触发降水和雷暴警报，需随时用“亲亲抱抱”和“秒回”进行人工干预。断联超过2小时可能引发强台风！"
+        },
+        avoidant: {
+            name: "回避型",
+            sub: "高冷冰雾型恋人 🌫️",
+            ingredients: "独立冰川 70% | 情感冷锋 20% | 表面高压 10%",
+            features: "极度看重个人空间和独立性，排斥过度的情感黏稠。当情感浓度过高时，会本能地起雾隐藏自己，常被误认为冷血。",
+            warning: "请勿强行驱散其冰雾防御圈或进行高强度情感绑定！遇到冷锋过境请退后一步静置，强制靠近可能导致气温骤降至冰点。"
+        },
+        fearful: {
+            name: "恐惧型",
+            sub: "矛盾飓风型恋人 🌪️",
+            ingredients: "自尊防风林 45% | 极度缺爱气流 45% | 推拉龙卷风 10%",
+            features: "既害怕被卷走，又害怕靠得太近被伤害。经常口是心非，用推开对方的强风来测试对方是否会坚定地留下。",
+            warning: "气象预测难度 SS 级！需要极大的耐心与极致的偏爱。当其化身风暴推开你时，其实是在风眼处求救，请千万不要真的走开！"
+        }
+    };
+
+    // 答题状态
+    let currentQ = 0;
+    let historyStack = []; // 存储之前的分数状态 [{A, V}]
+    let currentScore = { A: 0, V: 0 };
+
+    // DOM 元素
+    const pages = {
+        home: document.getElementById('page-home'),
+        quiz: document.getElementById('page-quiz'),
+        result: document.getElementById('page-result')
+    };
+    
+    // 初始化
+    window.onload = () => {
+        let historyData = JSON.parse(localStorage.getItem('attachmentTestHistory')) || [];
+        if(historyData.length > 0) {
+            document.getElementById('btn-history').style.display = 'inline-block';
+        }
+        
+        // 挂载全局对象，供 test-matrix.js 读取当前测试信息
+        window.CURRENT_TEST_INFO = {
+            id: 'attachment-weather',
+            title: '恋爱依恋气象站',
+            tag: '情感预测',
+            url: window.location.href
+        };
+        
+        // 为了让弹窗正常工作，需要初始化一次（将按钮注入到一个隐藏容器中）
+        if (typeof initTestMatrix === 'function') {
+            const dummy = document.createElement('div');
+            dummy.id = 'dummy-matrix-container';
+            dummy.style.display = 'none';
+            document.body.appendChild(dummy);
+            initTestMatrix({ containerId: 'dummy-matrix-container', currentId: 'attachment-weather', theme: 'light' });
+        }
+        
+        // Hash 路由拦截
+        window.addEventListener('hashchange', handleHash);
+    };
+
+    function handleHash() {
+        if(location.hash === '#quiz' && pages.home.classList.contains('active')) {
+            showPage('quiz');
+        } else if(location.hash === '' && pages.quiz.classList.contains('active')) {
+            showPage('home');
+        }
+    }
+
+    function showPage(pageId) {
+        Object.values(pages).forEach(p => p.classList.remove('active'));
+        pages[pageId].classList.add('active');
+        window.scrollTo(0,0);
+    }
+
+    function startTest() {
+        currentQ = 0;
+        historyStack = [];
+        currentScore = { A: 0, V: 0 };
+        
+        // 打乱题目和选项
+        questions.sort(() => Math.random() - 0.5);
+        questions.forEach(q => q.options && q.options.sort(() => Math.random() - 0.5));
+        
+        location.hash = 'quiz';
+        showPage('quiz');
+        renderQuestion();
+    }
+
+    function renderQuestion() {
+        const q = questions[currentQ];
+        document.getElementById('question-text').innerText = q.text;
+        
+        const optionsList = document.getElementById('options-list');
+        optionsList.innerHTML = '';
+        
+        q.options.forEach((opt) => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.innerText = opt.text;
+            btn.onclick = () => selectOption(opt);
+            optionsList.appendChild(btn);
+        });
+
+        // 进度条
+        const progress = ((currentQ) / questions.length) * 100;
+        document.getElementById('progress-fill').style.width = `${progress}%`;
+
+        // 上一题按钮
+        document.getElementById('btn-prev').style.display = currentQ > 0 ? 'block' : 'none';
+    }
+
+    function selectOption(opt) {
+        historyStack.push({ A: currentScore.A, V: currentScore.V });
+        
+        currentScore.A += opt.A;
+        currentScore.V += opt.V;
+
+        currentQ++;
+        if (currentQ < questions.length) {
+            renderQuestion();
+        } else {
+            calculateResult();
+        }
+    }
+
+    function prevQuestion() {
+        if (currentQ > 0) {
+            currentQ--;
+            const prevState = historyStack.pop();
+            currentScore.A = prevState.A;
+            currentScore.V = prevState.V;
+            renderQuestion();
+        }
+    }
+
+    function calculateResult() {
+        // 阈值判断：总分10分，>=5 算高
+        const isAnxious = currentScore.A >= 5;
+        const isAvoidant = currentScore.V >= 5;
+
+        let typeKey = 'secure';
+        if (isAnxious && !isAvoidant) typeKey = 'anxious';
+        if (!isAnxious && isAvoidant) typeKey = 'avoidant';
+        if (isAnxious && isAvoidant) typeKey = 'fearful';
+
+        const resultData = results[typeKey];
+        
+        let historyData = JSON.parse(localStorage.getItem('attachmentTestHistory')) || [];
+        const record = {
+            date: new Date().toLocaleString('zh-CN', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }),
+            result: resultData
+        };
+        historyData.unshift(record);
+        localStorage.setItem('attachmentTestHistory', JSON.stringify(historyData));
+        
+        displayResult(resultData);
+    }
+
+    function openHistory() {
+        const historyData = JSON.parse(localStorage.getItem('attachmentTestHistory')) || [];
+        const listDiv = document.getElementById('history-list');
+        listDiv.innerHTML = '';
+        
+        historyData.forEach((record, index) => {
+            const item = document.createElement('div');
+            item.className = 'history-item';
+            item.innerHTML = `
+                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                    <div>
+                        <div class="history-item-title">${record.result.name} - ${record.result.sub}</div>
+                        <div class="history-item-date">${record.date}</div>
+                    </div>
+                    <div style="font-size:12px; font-weight:bold; background:var(--accent-color); color:white; padding:2px 8px; border-radius:12px;">
+                        #${historyData.length - index}
+                    </div>
+                </div>
+            `;
+            item.onclick = () => {
+                closeHistory();
+                displayResult(record.result);
+            };
+            listDiv.appendChild(item);
+        });
+        
+        document.getElementById('history-modal').style.display = 'flex';
+    }
+
+    function closeHistory() {
+        document.getElementById('history-modal').style.display = 'none';
+    }
+
+    function displayResult(data) {
+        document.getElementById('res-type-name').innerText = data.name;
+        document.getElementById('res-type-sub').innerText = data.sub;
+        document.getElementById('res-ingredients').innerText = data.ingredients;
+        document.getElementById('res-features').innerText = data.features;
+        document.getElementById('res-warning').innerText = data.warning;
+        
+        location.hash = 'result';
+        showPage('result');
+    }
+
+    function generatePoster() {
+        const captureWrapper = document.getElementById('capture-wrapper');
+        
+        // 生成海报前稍作延迟，确保字体和样式完全渲染
+        setTimeout(() => {
+            htmlToImage.toPng(captureWrapper, {
+                pixelRatio: window.devicePixelRatio > 1 ? window.devicePixelRatio : 2,
+                backgroundColor: '#e0c3fc', // 使用渐变起始色作为兜底背景
+                style: {
+                    margin: '0',
+                    transform: 'scale(1)',
+                    transformOrigin: 'top left',
+                    background: 'linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%)' // 强制注入渐变背景确保不透明
+                }
+            }).then(dataUrl => {
+                document.getElementById('poster-img').src = dataUrl;
+                document.getElementById('poster-modal').style.display = 'flex';
+            }).catch(err => {
+                console.error('截图生成失败', err);
+                alert('生成失败，请直接使用手机系统截图');
+            });
+        }, 100);
+    }
+
+    function closePoster() {
+        document.getElementById('poster-modal').style.display = 'none';
+    }
+</script>
+
+</body>
+</html>
