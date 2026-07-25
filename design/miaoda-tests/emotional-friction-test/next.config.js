@@ -6,6 +6,11 @@ const nextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
+  experimental: {
+    cpus: 1,
+    workerThreads: false,
+    memoryBasedWorkersCount: true,
+  },
 }
 
 module.exports = nextConfig
