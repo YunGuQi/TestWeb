@@ -11,7 +11,7 @@ export function middleware(request: NextRequest) {
   if (isProtectedPath && !isLoginPath) {
     const token = request.cookies.get('admin_token')?.value;
 
-    if (token !== 'Jiasite_Authorized') {
+    if (token !== 'jiasite_Authorized') {
       // If it's an API request, return 401 JSON
       if (path.startsWith('/api/')) {
         return NextResponse.json({ success: false, error: 'Unauthorized. Please login.' }, { status: 401 });
