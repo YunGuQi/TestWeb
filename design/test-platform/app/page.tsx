@@ -1,6 +1,21 @@
+'use client';
 import Link from 'next/link';
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 export default function LobbyPage() {
+  const [clickCount, setClickCount] = useState(0);
+  const router = useRouter();
+
+  const handleTitleClick = () => {
+    const newCount = clickCount + 1;
+    setClickCount(newCount);
+    if (newCount >= 5) {
+      setClickCount(0);
+      window.open('/admin/login', '_blank');
+    }
+  };
+
   return (
     <div className="text-white min-h-[100dvh] relative overflow-hidden bg-[#09090b]">
       <style dangerouslySetInnerHTML={{__html: `
@@ -64,7 +79,7 @@ export default function LobbyPage() {
 
       {/* MAIN CONTENT: 卡片列表 */}
       <div className="relative z-10 pb-24 px-4 pt-10 max-w-md mx-auto">
-        <div className="mb-10 text-center">
+        <div className="mb-10 text-center select-none cursor-pointer" onClick={handleTitleClick}>
           <h2 className="text-2xl font-black tracking-widest bg-clip-text text-transparent bg-gradient-to-r from-blue-300 via-purple-300 to-rose-300">EXPLORE</h2>
           <p className="text-xs text-gray-400 mt-2 tracking-widest uppercase">探索更多心理深潜</p>
         </div>

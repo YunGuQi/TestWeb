@@ -5,13 +5,13 @@ export async function POST(request: Request) {
   try {
     const { password } = await request.json();
 
-    if (password === 'Jiasite') {
+    if (password === 'jiasite') {
       const response = NextResponse.json({ success: true });
       
       // Set HttpOnly cookie for auth
       response.cookies.set({
         name: 'admin_token',
-        value: 'Jiasite_Authorized',
+        value: 'jiasite_Authorized',
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'lax',

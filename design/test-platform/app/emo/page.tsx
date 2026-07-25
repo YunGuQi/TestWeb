@@ -9,7 +9,6 @@ export default function App() {
   const [currentView, setCurrentView] = useState<'home' | 'test' | 'result'>('home');
   const [answers, setAnswers] = useState<Record<string, any>>({});
   const [showHistory, setShowHistory] = useState(false);
-  const [clickCount, setClickCount] = useState(0);
   const [historyRecords, setHistoryRecords] = useState<any[]>([]);
 
   const [isEntering, setIsEntering] = useState(false);
@@ -25,15 +24,6 @@ export default function App() {
       setHistoryRecords(saved);
     } catch (e) {}
   }, []);
-
-  const handleQueueClick = () => {
-    const newCount = clickCount + 1;
-    setClickCount(newCount);
-    if (newCount >= 5) {
-      setClickCount(0); // reset
-      window.open('/admin', '_blank');
-    }
-  };
 
   const handleFinishTest = (finalAnswers: Record<string, any>) => {
     setAnswers(finalAnswers);
@@ -117,7 +107,7 @@ export default function App() {
                       )}
                   </button>
                   
-                  <div onClick={handleQueueClick} className="flex items-center justify-center gap-2 text-[10px] text-black/60 font-mono font-bold mb-8 mx-auto px-4 cursor-pointer select-none">
+                  <div className="flex items-center justify-center gap-2 text-[10px] text-black/60 font-mono font-bold mb-8 mx-auto px-4 select-none">
                       <div className="w-1 h-1 bg-green-500 rounded-full animate-pulse"></div>
                       当前排队结账人数：<span>12,543</span> 人
                   </div>
