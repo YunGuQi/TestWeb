@@ -12,7 +12,7 @@ export default function LobbyPage() {
     setClickCount(newCount);
     if (newCount >= 5) {
       setClickCount(0);
-      window.open('/admin/login', '_blank');
+      router.push('/admin/login');
     }
   };
 
@@ -79,7 +79,7 @@ export default function LobbyPage() {
 
       {/* MAIN CONTENT: 卡片列表 */}
       <div className="relative z-10 pb-24 px-4 pt-10 max-w-md mx-auto">
-        <div className="mb-10 text-center select-none cursor-pointer" onClick={handleTitleClick}>
+        <div className="mb-10 text-center select-none cursor-pointer active:scale-95 transition-transform" onClick={handleTitleClick}>
           <h2 className="text-2xl font-black tracking-widest bg-clip-text text-transparent bg-gradient-to-r from-blue-300 via-purple-300 to-rose-300">EXPLORE</h2>
           <p className="text-xs text-gray-400 mt-2 tracking-widest uppercase">探索更多心理深潜</p>
         </div>

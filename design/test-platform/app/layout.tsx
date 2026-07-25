@@ -5,6 +5,13 @@ export const metadata = {
   description: '你的每一次纠结，都在暗中标好了价格',
 }
 
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+}
+
 export default function RootLayout({
   children,
 }: {
