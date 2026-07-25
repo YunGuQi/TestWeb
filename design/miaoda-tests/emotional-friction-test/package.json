@@ -24,6 +24,8 @@
     "tsx": "^4.23.1"
   },
   "devDependencies": {
+    "eslint": "latest",
+    "eslint-config-next": "latest",
     "typescript": "7.0.2"
   }
 }
