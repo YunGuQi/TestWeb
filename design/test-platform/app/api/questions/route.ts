@@ -3,9 +3,13 @@ import { prisma } from '../../../lib/prisma';
 
 export const dynamic = 'force-dynamic';
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
+    const { searchParams } = new URL(request.url);
+    const testId = searchParams.get('testId') || 'emotional-friction';
+    
     const questions = await prisma.question.findMany({
+      where: { testId },
       include: {
         options: true
       },

@@ -36,8 +36,8 @@ export default function TestEngine({ onBack, onFinish }: TestEngineProps) {
       <main className="flex-1 flex flex-col justify-center items-center h-full relative z-10 p-4">
          <div className="bg-white border-4 border-black p-8 max-w-sm w-full shadow-[8px_8px_0px_#000] text-center">
             <div className="w-8 h-8 border-4 border-black border-t-transparent rounded-full animate-spin mx-auto mb-6"></div>
-            <h2 className="text-xl font-black mb-2 tracking-widest">正在拉取最新题库</h2>
-            <p className="text-xs text-gray-600 font-bold">LOADING...</p>
+            <h2 className="text-xl font-black mb-2 tracking-widest">正在生成你的账单</h2>
+            <p className="text-xs text-gray-600 font-bold font-mono">系统扫描情绪成分中... 请稍候</p>
          </div>
       </main>
     );

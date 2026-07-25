@@ -12,6 +12,8 @@ export default function App() {
   const [clickCount, setClickCount] = useState(0);
   const [historyRecords, setHistoryRecords] = useState<any[]>([]);
 
+  const [isEntering, setIsEntering] = useState(false);
+
   useEffect(() => {
     // 初始化唯一设备 ID（首次生成后持久保存）
     if (!localStorage.getItem('deviceId')) {
@@ -97,8 +99,22 @@ export default function App() {
               </div>
 
               <div className="mt-auto w-full mb-8">
-                  <button onClick={() => setCurrentView('test')} className="brutalist-btn text-xl mb-3">
-                      <span>拉出结账单开始测算</span>
+                  <button
+                      onClick={() => {
+                        setIsEntering(true);
+                        setTimeout(() => setCurrentView('test'), 150);
+                      }}
+                      disabled={isEntering}
+                      className="brutalist-btn text-xl mb-3 disabled:opacity-80"
+                  >
+                      {isEntering ? (
+                        <span className="flex items-center justify-center gap-2">
+                          <span className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin inline-block"></span>
+                          正在进入...
+                        </span>
+                      ) : (
+                        <span>拉出结账单开始测算</span>
+                      )}
                   </button>
                   
                   <div onClick={handleQueueClick} className="flex items-center justify-center gap-2 text-[10px] text-black/60 font-mono font-bold mb-8 mx-auto px-4 cursor-pointer select-none">
