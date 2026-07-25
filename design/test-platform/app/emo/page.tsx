@@ -46,6 +46,7 @@ export default function App() {
 
   const handleRestart = () => {
     setAnswers({});
+    setIsEntering(false);
     setCurrentView('home');
   };
 
@@ -174,7 +175,10 @@ export default function App() {
 
       {currentView === 'test' && (
         <TestEngine 
-          onBack={() => setCurrentView('home')} 
+          onBack={() => {
+            setCurrentView('home');
+            setIsEntering(false);
+          }} 
           onFinish={handleFinishTest} 
         />
       )}
