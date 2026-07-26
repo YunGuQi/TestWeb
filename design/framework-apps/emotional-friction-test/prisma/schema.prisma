@@ -1,0 +1,52 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Question {
+  id        Int      @id @default(autoincrement())
+  text      String
+  order     Int
+  options   Option[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Option {
+  id         Int      @id @default(autoincrement())
+  questionId Int
+  question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  text       String
+  billName   String   // e.g. "装瞎逃避税"
+  senScore   Int      @default(0) // Sensitivity
+  rumScore   Int      @default(0) // Rumination
+  plsScore   Int      @default(0) // Pleasing
+  bndScore   Int      @default(0) // Boundary
+  createdAt  DateTime @default(now())
+}
+
+model ResultConfig {
+  id            Int      @id @default(autoincrement())
+  key           String   @unique // e.g. "high_bnd_low_sen"
+  title         String   // e.g. "【人间铁壁】"
+  tags          String   // e.g. "#钝感力王者,#反PUA大师,#关我屁事"
+  desc          String   // 解析长文
+  quote         String   // 总结金句
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model TestRecord {
+  id         Int      @id @default(autoincrement())
+  senTotal   Int
+  rumTotal   Int
+  plsTotal   Int
+  bndTotal   Int
+  resultKey  String
+  billsJson  String   @default("[]")
+  createdAt  DateTime @default(now())
+}
