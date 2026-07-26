@@ -14,7 +14,7 @@ export default function Home({ onStartTest, onRestoreHistory }: HomeProps) {
   const [queueCount, setQueueCount] = useState(42);
 
   const fetchHistory = (deviceId: string) => {
-    fetch(`/api/history?deviceId=${deviceId}&testId=emotional-friction`)
+    fetch(`/api/history?deviceId=${deviceId}&testId=emotional-friction&t=${Date.now()}`)
       .then(res => res.json())
       .then(data => {
         if (data.success && data.history) {

@@ -25,6 +25,30 @@ export async function GET(request: Request) {
       take: 20
     });
 
+    const resultConfigs = await prisma.resultConfig.findMany({
+      where: { testId }
+    });
+    const resultConfigMap = new Map(resultConfigs.map(r => [r.condition, r]));
+
+    const allOptionIds = new Set<string>();
+    records.forEach(rec => {
+      try {
+        const answers = JSON.parse(rec.answers || '{}');
+        Object.values(answers).forEach((v: any) => {
+          if (v) allOptionIds.add(v.toString());
+        });
+      } catch(e) {}
+    });
+
+    const numericIds = Array.from(allOptionIds).map(id => parseInt(id, 10)).filter(n => !isNaN(n));
+    let dbOptionsMap = new Map<number, any>();
+    if (numericIds.length > 0) {
+      const dbOptions = await prisma.option.findMany({
+        where: { id: { in: numericIds } }
+      });
+      dbOptions.forEach(opt => dbOptionsMap.set(opt.id, opt));
+    }
+
     const history = records.map(rec => {
       let answers: Record<string, any> = {};
       try {
@@ -55,6 +79,30 @@ export async function GET(request: Request) {
           }
         });
       });
+      
+      optionIds.forEach(id => {
+        const numId = parseInt(id, 10);
+        const opt = dbOptionsMap.get(numId);
+        if (opt) {
+          try {
+            const scores = JSON.parse(opt.scores || '{}');
+            const senScore = scores.sen || 0;
+            const rumScore = scores.rum || 0;
+            const plsScore = scores.pls || 0;
+            const bndScore = scores.bnd || 0;
+
+            sen += senScore;
+            rum += rumScore;
+            pls += plsScore;
+            bnd += bndScore;
+
+            const cost = (senScore * 300) + (rumScore * 250) + (plsScore * 280);
+            if (scores.billName && cost > 0) {
+              billItems.push({ name: scores.billName, cost });
+            }
+          } catch (e) {}
+        }
+      });
 
       let totalFriction = (sen * 300) + (rum * 250) + (pls * 280) - (bnd * 100);
       if (totalFriction < 0) totalFriction = 0;
@@ -81,17 +129,18 @@ export async function GET(request: Request) {
       }
 
       const fallbackRes = results.find(r => r.key === resultKey) || results[0];
+      const resConfig = resultConfigMap.get(resultKey);
 
       return {
         id: rec.id,
         timestamp: new Date(rec.createdAt).getTime(),
         result: {
-          id: rec.resultId || 1,
+          id: rec.resultId || resConfig?.id || 1,
           key: resultKey,
-          title: fallbackRes.title,
+          title: resConfig?.title || fallbackRes.title,
           tags: fallbackRes.tags || '#钝感力王者,#反PUA大师',
-          description: fallbackRes.description,
-          quote: fallbackRes.quote,
+          description: resConfig?.desc || fallbackRes.description,
+          quote: resConfig?.quote || fallbackRes.quote,
           sen,
           rum,
           pls,
