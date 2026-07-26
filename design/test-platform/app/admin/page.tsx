@@ -17,13 +17,8 @@ export default async function AdminDashboard({ searchParams }: { searchParams: P
       }
     }
   });
-  const testRecordCount = await prisma.testRecord.count({ where: { testId } });
-  
   let config = await prisma.globalConfig.findFirst({ where: { testId } });
   let baseCount = config?.baseCount || 12544;
-  
-  const totalPV = baseCount + testRecordCount * 3; 
-  const conversionRate = totalPV > 0 ? ((testRecordCount / totalPV) * 100).toFixed(2) : '0.00';
 
   // --- Analytics Calculation ---
   const allCodesForStats = await prisma.activationCode.findMany({
@@ -72,6 +67,17 @@ export default async function AdminDashboard({ searchParams }: { searchParams: P
   const uniqueDevices = Object.keys(deviceCounts).length;
   const multiTestDevices = Object.values(deviceCounts).filter(c => c > 1).length;
   const retestRate = uniqueDevices > 0 ? ((multiTestDevices / uniqueDevices) * 100).toFixed(1) : '0.0';
+
+  let testRecordCount = 0;
+  allCodesForStats.forEach(code => {
+    try {
+      const devices = JSON.parse(code.devices || '[]');
+      const uniqueCodeDevices = Array.from(new Set(devices));
+      uniqueCodeDevices.forEach((d: any) => {
+        testRecordCount += (deviceCounts[d] || 0);
+      });
+    } catch(e) {}
+  });
 
   const resultsConfig = await prisma.resultConfig.findMany({ where: { testId } });
   const resultTitleMap = new Map(resultsConfig.map(r => [r.id, r.title]));
