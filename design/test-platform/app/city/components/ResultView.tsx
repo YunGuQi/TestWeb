@@ -251,14 +251,18 @@ export default function ResultView({ forcedResultData }: ResultViewProps) {
               { label: '社交', value: userCoords[3] ?? 5 },
               { label: '品味', value: userCoords[4] ?? 5 }
             ].map((dim, i) => {
-              const pct = Math.round(Math.min(100, Math.max(0, (dim.value / 10) * 100)));
+              let pct = (dim.value / 10) * 100;
+              if (pct < 10) pct = 10;
+              if (pct > 99) pct = 99;
+              const hash = ((dim.value * 13.5 + rank * 7.3 + i * 3.1) % 1) * 0.99;
+              const pctStr = (Math.floor(pct) + hash).toFixed(2) + '%';
               return (
                 <div key={i} className="flex gap-2.5 text-xs items-center">
                   <span className="w-8 font-bold opacity-90 shrink-0">{dim.label}</span>
                   <div className={`h-2.5 ${currentStyle.barTrack} flex-1 rounded-full overflow-hidden border shadow-inner transition-colors duration-300`}>
-                    <div style={{ width: `${pct}%` }} className={`h-full ${currentStyle.barFill} rounded-full transition-all duration-500`}></div>
+                    <div style={{ width: pctStr }} className={`h-full ${currentStyle.barFill} rounded-full transition-all duration-500`}></div>
                   </div>
-                  <span className="w-9 text-right font-mono font-bold text-xs shrink-0">{pct}%</span>
+                  <span className="w-12 text-right font-mono font-bold text-xs shrink-0">{pctStr}</span>
                 </div>
               );
             })}
