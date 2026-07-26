@@ -5,7 +5,8 @@ import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 
 const TESTS = [
   { id: 'emotional-friction', name: '深度情绪内耗测算', icon: '🔥', tag: 'EMO' },
-  { id: 'city-personality', name: '性格城市匹配测试', icon: '🏙️', tag: 'CITY' }
+  { id: 'city-personality', name: '性格城市匹配测试', icon: '🏙️', tag: 'CITY' },
+  { id: 'destiny-lover', name: '命定恋人红娘测试', icon: '🧧', tag: 'DESTINY' }
 ];
 
 function WorkspaceDropdown({ 

@@ -123,7 +123,29 @@ export default function LobbyPage() {
               <span className="bg-white/10 text-white/90 px-4 py-1.5 rounded-full font-bold group-hover:bg-white/20 transition">Start →</span>
             </div>
           </Link>
-
+          {/* Card 2: 命定恋人档案卡 */}
+          <Link href="/destiny-lover" className="block group overflow-hidden rounded-3xl p-5 glass-card hover:bg-white/10 transition-all duration-300 hover:scale-[1.02]">
+            <div className="flex gap-4">
+              <div className="w-24 h-24 shrink-0 rounded-[1.25rem] bg-gradient-to-br from-[#8A2B2B] to-[#5c1c1c] flex items-center justify-center relative shadow-[0_8px_16px_rgba(138,43,43,0.4)] overflow-hidden border border-[#D13030]/30">
+                <div className="w-12 h-12 border border-[#E8E2D5]/50 flex items-center justify-center animate-pulse">
+                    <span className="text-[#E8E2D5] font-serif text-2xl font-bold tracking-widest" style={{ writingMode: 'vertical-rl' }}>缘</span>
+                </div>
+                <div className="absolute top-0 right-0 bg-gradient-to-r from-yellow-400 to-amber-500 text-amber-900 text-[9px] font-bold px-2 py-0.5 rounded-bl-lg shadow-lg">NEW</div>
+              </div>
+              <div className="flex-1">
+                <h3 className="font-bold text-base mb-1.5 text-white/95 tracking-wide">月老办事处：解密命定恋人</h3>
+                <p className="text-xs text-white/60 leading-relaxed line-clamp-2 mb-3">你命中注定的那个人究竟是什么模样？花3分钟完成灵魂问卷，抽取你的专属红娘档案卡。</p>
+                <div className="flex flex-wrap items-center gap-2 text-[10px] text-white/80">
+                  <div className="glowing-tag rounded-full px-2 py-1 flex items-center gap-1">💖 情感解析</div>
+                  <div className="glowing-tag rounded-full px-2 py-1 flex items-center gap-1">📜 签文解读</div>
+                </div>
+              </div>
+            </div>
+            <div className="mt-4 border-t border-white/10 pt-3 flex justify-between items-center text-xs">
+              <span className="text-white/40 font-mono">NEW LAUNCH</span>
+              <span className="bg-white/10 text-white/90 px-4 py-1.5 rounded-full font-bold group-hover:bg-white/20 transition">Start →</span>
+            </div>
+          </Link>
           {/* Card 2: 性格城市匹配测试 (Now Active!) */}
           <Link href="/city" className="block group overflow-hidden rounded-3xl p-5 glass-card hover:bg-white/10 transition-all duration-300 hover:scale-[1.02]">
             <div className="flex gap-4">

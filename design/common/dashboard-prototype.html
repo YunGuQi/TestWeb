@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CMS 大盘 - UI Prototype</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+    .font-sans { font-family: 'Inter', sans-serif; }
+    .font-mono { font-family: 'Space Mono', monospace; }
+  </style>
+</head>
+<body class="antialiased min-h-screen">
+  <div id="app"></div>
+
+  <script>
+    const data = {
+      stats: [
+        { label: '题库统计 (Questions)', value: '12', subtext: '8 个测试结果配置' },
+        { label: '流量统计 (Traffic)', value: '4,521', subtext: '今日真实测试次数' },
+        { label: '订单统计 (Codes)', value: '1,205', subtext: '已售出 / 绑定数' },
+        { label: '前端展示注水数 (Display)', value: '152K+', subtext: '真实测试数 + BaseCount' }
+      ],
+      actions: [
+        { icon: '📝', title: '编辑题目', desc: '管理题干与选项分值' },
+        { icon: '🎨', title: '结果卡片配置', desc: '修改深度解析与海报' },
+        { icon: '🔑', title: '生成订单卡密', desc: '一键批量生成激活码' },
+        { icon: '⚙️', title: '全局动效配置', desc: '弹幕速度与覆盖文案' }
+      ]
+    };
+
+    const variants = {
+      'A': {
+        name: 'Linear风 / 高级暗黑 (Dark & Sleek)',
+        render: () => `
+          <div class="min-h-screen bg-[#0A0A0A] text-gray-300 font-sans selection:bg-indigo-500/30">
+            <!-- Sidebar & Main Layout -->
+            <div class="flex h-screen overflow-hidden">
+              <aside class="w-64 border-r border-white/10 bg-[#0F0F0F] p-6 flex flex-col gap-6">
+                <div class="text-white font-bold text-xl tracking-tight flex items-center gap-2">
+                  <div class="w-6 h-6 rounded bg-gradient-to-tr from-indigo-500 to-purple-500 shadow-[0_0_15px_rgba(99,102,241,0.4)]"></div>
+                  Psyche CMS
+                </div>
+                <nav class="flex flex-col gap-2 mt-4 text-sm font-medium">
+                  <a href="#" class="px-3 py-2 rounded-lg bg-white/5 text-white border border-white/5">大盘概览 Overview</a>
+                  <a href="#" class="px-3 py-2 rounded-lg text-gray-500 hover:text-gray-300 hover:bg-white/5 transition">订单管理 Codes</a>
+                  <a href="#" class="px-3 py-2 rounded-lg text-gray-500 hover:text-gray-300 hover:bg-white/5 transition">内容管理 CMS</a>
+                  <a href="#" class="px-3 py-2 rounded-lg text-gray-500 hover:text-gray-300 hover:bg-white/5 transition">动效组件 Addons</a>
+                </nav>
+              </aside>
+              
+              <main class="flex-1 p-10 overflow-y-auto">
+                <header class="mb-10 flex justify-between items-end">
+                  <div>
+                    <h1 class="text-3xl font-bold text-white tracking-tight mb-2">大盘概览</h1>
+                    <p class="text-gray-500 text-sm">欢迎回来，今日核心数据已更新。</p>
+                  </div>
+                  <button class="bg-white text-black px-4 py-2 rounded-md text-sm font-semibold hover:bg-gray-200 transition">
+                    + 新建测试
+                  </button>
+                </header>
+
+                <div class="grid grid-cols-4 gap-4 mb-10">
+                  ${data.stats.map(s => `
+                    <div class="bg-[#111] border border-white/10 p-5 rounded-xl shadow-lg relative overflow-hidden group hover:border-white/20 transition">
+                      <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition transform group-hover:scale-110">
+                        <svg class="w-16 h-16" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L2 22h20L12 2zm0 3.83L18.17 20H5.83L12 5.83z"/></svg>
+                      </div>
+                      <h3 class="text-gray-400 text-xs font-medium mb-3 uppercase tracking-wider">${s.label}</h3>
+                      <div class="text-3xl font-bold text-white mb-1">${s.value}</div>
+                      <div class="text-xs text-gray-500">${s.subtext}</div>
+                    </div>
+                  `).join('')}
+                </div>
+
+                <h2 class="text-lg font-semibold text-white mb-4">快捷入口</h2>
+                <div class="grid grid-cols-2 gap-4">
+                  ${data.actions.map(a => `
+                    <button class="flex items-start text-left gap-4 bg-[#111] border border-white/10 p-5 rounded-xl hover:bg-[#161616] hover:border-white/20 transition">
+                      <div class="text-2xl bg-white/5 p-3 rounded-lg border border-white/5">${a.icon}</div>
+                      <div>
+                        <div class="text-white font-medium mb-1">${a.title}</div>
+                        <div class="text-gray-500 text-sm">${a.desc}</div>
+                      </div>
+                    </button>
+                  `).join('')}
+                </div>
+              </main>
+            </div>
+          </div>
+        `
+      },
+      'B': {
+        name: 'Vercel风 / 极简科技 (Minimalist)',
+        render: () => `
+          <div class="min-h-screen bg-[#FAFAFA] text-gray-900 font-sans selection:bg-black selection:text-white">
+            <!-- Topbar Layout -->
+            <nav class="border-b border-gray-200 bg-white">
+              <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+                <div class="flex items-center gap-8">
+                  <div class="font-bold flex items-center gap-2">
+                    <div class="w-5 h-5 bg-black rounded-sm"></div>
+                    PSYCHE
+                  </div>
+                  <div class="flex gap-1 text-sm font-medium text-gray-600">
+                    <a href="#" class="px-3 py-1.5 rounded-md bg-gray-100 text-black">Overview</a>
+                    <a href="#" class="px-3 py-1.5 rounded-md hover:bg-gray-50 transition">Codes</a>
+                    <a href="#" class="px-3 py-1.5 rounded-md hover:bg-gray-50 transition">CMS</a>
+                  </div>
+                </div>
+                <div class="w-8 h-8 rounded-full bg-gray-200 border border-gray-300"></div>
+              </div>
+            </nav>
+
+            <main class="max-w-6xl mx-auto px-6 py-10">
+              <div class="mb-8 flex justify-between items-center">
+                <h1 class="text-2xl font-bold tracking-tight">Overview</h1>
+              </div>
+
+              <div class="grid grid-cols-4 gap-4 mb-10">
+                ${data.stats.map(s => `
+                  <div class="bg-white border border-gray-200 p-5 rounded-lg shadow-sm">
+                    <h3 class="text-gray-500 text-xs font-medium mb-2">${s.label}</h3>
+                    <div class="text-3xl font-bold mb-1 tracking-tight">${s.value}</div>
+                    <div class="text-xs text-gray-400">${s.subtext}</div>
+                  </div>
+                `).join('')}
+              </div>
+
+              <h2 class="text-sm font-semibold text-gray-900 uppercase tracking-widest mb-4">Quick Actions</h2>
+              <div class="grid grid-cols-4 gap-4">
+                ${data.actions.map(a => `
+                  <button class="text-left bg-white border border-gray-200 p-4 rounded-lg hover:border-black hover:shadow-md transition-all duration-200 group">
+                    <div class="text-xl mb-3 grayscale group-hover:grayscale-0 transition">${a.icon}</div>
+                    <div class="font-semibold text-sm mb-1">${a.title}</div>
+                    <div class="text-xs text-gray-500 leading-relaxed">${a.desc}</div>
+                  </button>
+                `).join('')}
+              </div>
+            </main>
+          </div>
+        `
+      },
+      'C': {
+        name: 'Neo-Brutalist / 现代工业风',
+        render: () => `
+          <div class="min-h-screen bg-[#E5E1D8] text-black font-sans">
+            <nav class="border-b-4 border-black bg-[#CCFF00] px-6 h-16 flex items-center justify-between">
+              <div class="font-black text-xl tracking-tighter uppercase">PSYCHE_ADMIN</div>
+              <div class="flex gap-4 font-bold text-sm uppercase">
+                <a href="#" class="underline decoration-2 underline-offset-4">Overview</a>
+                <a href="#" class="hover:underline decoration-2 underline-offset-4">Codes</a>
+                <a href="#" class="hover:underline decoration-2 underline-offset-4">CMS</a>
+              </div>
+            </nav>
+
+            <main class="max-w-6xl mx-auto px-6 py-10">
+              <header class="mb-8 border-4 border-black bg-white p-6 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+                <h1 class="text-4xl font-black uppercase tracking-tighter mb-1">Dashboard</h1>
+                <p class="font-bold text-gray-600">SYSTEM STATUS: ALL SYSTEMS NOMINAL</p>
+              </header>
+
+              <div class="grid grid-cols-4 gap-6 mb-12">
+                ${data.stats.map(s => `
+                  <div class="bg-white border-4 border-black p-5 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-y-1 hover:translate-x-1 hover:shadow-[0px_0px_0px_0px_rgba(0,0,0,1)] transition-all">
+                    <h3 class="font-bold text-xs uppercase mb-4 border-b-2 border-black pb-2">${s.label}</h3>
+                    <div class="text-4xl font-black mb-1">${s.value}</div>
+                    <div class="text-xs font-bold text-gray-500 uppercase">${s.subtext}</div>
+                  </div>
+                `).join('')}
+              </div>
+
+              <h2 class="text-xl font-black uppercase mb-4 bg-black text-white inline-block px-3 py-1">Actions</h2>
+              <div class="grid grid-cols-2 gap-6">
+                ${data.actions.map(a => `
+                  <button class="flex items-center gap-4 text-left bg-white border-4 border-black p-4 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:bg-[#CCFF00] transition-colors active:translate-y-1 active:translate-x-1 active:shadow-none">
+                    <div class="text-4xl">${a.icon}</div>
+                    <div>
+                      <div class="font-black text-lg uppercase">${a.title}</div>
+                      <div class="font-bold text-sm text-gray-700">${a.desc}</div>
+                    </div>
+                  </button>
+                `).join('')}
+              </div>
+            </main>
+          </div>
+        `
+      },
+      'D': {
+        name: 'Notion风 / 亲和治愈 (Soft/Pastel)',
+        render: () => `
+          <div class="min-h-screen bg-[#FDFBF7] text-[#37352F] font-sans">
+            <div class="flex h-screen overflow-hidden">
+              <!-- Sidebar -->
+              <aside class="w-60 bg-[#F7F6F3] border-r border-[#EBEBEB] py-6 flex flex-col gap-1">
+                <div class="px-4 mb-4 flex items-center gap-2">
+                  <div class="w-6 h-6 rounded bg-orange-100 flex items-center justify-center text-xs">🪴</div>
+                  <span class="font-semibold text-[15px]">Psyche Admin</span>
+                </div>
+                <nav class="flex flex-col text-[14px] font-medium text-[#787774]">
+                  <a href="#" class="px-4 py-1.5 bg-[#EBEBEB] text-[#37352F] mx-2 rounded-md">大盘概览</a>
+                  <a href="#" class="px-4 py-1.5 hover:bg-[#EBEBEB]/50 mx-2 rounded-md transition">订单管理</a>
+                  <a href="#" class="px-4 py-1.5 hover:bg-[#EBEBEB]/50 mx-2 rounded-md transition">测试题库</a>
+                  <a href="#" class="px-4 py-1.5 hover:bg-[#EBEBEB]/50 mx-2 rounded-md transition">全局配置</a>
+                </nav>
+              </aside>
+
+              <main class="flex-1 p-12 overflow-y-auto">
+                <h1 class="text-[32px] font-bold mb-8">大盘概览 👋</h1>
+
+                <div class="grid grid-cols-4 gap-5 mb-12">
+                  ${data.stats.map((s, i) => `
+                    <div class="bg-white border border-[#EBEBEB] p-5 rounded-2xl shadow-[0_4px_20px_rgb(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] transition-shadow">
+                      <div class="w-8 h-8 rounded-full ${['bg-blue-50','bg-green-50','bg-purple-50','bg-orange-50'][i]} flex items-center justify-center mb-3 text-[#37352F]/60">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                      </div>
+                      <div class="text-[#787774] text-xs font-medium mb-1">${s.label}</div>
+                      <div class="text-2xl font-bold mb-1">${s.value}</div>
+                      <div class="text-xs text-[#9F9E9B]">${s.subtext}</div>
+                    </div>
+                  `).join('')}
+                </div>
+
+                <h2 class="text-[18px] font-bold mb-4 flex items-center gap-2">
+                  <span class="text-[#9F9E9B]">⚡</span> 快捷操作
+                </h2>
+                <div class="grid grid-cols-2 gap-4">
+                  ${data.actions.map(a => `
+                    <button class="flex items-center text-left gap-4 bg-white border border-[#EBEBEB] p-4 rounded-xl hover:bg-[#F7F6F3] transition-colors">
+                      <div class="text-2xl">${a.icon}</div>
+                      <div>
+                        <div class="font-semibold text-[#37352F] text-[15px] mb-0.5">${a.title}</div>
+                        <div class="text-[#787774] text-xs">${a.desc}</div>
+                      </div>
+                    </button>
+                  `).join('')}
+                </div>
+              </main>
+            </div>
+          </div>
+        `
+      }
+    };
+
+    function renderApp() {
+      const urlParams = new URLSearchParams(window.location.search);
+      let currentVariantKey = urlParams.get('variant') || 'A';
+      if (!variants[currentVariantKey]) currentVariantKey = 'A';
+      
+      const app = document.getElementById('app');
+      app.innerHTML = variants[currentVariantKey].render();
+
+      const keys = Object.keys(variants);
+      const currentIndex = keys.indexOf(currentVariantKey);
+      const prevKey = keys[(currentIndex - 1 + keys.length) % keys.length];
+      const nextKey = keys[(currentIndex + 1) % keys.length];
+
+      const switcherHTML = `
+        <div class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center bg-zinc-900/90 backdrop-blur-md border border-zinc-700 p-1.5 rounded-full shadow-2xl text-white font-sans text-sm">
+          <a href="?variant=${prevKey}" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-zinc-700 transition">←</a>
+          <div class="px-4 font-medium min-w-[240px] text-center">
+            <span class="text-zinc-400 mr-1">${currentVariantKey} —</span> ${variants[currentVariantKey].name}
+          </div>
+          <a href="?variant=${nextKey}" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-zinc-700 transition">→</a>
+        </div>
+      `;
+      app.innerHTML += switcherHTML;
+    }
+
+    document.body.addEventListener('click', e => {
+      const link = e.target.closest('a[href^="?variant="]');
+      if (link) {
+        e.preventDefault();
+        window.history.pushState({}, '', link.href);
+        renderApp();
+      }
+    });
+
+    window.addEventListener('popstate', renderApp);
+    renderApp();
+
+    document.addEventListener('keydown', (e) => {
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+      const urlParams = new URLSearchParams(window.location.search);
+      let current = urlParams.get('variant') || 'A';
+      const keys = Object.keys(variants);
+      let idx = keys.indexOf(current);
+      if (e.key === 'ArrowLeft') {
+        window.history.pushState({}, '', '?variant=' + keys[(idx - 1 + keys.length) % keys.length]);
+        renderApp();
+      } else if (e.key === 'ArrowRight') {
+        window.history.pushState({}, '', '?variant=' + keys[(idx + 1) % keys.length]);
+        renderApp();
+      }
+    });
+  </script>
+</body>
+</html>

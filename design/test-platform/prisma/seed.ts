@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client'
 import { questions, results } from '../lib/data'
+import { destinyLoverQuestions, destinyLoverResults } from '../lib/destiny-lover-data'
 
 const prisma = new PrismaClient()
 
@@ -35,11 +36,12 @@ async function main() {
   }
   console.log('ResultConfigs seeded.')
 
-  // 3. 初始化 Questions & Options
+  // 3. 初始化 Questions & Options (emotional-friction)
   for (let i = 0; i < questions.length; i++) {
     const q = questions[i]
     const createdQuestion = await prisma.question.create({
       data: {
+        testId: 'emotional-friction',
         order: i + 1,
         text: q.text,
       },
@@ -61,6 +63,49 @@ async function main() {
       })
     }
   }
+
+  // 4. 初始化 Destiny Lover (命定恋人红娘测试) 数据
+  await prisma.globalConfig.create({
+    data: {
+      testId: 'destiny-lover',
+      baseCount: 88,
+    },
+  })
+
+  for (const res of destinyLoverResults) {
+    await prisma.resultConfig.create({
+      data: {
+        testId: 'destiny-lover',
+        title: res.title,
+        desc: res.description,
+        quote: res.quote,
+        imageUrl: '',
+        condition: res.key,
+      },
+    })
+  }
+
+  for (let i = 0; i < destinyLoverQuestions.length; i++) {
+    const q = destinyLoverQuestions[i]
+    const createdQuestion = await prisma.question.create({
+      data: {
+        testId: 'destiny-lover',
+        order: i + 1,
+        text: q.text,
+      },
+    })
+
+    for (const opt of q.options) {
+      await prisma.option.create({
+        data: {
+          text: opt.text,
+          scores: JSON.stringify(opt.scores),
+          questionId: createdQuestion.id,
+        },
+      })
+    }
+  }
+
   console.log('Questions and Options seeded.')
   console.log('Seeding finished.')
 }

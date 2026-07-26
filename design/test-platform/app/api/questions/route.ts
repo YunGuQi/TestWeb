@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '../../../lib/prisma';
+import { destinyLoverQuestions } from '../../../lib/destiny-lover-data';
 
 export const dynamic = 'force-dynamic';
 
@@ -8,15 +9,24 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const testId = searchParams.get('testId') || 'emotional-friction';
     
-    const questions = await prisma.question.findMany({
-      where: { testId },
-      include: {
-        options: true
-      },
-      orderBy: {
-        order: 'asc'
-      }
-    });
+    if (testId === 'destiny-lover') {
+      return NextResponse.json({ success: true, questions: destinyLoverQuestions });
+    }
+
+    let questions: any[] = [];
+    try {
+      questions = await prisma.question.findMany({
+        where: { testId },
+        include: {
+          options: true
+        },
+        orderBy: {
+          order: 'asc'
+        }
+      });
+    } catch (dbError) {
+      console.warn('DB connect failed for questions, attempting fallback if available.');
+    }
 
     const formattedQuestions = questions.map(q => ({
       id: q.id.toString(), // or keep it number if frontend handles it

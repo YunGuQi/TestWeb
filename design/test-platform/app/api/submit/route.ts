@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '../../../lib/prisma';
 import { questions, results } from '../../../lib/data';
+import { destinyLoverQuestions, destinyLoverResults } from '../../../lib/destiny-lover-data';
 
 export async function POST(request: Request) {
   try {
@@ -16,6 +17,95 @@ export async function POST(request: Request) {
       if (typeof v === 'string' || typeof v === 'number') return v.toString();
       return v?.id?.toString();
     }).filter(Boolean);
+
+    // ==== 命运恋人独立算分分支 ====
+    if (testId === 'destiny-lover') {
+      let L = 0, G = 0, D = 0, S = 0, A = 0, C = 0, R = 0, P = 0;
+      
+      // 遍历所有题目和选项进行算分
+      destinyLoverQuestions.forEach(q => {
+        q.options.forEach(opt => {
+          if (optionIds.includes(opt.id.toString())) {
+            L += opt.scores.L;
+            G += opt.scores.G;
+            D += opt.scores.D;
+            S += opt.scores.S;
+            A += opt.scores.A;
+            C += opt.scores.C;
+            R += opt.scores.R;
+            P += opt.scores.P;
+          }
+        });
+      });
+
+      // 计算四个维度的胜出者组合
+      const dim1 = L >= G ? 'l' : 'g';
+      const dim2 = D >= S ? 'd' : 's';
+      const dim3 = A >= C ? 'a' : 'c';
+      const dim4 = R >= P ? 'r' : 'p';
+      const userCombo = dim1 + dim2 + dim3 + dim4; // 例如 "ldar"
+
+      // 寻找最匹配的结果
+      let bestMatch = destinyLoverResults[0];
+      let maxMatchCount = -1;
+
+      for (const res of destinyLoverResults) {
+        let matchCount = 0;
+        const resKey = res.key.split('_')[0]; // 处理 gscp_pure
+        for (let i = 0; i < 4; i++) {
+          if (resKey[i] && userCombo[i] && resKey[i] === userCombo[i]) {
+            matchCount++;
+          }
+        }
+        if (matchCount > maxMatchCount) {
+          maxMatchCount = matchCount;
+          bestMatch = res;
+        }
+      }
+
+      // 动态注入称呼与状态微调
+      const nickname = body.metadata?.nickname || '你';
+      const userStatus = body.metadata?.status || 'single';
+      
+      let finalDesc = bestMatch.description.replace(/{name}/g, nickname);
+      if (userStatus === 'dating') {
+        finalDesc = finalDesc.replace(/你的命定恋人/g, '你现在的另一半(如果是命定的话)');
+      }
+
+      const finalResult = {
+        id: bestMatch.id,
+        key: bestMatch.key,
+        title: bestMatch.title,
+        subtitle: bestMatch.subtitle,
+        tags: bestMatch.tags,
+        description: finalDesc,
+        quote: bestMatch.quote,
+        radar: bestMatch.radar, // 返回雷达图数据
+        rawScores: { L, G, D, S, A, C, R, P, userCombo }
+      };
+
+      let recordId = 1;
+      try {
+        const record = await prisma.testRecord.create({
+          data: {
+            testId,
+            deviceId: deviceId || 'unknown',
+            answers: JSON.stringify(answers),
+            resultId: 1 // 简化记录，实际可存字典表 ID
+          }
+        });
+        recordId = record.id;
+      } catch (dbErr) {
+        console.warn('DB connect failed during testRecord create. Gracefully continuing.');
+      }
+
+      return NextResponse.json({
+        success: true,
+        recordId: recordId,
+        result: finalResult
+      });
+    }
+    // ==== 原有 emo 算分分支 ====
 
     let sen = 0, rum = 0, pls = 0, bnd = 0;
     const billItems: Array<{ name: string; cost: number }> = [];
@@ -53,7 +143,7 @@ export async function POST(request: Request) {
         }
       });
     } else {
-      // 降级兜底：用 lib/data.ts 计算分值（容错本地临时测试）
+      // 降级兜底：用 lib/data.ts 计算分值
       questions.forEach(q => {
         q.options.forEach(opt => {
           if (optionIds.includes(opt.id.toString())) {
