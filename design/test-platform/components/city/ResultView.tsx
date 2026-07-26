@@ -7,11 +7,78 @@ import { useQuizStore } from '@/lib/city/store/useQuizStore';
 import OrderOverlay from './OrderOverlay';
 import { toPng } from 'html-to-image';
 
+const ticketStyles = [
+  {
+    name: '默认风格',
+    sub: '复古列车档案',
+    bg: 'bg-[#fdfbf7]',
+    text: 'text-[#1a1a1a]',
+    border: 'border-[#d1cdc1]',
+    divider: 'border-[#b5b1a3]',
+    stampBorder: 'border-red-600 text-red-600',
+    tagBg: 'bg-[#1a1a1a] text-[#fdfbf7]',
+    barFill: 'bg-[#1a1a1a]',
+    barTrack: 'bg-[#e4dfd4] border-[#1a1a1a]/15',
+    quoteBg: 'bg-black/5 border-black',
+    labelBg: 'bg-black/10 text-black',
+    btnBg: 'bg-[#1a1a1a] text-white hover:bg-black',
+    taglineColor: 'border-black'
+  },
+  {
+    name: '暗夜赛博',
+    sub: '黑客夜行凭证',
+    bg: 'bg-[#121212]',
+    text: 'text-[#f0f0f0]',
+    border: 'border-[#333333]',
+    divider: 'border-[#333333]',
+    stampBorder: 'border-[#00FF66] text-[#00FF66] bg-[#00FF66]/10',
+    tagBg: 'bg-[#00FF66] text-[#121212]',
+    barFill: 'bg-[#00FF66]',
+    barTrack: 'bg-[#262626] border-[#00FF66]/30',
+    quoteBg: 'bg-[#00FF66]/10 border-[#00FF66] text-[#00FF66]',
+    labelBg: 'bg-[#00FF66]/20 text-[#00FF66]',
+    btnBg: 'bg-[#00FF66] text-black hover:bg-[#00e65c]',
+    taglineColor: 'border-[#333333]'
+  },
+  {
+    name: '日落报刊',
+    sub: '复古波普剪报',
+    bg: 'bg-[#FFF8EE]',
+    text: 'text-[#2C1810]',
+    border: 'border-[#E0533C]',
+    divider: 'border-[#E0533C]/40',
+    stampBorder: 'border-[#E0533C] text-[#E0533C] bg-[#E0533C]/10',
+    tagBg: 'bg-[#E0533C] text-[#FFF8EE]',
+    barFill: 'bg-[#E0533C]',
+    barTrack: 'bg-[#EEDDCD] border-[#E0533C]/20',
+    quoteBg: 'bg-[#E0533C]/10 border-[#E0533C]',
+    labelBg: 'bg-[#E0533C]/15 text-[#E0533C]',
+    btnBg: 'bg-[#E0533C] text-white hover:bg-[#c94630]',
+    taglineColor: 'border-[#E0533C]/30'
+  }
+];
+
 export default function ResultView() {
   const { answers, deviceId, reset } = useQuizStore();
   const [resultData, setResultData] = useState<any>(null);
   const [isUnlocked, setIsUnlocked] = useState(false);
+  const [styleIdx, setStyleIdx] = useState(0);
+  const currentStyle = ticketStyles[styleIdx];
+  const touchStartX = useRef(0);
   const ticketRef = useRef<HTMLDivElement>(null);
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    const diff = e.changedTouches[0].clientX - touchStartX.current;
+    if (diff > 50) {
+      setStyleIdx((prev) => (prev - 1 + ticketStyles.length) % ticketStyles.length);
+    } else if (diff < -50) {
+      setStyleIdx((prev) => (prev + 1) % ticketStyles.length);
+    }
+  };
 
   useEffect(() => {
     // Check if unlocked
@@ -76,15 +143,20 @@ export default function ResultView() {
   return (
     <section className="page-section w-full max-w-md mx-auto py-8 min-h-screen flex flex-col items-center justify-center px-4">
       <div className="w-full flex justify-between items-center mb-4 px-2 select-none">
-        <button className="text-gray-400 hover:text-black font-bold p-2 text-xl active:scale-90 transition-transform">&lsaquo;</button>
+        <button onClick={() => setStyleIdx((prev) => (prev - 1 + ticketStyles.length) % ticketStyles.length)} className="text-gray-400 hover:text-black font-bold p-2 text-xl active:scale-90 transition-transform cursor-pointer">&lsaquo;</button>
         <div className="flex flex-col items-center">
-          <span className="text-[10px] text-gray-400 font-mono mb-1 tracking-widest uppercase">左右滑动切换设计风格</span>
-          <span className="text-sm font-bold tracking-widest text-gray-800">默认风格</span>
+          <span className="text-[10px] text-gray-400 font-mono mb-0.5 tracking-widest uppercase">左右滑动或点击切换设计风格 ({styleIdx + 1}/{ticketStyles.length})</span>
+          <span className="text-sm font-bold tracking-widest text-gray-800">{currentStyle.name} <span className="text-[11px] font-normal text-gray-400">({currentStyle.sub})</span></span>
         </div>
-        <button className="text-gray-400 hover:text-black font-bold p-2 text-xl active:scale-90 transition-transform">&rsaquo;</button>
+        <button onClick={() => setStyleIdx((prev) => (prev + 1) % ticketStyles.length)} className="text-gray-400 hover:text-black font-bold p-2 text-xl active:scale-90 transition-transform cursor-pointer">&rsaquo;</button>
       </div>
 
-      <div ref={ticketRef} className="relative bg-[#fdfbf7] text-[#1a1a1a] w-full flex flex-col overflow-hidden pb-6 rounded shadow-[0_10px_40px_rgba(0,0,0,0.06)] border border-[#d1cdc1]">
+      <div 
+        ref={ticketRef}
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+        className={`relative ${currentStyle.bg} ${currentStyle.text} w-full flex flex-col overflow-hidden pb-6 rounded shadow-[0_10px_40px_rgba(0,0,0,0.06)] border ${currentStyle.border} transition-colors duration-300`}
+      >
         
         {!isUnlocked && <OrderOverlay testId="city-personality" onSuccess={() => setIsUnlocked(true)} />}
 
@@ -94,7 +166,7 @@ export default function ResultView() {
             {'> 你是本次列车第 '}<span>{rank}</span>{' 位乘车的旅客 <'}
           </div>
           
-          <div className="absolute top-[35px] right-[20px] border-4 border-red-600 text-red-600 rounded-full w-20 h-20 flex items-center justify-center font-bold text-sm -rotate-12 opacity-80 text-center leading-tight">
+          <div className={`absolute top-[35px] right-[20px] border-4 ${currentStyle.stampBorder} rounded-full w-20 h-20 flex items-center justify-center font-bold text-sm -rotate-12 opacity-80 text-center leading-tight transition-colors duration-300`}>
             灵魂<br/>归属
           </div>
 
@@ -117,12 +189,12 @@ export default function ResultView() {
           
           <div className="flex flex-wrap gap-2 mt-3">
             {city.tags.map((tag: string, i: number) => (
-              <span key={i} className="bg-[#1a1a1a] text-[#fdfbf7] text-xs px-2 py-1 font-bold">{tag}</span>
+              <span key={i} className={`${currentStyle.tagBg} text-xs px-2.5 py-1 font-bold rounded-sm transition-colors duration-300`}>{tag}</span>
             ))}
           </div>
         </div>
 
-        <div className="border-t-2 border-dashed border-[#b5b1a3] mx-4 my-2"></div>
+        <div className={`border-t-2 border-dashed ${currentStyle.divider} mx-4 my-2 transition-colors duration-300`}></div>
 
         {/* Middle Section */}
         <div className="p-6 pb-2">
@@ -138,11 +210,11 @@ export default function ResultView() {
               const pct = Math.round(Math.min(100, Math.max(0, (dim.value / 10) * 100)));
               return (
                 <div key={i} className="flex gap-2.5 text-xs items-center">
-                  <span className="w-8 font-bold text-[#1a1a1a]/90 shrink-0">{dim.label}</span>
-                  <div className="h-2.5 bg-[#e4dfd4] flex-1 rounded-full overflow-hidden border border-[#1a1a1a]/15 shadow-inner">
-                    <div style={{ width: `${pct}%` }} className="h-full bg-[#1a1a1a] rounded-full transition-all duration-500"></div>
+                  <span className="w-8 font-bold opacity-90 shrink-0">{dim.label}</span>
+                  <div className={`h-2.5 ${currentStyle.barTrack} flex-1 rounded-full overflow-hidden border shadow-inner transition-colors duration-300`}>
+                    <div style={{ width: `${pct}%` }} className={`h-full ${currentStyle.barFill} rounded-full transition-all duration-500`}></div>
                   </div>
-                  <span className="w-9 text-right font-mono font-bold text-[#1a1a1a] text-xs shrink-0">{pct}%</span>
+                  <span className="w-9 text-right font-mono font-bold text-xs shrink-0">{pct}%</span>
                 </div>
               );
             })}
@@ -151,11 +223,11 @@ export default function ResultView() {
           <div className="font-mono text-xs opacity-70 mb-3">DIAGNOSTIC REPORT</div>
           
           <div className="mb-4">
-            <div className="font-bold text-xs mb-1 bg-black/10 inline-block px-2 py-0.5 rounded font-mono">【灵魂基调】</div>
+            <div className={`font-bold text-xs mb-1 ${currentStyle.labelBg} inline-block px-2 py-0.5 rounded font-mono transition-colors duration-300`}>【灵魂基调】</div>
             <p className="text-[13px] leading-relaxed font-medium text-justify">{city.desc}</p>
           </div>
           
-          <div className="mt-5 p-4 bg-black/5 border-l-4 border-black italic font-bold text-sm">
+          <div className={`mt-5 p-4 ${currentStyle.quoteBg} border-l-4 italic font-bold text-sm transition-colors duration-300`}>
             “{city.quote}”
           </div>
         </div>
@@ -166,14 +238,14 @@ export default function ResultView() {
             || | ||| || || | | || | |
           </div>
           <div className="font-mono text-[10px] opacity-50 mt-1 mb-2">NO. 8492039485721</div>
-          <div className="font-mono text-[9px] opacity-40 text-center tracking-widest mt-1 border-t border-black pt-2 w-full">
+          <div className={`font-mono text-[9px] opacity-40 text-center tracking-widest mt-1 border-t ${currentStyle.taglineColor} pt-2 w-full`}>
             * 本档案结果仅供娱乐参考，请凭直觉执行
           </div>
         </div>
       </div>
 
       <div className="w-full mt-8 flex flex-col gap-4 pb-8">
-        <button onClick={handleSave} className="w-full bg-[#1a1a1a] text-white py-4 rounded font-bold tracking-widest hover:bg-black active:scale-[0.98] transition-transform shadow-lg">
+        <button onClick={handleSave} className={`w-full ${currentStyle.btnBg} py-4 rounded font-bold tracking-widest active:scale-[0.98] transition-all duration-300 shadow-lg`}>
           长按保存专属车票
         </button>
 
