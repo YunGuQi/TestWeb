@@ -139,15 +139,9 @@ export default function ResultReceipt({ result, onRestart, forcedUnlock }: Resul
       htmlToImage.toJpeg(node, { 
         quality: 0.95, 
         backgroundColor: '#fdfdfd',
-        pixelRatio: 2,
         cacheBust: true,
-        width: width,
-        height: height,
         style: {
-          transform: 'scale(1)',
-          transformOrigin: 'top left',
-          width: width + 'px',
-          height: height + 'px'
+          transform: 'scale(1)'
         }
       })
         .then((dataUrl) => {

@@ -97,7 +97,9 @@
 
 /* Receipt UI */
 .receipt-container { 
-  filter: drop-shadow(-2px 0 0 #000) drop-shadow(2px 0 0 #000) drop-shadow(0 -2px 0 #000) drop-shadow(0 2px 0 #000) drop-shadow(8px 8px 0 #000); 
+  box-shadow: 8px 8px 0 #000;
+  background-color: #000;
+  border: 2px solid #000;
 }
 .receipt-paper {
   background-color: #fdfdfd; color: #000; position: relative;
