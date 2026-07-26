@@ -24,23 +24,15 @@ export default function OrderOverlay({ testId, onSuccess }: OrderOverlayProps) {
     }
     
     setLoading(true);
-    let did = deviceId || (typeof window !== 'undefined' ? (localStorage.getItem('deviceId_city') || localStorage.getItem('deviceId')) : null);
+    let did = deviceId;
     if (!did && typeof window !== 'undefined') {
-      did = crypto.randomUUID();
-      localStorage.setItem('deviceId_city', did);
+      did = localStorage.getItem('deviceId_city') || localStorage.getItem('deviceId') || crypto.randomUUID();
+      if (!deviceId) {
+        useQuizStore.getState().setDeviceId(did);
+      }
     }
     try {
-      const res = await fetch('/api/verify', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          code: code.trim(),
-          deviceId: did || 'unknown',
-          recordId: testId
-        })
-      });
-      
-      const data = await res.json();
+      const data = await verifyOrderCode(code.trim(), did || 'unknown', testId);
       setLoading(false);
       
       if (data.success) {
