@@ -1,37 +1,54 @@
 import { NextResponse } from 'next/server';
+import { prisma } from '../../../../lib/prisma';
 
-export async function POST(req: Request) {
+export async function POST(request: Request) {
   try {
-    const body = await req.json();
-    const API_BASE = process.env.API_BASE_URL || 'https://shared-backend-285344-10-1257349014.sh.run.tcloudbase.com';
-    
-    const res = await fetch(`${API_BASE}/api/verify`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body)
+    const { code, deviceId, recordId = 'city-personality' } = await request.json();
+    const testId = recordId || 'city-personality';
+
+    // Find code strictly scoped to this test
+    const activation = await prisma.activationCode.findUnique({
+      where: {
+        code_testId: {
+          code: code,
+          testId: testId
+        }
+      }
     });
-    
-    if (!res.ok) {
-      console.error('Backend returned status:', res.status);
+
+    if (!activation) {
+      return NextResponse.json({ success: false, error: '激活码无效或不适用于该测试' });
     }
-    
-    const contentType = res.headers.get('content-type') || '';
-    if (contentType.includes('application/json')) {
-      const data = await res.json();
-      return NextResponse.json(data);
-    } else {
-      const text = await res.text();
-      console.error('Backend returned non-JSON:', text.substring(0, 200));
-      return NextResponse.json(
-        { success: false, error: '大盘服务暂时不可用或返回格式错误' },
-        { status: 200 } // 返回200让前端正常弹窗提示错误，不要抛出 fetch error
-      );
+
+    if (activation.isDisabled) {
+      return NextResponse.json({ success: false, error: '该激活码已被禁用' });
     }
-  } catch (error) {
-    console.error('Verify order API error:', error);
-    return NextResponse.json(
-      { success: false, error: 'Internal Server Error' },
-      { status: 500 }
-    );
+
+    let devices: string[] = [];
+    try {
+      devices = JSON.parse(activation.devices || '[]');
+    } catch(e) {}
+
+    const maxUses = activation.maxUses || 3;
+    const currentDevice = deviceId || 'unknown';
+
+    if (!devices.includes(currentDevice)) {
+      if (devices.length >= maxUses) {
+        return NextResponse.json({ success: false, error: '该激活码已达到设备绑定上限' });
+      }
+      devices.push(currentDevice);
+      
+      await prisma.activationCode.update({
+        where: { id: activation.id },
+        data: {
+          devices: JSON.stringify(devices)
+        }
+      });
+    }
+
+    return NextResponse.json({ success: true, message: '验证通过' });
+  } catch (error: any) {
+    console.error('Verify error:', error);
+    return NextResponse.json({ success: false, error: '验证失败' }, { status: 500 });
   }
 }

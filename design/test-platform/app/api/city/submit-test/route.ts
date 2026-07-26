@@ -66,31 +66,8 @@ export async function POST(req: Request) {
       } catch(e) {}
     });
 
-    // 4. Hit shared-backend for rank
-    const API_BASE = process.env.API_BASE_URL || 'https://shared-backend-285344-10-1257349014.sh.run.tcloudbase.com';
-    let current_rank = 2000;
-    try {
-      const res = await fetch(`${API_BASE}/api/submit`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ testId: 'city-personality', deviceId })
-      });
-      
-      const contentType = res.headers.get('content-type') || '';
-      if (res.ok && contentType.includes('application/json')) {
-        const json = await res.json();
-        if (json.success && json.current_rank) {
-          current_rank = json.current_rank;
-        }
-      } else {
-        const text = await res.text();
-        console.error('Submit rank returned non-JSON:', text.substring(0, 200));
-      }
-    } catch (e) {
-      console.error("Error hitting shared backend:", e);
-    }
-
-    // 5. Save to TestRecord so /admin can count it
+    // 4. Save to TestRecord first so count is updated
+    let recordCount = 1;
     try {
       await prisma.testRecord.create({
         data: {
@@ -100,8 +77,23 @@ export async function POST(req: Request) {
           resultId: closestCity?.id || 1
         }
       });
+      recordCount = await prisma.testRecord.count({
+        where: { testId: 'city-personality' }
+      });
     } catch (e) {
       console.error("Error creating TestRecord for city:", e);
+    }
+
+    // 5. Calculate rank from local DB & GlobalConfig (matching admin dashboard)
+    let current_rank = 1263;
+    try {
+      const config = await prisma.globalConfig.findFirst({
+        where: { testId: 'city-personality' }
+      });
+      const baseCount = config?.baseCount || 1260;
+      current_rank = baseCount + recordCount;
+    } catch (e) {
+      console.error("Error calculating rank:", e);
     }
 
     return NextResponse.json({
