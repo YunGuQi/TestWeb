@@ -93,14 +93,14 @@ export default function CodesTable({ initialCodes, testId }: { initialCodes: any
   return (
     <div className="mt-8 text-[#37352F]">
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-xl font-bold flex items-center gap-4 text-[#37352F]">
-          卡密详细列表
+        <h2 className="text-xl font-bold flex flex-wrap items-center gap-2 sm:gap-4 text-[#37352F]">
+          <span>卡密详细列表</span>
           {selectedIds.length > 0 && (
             <div className="flex items-center gap-2">
-              <button onClick={handleBatchDelete} disabled={loading} className="text-xs font-semibold bg-red-50 text-red-600 border border-red-100 hover:bg-red-100 transition-colors px-3 py-1.5 rounded-md">
+              <button onClick={handleBatchDelete} disabled={loading} className="text-xs font-semibold bg-red-50 text-red-600 border border-red-100 hover:bg-red-100 transition-colors px-3 py-1.5 rounded-md cursor-pointer">
                 批量删除 ({selectedIds.length})
               </button>
-              <button onClick={handleExportCSV} className="text-xs font-semibold bg-green-50 text-green-600 border border-green-100 hover:bg-green-100 transition-colors px-3 py-1.5 rounded-md">
+              <button onClick={handleExportCSV} className="text-xs font-semibold bg-green-50 text-green-600 border border-green-100 hover:bg-green-100 transition-colors px-3 py-1.5 rounded-md cursor-pointer">
                 导出已选 ({selectedIds.length})
               </button>
             </div>
@@ -108,13 +108,13 @@ export default function CodesTable({ initialCodes, testId }: { initialCodes: any
         </h2>
         <button 
           onClick={() => setGenerateModal({ show: true, count: 10 })}
-          className="bg-white border border-[#EBEBEB] hover:bg-[#F7F6F3] transition-colors text-[#37352F] px-4 py-2 rounded-md font-semibold text-sm shadow-sm flex items-center gap-2"
+          className="bg-white border border-[#EBEBEB] hover:bg-[#F7F6F3] transition-colors text-[#37352F] px-4 py-2 rounded-md font-semibold text-sm shadow-sm flex items-center gap-2 shrink-0"
         >
           <span>✨</span> 一键生成
         </button>
       </div>
 
-      {/* ============ Mobile Select All & Batch Actions Bar (< md) ============ */}
+      {/* ============ Mobile Select All Bar (< md) ============ */}
       <div className="md:hidden bg-[#F7F6F3] border border-[#EBEBEB] p-3.5 rounded-xl mb-4 shadow-sm">
         <div className="flex items-center justify-between">
           <label className="flex items-center gap-2.5 text-sm font-bold text-[#37352F] cursor-pointer select-none">
@@ -135,24 +135,6 @@ export default function CodesTable({ initialCodes, testId }: { initialCodes: any
             </span>
           )}
         </div>
-
-        {selectedIds.length > 0 && (
-          <div className="flex items-center gap-2.5 pt-3 mt-3 border-t border-[#EBEBEB]">
-            <button 
-              onClick={handleBatchDelete} 
-              disabled={loading} 
-              className="flex-1 text-xs font-bold bg-red-50 text-red-600 border border-red-200 hover:bg-red-100 transition-all py-2.5 rounded-lg text-center cursor-pointer shadow-sm active:scale-95"
-            >
-              批量删除 ({selectedIds.length})
-            </button>
-            <button 
-              onClick={handleExportCSV} 
-              className="flex-1 text-xs font-bold bg-green-50 text-green-600 border border-green-200 hover:bg-green-100 transition-all py-2.5 rounded-lg text-center cursor-pointer shadow-sm active:scale-95"
-            >
-              导出已选 ({selectedIds.length})
-            </button>
-          </div>
-        )}
       </div>
 
       {/* ============ Mobile Cards View (< md) ============ */}
