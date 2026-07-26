@@ -2,54 +2,40 @@
 
 export default function DynamicBackground() {
   return (
-    <div className="fixed inset-0 z-[-1] bg-[#121212] overflow-hidden">
-      {/* 深邃的天空背景渐变 */}
-      <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a0a] to-[#1a1a1a]"></div>
-
-      {/* 飞驰的横向光线（线条） */}
-      <div className="absolute inset-0 opacity-60 mix-blend-screen"
+    <div className="fixed inset-0 z-[-1] bg-[#1a1a1a] overflow-hidden flex items-center justify-center">
+      {/* 飞驰的车窗光影 */}
+      <div className="absolute inset-0 opacity-40 mix-blend-screen z-0"
            style={{
-             backgroundImage: `
-               linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.15) 10%, transparent 20%),
-               linear-gradient(90deg, transparent 40%, rgba(255,200,100,0.1) 45%, transparent 50%),
-               linear-gradient(90deg, transparent 70%, rgba(100,200,255,0.15) 80%, transparent 90%)
-             `,
-             backgroundSize: '300% 1px, 200% 2px, 250% 1px',
-             backgroundPosition: '0 20%, 0 50%, 0 80%',
-             backgroundRepeat: 'no-repeat',
-             animation: 'moveLines 4s linear infinite',
+             background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.05) 50%, transparent 100%)',
+             backgroundSize: '200% 100%',
+             animation: 'moveScenery 10s linear infinite',
            }}
       />
       
-      {/* 额外的光晕划过 */}
-      <div className="absolute inset-0 opacity-40 mix-blend-screen"
+      {/* 车窗外掠过的柱子阴影 */}
+      <div className="absolute inset-0 opacity-20 z-0"
            style={{
-             background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.08) 50%, transparent 100%)',
-             backgroundSize: '200% 100%',
-             animation: 'moveScenery 12s linear infinite',
+             backgroundImage: 'repeating-linear-gradient(90deg, transparent, transparent 100px, rgba(0,0,0,0.8) 100px, rgba(0,0,0,0.8) 120px)',
+             animation: 'movePillars 3s linear infinite',
            }}
       />
 
-      {/* 掠过的柱子阴影（强化车窗速度感） */}
-      <div className="absolute inset-0 opacity-30 mix-blend-multiply"
-           style={{
-             backgroundImage: 'repeating-linear-gradient(90deg, transparent, transparent 150px, rgba(0,0,0,0.9) 150px, rgba(0,0,0,0.9) 180px)',
-             animation: 'movePillars 2s linear infinite',
-           }}
-      />
+      {/* 缓慢旋转的抽象地形等高线（用户在 HTML 原型中喜欢的线条） */}
+      <div className="absolute inset-0 flex items-center justify-center mix-blend-screen opacity-30 z-10 pointer-events-none">
+        <div className="absolute w-[150vw] h-[150vw] rounded-[40%_60%_70%_30%/40%_50%_60%_50%] border border-[#ffffff] opacity-40 animate-[spin_40s_linear_infinite]" />
+        <div className="absolute w-[120vw] h-[120vw] rounded-[60%_40%_30%_70%/50%_60%_40%_50%] border border-[#ffffff] opacity-30 animate-[spin_35s_linear_infinite_reverse]" />
+        <div className="absolute w-[90vw] h-[90vw] rounded-[30%_70%_70%_30%/30%_30%_70%_70%] border border-[#ffffff] opacity-20 animate-[spin_30s_linear_infinite]" />
+        <div className="absolute w-[60vw] h-[60vw] rounded-[50%_50%_20%_80%/25%_75%_25%_75%] border border-[#ffffff] opacity-10 animate-[spin_25s_linear_infinite_reverse]" />
+      </div>
 
       {/* CSS for animations */}
       <style dangerouslySetInnerHTML={{__html: `
-        @keyframes moveLines {
-          0% { background-position: 100% 20%, 150% 50%, 200% 80%; }
-          100% { background-position: -100% 20%, -50% 50%, -100% 80%; }
-        }
         @keyframes moveScenery {
           0% { background-position: 100% 0; }
           100% { background-position: -100% 0; }
         }
         @keyframes movePillars {
-          0% { transform: translateX(180px); }
+          0% { transform: translateX(120px); }
           100% { transform: translateX(0); }
         }
       `}} />
