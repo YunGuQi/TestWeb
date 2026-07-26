@@ -6,6 +6,7 @@ export default function ResultsClient({ initialResults }: { initialResults: any[
   const [results, setResults] = useState(initialResults);
   const [editRes, setEditRes] = useState<any>(null);
   const [loading, setLoading] = useState(false);
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
 
   const saveResult = async () => {
     if (!editRes) return;
@@ -58,10 +59,13 @@ export default function ResultsClient({ initialResults }: { initialResults: any[
             
             {r.imageUrl && (
               <div className="mb-5">
-                <a href={r.imageUrl} target="_blank" rel="noreferrer" className="relative block w-full h-40 mb-2 rounded-lg overflow-hidden border border-[#EBEBEB] bg-[#F7F6F3] cursor-pointer hover:opacity-90 transition-opacity">
+                <div 
+                  onClick={() => setPreviewImage(r.imageUrl)}
+                  className="relative block w-full h-40 mb-2 rounded-lg overflow-hidden border border-[#EBEBEB] bg-[#F7F6F3] cursor-pointer hover:opacity-90 transition-opacity"
+                >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={r.imageUrl} alt={r.title} className="object-cover w-full h-full" />
-                </a>
+                </div>
                 <div className="flex items-center gap-2 text-xs font-mono truncate bg-blue-50/50 text-blue-600 p-2.5 rounded-lg border border-blue-100/50">
                   <span>🔗</span> {r.imageUrl}
                 </div>
@@ -110,6 +114,19 @@ export default function ResultsClient({ initialResults }: { initialResults: any[
               <button onClick={saveResult} disabled={loading} className="px-4 py-2 bg-[#37352F] hover:bg-black text-white rounded-lg text-sm font-semibold transition-colors shadow-sm">{loading ? '保存中...' : '确认保存'}</button>
             </div>
           </div>
+        </div>
+      )}
+      {previewImage && (
+        <div 
+          className="fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 cursor-zoom-out"
+          onClick={() => setPreviewImage(null)}
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img 
+            src={previewImage} 
+            alt="Preview" 
+            className="max-w-full max-h-[90vh] object-contain rounded-lg shadow-2xl" 
+          />
         </div>
       )}
     </div>
