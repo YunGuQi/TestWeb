@@ -85,7 +85,7 @@ export default function QuizInterface() {
                   key={idx}
                   disabled={isDisabled}
                   onClick={() => handleOptionClick(idx)}
-                  className={`w-full text-left bg-white border border-[#1a1a1a] p-4 rounded shadow-sm font-medium leading-relaxed transition-transform ${isSelected ? 'bg-black text-white' : 'text-[#1a1a1a] hover:bg-gray-50 active:scale-[0.98]'} ${isDisabled ? 'opacity-80 cursor-default' : ''}`}
+                  className={`w-full text-left border border-[#1a1a1a] p-4 rounded shadow-sm font-medium leading-relaxed transition-transform ${isSelected ? 'bg-black text-white' : 'bg-white text-[#1a1a1a] hover:bg-gray-50 active:scale-[0.98]'} ${isDisabled ? 'opacity-80 cursor-default' : ''}`}
                 >
                   <div className="relative z-10 flex gap-3 font-bold"><span className="shrink-0">{isSelected ? '[x]' : '[ ]'}</span><span>{abcd[idx]}. {opt.t}</span></div>
                 </button>
