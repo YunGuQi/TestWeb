@@ -47,7 +47,7 @@ export default function App() {
   };
 
   return (
-    <div className="brutalist-theme font-mono flex flex-col min-h-[100dvh]">
+    <div className="brutalist-theme flex flex-col min-h-[100dvh]">
       <BackgroundLayers />
       
       {currentView === 'home' && (
