@@ -191,20 +191,20 @@ export default function ResultReceipt({ result, onRestart, forcedUnlock }: Resul
                     </div>
                     <div className="border-b-4 border-black my-2"></div>
                     
-                    <div className="text-center mb-6 mt-4">
+                    <div className="text-center mb-4 mt-2">
                         <div className="text-sm font-bold text-gray-600 mb-1">鉴定结果</div>
                         <div className="text-2xl font-black bg-black text-white py-2 px-4 inline-block transform -rotate-1" id="res-title">
                             {result.title}
                         </div>
                     </div>
-                    <div className="flex flex-wrap justify-center gap-2 mb-6" id="res-tags">
+                    <div className="flex flex-wrap justify-center gap-2 mb-4" id="res-tags">
                         {result.tags.split(',').map(tag => (
                           <span key={tag} className="text-[10px] bg-black text-white px-2 py-1 font-bold">{tag}</span>
                         ))}
                     </div>
-                    <div className="border-b-2 border-dashed border-gray-400 mb-6"></div>
+                    <div className="border-b-2 border-dashed border-gray-400 mb-4"></div>
                     
-                    <div className="mb-6 font-mono text-xs text-black border-t-2 border-b-2 border-black py-4">
+                    <div className="mb-4 font-mono text-xs text-black border-t-2 border-b-2 border-black py-3">
                         <div className="flex justify-between items-end pb-2 border-b-2 border-black font-bold gap-2">
                             <span className="text-xs whitespace-nowrap leading-none">TOTAL FRICTION (总内耗)</span>
                             <span className="text-lg whitespace-nowrap leading-none" id="res-total">¥ {Math.floor(result.totalFriction / 10).toLocaleString()}</span>
@@ -229,7 +229,7 @@ export default function ResultReceipt({ result, onRestart, forcedUnlock }: Resul
                         )}
                     </div>
                     
-                    <div className="mt-4 pt-4 text-center">
+                    <div className="mt-3 pt-3 text-center">
                         <div id="barcode-bottom">
                             <svg className="w-full h-8" preserveAspectRatio="none" viewBox="0 0 100 10">
                                 {[...Array(40)].map((_, i) => {
@@ -246,14 +246,14 @@ export default function ResultReceipt({ result, onRestart, forcedUnlock }: Resul
                         <p className="text-[10px] text-gray-500 font-bold tracking-tighter mt-2" id="beat-text">击败了 {Math.max(1, Math.min(99, Math.floor(result.totalFriction / 300)))}% 的测试者</p>
                     </div>
                     
-                    <div className="border-b-4 border-black my-8"></div>
+                    <div className="border-b-4 border-black my-4"></div>
                     
-                    <div className="text-center font-mono mb-4 shrink-0">
+                    <div className="text-center font-mono mb-3 shrink-0">
                         <h2 className="text-xl font-black mb-1 tracking-widest text-black">深度评估报告</h2>
                         <p className="text-xs uppercase font-bold text-gray-600">--- ANALYSIS ---</p>
                     </div>
                     
-                    <div className="space-y-3 mb-6 font-bold text-black border-2 border-black p-4 bg-[#f4f4f4] shadow-[4px_4px_0px_#000]">
+                    <div className="space-y-2 mb-4 font-bold text-black border-2 border-black p-3 bg-[#f4f4f4] shadow-[4px_4px_0px_#000]">
                         <p className="text-[10px] font-mono text-gray-500 mb-1">DIMENSION SCORES</p>
                         {[
                           { label: '敏感 (Sen)', score: result.sen, id: 'sen' },
@@ -287,16 +287,16 @@ export default function ResultReceipt({ result, onRestart, forcedUnlock }: Resul
                                 </button>
                             </div>
                         )}
-                        <div id="res-desc" className="text-[13px] text-left leading-relaxed font-bold border-2 border-black p-4 bg-white mb-4 shadow-[4px_4px_0px_#000]">
+                        <div id="res-desc" className="text-[13px] text-left leading-relaxed font-bold border-2 border-black p-3 bg-white mb-3 shadow-[4px_4px_0px_#000]">
                             {result.description}
                         </div>
-                        <div className="text-left font-mono mb-4">
+                        <div className="text-left font-mono mb-3">
                             <div className="text-[10px] bg-black text-white px-2 py-0.5 inline-block mb-1">▶ 核心金句 QUOTE</div>
                             <div id="res-quote" className="text-xs leading-relaxed font-bold border-l-2 border-black pl-2 italic">
                                 {result.quote}
                             </div>
                         </div>
-                        <div className="text-left font-mono mb-8">
+                        <div className="text-left font-mono mb-4">
                             <div className="text-[10px] bg-black text-white px-2 py-0.5 inline-block mb-1">▶ 破局建议 ADVICE</div>
                             <div className="text-xs leading-relaxed font-bold border-l-2 border-black pl-2">
                                 <ul className="list-disc pl-4 space-y-1">
@@ -308,7 +308,7 @@ export default function ResultReceipt({ result, onRestart, forcedUnlock }: Resul
                         </div>
                     </div>
                     
-                    <div className="mt-8 pt-8 border-t-2 border-black border-dashed">
+                    <div className="mt-4 pt-4 border-t-2 border-black border-dashed">
                         <div className="text-center text-[10px] text-gray-500 font-mono mb-4">--- ANALYSIS END ---</div>
                         <p className="text-[10px] text-gray-500 font-bold tracking-tighter text-center">*本报告最终解释权归本人的小世界所有</p>
                     </div>
