@@ -6,7 +6,7 @@ export function middleware(request: NextRequest) {
 
   // Protect /ops-dashboard routes and /api/admin routes, but exclude the login routes
   const isProtectedPath = path.startsWith('/ops-dashboard') || path.startsWith('/api/admin');
-  const isLoginPath = path === '/ops-dashboard/login' || path === '/api/admin/login';
+  const isLoginPath = path === '/ops-login' || path === '/api/admin/login';
 
   if (isProtectedPath && !isLoginPath) {
     const token = request.cookies.get('admin_token')?.value;
@@ -18,7 +18,7 @@ export function middleware(request: NextRequest) {
       }
       
       // Otherwise redirect to the admin login page
-      return NextResponse.redirect(new URL('/ops-dashboard/login', request.url));
+      return NextResponse.redirect(new URL('/ops-login', request.url));
     }
   }
 

@@ -179,7 +179,7 @@ export default function ResultReceipt({ result, onRestart, forcedUnlock }: Resul
         />
         <div className="flex-1 overflow-y-auto px-4 hide-scrollbar flex flex-col items-center pb-8 relative z-10">
 
-            <div ref={receiptRef} className="p-6 w-full max-w-[380px] mx-auto flex flex-col items-center relative z-20 mb-4 mt-2 bg-[#fdfdfd]">
+            <div ref={receiptRef} className="pr-2 pb-2 w-full max-w-[380px] mx-auto flex flex-col items-center relative z-20 mb-4 mt-2">
                 <div id="poster-container" className="w-full flex flex-col relative z-20 pt-0 bg-black border-2 border-black shadow-[8px_8px_0px_#000]">
                 <div className="receipt-top shrink-0"></div>
                 <div className="receipt-paper px-6 py-4 flex-1 flex flex-col relative overflow-hidden">
