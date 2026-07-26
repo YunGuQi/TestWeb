@@ -32,11 +32,11 @@ const DanmakuOverlay = ({ danmakuList, isHidden, speedPct, opacityPct }: { danma
 };
 
 interface ResultReceiptProps {
-  answers: Record<string, any>;
+  result: any;
   onRestart: () => void;
 }
 
-export default function ResultReceipt({ answers, onRestart }: ResultReceiptProps) {
+export default function ResultReceipt({ result, onRestart }: ResultReceiptProps) {
   const [isUnlocked, setIsUnlocked] = useState(false);
   const [unlockCode, setUnlockCode] = useState('');
   const [isVerifying, setIsVerifying] = useState(false);
@@ -61,49 +61,7 @@ export default function ResultReceipt({ answers, onRestart }: ResultReceiptProps
       .catch(e => console.error(e));
   }, []);
 
-  const calculateResult = () => {
-    if (!answers || Object.keys(answers).length === 0) return { ...results[0], sen: 0, rum: 0, pls: 0, bnd: 0, totalFriction: 0, maxScore: 100 };
-
-    let sen = 0, rum = 0, pls = 0, bnd = 0;
-    
-    Object.values(answers).forEach((opt: any) => {
-      sen += opt.senScore || 0;
-      rum += opt.rumScore || 0;
-      pls += opt.plsScore || 0;
-      bnd += opt.bndScore || 0;
-    });
-
-    let totalFriction = (sen * 300) + (rum * 250) + (pls * 280) - (bnd * 100);
-    if (totalFriction < 0) totalFriction = 0;
-
-    let resultKey = 'bnd'; // default
-    const maxVal = Math.max(sen, rum, pls, bnd);
-
-    if (sen >= 35 && rum >= 35 && pls >= 35) {
-      resultKey = 'high';
-    } else if (sen >= 30 && pls >= 30) {
-      resultKey = 'sen_pls';
-    } else if (rum >= 40 && bnd <= 10) {
-      resultKey = 'rum_low_bnd';
-    } else if (bnd >= 40 && sen <= 15) {
-      resultKey = 'low';
-    } else if (pls === maxVal) {
-      resultKey = 'pls';
-    } else if (rum === maxVal) {
-      resultKey = 'rum';
-    } else if (sen === maxVal) {
-      resultKey = 'sen';
-    } else if (bnd === maxVal) {
-      resultKey = 'bnd';
-    }
-
-    const res = results.find(r => r.key === resultKey) || results[0];
-    
-    // max possible score for a dimension is roughly 100 (20 questions * 5)
-    return { ...res, sen, rum, pls, bnd, totalFriction, maxScore: 100 };
-  };
-
-  const result = calculateResult();
+  // 结果已由后端全权计算得出
 
   useEffect(() => {
     if (typeof window !== 'undefined' && result?.id) {
@@ -248,15 +206,10 @@ export default function ResultReceipt({ answers, onRestart }: ResultReceiptProps
                           <div id="details-container" className="space-y-3 mt-4 pt-2">
                               <div className="text-[10px] text-gray-500 mb-2">ITEM ................................. AMOUNT</div>
                               <div id="details-list" className="flex flex-col gap-3">
-                                {Object.values(answers).map((opt: any, i) => {
-                                  if (!opt || !opt.scores?.billName) return null;
-                                  const cost = (opt.scores.sen || 0)*300 + (opt.scores.rum || 0)*250 + (opt.scores.pls || 0)*280;
-                                  if (cost === 0) return null;
-                                  return (
-                                    <div key={i} className="flex justify-between items-center"><span className="truncate pr-2">{opt.scores.billName}</span><span className="shrink-0">¥ {cost.toLocaleString()}</span></div>
-                                  )
-                                })}
-                                {Object.values(answers).length === 0 && <div className="text-xs text-gray-500 italic">暂无消费记录</div>}
+                                {(result.billItems || []).map((item: any, i: number) => (
+                                  <div key={i} className="flex justify-between items-center"><span className="truncate pr-2">{item.name}</span><span className="shrink-0">¥ {item.cost.toLocaleString()}</span></div>
+                                ))}
+                                {(!result.billItems || result.billItems.length === 0) && <div className="text-xs text-gray-500 italic">暂无消费明细</div>}
                               </div>
                           </div>
                         )}

@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 
 interface TestEngineProps {
   onBack: () => void;
-  onFinish: (answers: Record<string, any>) => void;
+  onFinish: (result: any) => void;
 }
 
 export default function TestEngine({ onBack, onFinish }: TestEngineProps) {
@@ -51,7 +51,7 @@ export default function TestEngine({ onBack, onFinish }: TestEngineProps) {
   const progressPercent = ((currentIndex + 1) / questions.length) * 100;
 
   const handleSelect = (qId: string, opt: any) => {
-    const newAnswers = { ...answers, [qId]: opt };
+    const newAnswers = { ...answers, [qId]: opt.id };
     setAnswers(newAnswers);
 
     if (currentIndex < questions.length - 1) {
@@ -69,14 +69,15 @@ export default function TestEngine({ onBack, onFinish }: TestEngineProps) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           deviceId: localStorage.getItem('deviceId') || 'unknown',
-          answers
+          answers,
+          testId: 'emotional-friction'
         })
       });
       const data = await res.json();
-      if (data.success) {
-        onFinish(answers);
+      if (data.success && data.result) {
+        onFinish(data.result);
       } else {
-        alert('提交失败');
+        alert('提交失败: ' + (data.error || '未知原因'));
       }
     } catch(e) {
       alert('网络错误');
@@ -125,7 +126,7 @@ export default function TestEngine({ onBack, onFinish }: TestEngineProps) {
             </h2>
             <div id="options-container" className="space-y-4">
                 {currentQ.options.map((opt) => {
-                  const isSelected = answers[currentQ.id]?.id === opt.id;
+                  const isSelected = answers[currentQ.id]?.toString() === opt.id.toString();
                   return (
                     <button 
                       key={opt.id} 

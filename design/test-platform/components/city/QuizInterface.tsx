@@ -8,7 +8,7 @@ interface Option { t: string; e?: number[] }
 interface Question { text: string; opts: Option[] }
 
 export default function QuizInterface() {
-  const { currentStep, nextStep, prevStep } = useQuizStore();
+  const { currentStep, nextStep, prevStep, answers } = useQuizStore();
   const [questions, setQuestions] = useState<Question[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -33,7 +33,7 @@ export default function QuizInterface() {
   if (!questions.length) return <div className="min-h-screen flex items-center justify-center">暂无题库</div>;
 
   const currentQ = questions[currentStep];
-  const isLast = currentStep === 19; // 20 questions
+  const isLast = currentStep === questions.length - 1;
 
   const handleOptionClick = (idx: number) => {
     // We would ideally get the 'e' array from the backend, but since the frontend doesn't have it (anti-cheat),

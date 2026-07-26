@@ -23,8 +23,7 @@ export async function GET(request: Request) {
       text: q.text,
       options: q.options.map(opt => ({
         id: opt.id.toString(),
-        text: opt.text,
-        scores: JSON.parse(opt.scores)
+        text: opt.text
       }))
     }));
 

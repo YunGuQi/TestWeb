@@ -7,23 +7,31 @@ import ResultReceipt from '../../components/ResultReceipt';
 
 export default function App() {
   const [currentView, setCurrentView] = useState<'home' | 'test' | 'result'>('home');
-  const [answers, setAnswers] = useState<Record<string, any>>({});
+  const [result, setResult] = useState<any>(null);
   const [showHistory, setShowHistory] = useState(false);
   const [historyRecords, setHistoryRecords] = useState<any[]>([]);
 
   const [isEntering, setIsEntering] = useState(false);
   const [queueCount, setQueueCount] = useState(42);
 
+  const fetchHistory = (deviceId: string) => {
+    fetch(`/api/history?deviceId=${deviceId}&testId=emotional-friction`)
+      .then(res => res.json())
+      .then(data => {
+        if (data.success && data.history) {
+          setHistoryRecords(data.history);
+        }
+      })
+      .catch(e => console.error(e));
+  };
+
   useEffect(() => {
-    // 初始化唯一设备 ID（首次生成后持久保存）
-    if (!localStorage.getItem('deviceId')) {
-      const newId = 'dev-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8);
-      localStorage.setItem('deviceId', newId);
+    let deviceId = localStorage.getItem('deviceId');
+    if (!deviceId) {
+      deviceId = 'dev-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8);
+      localStorage.setItem('deviceId', deviceId);
     }
-    try {
-      const saved = JSON.parse(localStorage.getItem('quiz_history_emotional') || '[]');
-      setHistoryRecords(saved);
-    } catch (e) {}
+    fetchHistory(deviceId);
 
     const intervalId = setInterval(() => {
       setQueueCount(Math.floor(Math.random() * 101));
@@ -32,20 +40,18 @@ export default function App() {
     return () => clearInterval(intervalId);
   }, []);
 
-  const handleFinishTest = (finalAnswers: Record<string, any>) => {
-    setAnswers(finalAnswers);
+  const handleFinishTest = (finalResult: any) => {
+    setResult(finalResult);
     setCurrentView('result');
     
-    // Save to history
-    const newId = Date.now().toString().slice(-6);
-    const newRecord = { id: newId, answers: finalAnswers, timestamp: Date.now() };
-    const updatedHistory = [...historyRecords, newRecord];
-    setHistoryRecords(updatedHistory);
-    localStorage.setItem('quiz_history_emotional', JSON.stringify(updatedHistory));
+    const deviceId = localStorage.getItem('deviceId');
+    if (deviceId) {
+      fetchHistory(deviceId);
+    }
   };
 
   const handleRestart = () => {
-    setAnswers({});
+    setResult(null);
     setIsEntering(false);
     setCurrentView('home');
   };
@@ -138,30 +144,30 @@ export default function App() {
                           {historyRecords.length === 0 ? (
                             <div className="text-gray-500 text-sm mt-4 italic font-bold">暂无消费记录。</div>
                           ) : (
-                            [...historyRecords].reverse().map((record, index) => {
-                              const id = typeof record === 'string' ? record : record.id;
-                              const recordAnswers = typeof record === 'string' ? {} : record.answers;
+                            [...historyRecords].map((record, index) => {
+                              const id = record.id;
+                              const recordResult = record.result;
                               
                               return (
                                 <button 
                                   key={id + index}
                                   onClick={() => {
-                                    if (Object.keys(recordAnswers).length === 0) {
-                                      alert('早期版本暂无答案数据，请重新测算。');
+                                    if (!recordResult) {
+                                      alert('无数据，请重新测算。');
                                       return;
                                     }
-                                    setAnswers(recordAnswers);
+                                    setResult(recordResult);
                                     setShowHistory(false);
                                     setCurrentView('result');
                                   }}
                                   className="w-full text-left p-4 bg-white border-2 border-black shadow-[4px_4px_0px_#000] hover:-translate-y-1 hover:shadow-[6px_6px_0px_#000] transition-all flex items-center justify-between mb-3"
                                 >
                                     <div>
-                                        <div className="text-xs text-gray-500 font-mono mb-1">RECEIPT {id}</div>
-                                        <div className="font-bold text-sm">深度情绪内耗测算</div>
+                                        <div className="text-xs text-gray-500 font-mono mb-1">RECEIPT {id ? id.toString().slice(-6) : '---'}</div>
+                                        <div className="font-bold text-sm">{recordResult?.title || '深度情绪内耗测算'}</div>
                                     </div>
                                     <div className="font-mono text-xs text-black border border-black px-2 py-1">查看 &gt;</div>
-                                </button>
+                                  </button>
                               );
                             })
                           )}
@@ -185,7 +191,7 @@ export default function App() {
 
       {currentView === 'result' && (
         <ResultReceipt 
-          answers={answers} 
+          result={result} 
           onRestart={handleRestart} 
         />
       )}
