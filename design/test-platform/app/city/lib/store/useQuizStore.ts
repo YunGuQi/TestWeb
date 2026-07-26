@@ -70,9 +70,6 @@ export const useQuizStore = create<QuizState>()(
       setDeviceId: (id) => set({ deviceId: id }),
       
       reset: () => {
-        if (typeof window !== 'undefined') {
-          localStorage.removeItem('city-personality_unlocked');
-        }
         set({ 
           hasStarted: false, 
           currentStep: 0, 
