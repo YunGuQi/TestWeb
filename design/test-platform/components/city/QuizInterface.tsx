@@ -50,7 +50,7 @@ export default function QuizInterface() {
     
     // For now, assume API returns 'e' and we use it, we will fix the API later.
     const coordsDelta = currentQ.opts[idx]?.e || [0, 0, 0, 0, 0];
-    nextStep(coordsDelta, idx);
+    nextStep(coordsDelta, idx, isLast);
   };
 
   return (

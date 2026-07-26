@@ -56,10 +56,11 @@ export const useQuizStore = create<QuizState>()(
       }),
       
       prevStep: () => set((state) => {
-        if (state.currentStep === 0) return state;
-        const prevCoords = state.historyStackCoords[state.historyStackCoords.length - 1];
+        if (state.answers.length === 0) return state;
+        const prevCoords = state.historyStackCoords[state.historyStackCoords.length - 1] || [5, 5, 0, 5, 5];
+        const isFinished = state.answers.length > state.currentStep;
         return {
-          currentStep: state.currentStep - 1,
+          currentStep: isFinished ? state.currentStep : Math.max(0, state.currentStep - 1),
           userCoords: [...prevCoords],
           answers: state.answers.slice(0, -1),
           historyStackCoords: state.historyStackCoords.slice(0, -1)
