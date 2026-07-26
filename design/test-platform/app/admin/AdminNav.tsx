@@ -119,12 +119,12 @@ export default function AdminNav() {
   const handleTestChange = (newTestId: string) => {
     const params = new URLSearchParams(searchParams.toString());
     params.set('testId', newTestId);
-    window.location.href = `${pathname}?${params.toString()}`;
+    router.push(`${pathname}?${params.toString()}`);
   };
 
   const handleNavClick = (path: string) => {
     if (pathname !== path) {
-      window.location.href = buildHref(path);
+      router.push(buildHref(path));
     }
   };
 
