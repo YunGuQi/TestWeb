@@ -1,8 +1,10 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 export default function CodesTable({ initialCodes, testId }: { initialCodes: any[], testId: string }) {
+  const router = useRouter();
   const [codes, setCodes] = useState(initialCodes);
   const [loading, setLoading] = useState(false);
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
@@ -59,7 +61,7 @@ export default function CodesTable({ initialCodes, testId }: { initialCodes: any
 
       const data = await res.json();
       if (data.success) {
-        window.location.reload();
+        router.refresh();
       } else {
         alert(data.error);
       }
@@ -80,7 +82,7 @@ export default function CodesTable({ initialCodes, testId }: { initialCodes: any
       });
       const data = await res.json();
       if (data.success) {
-        window.location.reload();
+        router.refresh();
       } else {
         alert(data.error);
       }

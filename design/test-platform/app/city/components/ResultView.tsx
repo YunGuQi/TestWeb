@@ -4,6 +4,7 @@ import { useEffect, useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Download, Share2, Sparkles, MapPin } from 'lucide-react';
 import { useQuizStore } from '../lib/store/useQuizStore';
+import { useRouter } from 'next/navigation';
 import OrderOverlay from './OrderOverlay';
 import { toPng } from 'html-to-image';
 
@@ -95,6 +96,7 @@ interface ResultViewProps {
 }
 
 export default function ResultView({ forcedResultData }: ResultViewProps) {
+  const router = useRouter();
   const { answers, deviceId, reset } = useQuizStore();
   const [resultData, setResultData] = useState<any>(forcedResultData || null);
   const [isUnlocked, setIsUnlocked] = useState(!!forcedResultData);
@@ -302,13 +304,13 @@ export default function ResultView({ forcedResultData }: ResultViewProps) {
         </button>
 
         <div className="flex justify-center gap-6 mt-1 mb-2 font-mono font-bold w-full">
-          <button onClick={() => { reset(); window.location.reload(); }} className="text-xs text-gray-400 hover:text-[#1a1a1a] transition-colors tracking-widest underline underline-offset-4">
+          <button onClick={() => { reset(); router.push('/city'); }} className="text-xs text-gray-400 hover:text-[#1a1a1a] transition-colors tracking-widest underline underline-offset-4">
             [ 重新购买车票 ]
           </button>
           
-          <a href="/" className="text-xs text-gray-400 hover:text-[#1a1a1a] transition-colors underline underline-offset-4 tracking-widest">
+          <button onClick={() => router.push('/')} className="text-xs text-gray-400 hover:text-[#1a1a1a] transition-colors underline underline-offset-4 tracking-widest">
             [ 探索测试大厅 ]
-          </a>
+          </button>
         </div>
       </div>
     </section>
