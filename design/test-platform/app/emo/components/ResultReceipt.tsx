@@ -176,6 +176,7 @@ export default function ResultReceipt({ result, onRestart, forcedUnlock }: Resul
           isHidden={isGeneratingImage} 
           speedPct={danmakuConfig.speed} 
           opacityPct={danmakuConfig.opacity} 
+        />
         <div className="flex-1 overflow-y-auto px-4 hide-scrollbar flex flex-col items-center pb-8 relative z-10">
 
             <div ref={receiptRef} className="p-6 w-full max-w-[380px] mx-auto flex flex-col items-center relative z-20 mb-4 mt-2 bg-[#fdfdfd]">
