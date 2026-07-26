@@ -120,10 +120,8 @@ export default function ResultView({ forcedResultData }: ResultViewProps) {
 
   useEffect(() => {
     // Check if unlocked
-    if (!forcedResultData) {
-      const unlocked = localStorage.getItem(`city-personality_unlocked`) === 'true';
-      setIsUnlocked(unlocked);
-    }
+    const unlocked = localStorage.getItem(`city-personality_unlocked`) === 'true';
+    setIsUnlocked(unlocked);
 
     async function fetchResult() {
       if (forcedResultData) return;

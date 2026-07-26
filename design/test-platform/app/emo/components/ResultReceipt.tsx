@@ -65,8 +65,8 @@ export default function ResultReceipt({ result, onRestart, forcedUnlock }: Resul
   // 结果已由后端全权计算得出
 
   useEffect(() => {
-    if (typeof window !== 'undefined' && result?.recordId) {
-      if (localStorage.getItem(`verified_${result.recordId}`) === 'true') {
+    if (typeof window !== 'undefined') {
+      if (localStorage.getItem(`verified_emotional-friction`) === 'true' || (result?.recordId && localStorage.getItem(`verified_${result.recordId}`))) {
         setIsUnlocked(true);
       }
     }
@@ -102,8 +102,11 @@ export default function ResultReceipt({ result, onRestart, forcedUnlock }: Resul
         setIsUnlocked(true);
         setIsVerifying(false);
         document.getElementById('modal-unlock')?.classList.add('hidden');
-        if (typeof window !== 'undefined' && result?.recordId) {
-          localStorage.setItem(`verified_${result.recordId}`, 'true');
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('verified_emotional-friction', 'true');
+          if (result?.recordId) {
+            localStorage.setItem(`verified_${result.recordId}`, 'true');
+          }
         }
       } else {
         setVerifyError(data.error || '激活码无效或已达上限，请重新输入');
