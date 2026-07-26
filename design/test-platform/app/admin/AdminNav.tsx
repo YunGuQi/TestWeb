@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import Link from 'next/link';
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 
 const TESTS = [
@@ -27,7 +26,7 @@ function WorkspaceDropdown({
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className={`w-full flex items-center justify-between gap-2 bg-white border border-[#E2E1DE] text-[#37352F] font-semibold rounded-xl shadow-[0_2px_8px_rgba(0,0,0,0.04)] hover:border-[#C4C3BF] hover:shadow-[0_4px_12px_rgba(0,0,0,0.06)] transition-all cursor-pointer ${
+        className={`w-full flex items-center justify-between gap-2 bg-white border border-[#E2E1DE] text-[#37352F] font-semibold rounded-xl shadow-[0_2px_8px_rgba(0,0,0,0.04)] hover:border-[#C4C3BF] hover:shadow-[0_4px_12px_rgba(0,0,0,0.06)] transition-all cursor-pointer touch-manipulation ${
           isCompact ? 'px-2.5 py-1.5 text-xs' : 'px-3 py-2.5 text-sm'
         }`}
       >
@@ -74,7 +73,7 @@ function WorkspaceDropdown({
                     setIsOpen(false);
                     onSelect(test.id);
                   }}
-                  className={`w-full flex items-center justify-between px-2.5 py-2 rounded-xl text-left transition-colors cursor-pointer ${
+                  className={`w-full flex items-center justify-between px-2.5 py-2 rounded-xl text-left transition-colors cursor-pointer touch-manipulation ${
                     isSelected 
                       ? 'bg-[#F4F3EE] text-[#37352F] font-bold' 
                       : 'text-[#65645F] hover:bg-[#F9F8F6] hover:text-[#37352F] font-medium'
@@ -123,6 +122,12 @@ export default function AdminNav() {
     window.location.href = `${pathname}?${params.toString()}`;
   };
 
+  const handleNavClick = (path: string) => {
+    if (pathname !== path) {
+      window.location.href = buildHref(path);
+    }
+  };
+
   const navItems = [
     { name: '概览 (Overview)', shortName: '概览', path: '/admin', icon: '📊' },
     { name: '题库编辑 (CMS)', shortName: '题库', path: '/admin/questions', icon: '📝' },
@@ -152,18 +157,19 @@ export default function AdminNav() {
           {navItems.map((item) => {
             const isActive = pathname === item.path;
             return (
-              <Link
+              <button
                 key={item.path}
-                href={buildHref(item.path)}
-                className={`flex items-center gap-1 px-2.5 py-1.5 text-xs font-bold rounded-md whitespace-nowrap transition-colors ${
+                type="button"
+                onClick={() => handleNavClick(item.path)}
+                className={`flex items-center gap-1.5 px-3 py-2 text-xs font-bold rounded-lg whitespace-nowrap transition-all touch-manipulation cursor-pointer select-none active:scale-95 ${
                   isActive 
                     ? 'bg-white text-[#37352F] shadow-sm border border-[#EBEBEB]' 
                     : 'text-[#787774] hover:bg-[#EBEBEB]/50 hover:text-[#37352F]'
                 }`}
               >
-                <span>{item.icon}</span>
+                <span className="text-sm">{item.icon}</span>
                 <span>{item.shortName}</span>
-              </Link>
+              </button>
             );
           })}
         </nav>
@@ -193,18 +199,19 @@ export default function AdminNav() {
           {navItems.map((item) => {
             const isActive = pathname === item.path;
             return (
-              <Link
+              <button
                 key={item.path}
-                href={buildHref(item.path)}
-                className={`flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                type="button"
+                onClick={() => handleNavClick(item.path)}
+                className={`w-full flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-lg transition-all touch-manipulation cursor-pointer select-none active:scale-98 text-left ${
                   isActive 
                     ? 'bg-white text-[#37352F] shadow-sm' 
                     : 'text-[#787774] hover:bg-[#EBEBEB]/50 hover:text-[#37352F]'
                 }`}
               >
-                <span>{item.icon}</span>
+                <span className="text-base">{item.icon}</span>
                 {item.name}
-              </Link>
+              </button>
             );
           })}
         </nav>

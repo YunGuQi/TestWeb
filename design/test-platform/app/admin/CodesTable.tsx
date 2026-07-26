@@ -114,6 +114,47 @@ export default function CodesTable({ initialCodes, testId }: { initialCodes: any
         </button>
       </div>
 
+      {/* ============ Mobile Select All & Batch Actions Bar (< md) ============ */}
+      <div className="md:hidden bg-[#F7F6F3] border border-[#EBEBEB] p-3.5 rounded-xl mb-4 shadow-sm">
+        <div className="flex items-center justify-between">
+          <label className="flex items-center gap-2.5 text-sm font-bold text-[#37352F] cursor-pointer select-none">
+            <input 
+              type="checkbox" 
+              checked={codes.length > 0 && codes.every(c => selectedIds.includes(c.id))}
+              onChange={(e) => {
+                if (e.target.checked) setSelectedIds(codes.map(c => c.id));
+                else setSelectedIds([]);
+              }}
+              className="w-4 h-4 rounded border-[#EBEBEB] text-blue-500 focus:ring-blue-500 cursor-pointer"
+            />
+            <span>全选所有卡密 ({codes.length})</span>
+          </label>
+          {selectedIds.length > 0 && (
+            <span className="text-xs font-bold text-[#37352F] bg-white border border-[#EBEBEB] px-2.5 py-1 rounded-md shadow-sm">
+              已选 {selectedIds.length} 项
+            </span>
+          )}
+        </div>
+
+        {selectedIds.length > 0 && (
+          <div className="flex items-center gap-2.5 pt-3 mt-3 border-t border-[#EBEBEB]">
+            <button 
+              onClick={handleBatchDelete} 
+              disabled={loading} 
+              className="flex-1 text-xs font-bold bg-red-50 text-red-600 border border-red-200 hover:bg-red-100 transition-all py-2.5 rounded-lg text-center cursor-pointer shadow-sm active:scale-95"
+            >
+              批量删除 ({selectedIds.length})
+            </button>
+            <button 
+              onClick={handleExportCSV} 
+              className="flex-1 text-xs font-bold bg-green-50 text-green-600 border border-green-200 hover:bg-green-100 transition-all py-2.5 rounded-lg text-center cursor-pointer shadow-sm active:scale-95"
+            >
+              导出已选 ({selectedIds.length})
+            </button>
+          </div>
+        )}
+      </div>
+
       {/* ============ Mobile Cards View (< md) ============ */}
       <div className="md:hidden space-y-3">
         {codes.map(code => {
