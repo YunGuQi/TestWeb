@@ -127,13 +127,25 @@ export default function ResultView() {
         {/* Middle Section */}
         <div className="p-6 pb-2">
           <div className="font-mono text-xs opacity-70 mb-3">5D SOUL SPECTRUM</div>
-          <div className="mb-6 flex flex-col gap-2">
-            {/* simple radar bar representation */}
-            <div className="flex gap-2 text-[10px] items-center"><span className="w-10">节奏</span><div className="h-2 bg-black flex-1"><div style={{width: `${Math.min(100, Math.max(0, (userCoords[0]/10)*100))}%`}} className="h-full bg-white opacity-50"></div></div></div>
-            <div className="flex gap-2 text-[10px] items-center"><span className="w-10">环境</span><div className="h-2 bg-black flex-1"><div style={{width: `${Math.min(100, Math.max(0, (userCoords[1]/10)*100))}%`}} className="h-full bg-white opacity-50"></div></div></div>
-            <div className="flex gap-2 text-[10px] items-center"><span className="w-10">温度</span><div className="h-2 bg-black flex-1"><div style={{width: `${Math.min(100, Math.max(0, (userCoords[2]/10)*100))}%`}} className="h-full bg-white opacity-50"></div></div></div>
-            <div className="flex gap-2 text-[10px] items-center"><span className="w-10">社交</span><div className="h-2 bg-black flex-1"><div style={{width: `${Math.min(100, Math.max(0, (userCoords[3]/10)*100))}%`}} className="h-full bg-white opacity-50"></div></div></div>
-            <div className="flex gap-2 text-[10px] items-center"><span className="w-10">品味</span><div className="h-2 bg-black flex-1"><div style={{width: `${Math.min(100, Math.max(0, (userCoords[4]/10)*100))}%`}} className="h-full bg-white opacity-50"></div></div></div>
+          <div className="mb-6 flex flex-col gap-2.5">
+            {[
+              { label: '节奏', value: userCoords[0] ?? 5 },
+              { label: '环境', value: userCoords[1] ?? 5 },
+              { label: '温度', value: userCoords[2] ?? 5 },
+              { label: '社交', value: userCoords[3] ?? 5 },
+              { label: '品味', value: userCoords[4] ?? 5 }
+            ].map((dim, i) => {
+              const pct = Math.round(Math.min(100, Math.max(0, (dim.value / 10) * 100)));
+              return (
+                <div key={i} className="flex gap-2.5 text-xs items-center">
+                  <span className="w-8 font-bold text-[#1a1a1a]/90 shrink-0">{dim.label}</span>
+                  <div className="h-2.5 bg-[#e4dfd4] flex-1 rounded-full overflow-hidden border border-[#1a1a1a]/15 shadow-inner">
+                    <div style={{ width: `${pct}%` }} className="h-full bg-[#1a1a1a] rounded-full transition-all duration-500"></div>
+                  </div>
+                  <span className="w-9 text-right font-mono font-bold text-[#1a1a1a] text-xs shrink-0">{pct}%</span>
+                </div>
+              );
+            })}
           </div>
 
           <div className="font-mono text-xs opacity-70 mb-3">DIAGNOSTIC REPORT</div>
