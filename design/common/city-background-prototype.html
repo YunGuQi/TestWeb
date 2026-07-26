@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>City Test Background Prototype</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow: hidden;
+            font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+
+        /* Variant A */
+        .bg-variant-a {
+            background-color: #f0ede6;
+            background-image: radial-gradient(#d1cdc1 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        /* Variant B */
+        .bg-variant-b {
+            background-color: #1a1a1a;
+        }
+        .bg-variant-b .scenery {
+            position: absolute;
+            inset: 0;
+            opacity: 0.4;
+            mix-blend-mode: screen;
+            background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.05) 50%, transparent 100%);
+            background-size: 200% 100%;
+            animation: moveScenery 10s linear infinite;
+        }
+        .bg-variant-b .pillars {
+            position: absolute;
+            inset: 0;
+            opacity: 0.2;
+            background-image: repeating-linear-gradient(90deg, transparent, transparent 100px, rgba(0,0,0,0.8) 100px, rgba(0,0,0,0.8) 120px);
+            animation: movePillars 3s linear infinite;
+        }
+        @keyframes moveScenery {
+            0% { background-position: 100% 0; }
+            100% { background-position: -100% 0; }
+        }
+        @keyframes movePillars {
+            0% { transform: translateX(120px); }
+            100% { transform: translateX(0); }
+        }
+
+        /* Variant C */
+        .bg-variant-c {
+            background-color: #e3e1db;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .topo-line {
+            position: absolute;
+            border: 1px solid;
+            border-radius: 50%;
+        }
+        .topo-1 { width: 150vw; height: 150vw; border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%; border-color: #d1cdc1; opacity: 0.5; animation: spin 40s linear infinite; }
+        .topo-2 { width: 120vw; height: 120vw; border-radius: 60% 40% 30% 70% / 50% 60% 40% 50%; border-color: #c1bdb0; opacity: 0.4; animation: spin 35s linear infinite reverse; }
+        .topo-3 { width: 90vw; height: 90vw; border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%; border-color: #a8a496; opacity: 0.3; animation: spin 30s linear infinite; }
+        .topo-4 { width: 60vw; height: 60vw; border-radius: 50% 50% 20% 80% / 25% 75% 25% 75%; border-color: #8f8c80; opacity: 0.2; animation: spin 25s linear infinite reverse; }
+        
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        /* General Background Layer */
+        #bg-layer {
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            transition: background-color 0.3s;
+        }
+
+        .variant-content {
+            display: none;
+            width: 100%;
+            height: 100%;
+        }
+        .variant-content.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <!-- Background Variants -->
+    <div id="bg-layer" class="bg-variant-a">
+        <!-- A Content -->
+        <div id="content-a" class="variant-content active">
+            <div class="absolute inset-0 bg-gradient-to-b from-transparent to-[#f0ede6]/50"></div>
+        </div>
+        <!-- B Content -->
+        <div id="content-b" class="variant-content">
+            <div class="scenery"></div>
+            <div class="pillars"></div>
+        </div>
+        <!-- C Content -->
+        <div id="content-c" class="variant-content flex items-center justify-center">
+            <div class="topo-line topo-1"></div>
+            <div class="topo-line topo-2"></div>
+            <div class="topo-line topo-3"></div>
+            <div class="topo-line topo-4"></div>
+        </div>
+    </div>
+
+    <!-- UI Overlay (Mock Landing Page) -->
+    <section class="min-h-[100dvh] w-full flex flex-col items-center justify-center p-8 max-w-md mx-auto relative z-10">
+        <div class="relative bg-[#fdfbf7] text-[#1a1a1a] w-full p-8 text-center flex flex-col items-center rounded shadow-[0_10px_40px_rgba(0,0,0,0.06)] border border-[#d1cdc1] before:content-[''] before:absolute before:top-1/2 before:-translate-y-1/2 before:-left-4 before:w-8 before:h-8 before:bg-transparent before:rounded-full before:shadow-[inset_0_2px_4px_rgba(0,0,0,0.05)] before:border before:border-[#d1cdc1] before:border-r-transparent before:border-t-transparent before:rotate-45 after:content-[''] after:absolute after:top-1/2 after:-translate-y-1/2 after:-right-4 after:w-8 after:h-8 after:bg-transparent after:rounded-full after:shadow-[inset_0_2px_4px_rgba(0,0,0,0.05)] after:border after:border-[#d1cdc1] after:border-l-transparent after:border-b-transparent after:rotate-45" id="ticket-card">
+          <h1 class="text-4xl font-black tracking-tight mb-2">心灵逃跑车票</h1>
+          <p class="font-mono text-sm opacity-70 mb-6 uppercase tracking-widest">ONE-WAY TICKET TO YOUR SOUL</p>
+  
+          <div class="text-left w-full bg-black/5 p-4 rounded text-sm text-gray-600 mb-8 font-mono leading-relaxed">
+            &gt; DESTINATION: UNKNOWN<br />
+            &gt; PASSENGER: YOU<br />
+            &gt; DEPARTURE: NOW<br />
+            <br />
+            回答20道极其真实的安检题，获取你的专属单程车票。寻找全国34个省份中最契合你灵魂的那座城。
+          </div>
+  
+          <button class="w-full bg-[#1a1a1a] text-[#fdfbf7] py-4 rounded font-bold tracking-widest text-lg shadow-lg hover:bg-black transition-colors">
+            开始检票 [CHECK-IN]
+          </button>
+  
+          <div class="mt-4 text-gray-500 px-4 py-1 rounded-full text-xs font-bold font-mono flex items-center justify-center">
+            <span class="inline-block w-2 h-2 bg-red-500 rounded-full mr-2 animate-pulse"></span>
+            目前有 1,408 人正在候车
+          </div>
+        </div>
+    </section>
+
+    <!-- Switcher -->
+    <div class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[9999] flex items-center gap-4 bg-black/80 backdrop-blur-md text-white px-4 py-2 rounded-full shadow-2xl border border-white/20 font-mono text-sm">
+        <button id="btn-prev" class="hover:text-white/60 p-1">←</button>
+        <div id="variant-label" class="font-bold tracking-wider">A — 极简航站楼波点网格</div>
+        <button id="btn-next" class="hover:text-white/60 p-1">→</button>
+    </div>
+
+    <script>
+        const variants = [
+            { id: 'a', name: '极简航站楼波点网格', className: 'bg-variant-a', cutoutColor: '#f0ede6' },
+            { id: 'b', name: '动态复古车窗', className: 'bg-variant-b', cutoutColor: '#1a1a1a' },
+            { id: 'c', name: '抽象地形等高线', className: 'bg-variant-c', cutoutColor: '#e3e1db' },
+        ];
+        let currentIndex = 0;
+
+        const bgLayer = document.getElementById('bg-layer');
+        const label = document.getElementById('variant-label');
+        
+        // We dynamically inject CSS to update the pseudo-elements (the ticket cutouts) background color so it matches the layer behind it
+        const styleEl = document.createElement('style');
+        document.head.appendChild(styleEl);
+
+        function updateVariant() {
+            const v = variants[currentIndex];
+            
+            // Update classes
+            bgLayer.className = v.className;
+            
+            // Update active content
+            document.querySelectorAll('.variant-content').forEach(el => el.classList.remove('active'));
+            document.getElementById(`content-${v.id}`).classList.add('active');
+
+            // Update ticket cutout colors to match the background
+            styleEl.textContent = `
+                #ticket-card::before, #ticket-card::after {
+                    background-color: ${v.cutoutColor} !important;
+                }
+            `;
+
+            // Update label
+            label.textContent = `${v.id.toUpperCase()} — ${v.name}`;
+        }
+
+        updateVariant(); // Init
+
+        document.getElementById('btn-prev').addEventListener('click', () => {
+            currentIndex = (currentIndex - 1 + variants.length) % variants.length;
+            updateVariant();
+        });
+
+        document.getElementById('btn-next').addEventListener('click', () => {
+            currentIndex = (currentIndex + 1) % variants.length;
+            updateVariant();
+        });
+
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft') {
+                currentIndex = (currentIndex - 1 + variants.length) % variants.length;
+                updateVariant();
+            } else if (e.key === 'ArrowRight') {
+                currentIndex = (currentIndex + 1) % variants.length;
+                updateVariant();
+            }
+        });
+    </script>
+</body>
+</html>
