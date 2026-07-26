@@ -8,12 +8,12 @@ export async function POST(request: Request) {
     if (password === 'jiasite') {
       const response = NextResponse.json({ success: true });
       
-      // Set HttpOnly cookie for auth
+      // Set auth cookie (httpOnly=false and secure=false to prevent reverse proxy/CDN dropping cookie)
       response.cookies.set({
         name: 'admin_token',
         value: 'jiasite_Authorized',
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
+        httpOnly: false,
+        secure: false,
         sameSite: 'lax',
         path: '/',
         maxAge: 60 * 60 * 24 * 7 // 7 days
