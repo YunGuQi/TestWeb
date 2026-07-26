@@ -55,9 +55,9 @@ export default function QuizInterface() {
 
   return (
     <section className="min-h-[100dvh] w-full flex flex-col items-center justify-center p-8 max-w-md mx-auto">
-      <div className="w-full flex justify-between items-center mb-8 font-mono text-sm font-bold opacity-70">
-        <button onClick={() => window.location.reload()} className="hover:text-black tracking-widest flex items-center gap-1 transition-colors">
-          &larr; 返回大厅
+      <div className="w-full flex justify-between items-center mb-8 font-mono text-sm font-bold opacity-70 text-white">
+        <button onClick={() => useQuizStore.setState({ hasStarted: false, hasGenerated: false, currentStep: 0, answers: [] })} className="hover:text-white/100 tracking-widest flex items-center gap-1 transition-colors">
+          &larr; 返回首页
         </button>
         <span>{String(currentStep + 1).padStart(2, '0')}/{questions.length}</span>
       </div>
