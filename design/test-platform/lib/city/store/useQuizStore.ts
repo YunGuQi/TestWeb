@@ -30,7 +30,7 @@ export const useQuizStore = create<QuizState>()(
     (set) => ({
       hasStarted: false,
       currentStep: 0,
-      userCoords: [5, 5, 0, 5, 5],
+      userCoords: [5, 5, 5, 5, 5],
       answers: [],
       deviceId: null,
       historyStackCoords: [],
@@ -39,7 +39,7 @@ export const useQuizStore = create<QuizState>()(
       startQuiz: () => set({ 
         hasStarted: true, 
         currentStep: 0, 
-        userCoords: [5, 5, 0, 5, 5],
+        userCoords: [5, 5, 5, 5, 5],
         answers: [],
         historyStackCoords: [],
         hasGenerated: false 

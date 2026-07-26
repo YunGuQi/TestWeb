@@ -24,13 +24,18 @@ export default function OrderOverlay({ testId, onSuccess }: OrderOverlayProps) {
     }
     
     setLoading(true);
+    let did = deviceId || (typeof window !== 'undefined' ? (localStorage.getItem('deviceId_city') || localStorage.getItem('deviceId')) : null);
+    if (!did && typeof window !== 'undefined') {
+      did = crypto.randomUUID();
+      localStorage.setItem('deviceId_city', did);
+    }
     try {
       const res = await fetch('/api/verify', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           code: code.trim(),
-          deviceId: deviceId || 'unknown',
+          deviceId: did || 'unknown',
           recordId: testId
         })
       });

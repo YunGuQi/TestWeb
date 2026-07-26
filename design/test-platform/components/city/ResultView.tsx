@@ -129,8 +129,11 @@ export default function ResultView() {
           <div className="font-mono text-xs opacity-70 mb-3">5D SOUL SPECTRUM</div>
           <div className="mb-6 flex flex-col gap-2">
             {/* simple radar bar representation */}
-            <div className="flex gap-2 text-[10px] items-center"><span className="w-10">节奏</span><div className="h-2 bg-black flex-1"><div style={{width: `${(userCoords[0]/10)*100}%`}} className="h-full bg-white opacity-50"></div></div></div>
-            <div className="flex gap-2 text-[10px] items-center"><span className="w-10">环境</span><div className="h-2 bg-black flex-1"><div style={{width: `${(userCoords[1]/10)*100}%`}} className="h-full bg-white opacity-50"></div></div></div>
+            <div className="flex gap-2 text-[10px] items-center"><span className="w-10">节奏</span><div className="h-2 bg-black flex-1"><div style={{width: `${Math.min(100, Math.max(0, (userCoords[0]/10)*100))}%`}} className="h-full bg-white opacity-50"></div></div></div>
+            <div className="flex gap-2 text-[10px] items-center"><span className="w-10">环境</span><div className="h-2 bg-black flex-1"><div style={{width: `${Math.min(100, Math.max(0, (userCoords[1]/10)*100))}%`}} className="h-full bg-white opacity-50"></div></div></div>
+            <div className="flex gap-2 text-[10px] items-center"><span className="w-10">温度</span><div className="h-2 bg-black flex-1"><div style={{width: `${Math.min(100, Math.max(0, (userCoords[2]/10)*100))}%`}} className="h-full bg-white opacity-50"></div></div></div>
+            <div className="flex gap-2 text-[10px] items-center"><span className="w-10">社交</span><div className="h-2 bg-black flex-1"><div style={{width: `${Math.min(100, Math.max(0, (userCoords[3]/10)*100))}%`}} className="h-full bg-white opacity-50"></div></div></div>
+            <div className="flex gap-2 text-[10px] items-center"><span className="w-10">品味</span><div className="h-2 bg-black flex-1"><div style={{width: `${Math.min(100, Math.max(0, (userCoords[4]/10)*100))}%`}} className="h-full bg-white opacity-50"></div></div></div>
           </div>
 
           <div className="font-mono text-xs opacity-70 mb-3">DIAGNOSTIC REPORT</div>

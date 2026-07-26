@@ -13,7 +13,7 @@ export async function POST(req: Request) {
     });
 
     // 2. Calculate coordinates
-    let userCoords = [5, 5, 0, 5, 5]; // Default coords for rhythm, env, temp, social, taste
+    let userCoords = [5, 5, 5, 5, 5]; // Default coords for rhythm, env, temp, social, taste
     if (Array.isArray(answers)) {
       answers.forEach((optIndex, qIndex) => {
         const q = questions[qIndex];
@@ -88,6 +88,20 @@ export async function POST(req: Request) {
       }
     } catch (e) {
       console.error("Error hitting shared backend:", e);
+    }
+
+    // 5. Save to TestRecord so /admin can count it
+    try {
+      await prisma.testRecord.create({
+        data: {
+          testId: 'city-personality',
+          deviceId: deviceId || 'unknown',
+          answers: JSON.stringify(answers || []),
+          resultId: closestCity?.id || 1
+        }
+      });
+    } catch (e) {
+      console.error("Error creating TestRecord for city:", e);
     }
 
     return NextResponse.json({
