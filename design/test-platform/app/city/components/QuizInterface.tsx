@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useQuizStore } from '@/lib/city/store/useQuizStore';
+import { useQuizStore } from '../lib/store/useQuizStore';
 
 interface Option { t: string; e?: number[] }
 interface Question { text: string; opts: Option[] }

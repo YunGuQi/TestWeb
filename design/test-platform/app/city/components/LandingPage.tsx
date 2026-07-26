@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { Compass, Sparkles, Map } from 'lucide-react';
-import { useQuizStore } from '@/lib/city/store/useQuizStore';
+import { useQuizStore } from '../lib/store/useQuizStore';
 import { useEffect, useState } from 'react';
 
 export default function LandingPage() {

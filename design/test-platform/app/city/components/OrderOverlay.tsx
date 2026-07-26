@@ -1,8 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { verifyOrderCode } from '@/lib/city/services/api';
-import { useQuizStore } from '@/lib/city/store/useQuizStore';
+import { verifyOrderCode } from '../lib/services/api';
+import { useQuizStore } from '../lib/store/useQuizStore';
 
 interface OrderOverlayProps {
   testId: string;

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import BackgroundLayers from './components/BackgroundLayers';
 import TestEngine from './components/TestEngine';
 import ResultReceipt from './components/ResultReceipt';
@@ -10,19 +10,40 @@ export default function App() {
   const [currentView, setCurrentView] = useState<'home' | 'test' | 'result'>('home');
   const [result, setResult] = useState<any>(null);
 
+  useEffect(() => {
+    // When the component mounts, set the initial history state
+    window.history.replaceState({ view: 'home' }, '', '');
+
+    const handlePopState = (e: PopStateEvent) => {
+      if (e.state && e.state.view) {
+        setCurrentView(e.state.view);
+      } else {
+        setCurrentView('home');
+      }
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
+  const navigateTo = (view: 'home' | 'test' | 'result') => {
+    setCurrentView(view);
+    window.history.pushState({ view }, '', '');
+  };
+
   const handleFinishTest = (finalResult: any) => {
     setResult(finalResult);
-    setCurrentView('result');
+    navigateTo('result');
   };
 
   const handleRestart = () => {
     setResult(null);
-    setCurrentView('home');
+    navigateTo('home');
   };
 
   const handleRestoreHistory = (recordResult: any) => {
     setResult(recordResult);
-    setCurrentView('result');
+    navigateTo('result');
   };
 
   return (
@@ -31,7 +52,7 @@ export default function App() {
       
       {currentView === 'home' && (
         <Home 
-          onStartTest={() => setCurrentView('test')} 
+          onStartTest={() => navigateTo('test')} 
           onRestoreHistory={handleRestoreHistory} 
         />
       )}
@@ -39,7 +60,7 @@ export default function App() {
       {currentView === 'test' && (
         <TestEngine 
           onBack={() => {
-            setCurrentView('home');
+            navigateTo('home');
           }} 
           onFinish={handleFinishTest} 
         />

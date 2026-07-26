@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Download, Share2, Sparkles, MapPin } from 'lucide-react';
-import { useQuizStore } from '@/lib/city/store/useQuizStore';
+import { useQuizStore } from '../lib/store/useQuizStore';
 import OrderOverlay from './OrderOverlay';
 import { toPng } from 'html-to-image';
 
