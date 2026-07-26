@@ -55,6 +55,38 @@ const ticketStyles = [
     labelBg: 'bg-[#E0533C]/15 text-[#E0533C]',
     btnBg: 'bg-[#E0533C] text-white hover:bg-[#c94630]',
     taglineColor: 'border-[#E0533C]/30'
+  },
+  {
+    name: '极简冷淡',
+    sub: '冷感工业票根',
+    bg: 'bg-white',
+    text: 'text-black',
+    border: 'border-black',
+    divider: 'border-black',
+    stampBorder: 'border-black text-black bg-black/5',
+    tagBg: 'bg-black text-white',
+    barFill: 'bg-black',
+    barTrack: 'bg-gray-200 border-black/10',
+    quoteBg: 'bg-white border-black text-black',
+    labelBg: 'bg-black text-white',
+    btnBg: 'bg-black text-white hover:bg-gray-800',
+    taglineColor: 'border-black/20'
+  },
+  {
+    name: '千禧霓虹',
+    sub: 'Y2K数字凭证',
+    bg: 'bg-[#0B0C10]',
+    text: 'text-[#45A29E]',
+    border: 'border-[#66FCF1]',
+    divider: 'border-[#45A29E]/50',
+    stampBorder: 'border-[#66FCF1] text-[#66FCF1] bg-[#66FCF1]/10',
+    tagBg: 'bg-[#45A29E] text-[#0B0C10]',
+    barFill: 'bg-[#66FCF1]',
+    barTrack: 'bg-[#1F2833] border-[#66FCF1]/20',
+    quoteBg: 'bg-[#1F2833] border-[#45A29E] text-[#66FCF1]',
+    labelBg: 'bg-[#66FCF1]/10 text-[#66FCF1]',
+    btnBg: 'bg-[#66FCF1] text-[#0B0C10] hover:bg-[#45A29E]',
+    taglineColor: 'border-[#45A29E]/30'
   }
 ];
 
