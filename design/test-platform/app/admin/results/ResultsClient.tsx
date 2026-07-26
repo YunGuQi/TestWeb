@@ -57,8 +57,14 @@ export default function ResultsClient({ initialResults }: { initialResults: any[
             </div>
             
             {r.imageUrl && (
-              <div className="mb-5 flex items-center gap-2 text-xs font-mono truncate bg-blue-50/50 text-blue-600 p-2.5 rounded-lg border border-blue-100/50">
-                <span>🔗</span> {r.imageUrl}
+              <div className="mb-5">
+                <div className="relative w-full h-40 mb-2 rounded-lg overflow-hidden border border-[#EBEBEB] bg-[#F7F6F3]">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={r.imageUrl} alt={r.title} className="object-cover w-full h-full" />
+                </div>
+                <div className="flex items-center gap-2 text-xs font-mono truncate bg-blue-50/50 text-blue-600 p-2.5 rounded-lg border border-blue-100/50">
+                  <span>🔗</span> {r.imageUrl}
+                </div>
               </div>
             )}
             
