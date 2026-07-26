@@ -20,12 +20,15 @@ export default function DynamicBackground() {
            }}
       />
 
-      {/* 缓慢旋转的抽象地形等高线 */}
+      {/* 缓慢旋转的抽象地形等高线（精确居中修复） */}
       <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
-        <div className="absolute w-[150vw] h-[150vw] rounded-[40%_60%_70%_30%/40%_50%_60%_50%] border border-[#e6e4df] opacity-10 animate-[spin_40s_linear_infinite]" />
-        <div className="absolute w-[120vw] h-[120vw] rounded-[60%_40%_30%_70%/50%_60%_40%_50%] border border-[#e6e4df] opacity-[0.15] animate-[spin_35s_linear_infinite_reverse]" />
-        <div className="absolute w-[90vw] h-[90vw] rounded-[30%_70%_70%_30%/30%_30%_70%_70%] border border-[#e6e4df] opacity-20 animate-[spin_30s_linear_infinite]" />
-        <div className="absolute w-[60vw] h-[60vw] rounded-[50%_50%_20%_80%/25%_75%_25%_75%] border border-[#e6e4df] opacity-[0.25] animate-[spin_25s_linear_infinite_reverse]" />
+        {/* 作为一个宽高为 0 的绝对居中锚点，确保内部线条严格基于中心进行布局和旋转，不受 flex 渲染差异影响 */}
+        <div className="relative w-0 h-0">
+          <div className="absolute w-[150vw] h-[150vw] -left-[75vw] -top-[75vw] rounded-[40%_60%_70%_30%/40%_50%_60%_50%] border border-[#e6e4df] opacity-10 animate-[spin_40s_linear_infinite]" />
+          <div className="absolute w-[120vw] h-[120vw] -left-[60vw] -top-[60vw] rounded-[60%_40%_30%_70%/50%_60%_40%_50%] border border-[#e6e4df] opacity-[0.15] animate-[spin_35s_linear_infinite_reverse]" />
+          <div className="absolute w-[90vw] h-[90vw] -left-[45vw] -top-[45vw] rounded-[30%_70%_70%_30%/30%_30%_70%_70%] border border-[#e6e4df] opacity-20 animate-[spin_30s_linear_infinite]" />
+          <div className="absolute w-[60vw] h-[60vw] -left-[30vw] -top-[30vw] rounded-[50%_50%_20%_80%/25%_75%_25%_75%] border border-[#e6e4df] opacity-[0.25] animate-[spin_25s_linear_infinite_reverse]" />
+        </div>
       </div>
 
       {/* CSS for animations */}
