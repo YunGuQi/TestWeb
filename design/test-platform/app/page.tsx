@@ -22,7 +22,7 @@ export default function LobbyPage() {
 
     if (newCount >= 5) {
       setClickCount(0);
-      router.push('/admin/login');
+      router.push('/ops-dashboard/login');
     }
   };
 

@@ -25,7 +25,7 @@ export default function AdminLogin() {
       if (data.success) {
         // Dual-layer cookie write + hard navigation to guarantee middleware authorization
         document.cookie = "admin_token=jiasite_Authorized; path=/; max-age=604800; SameSite=Lax";
-        window.location.href = '/admin';
+        window.location.href = '/ops-dashboard';
       } else {
         setError(data.error || '验证失败');
       }

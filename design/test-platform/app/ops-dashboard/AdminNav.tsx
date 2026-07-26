@@ -129,10 +129,10 @@ export default function AdminNav() {
   };
 
   const navItems = [
-    { name: '概览 (Overview)', shortName: '概览', path: '/admin', icon: '📊' },
-    { name: '题库编辑 (CMS)', shortName: '题库', path: '/admin/questions', icon: '📝' },
-    { name: '结果海报 (Posters)', shortName: '海报', path: '/admin/results', icon: '🖼️' },
-    { name: '弹幕管理 (Danmaku)', shortName: '弹幕', path: '/admin/danmaku', icon: '💬' },
+    { name: '概览 (Overview)', shortName: '概览', path: '/ops-dashboard', icon: '📊' },
+    { name: '题库编辑 (CMS)', shortName: '题库', path: '/ops-dashboard/questions', icon: '📝' },
+    { name: '结果海报 (Posters)', shortName: '海报', path: '/ops-dashboard/results', icon: '🖼️' },
+    { name: '弹幕管理 (Danmaku)', shortName: '弹幕', path: '/ops-dashboard/danmaku', icon: '💬' },
   ];
 
   return (
