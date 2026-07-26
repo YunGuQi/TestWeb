@@ -12,6 +12,6 @@ export default async function ResultsCMS({ searchParams }: { searchParams: Promi
   });
 
   return (
-    <ResultsClient initialResults={results} />
+    <ResultsClient key={testId} initialResults={results} />
   );
 }

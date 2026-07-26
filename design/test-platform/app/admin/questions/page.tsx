@@ -13,6 +13,6 @@ export default async function QuestionsCMS({ searchParams }: { searchParams: Pro
   });
 
   return (
-    <QuestionsClient initialQuestions={questions} />
+    <QuestionsClient key={testId} initialQuestions={questions} />
   );
 }

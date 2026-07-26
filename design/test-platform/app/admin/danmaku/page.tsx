@@ -13,7 +13,7 @@ export default async function DanmakuPage({ searchParams }: { searchParams: Prom
       <div className="flex items-center gap-2 mb-8">
         <h1 className="text-[32px] font-bold text-[#37352F]">弹幕管理</h1>
       </div>
-      <DanmakuManager testId={testId} initialResults={results} />
+      <DanmakuManager key={testId} testId={testId} initialResults={results} />
     </div>
   );
 }

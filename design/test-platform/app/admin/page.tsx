@@ -179,7 +179,7 @@ export default async function AdminDashboard({ searchParams }: { searchParams: P
       </div>
 
       <div className="bg-white border border-[#EBEBEB] p-6 rounded-2xl shadow-[0_4px_20px_rgb(0,0,0,0.03)]">
-        <CodesTable initialCodes={enrichedCodes} testId={testId} />
+        <CodesTable key={testId} initialCodes={enrichedCodes} testId={testId} />
       </div>
     </>
   );
