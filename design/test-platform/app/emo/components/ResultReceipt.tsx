@@ -143,7 +143,7 @@ export default function ResultReceipt({ result, onRestart, forcedUnlock }: Resul
         cacheBust: true,
         style: {
           transform: 'scale(1)',
-          transformOrigin: 'top left'
+          margin: '0'
         }
       })
         .then((dataUrl) => {
