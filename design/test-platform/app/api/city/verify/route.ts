@@ -32,6 +32,10 @@ export async function POST(request: Request) {
     const maxUses = activation.maxUses || 3;
     const currentDevice = deviceId || 'unknown';
 
+    if (devices.includes(currentDevice)) {
+      return NextResponse.json({ success: true, message: '已验证' });
+    }
+
     if (devices.length >= maxUses) {
       return NextResponse.json({ success: false, error: '该激活码已达到使用上限' });
     }

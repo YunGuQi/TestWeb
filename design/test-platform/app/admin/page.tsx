@@ -40,7 +40,8 @@ export default async function AdminDashboard({ searchParams }: { searchParams: P
     totalMaxUses += code.maxUses;
     try {
       const bound = JSON.parse(code.devices || '[]');
-      const count = bound.length;
+      const uniqueBound = Array.from(new Set(bound));
+      const count = uniqueBound.length;
       totalBoundDevices += count;
       if (count > 0) totalUsedCodesStats++;
       if (count > 1) codesWithMultipleDevices++;
@@ -95,8 +96,9 @@ export default async function AdminDashboard({ searchParams }: { searchParams: P
     let testCount = 0;
     try {
       const devices = JSON.parse(code.devices || '[]');
-      devices.forEach((d: string) => {
-        testCount += (deviceCounts[d] || 0);
+      const uniqueDevices = Array.from(new Set(devices));
+      uniqueDevices.forEach((d: string) => {
+        testCount += (deviceCounts[d as string] || 0);
       });
     } catch(e) {}
     return { ...code, testCount };
