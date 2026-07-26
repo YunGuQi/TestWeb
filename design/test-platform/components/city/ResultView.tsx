@@ -234,8 +234,14 @@ export default function ResultView() {
 
         {/* Bottom Section */}
         <div className="px-6 flex flex-col items-center mt-6">
-          <div className="font-mono text-[32px] tracking-[-2px] opacity-80 select-none">
-            || | ||| || || | | || | |
+          <div className="flex items-center justify-center gap-[2.5px] h-8 opacity-80 overflow-hidden w-full max-w-[240px] my-1 select-none">
+            {[2, 1, 3, 1, 2, 1, 4, 1, 2, 3, 1, 2, 1, 3, 2, 1, 2, 4, 1, 2, 1, 3, 1, 2, 4, 1, 2, 1, 3, 2, 1, 2, 1, 3, 1, 2, 4, 1, 2, 1].map((w, idx) => (
+              <div
+                key={idx}
+                style={{ width: `${w}px` }}
+                className={`h-full ${currentStyle.barFill} shrink-0`}
+              />
+            ))}
           </div>
           <div className="font-mono text-[10px] opacity-50 mt-1 mb-2">NO. 8492039485721</div>
           <div className={`font-mono text-[9px] opacity-40 text-center tracking-widest mt-1 border-t ${currentStyle.taglineColor} pt-2 w-full`}>
