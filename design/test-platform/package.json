@@ -29,6 +29,7 @@
   "devDependencies": {
     "eslint": "latest",
     "eslint-config-next": "latest",
+    "playwright": "^1.62.0",
     "typescript": "^5.9.3"
   }
 }

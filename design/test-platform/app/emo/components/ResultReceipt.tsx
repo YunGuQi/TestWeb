@@ -192,9 +192,9 @@ export default function ResultReceipt({ result, onRestart, forcedUnlock }: Resul
                     <div className="border-b-2 border-dashed border-gray-400 mb-6"></div>
                     
                     <div className="mb-6 font-mono text-xs text-black border-t-2 border-b-2 border-black py-4">
-                        <div className="flex justify-between items-end pb-2 border-b-2 border-black font-bold">
-                            <span className="text-sm">TOTAL FRICTION (总内耗)</span>
-                            <span className="text-lg" id="res-total">¥ {result.totalFriction.toLocaleString()}</span>
+                        <div className="flex justify-between items-end pb-2 border-b-2 border-black font-bold gap-2">
+                            <span className="text-xs whitespace-nowrap leading-none">TOTAL FRICTION (总内耗)</span>
+                            <span className="text-lg whitespace-nowrap leading-none" id="res-total">¥ {result.totalFriction.toLocaleString()}</span>
                         </div>
                         <button 
                           onClick={() => setIsDetailsExpanded(!isDetailsExpanded)} 

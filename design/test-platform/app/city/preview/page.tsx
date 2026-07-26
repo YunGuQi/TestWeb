@@ -2,8 +2,11 @@ import ResultView from '../components/ResultView';
 import { prisma } from '../../../lib/prisma';
 import { notFound } from 'next/navigation';
 
-export default async function CityPreview({ searchParams }: { searchParams: { id?: string } }) {
-  const cityId = parseInt(searchParams.id || '1', 10);
+export const dynamic = 'force-dynamic';
+
+export default async function CityPreview({ searchParams }: { searchParams: Promise<{ id?: string }> }) {
+  const resolvedParams = await searchParams;
+  const cityId = parseInt(resolvedParams.id || '1', 10);
   // Get all cities
   const allCities = await prisma.resultConfig.findMany({ where: { testId: 'city-personality' } });
   

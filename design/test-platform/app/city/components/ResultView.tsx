@@ -90,10 +90,14 @@ const ticketStyles = [
   }
 ];
 
-export default function ResultView({ forcedResultData }: { forcedResultData?: any }) {
+interface ResultViewProps {
+  forcedResultData?: any;
+}
+
+export default function ResultView({ forcedResultData }: ResultViewProps) {
   const { answers, deviceId, reset } = useQuizStore();
   const [resultData, setResultData] = useState<any>(forcedResultData || null);
-  const [isUnlocked, setIsUnlocked] = useState(false);
+  const [isUnlocked, setIsUnlocked] = useState(!!forcedResultData);
   const [styleIdx, setStyleIdx] = useState(0);
   const currentStyle = ticketStyles[styleIdx];
   const touchStartX = useRef(0);
@@ -114,8 +118,10 @@ export default function ResultView({ forcedResultData }: { forcedResultData?: an
 
   useEffect(() => {
     // Check if unlocked
-    const unlocked = localStorage.getItem(`city-personality_unlocked`) === 'true';
-    setIsUnlocked(unlocked);
+    if (!forcedResultData) {
+      const unlocked = localStorage.getItem(`city-personality_unlocked`) === 'true';
+      setIsUnlocked(unlocked);
+    }
 
     async function fetchResult() {
       if (forcedResultData) return;
@@ -150,7 +156,7 @@ export default function ResultView({ forcedResultData }: { forcedResultData?: an
     if (!forcedResultData) {
       fetchResult();
     }
-  }, [answers, deviceId]);
+  }, [answers, deviceId, forcedResultData]);
 
   if (!resultData) return <div className="min-h-screen flex items-center justify-center">正在生成你的专属车票...</div>;
 
@@ -192,6 +198,7 @@ export default function ResultView({ forcedResultData }: { forcedResultData?: an
 
       <div 
         ref={ticketRef}
+        id="ticket-capture"
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
         className={`relative ${currentStyle.bg} ${currentStyle.text} w-full flex flex-col overflow-hidden pb-6 rounded shadow-[0_10px_40px_rgba(0,0,0,0.06)] border ${currentStyle.border} transition-colors duration-300`}
@@ -221,8 +228,8 @@ export default function ResultView({ forcedResultData }: { forcedResultData?: an
           </div>
 
           <div className="font-mono text-xs opacity-70 mb-1">DESTINATION</div>
-          <div className="flex items-end gap-3 mb-2">
-            <h2 className="text-5xl font-black tracking-tighter">{city.name}</h2>
+          <div className="flex items-end gap-3 mb-2 flex-wrap">
+            <h2 className="text-5xl font-black tracking-tighter whitespace-nowrap">{city.name}</h2>
             <span className="text-lg font-bold opacity-50 mb-1">{city.title}</span>
           </div>
           
