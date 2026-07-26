@@ -85,7 +85,7 @@ export default function LandingPage() {
                   >
                     <div>
                       <div className="text-xs text-gray-500 font-mono mb-1">TICKET {record.id}</div>
-                      <div className="font-bold text-sm">性格城市匹配测试</div>
+                      <div className="font-bold text-sm">{record.result?.title || '性格城市匹配测试'}</div>
                     </div>
                     <div className="font-mono text-xs text-[#1a1a1a] px-2 py-1 font-bold">查看 &gt;</div>
                   </button>

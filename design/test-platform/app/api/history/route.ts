@@ -29,6 +29,7 @@ export async function GET(request: Request) {
       where: { testId }
     });
     const resultConfigMap = new Map(resultConfigs.map(r => [r.condition, r]));
+    const resultConfigMapById = new Map(resultConfigs.map(r => [r.id, r]));
 
     const allOptionIds = new Set<string>();
     records.forEach(rec => {
@@ -129,7 +130,7 @@ export async function GET(request: Request) {
       }
 
       const fallbackRes = results.find(r => r.key === resultKey) || results[0];
-      const resConfig = resultConfigMap.get(resultKey);
+      const resConfig = resultConfigMapById.get(rec.resultId) || resultConfigMap.get(resultKey);
 
       return {
         id: rec.id,
@@ -138,7 +139,7 @@ export async function GET(request: Request) {
           id: rec.resultId || resConfig?.id || 1,
           key: resultKey,
           title: resConfig?.title || fallbackRes.title,
-          tags: fallbackRes.tags || '#钝感力王者,#反PUA大师',
+          tags: resConfig ? '' : (fallbackRes.tags || '#钝感力王者,#反PUA大师'),
           description: resConfig?.desc || fallbackRes.description,
           quote: resConfig?.quote || fallbackRes.quote,
           sen,

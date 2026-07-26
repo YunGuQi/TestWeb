@@ -20,3 +20,17 @@
 - **禁止自行 Git 回滚**：不要自己用 git 回滚代码（如使用 `git checkout` 等命令），以避免已修改或未提交的内容被意外覆盖。
 - **字符编码规范**：在修改或处理文件内容时，务必注意 UTF-8 的编码问题，严禁再次出现因编码设置不当导致的中文乱码。
 **特别警告：绝对禁止在没有显式指定 `-Encoding utf8` 的情况下，使用 Windows PowerShell（如 `Get-Content` 或 `Set-Content`）直接处理包含中文的代码文件，这会将其错误编码并直接导致乱码毁坏文件！优先使用内部的原生文件修改工具（如 `replace_file_content`）。**
+
+## Agent skills
+
+### Issue tracker
+
+采用本地 Markdown 文件进行问题与需求追踪（存储在 `.scratch/<feature>/` 下）。详见 `document/agents/issue-tracker.md`。
+
+### Triage labels
+
+已启用中文自定义标签集（待评估, 待反馈, AI可接手, 需人工处理, 不予处理）。详见 `document/agents/triage-labels.md`。
+
+### Domain docs
+
+采用单上下文架构 (Single-context)，主知识库位于项目根目录。详见 `document/agents/domain.md`。

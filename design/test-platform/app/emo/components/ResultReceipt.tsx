@@ -179,7 +179,7 @@ export default function ResultReceipt({ result, onRestart, forcedUnlock }: Resul
         />
         <div className="flex-1 overflow-y-auto px-4 hide-scrollbar flex flex-col items-center pb-8 relative z-10">
 
-            <div ref={receiptRef} className="pr-2 pb-2 w-full max-w-[360px] mx-auto flex flex-col items-center relative z-20 mb-4 mt-2 bg-[#fdfdfd]">
+            <div ref={receiptRef} className="pl-2 pr-4 pt-2 pb-4 w-full max-w-[380px] mx-auto flex flex-col items-center relative z-20 mb-4 mt-2 bg-[#fdfdfd]">
                 <div id="poster-container" className="w-full flex flex-col relative z-20 pt-0 bg-black border-2 border-black shadow-[8px_8px_0px_#000]">
                 <div className="receipt-top shrink-0"></div>
                 <div className="receipt-paper px-6 py-4 flex-1 flex flex-col relative overflow-hidden">
@@ -294,13 +294,13 @@ export default function ResultReceipt({ result, onRestart, forcedUnlock }: Resul
                         </div>
                         <div className="text-left font-mono mb-3">
                             <div className="text-[10px] bg-black text-white px-2 py-0.5 inline-block mb-1">▶ 核心金句 QUOTE</div>
-                            <div id="res-quote" className="text-xs leading-relaxed font-bold border-l-2 border-black pl-2 italic">
+                            <div id="res-quote" className="text-xs leading-relaxed font-bold border-l-2 border-green-700 pl-2 italic text-green-700">
                                 {result.quote}
                             </div>
                         </div>
                         <div className="text-left font-mono mb-4">
                             <div className="text-[10px] bg-black text-white px-2 py-0.5 inline-block mb-1">▶ 破局建议 ADVICE</div>
-                            <div className="text-xs leading-relaxed font-bold border-l-2 border-black pl-2">
+                            <div className="text-xs leading-relaxed font-bold border-l-2 border-green-700 pl-2 text-green-700">
                                 <ul className="list-disc pl-4 space-y-1">
                                     <li>尝试在小事上直接拒绝别人。</li>
                                     <li>设立睡前“断电时间”，禁止复盘当天。</li>

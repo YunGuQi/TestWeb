@@ -17,7 +17,7 @@
 | 性格城市匹配测试 | 本地 `common/city-matching-test/` | **开发完成** | 虚拟定制类目 |
 | 依恋类型使用说明书 | 本地 `common/attachment-manual-test/` | **开发完成** | 极简风情绪测算 |
 | 恋爱物种领养中心 | 本地 `common/love-species-test/` | **开发完成** | 依恋类型与防御机制测试 |
-| MBTI 意识结晶提取 | 本地 `common/mbti-crystal-test/` | **开发完成** | 赛博科技暗黑风 MBTI 测算 |
+| 平行宇宙航线测算 | 本地 `common/mbti-crystal-test/` | **开发完成** | 赛博科技暗黑风 MBTI 测算 |
 | SCL-90 / SDS 等 | `(原链接已失效)` | 待重构 | 秒哒已放弃，待后续重制 |
 
 **独立域名托管状态 (`mutong-xhs.top`)**：
