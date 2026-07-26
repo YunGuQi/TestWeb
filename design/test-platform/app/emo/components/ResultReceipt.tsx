@@ -34,10 +34,11 @@ const DanmakuOverlay = ({ danmakuList, isHidden, speedPct, opacityPct }: { danma
 interface ResultReceiptProps {
   result: any;
   onRestart: () => void;
+  forcedUnlock?: boolean;
 }
 
-export default function ResultReceipt({ result, onRestart }: ResultReceiptProps) {
-  const [isUnlocked, setIsUnlocked] = useState(false);
+export default function ResultReceipt({ result, onRestart, forcedUnlock }: ResultReceiptProps) {
+  const [isUnlocked, setIsUnlocked] = useState(forcedUnlock || false);
   const [unlockCode, setUnlockCode] = useState('');
   const [isVerifying, setIsVerifying] = useState(false);
   const [verifyError, setVerifyError] = useState('');

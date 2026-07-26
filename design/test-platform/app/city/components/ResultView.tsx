@@ -90,9 +90,9 @@ const ticketStyles = [
   }
 ];
 
-export default function ResultView() {
+export default function ResultView({ forcedResultData }: { forcedResultData?: any }) {
   const { answers, deviceId, reset } = useQuizStore();
-  const [resultData, setResultData] = useState<any>(null);
+  const [resultData, setResultData] = useState<any>(forcedResultData || null);
   const [isUnlocked, setIsUnlocked] = useState(false);
   const [styleIdx, setStyleIdx] = useState(0);
   const currentStyle = ticketStyles[styleIdx];
@@ -118,6 +118,7 @@ export default function ResultView() {
     setIsUnlocked(unlocked);
 
     async function fetchResult() {
+      if (forcedResultData) return;
       try {
         let did = deviceId;
         if (!did) {
@@ -146,10 +147,16 @@ export default function ResultView() {
         console.error(err);
       }
     }
-    fetchResult();
+    if (!forcedResultData) {
+      fetchResult();
+    }
   }, [answers, deviceId]);
 
   if (!resultData) return <div className="min-h-screen flex items-center justify-center">正在生成你的专属车票...</div>;
+
+  if (!isUnlocked && !forcedResultData) {
+    return <OrderOverlay resultData={resultData} onUnlock={() => setIsUnlocked(true)} />;
+  }
 
   const { city, rank, userCoords } = resultData;
 
