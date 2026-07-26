@@ -75,15 +75,15 @@ export default function QuestionsClient({ initialQuestions }: { initialQuestions
             
             <div className="mt-4 space-y-3">
               {q.options.map((opt: any) => (
-                <div key={opt.id} className="flex justify-between text-sm items-center bg-[#FDFBF7] p-3 rounded-xl border border-[#EBEBEB] hover:border-[#D9D9D9] transition-colors">
-                  <span className="font-medium text-[#37352F] flex-1 mr-4">{opt.text}</span>
-                  <div className="flex gap-4 items-center shrink-0">
-                    <span className="font-mono text-xs text-[#787774] bg-white border border-[#EBEBEB] px-3 py-1.5 rounded-lg shadow-[0_2px_8px_rgb(0,0,0,0.02)]">
+                <div key={opt.id} className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 bg-[#FDFBF7] p-3.5 rounded-xl border border-[#EBEBEB] hover:border-[#D9D9D9] transition-colors">
+                  <span className="font-medium text-[#37352F] text-sm leading-relaxed w-full sm:w-auto flex-1 sm:mr-4">{opt.text}</span>
+                  <div className="flex items-center justify-between sm:justify-end gap-3 w-full sm:w-auto pt-2 sm:pt-0 border-t sm:border-t-0 border-[#EBEBEB]/60">
+                    <span className="font-mono text-xs text-[#787774] bg-white border border-[#EBEBEB] px-2.5 py-1 rounded-lg shadow-sm break-all max-w-[240px] sm:max-w-md overflow-x-auto">
                       {opt.scores}
                     </span>
                     <button 
                       onClick={() => setEditOpt({ show: true, id: opt.id, text: opt.text, scores: JSON.parse(opt.scores) })}
-                      className="text-xs font-medium text-[#787774] hover:text-[#37352F] bg-white hover:bg-[#F7F6F3] transition-colors px-3 py-1.5 rounded-lg border border-[#EBEBEB] shadow-[0_2px_8px_rgb(0,0,0,0.02)]"
+                      className="shrink-0 text-xs font-medium text-[#787774] hover:text-[#37352F] bg-white hover:bg-[#F7F6F3] transition-colors px-3 py-1.5 rounded-lg border border-[#EBEBEB] shadow-sm cursor-pointer"
                     >
                       修改
                     </button>

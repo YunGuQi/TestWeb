@@ -114,8 +114,70 @@ export default function CodesTable({ initialCodes, testId }: { initialCodes: any
         </button>
       </div>
 
-      <div className="overflow-x-auto bg-white border border-[#EBEBEB] rounded-xl shadow-[0_4px_20px_rgb(0,0,0,0.02)]">
-        <table className="w-full text-left text-sm">
+      {/* ============ Mobile Cards View (< md) ============ */}
+      <div className="md:hidden space-y-3">
+        {codes.map(code => {
+          const isSelected = selectedIds.includes(code.id);
+          const deviceCount = JSON.parse(code.devices || '[]').length;
+          return (
+            <div 
+              key={code.id} 
+              className={`bg-white border p-4 rounded-xl transition-colors shadow-sm ${
+                isSelected ? 'border-blue-500 bg-blue-50/20' : 'border-[#EBEBEB]'
+              }`}
+            >
+              <div className="flex items-center justify-between pb-3 border-b border-[#EBEBEB]/60 mb-3">
+                <div className="flex items-center gap-2.5">
+                  <input 
+                    type="checkbox"
+                    checked={isSelected}
+                    onChange={(e) => {
+                      if (e.target.checked) setSelectedIds([...selectedIds, code.id]);
+                      else setSelectedIds(selectedIds.filter(id => id !== code.id));
+                    }}
+                    className="rounded border-[#EBEBEB] text-blue-500 focus:ring-blue-500"
+                  />
+                  <span className="font-mono font-bold text-base text-[#37352F] tracking-wide">{code.code}</span>
+                </div>
+                <button 
+                  onClick={() => setEditModal({ show: true, id: code.id, code: code.code, maxUses: code.maxUses })}
+                  className="text-xs font-semibold text-[#787774] hover:text-[#37352F] bg-[#F7F6F3] hover:bg-[#EBEBEB] transition-colors px-3 py-1.5 rounded-lg border border-[#EBEBEB] shadow-sm cursor-pointer"
+                >
+                  修改上限
+                </button>
+              </div>
+
+              <div className="grid grid-cols-3 gap-2 py-1 mb-2 text-center">
+                <div className="bg-[#FDFBF7] p-2 rounded-lg border border-[#EBEBEB]/50">
+                  <div className="text-[10px] text-[#787774] font-medium mb-0.5">可用上限</div>
+                  <div className="font-bold text-sm text-[#37352F]">{code.maxUses}</div>
+                </div>
+                <div className="bg-[#FDFBF7] p-2 rounded-lg border border-[#EBEBEB]/50">
+                  <div className="text-[10px] text-[#787774] font-medium mb-0.5">已绑设备</div>
+                  <div className="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold bg-blue-50 text-blue-700">
+                    {deviceCount}
+                  </div>
+                </div>
+                <div className="bg-[#FDFBF7] p-2 rounded-lg border border-[#EBEBEB]/50">
+                  <div className="text-[10px] text-[#787774] font-medium mb-0.5">测算次数</div>
+                  <div className="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold bg-purple-50 text-purple-700">
+                    {code.testCount || 0}
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between pt-2 text-[11px] text-[#9F9E9B] font-mono">
+                <span>创建: {new Date(code.createdAt).toLocaleDateString('zh-CN')}</span>
+                <span>ID: #{code.id}</span>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* ============ Desktop Table View (>= md) ============ */}
+      <div className="hidden md:block overflow-x-auto bg-white border border-[#EBEBEB] rounded-xl shadow-[0_4px_20px_rgb(0,0,0,0.02)]">
+        <table className="w-full text-left text-sm whitespace-nowrap">
           <thead className="bg-[#F7F6F3] border-b border-[#EBEBEB] text-[#787774] font-medium text-xs uppercase tracking-wider">
             <tr>
               <th className="p-4 w-10">
