@@ -64,12 +64,12 @@ export default function ResultReceipt({ result, onRestart }: ResultReceiptProps)
   // 结果已由后端全权计算得出
 
   useEffect(() => {
-    if (typeof window !== 'undefined' && result?.id) {
-      if (localStorage.getItem(`verified_${result.id}`) === 'true') {
+    if (typeof window !== 'undefined' && result?.recordId) {
+      if (localStorage.getItem(`verified_${result.recordId}`) === 'true') {
         setIsUnlocked(true);
       }
     }
-  }, [result?.id]);
+  }, [result?.recordId]);
 
   const handleVerify = async () => {
     setVerifyError('');
@@ -101,8 +101,8 @@ export default function ResultReceipt({ result, onRestart }: ResultReceiptProps)
         setIsUnlocked(true);
         setIsVerifying(false);
         document.getElementById('modal-unlock')?.classList.add('hidden');
-        if (typeof window !== 'undefined') {
-          localStorage.setItem(`verified_${result.id}`, 'true');
+        if (typeof window !== 'undefined' && result?.recordId) {
+          localStorage.setItem(`verified_${result.recordId}`, 'true');
         }
       } else {
         setVerifyError(data.error || '激活码无效或已达上限，请重新输入');

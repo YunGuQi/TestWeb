@@ -176,7 +176,7 @@ export default function CodesTable({ initialCodes, testId }: { initialCodes: any
                   <div className="font-bold text-sm text-[#37352F]">{code.maxUses}</div>
                 </div>
                 <div className="bg-[#FDFBF7] p-2 rounded-lg border border-[#EBEBEB]/50">
-                  <div className="text-[10px] text-[#787774] font-medium mb-0.5">已绑设备</div>
+                  <div className="text-[10px] text-[#787774] font-medium mb-0.5">已用次数</div>
                   <div className="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold bg-blue-50 text-blue-700">
                     {deviceCount}
                   </div>

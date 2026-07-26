@@ -135,7 +135,7 @@ export default function Home({ onStartTest, onRestoreHistory }: HomeProps) {
                                   alert('无数据，请重新测算。');
                                   return;
                                 }
-                                onRestoreHistory(recordResult);
+                                onRestoreHistory({ ...recordResult, recordId: id });
                               }}
                               className="w-full text-left p-4 bg-white border-2 border-black shadow-[4px_4px_0px_#000] hover:-translate-y-1 hover:shadow-[6px_6px_0px_#000] transition-all flex items-center justify-between mb-3"
                             >

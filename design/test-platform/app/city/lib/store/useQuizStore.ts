@@ -69,14 +69,19 @@ export const useQuizStore = create<QuizState>()(
       
       setDeviceId: (id) => set({ deviceId: id }),
       
-      reset: () => set({ 
-        hasStarted: false, 
-        currentStep: 0, 
-        userCoords: [5, 5, 0, 5, 5], 
-        answers: [], 
-        historyStackCoords: [],
-        hasGenerated: false
-      }),
+      reset: () => {
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem('city-personality_unlocked');
+        }
+        set({ 
+          hasStarted: false, 
+          currentStep: 0, 
+          userCoords: [5, 5, 0, 5, 5], 
+          answers: [], 
+          historyStackCoords: [],
+          hasGenerated: false
+        });
+      },
       setAnswers: (answers) => set({ answers }),
       setCurrentStep: (step) => set({ currentStep: step, hasStarted: true }),
       setHasGenerated: (val) => set({ hasGenerated: val })

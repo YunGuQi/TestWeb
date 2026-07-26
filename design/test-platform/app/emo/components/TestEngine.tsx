@@ -75,7 +75,7 @@ export default function TestEngine({ onBack, onFinish }: TestEngineProps) {
       });
       const data = await res.json();
       if (data.success && data.result) {
-        onFinish(data.result);
+        onFinish({ ...data.result, recordId: data.recordId });
       } else {
         alert('提交失败: ' + (data.error || '未知原因'));
       }

@@ -32,19 +32,18 @@ export async function POST(request: Request) {
     const maxUses = activation.maxUses || 3;
     const currentDevice = deviceId || 'unknown';
 
-    if (!devices.includes(currentDevice)) {
-      if (devices.length >= maxUses) {
-        return NextResponse.json({ success: false, error: '该激活码已达到设备绑定上限' });
-      }
-      devices.push(currentDevice);
-      
-      await prisma.activationCode.update({
-        where: { id: activation.id },
-        data: {
-          devices: JSON.stringify(devices)
-        }
-      });
+    if (devices.length >= maxUses) {
+      return NextResponse.json({ success: false, error: '该激活码已达到使用上限' });
     }
+    
+    devices.push(currentDevice);
+    
+    await prisma.activationCode.update({
+      where: { id: activation.id },
+      data: {
+        devices: JSON.stringify(devices)
+      }
+    });
 
     return NextResponse.json({ success: true, message: '验证通过' });
   } catch (error: any) {
