@@ -162,10 +162,6 @@ export default function ResultView({ forcedResultData }: ResultViewProps) {
 
   if (!resultData) return <div className="min-h-screen flex items-center justify-center">正在生成你的专属车票...</div>;
 
-  if (!isUnlocked && !forcedResultData) {
-    return <OrderOverlay resultData={resultData} onUnlock={() => setIsUnlocked(true)} />;
-  }
-
   const { city, rank, userCoords } = resultData;
 
   const handleSave = async () => {

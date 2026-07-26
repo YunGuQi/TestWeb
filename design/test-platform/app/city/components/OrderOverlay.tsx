@@ -51,7 +51,7 @@ export default function OrderOverlay({ testId, onSuccess }: OrderOverlayProps) {
 
   return (
     <>
-      <div className="absolute top-[280px] left-0 w-full h-[calc(100%-280px)] bg-white/40 backdrop-blur-sm z-10 flex flex-col items-center justify-center">
+      <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-white/40 backdrop-blur-[6px]">
          <button id="btn-show-unlock" onClick={() => setShowModal(true)} className="bg-black text-white px-6 py-3 font-bold border-2 border-black shadow-[4px_4px_0px_#fff] hover:translate-y-1 hover:shadow-none transition-all">
             解锁后查看完整车票
          </button>
