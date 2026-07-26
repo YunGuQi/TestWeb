@@ -130,8 +130,23 @@ export default function ResultReceipt({ result, onRestart, forcedUnlock }: Resul
     setIsGeneratingImage(true);
 
     setTimeout(() => {
-      if (!receiptRef.current) return;
-      htmlToImage.toJpeg(receiptRef.current, { quality: 0.95, backgroundColor: '#fdfdfd' })
+      const node = receiptRef.current;
+      const width = node.offsetWidth;
+      const height = node.offsetHeight;
+      htmlToImage.toJpeg(node, { 
+        quality: 0.95, 
+        backgroundColor: '#fdfdfd',
+        pixelRatio: 2,
+        cacheBust: true,
+        width: width,
+        height: height,
+        style: {
+          transform: 'scale(1)',
+          transformOrigin: 'top left',
+          width: width + 'px',
+          height: height + 'px'
+        }
+      })
         .then((dataUrl) => {
           const link = document.createElement('a');
           link.download = `深度情绪内耗账单_${Date.now()}.jpg`;
@@ -194,7 +209,7 @@ export default function ResultReceipt({ result, onRestart, forcedUnlock }: Resul
                     <div className="mb-6 font-mono text-xs text-black border-t-2 border-b-2 border-black py-4">
                         <div className="flex justify-between items-end pb-2 border-b-2 border-black font-bold gap-2">
                             <span className="text-xs whitespace-nowrap leading-none">TOTAL FRICTION (总内耗)</span>
-                            <span className="text-lg whitespace-nowrap leading-none" id="res-total">¥ {result.totalFriction.toLocaleString()}</span>
+                            <span className="text-lg whitespace-nowrap leading-none" id="res-total">¥ {Math.floor(result.totalFriction / 10).toLocaleString()}</span>
                         </div>
                         <button 
                           onClick={() => setIsDetailsExpanded(!isDetailsExpanded)} 
@@ -208,7 +223,7 @@ export default function ResultReceipt({ result, onRestart, forcedUnlock }: Resul
                               <div className="text-[10px] text-gray-500 mb-2">ITEM ................................. AMOUNT</div>
                               <div id="details-list" className="flex flex-col gap-3">
                                 {(result.billItems || []).map((item: any, i: number) => (
-                                  <div key={i} className="flex justify-between items-center"><span className="truncate pr-2">{item.name}</span><span className="shrink-0">¥ {item.cost.toLocaleString()}</span></div>
+                                  <div key={i} className="flex justify-between items-center"><span className="truncate pr-2">{item.name}</span><span className="shrink-0">¥ {Math.floor(item.cost / 10).toLocaleString()}</span></div>
                                 ))}
                                 {(!result.billItems || result.billItems.length === 0) && <div className="text-xs text-gray-500 italic">暂无消费明细</div>}
                               </div>
@@ -242,22 +257,24 @@ export default function ResultReceipt({ result, onRestart, forcedUnlock }: Resul
                     
                     <div className="space-y-3 mb-6 font-bold text-black border-2 border-black p-4 bg-[#f4f4f4] shadow-[4px_4px_0px_#000]">
                         <p className="text-[10px] font-mono text-gray-500 mb-1">DIMENSION SCORES</p>
-                        <div className="flex flex-col gap-1">
-                            <div className="flex justify-between text-[10px] uppercase"><span>敏感 (Sen)</span><span id="score-sen">{result.sen}</span></div>
-                            <div className="w-full h-2 border-2 border-black bg-white"><div id="bar-sen" className="h-full bg-black transition-all duration-1000" style={{width: `${Math.min(100, (result.sen / result.maxScore) * 100)}%`}}></div></div>
-                        </div>
-                        <div className="flex flex-col gap-1">
-                            <div className="flex justify-between text-[10px] uppercase"><span>反刍 (Rum)</span><span id="score-rum">{result.rum}</span></div>
-                            <div className="w-full h-2 border-2 border-black bg-white"><div id="bar-rum" className="h-full bg-black transition-all duration-1000" style={{width: `${Math.min(100, (result.rum / result.maxScore) * 100)}%`}}></div></div>
-                        </div>
-                        <div className="flex flex-col gap-1">
-                            <div className="flex justify-between text-[10px] uppercase"><span>讨好 (Pls)</span><span id="score-pls">{result.pls}</span></div>
-                            <div className="w-full h-2 border-2 border-black bg-white"><div id="bar-pls" className="h-full bg-black transition-all duration-1000" style={{width: `${Math.min(100, (result.pls / result.maxScore) * 100)}%`}}></div></div>
-                        </div>
-                        <div className="flex flex-col gap-1">
-                            <div className="flex justify-between text-[10px] uppercase"><span>边界 (Bnd)</span><span id="score-bnd">{result.bnd}</span></div>
-                            <div className="w-full h-2 border-2 border-black bg-white"><div id="bar-bnd" className="h-full bg-black transition-all duration-1000" style={{width: `${Math.min(100, (result.bnd / result.maxScore) * 100)}%`}}></div></div>
-                        </div>
+                        {[
+                          { label: '敏感 (Sen)', score: result.sen, id: 'sen' },
+                          { label: '反刍 (Rum)', score: result.rum, id: 'rum' },
+                          { label: '讨好 (Pls)', score: result.pls, id: 'pls' },
+                          { label: '边界 (Bnd)', score: result.bnd, id: 'bnd' }
+                        ].map((dim, i) => {
+                          let p = result.maxScore > 0 ? (dim.score / result.maxScore) * 100 : 10;
+                          if (p < 10) p = 10;
+                          if (p > 99) p = 99;
+                          const hash = ((dim.score * 13.5 + i * 7.3) % 1) * 0.99;
+                          const pStr = (Math.floor(p) + hash).toFixed(2) + '%';
+                          return (
+                            <div key={dim.id} className="flex flex-col gap-1">
+                                <div className="flex justify-between text-[10px] uppercase"><span>{dim.label}</span><span id={`score-${dim.id}`}>{pStr}</span></div>
+                                <div className="w-full h-2 border-2 border-black bg-white"><div id={`bar-${dim.id}`} className="h-full bg-gradient-to-r from-gray-900 to-gray-400 transition-all duration-1000" style={{width: pStr}}></div></div>
+                            </div>
+                          );
+                        })}
                     </div>
                     
                     <div className="relative">

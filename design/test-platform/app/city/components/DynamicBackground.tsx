@@ -25,10 +25,10 @@ export default function DynamicBackground() {
         {/* 将锚点放置在屏幕垂直 150% 的位置，水平居中。*/}
         <div className="absolute w-0 h-0 top-[150%] left-1/2">
           {/* 使用 vh 代替 vw，确保在手机端（屏幕很窄时）圆的半径依然足够大，能够从 150% 底部升起并划过整个屏幕 */}
-          <div className="absolute w-[270vh] h-[270vh] -left-[135vh] -top-[135vh] rounded-[40%_60%_70%_30%/40%_50%_60%_50%] border border-[#e6e4df] opacity-10 animate-[spin_40s_linear_infinite]" />
-          <div className="absolute w-[210vh] h-[210vh] -left-[105vh] -top-[105vh] rounded-[60%_40%_30%_70%/50%_60%_40%_50%] border border-[#e6e4df] opacity-[0.15] animate-[spin_35s_linear_infinite_reverse]" />
-          <div className="absolute w-[160vh] h-[160vh] -left-[80vh] -top-[80vh] rounded-[30%_70%_70%_30%/30%_30%_70%_70%] border border-[#e6e4df] opacity-20 animate-[spin_30s_linear_infinite]" />
-          <div className="absolute w-[110vh] h-[110vh] -left-[55vh] -top-[55vh] rounded-[50%_50%_20%_80%/25%_75%_25%_75%] border border-[#e6e4df] opacity-[0.25] animate-[spin_25s_linear_infinite_reverse]" />
+          <div className="absolute w-[270vh] h-[270vh] -left-[135vh] -top-[135vh] rounded-[40%_60%_70%_30%/40%_50%_60%_50%] border-2 border-[#e6e4df] opacity-10 animate-[spin_40s_linear_infinite]" />
+          <div className="absolute w-[210vh] h-[210vh] -left-[105vh] -top-[105vh] rounded-[60%_40%_30%_70%/50%_60%_40%_50%] border-2 border-[#e6e4df] opacity-[0.15] animate-[spin_35s_linear_infinite_reverse]" />
+          <div className="absolute w-[160vh] h-[160vh] -left-[80vh] -top-[80vh] rounded-[30%_70%_70%_30%/30%_30%_70%_70%] border-2 border-[#e6e4df] opacity-20 animate-[spin_30s_linear_infinite]" />
+          <div className="absolute w-[110vh] h-[110vh] -left-[55vh] -top-[55vh] rounded-[50%_50%_20%_80%/25%_75%_25%_75%] border-2 border-[#e6e4df] opacity-[0.25] animate-[spin_25s_linear_infinite_reverse]" />
         </div>
       </div>
 
