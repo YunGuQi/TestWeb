@@ -17,7 +17,7 @@ export async function POST(request: Request) {
 
     for (let i = 0; i < count; i++) {
       const currentTestId = testId || 'emotional-friction';
-      const prefix = currentTestId === 'emotional-friction' ? 'EMO' : currentTestId === 'city-personality' ? 'CITY' : currentTestId === 'destiny-lover' ? 'LOVE' : 'CODE';
+      const prefix = currentTestId === 'emotional-friction' ? 'EMO' : currentTestId === 'city-personality' ? 'CITY' : currentTestId === 'destiny-lover' ? 'DESTINY' : 'CODE';
       
       codesToCreate.push({
         testId: currentTestId,
