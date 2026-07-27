@@ -38,14 +38,19 @@ export default function CodesTable({ initialCodes, testId }: { initialCodes: any
       const res = await fetch('/api/admin/code/delete', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ids: selectedIds })
+        body: JSON.stringify({ ids: selectedIds.map(id => Number(id)) })
       });
       const data = await res.json();
       if (data.success) {
         setCodes(codes.filter(c => !selectedIds.includes(c.id)));
         setSelectedIds([]);
+        router.refresh();
+      } else {
+        alert(data.error || '批量删除卡密失败');
       }
-    } catch(e) {}
+    } catch(e: any) {
+      alert('请求删除发生网络或服务器异常: ' + (e.message || ''));
+    }
     setLoading(false);
   };
 

@@ -5,15 +5,20 @@ export async function POST(request: Request) {
   try {
     const { ids } = await request.json();
 
+    const numericIds = Array.isArray(ids) ? ids.map(id => Number(id)).filter(id => !isNaN(id)) : [];
+    if (numericIds.length === 0) {
+      return NextResponse.json({ success: false, error: '请选择有效卡密 ID' }, { status: 400 });
+    }
+
     const deleted = await prisma.activationCode.deleteMany({
       where: {
-        id: { in: ids }
+        id: { in: numericIds }
       }
     });
 
     return NextResponse.json({ success: true, deletedCount: deleted.count });
   } catch (error: any) {
     console.error('Delete codes error:', error);
-    return NextResponse.json({ success: false, error: '删除失败' }, { status: 500 });
+    return NextResponse.json({ success: false, error: '删除卡密失败: ' + (error.message || '') }, { status: 500 });
   }
 }
