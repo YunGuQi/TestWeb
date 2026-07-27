@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '../../../../../lib/prisma';
+import { revalidatePath } from 'next/cache';
 
 export async function POST(request: Request) {
   try {
@@ -15,6 +16,9 @@ export async function POST(request: Request) {
         id: { in: numericIds }
       }
     });
+
+    revalidatePath('/ops-dashboard');
+    revalidatePath('/admin');
 
     return NextResponse.json({ success: true, deletedCount: deleted.count });
   } catch (error: any) {
