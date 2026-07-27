@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
 export default function CodesTable({ initialCodes, testId }: { initialCodes: any[], testId: string }) {
@@ -10,6 +10,10 @@ export default function CodesTable({ initialCodes, testId }: { initialCodes: any
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
   const [generateModal, setGenerateModal] = useState({ show: false, count: 10 });
   const [editModal, setEditModal] = useState({ show: false, id: 0, code: '', maxUses: 3 });
+
+  useEffect(() => {
+    setCodes(initialCodes);
+  }, [initialCodes]);
 
   const handleExportCSV = () => {
     if (selectedIds.length === 0) return alert('请先勾选需要导出的激活码');
@@ -61,6 +65,10 @@ export default function CodesTable({ initialCodes, testId }: { initialCodes: any
 
       const data = await res.json();
       if (data.success) {
+        if (data.codes && Array.isArray(data.codes)) {
+          setCodes([...data.codes, ...codes]);
+        }
+        setGenerateModal({ show: false, count: 10 });
         router.refresh();
       } else {
         alert(data.error);
@@ -82,6 +90,7 @@ export default function CodesTable({ initialCodes, testId }: { initialCodes: any
       });
       const data = await res.json();
       if (data.success) {
+        setEditModal({ show: false, id: 0, code: '', maxUses: 3 });
         router.refresh();
       } else {
         alert(data.error);
