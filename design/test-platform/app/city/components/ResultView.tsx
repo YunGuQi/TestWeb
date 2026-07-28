@@ -293,9 +293,12 @@ export default function ResultView({ forcedResultData }: ResultViewProps) {
             ].map((dim, i) => {
               let pct = (dim.value / 10) * 100;
               if (pct < 10) pct = 10;
-              if (pct > 99) pct = 99;
               const hash = ((dim.value * 13.5 + rank * 7.3 + i * 3.1) % 1) * 0.99;
-              const pctStr = (Math.floor(pct) + hash).toFixed(2) + '%';
+              let calcPct = pct + hash;
+              if (calcPct >= 100 || pct >= 100) {
+                calcPct = 100 - Number((Math.random() * 0.98 + 0.01).toFixed(2));
+              }
+              const pctStr = calcPct.toFixed(2) + '%';
               return (
                 <div key={i} className="flex gap-2.5 text-xs items-center">
                   <span className="w-8 font-bold opacity-90 shrink-0">{dim.label}</span>

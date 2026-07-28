@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Home from './components/Home';
 import TestEngine from './components/TestEngine';
 import ResultReceipt from './components/ResultReceipt';
+import DestinyBackground from './components/DestinyBackground';
 
 export default function DestinyLoverApp() {
   const [currentView, setCurrentView] = useState<'home' | 'test' | 'result'>('home');
@@ -73,7 +74,7 @@ export default function DestinyLoverApp() {
   };
 
   return (
-    <div className="flex flex-col min-h-[100dvh] text-[#333] font-serif overflow-hidden" style={{ backgroundColor: '#F0EBE0' }}>
+    <DestinyBackground>
       {currentView === 'home' && (
         <Home onStartTest={handleStartTest} onRestoreHistory={handleFinishTest} />
       )}
@@ -93,6 +94,7 @@ export default function DestinyLoverApp() {
           onRestart={handleRestart} 
         />
       )}
-    </div>
+    </DestinyBackground>
   );
 }
+

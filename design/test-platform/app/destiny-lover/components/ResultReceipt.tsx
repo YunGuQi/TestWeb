@@ -161,7 +161,11 @@ export default function ResultReceipt({ result, userInfo, onRestart }: ResultRec
               {result.radar && result.radar.length > 0 && (
                 <div className="space-y-4 mb-8 px-1">
                     {result.radar.map((item: any, idx: number) => {
-                      const pStr = (item.value + ((idx * 17) % 99) * 0.01).toFixed(2);
+                      let calcVal = item.value + ((idx * 17) % 99) * 0.01;
+                      if (calcVal >= 100 || item.value >= 100) {
+                        calcVal = 100 - Number((Math.random() * 0.98 + 0.01).toFixed(2));
+                      }
+                      const pStr = calcVal.toFixed(2);
                       return (
                         <div key={idx} className="flex items-center gap-3 text-sm border-b border-[#F0F0F0] pb-2.5">
                             <span className="text-[#5A524A] tracking-widest w-20 shrink-0 font-serif text-left">{item.label}</span>

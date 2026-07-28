@@ -274,9 +274,12 @@ export default function ResultReceipt({ result, onRestart, forcedUnlock }: Resul
                         ].map((dim, i) => {
                           let p = result.maxScore > 0 ? (dim.score / result.maxScore) * 100 : 10;
                           if (p < 10) p = 10;
-                          if (p > 99) p = 99;
                           const hash = ((dim.score * 13.5 + i * 7.3) % 1) * 0.99;
-                          const pStr = (Math.floor(p) + hash).toFixed(2) + '%';
+                          let calcP = p + hash;
+                          if (calcP >= 100 || p >= 100) {
+                            calcP = 100 - Number((Math.random() * 0.98 + 0.01).toFixed(2));
+                          }
+                          const pStr = calcP.toFixed(2) + '%';
                           return (
                             <div key={dim.id} className="flex flex-col gap-1">
                                 <div className="flex justify-between text-[10px] uppercase"><span>{dim.label}</span><span id={`score-${dim.id}`}>{pStr}</span></div>
