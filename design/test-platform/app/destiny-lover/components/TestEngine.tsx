@@ -170,15 +170,15 @@ export default function TestEngine({ userInfo, onBack, onFinish }: TestEnginePro
                         <button 
                           key={opt.id} 
                           onClick={() => handleSelect(currentQ.id, opt)}
-                          className={`w-full relative text-left p-6 border-b border-[#D9D0C1] bg-[#FAF8F5]/50 backdrop-blur-sm transition-all duration-300 hover:bg-[#FAF8F5] group ${isStamped ? 'scale-[0.98]' : ''}`}
+                          className={`w-full relative text-left p-6 border border-[#D9D0C1]/80 rounded-sm bg-[#FAF8F5]/70 backdrop-blur-sm transition-all duration-300 hover:bg-[#FAF8F5] hover:border-[#B93A32]/60 hover:shadow-[0_8px_25px_rgba(44,40,37,0.05)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#B93A32]/40 active:scale-[0.99] group ${isStamped ? 'scale-[0.99] border-[#B93A32] bg-[#FAF8F5] shadow-sm' : ''}`}
                         >
-                          <p className={`text-base md:text-lg leading-relaxed font-serif ${isStamped ? 'text-[#B93A32]' : 'text-[#5A524A] group-hover:text-[#2C2825]'}`}>
+                          <p className={`text-base md:text-lg leading-relaxed font-serif ${isStamped ? 'text-[#B93A32] font-semibold' : 'text-[#5A524A] group-hover:text-[#2C2825]'}`}>
                             {opt.text}
                           </p>
                           
                           {/* 盖章动效 */}
                           {isStamped && (
-                            <div className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 border-2 border-[#B93A32] text-[#B93A32] text-xs font-bold rounded-full flex items-center justify-center transform rotate-12 animate-stamp">
+                            <div className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 border-2 border-[#B93A32] text-[#B93A32] text-xs font-bold rounded-full flex items-center justify-center transform rotate-12 animate-stamp shadow-[0_2px_8px_rgba(185,58,50,0.25)]">
                                 缘
                             </div>
                           )}
@@ -190,7 +190,7 @@ export default function TestEngine({ userInfo, onBack, onFinish }: TestEnginePro
             
             {currentIndex > 0 && !isFinished && (
               <div className="absolute bottom-6 left-0 w-full text-center">
-                  <button onClick={handleUndo} className="text-xs text-[#8C847A] hover:text-[#B93A32] transition-colors tracking-widest font-serif border-b border-[#8C847A] hover:border-[#B93A32] pb-1">
+                  <button onClick={handleUndo} className="text-xs text-[#8C847A] hover:text-[#B93A32] focus-visible:underline transition-colors tracking-widest font-serif border-b border-[#8C847A] hover:border-[#B93A32] pb-1">
                       撤回上一步
                   </button>
               </div>
@@ -204,7 +204,7 @@ export default function TestEngine({ userInfo, onBack, onFinish }: TestEnginePro
                         setIsFinished(true);
                         submitAnswers(answers);
                       }}
-                      className="w-full max-w-[200px] bg-[#B93A32] text-white py-3 rounded-sm font-medium tracking-widest shadow-lg hover:bg-[#A32626] transition-colors"
+                      className="w-full max-w-[200px] bg-[#B93A32] text-white py-3.5 rounded-sm font-medium tracking-widest shadow-lg hover:bg-[#A32626] active:scale-[0.99] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#B93A32]/40 transition-all"
                   >
                       解签查看结果
                   </button>
@@ -225,10 +225,10 @@ export default function TestEngine({ userInfo, onBack, onFinish }: TestEnginePro
                     <h3 className="text-xl font-bold text-[#2C2825] mb-3 font-serif">确认要离开吗？</h3>
                     <p className="text-[#8C847A] text-sm mb-8 font-serif">姻缘簿合上后，缘分可能流失（进度不保存）。</p>
                     <div className="flex gap-4">
-                        <button onClick={() => setShowExitModal(false)} className="flex-1 py-3 border border-[#D9D0C1] text-[#5A524A] font-medium hover:bg-[#F4F1EA] transition-colors tracking-widest">
+                        <button onClick={() => setShowExitModal(false)} className="flex-1 py-3 border border-[#D9D0C1] text-[#5A524A] font-medium hover:bg-[#F4F1EA] active:scale-[0.99] transition-all tracking-widest">
                             继续解密
                         </button>
-                        <button onClick={onBack} className="flex-1 py-3 bg-[#B93A32] text-white font-medium hover:bg-[#A32626] transition-colors tracking-widest shadow-md">
+                        <button onClick={onBack} className="flex-1 py-3 bg-[#B93A32] text-white font-medium hover:bg-[#A32626] active:scale-[0.99] transition-all tracking-widest shadow-md">
                             确认离开
                         </button>
                     </div>

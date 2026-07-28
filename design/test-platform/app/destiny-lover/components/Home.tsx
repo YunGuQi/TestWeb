@@ -68,8 +68,8 @@ export default function Home({ onStartTest, onRestoreHistory }: HomeProps) {
       <div className="absolute top-0 left-0 w-full h-full opacity-5 pointer-events-none" style={{ backgroundImage: 'radial-gradient(#1F1B18 1px, transparent 1px)', backgroundSize: '20px 20px' }}></div>
       
       {!showForm ? (
-        <div className="max-w-md w-full bg-[#FAF8F5] p-8 shadow-xl border border-[#D9D0C1] rounded-sm relative z-10 text-center animate-fade-in-up">
-          <div className="w-16 h-16 border-2 border-[#B93A32] rounded-full flex items-center justify-center mx-auto mb-6 opacity-80">
+        <div className="max-w-md w-full bg-[#FAF8F5] p-8 md:p-10 shadow-[0_24px_60px_rgba(44,40,37,0.08),0_1px_3px_rgba(0,0,0,0.03)] border border-[#D9D0C1]/80 rounded-sm relative z-10 text-center animate-fade-in-up">
+          <div className="w-16 h-16 border-2 border-[#B93A32] rounded-full flex items-center justify-center mx-auto mb-6 opacity-90 shadow-[0_4px_16px_rgba(185,58,50,0.15)]">
             <span className="text-[#B93A32] text-sm font-bold tracking-widest leading-tight text-center">月老<br/>办事处</span>
           </div>
           
@@ -82,7 +82,7 @@ export default function Home({ onStartTest, onRestoreHistory }: HomeProps) {
 
           <button 
             onClick={() => setShowForm(true)}
-            className="w-full bg-[#B93A32] text-white font-medium py-3 px-6 rounded-sm tracking-widest hover:bg-[#A32626] transition-colors shadow-md mb-3"
+            className="w-full bg-[#B93A32] text-white font-medium py-3.5 px-6 rounded-sm tracking-widest hover:bg-[#A32626] active:scale-[0.99] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#B93A32]/40 transition-all shadow-md mb-3"
           >
             翻开姻缘簿
           </button>
@@ -94,13 +94,13 @@ export default function Home({ onStartTest, onRestoreHistory }: HomeProps) {
 
           <div className="flex flex-col items-center gap-3">
               <div className="flex items-center justify-center gap-6 font-medium">
-                  <button onClick={() => setShowHistory(true)} className="text-xs text-[#5A524A] hover:text-[#B93A32] transition-colors underline underline-offset-4 tracking-widest">[ 查看历史档案 ]</button>
-                  <a href="/design/common/lobby.html" className="text-xs text-[#5A524A] hover:text-[#B93A32] transition-colors underline underline-offset-4 tracking-widest">[ 探索其他测试 ]</a>
+                  <button onClick={() => setShowHistory(true)} className="text-xs text-[#5A524A] hover:text-[#B93A32] focus-visible:underline transition-colors underline underline-offset-4 tracking-widest">[ 查看历史档案 ]</button>
+                  <a href="/design/common/lobby.html" className="text-xs text-[#5A524A] hover:text-[#B93A32] focus-visible:underline transition-colors underline underline-offset-4 tracking-widest">[ 探索其他测试 ]</a>
               </div>
           </div>
         </div>
       ) : (
-        <div className="max-w-md w-full bg-[#FAF8F5] p-8 shadow-xl border border-[#D9D0C1] rounded-sm relative z-10 animate-fade-in">
+        <div className="max-w-md w-full bg-[#FAF8F5] p-8 md:p-10 shadow-[0_24px_60px_rgba(44,40,37,0.08),0_1px_3px_rgba(0,0,0,0.03)] border border-[#D9D0C1]/80 rounded-sm relative z-10 animate-fade-in">
           <h2 className="text-xl font-bold text-center mb-6 tracking-widest border-b border-[#D9D0C1] pb-4">身份录入</h2>
           
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -111,7 +111,7 @@ export default function Home({ onStartTest, onRestoreHistory }: HomeProps) {
                 value={nickname}
                 onChange={(e) => setNickname(e.target.value)}
                 placeholder="请输入昵称/称呼" 
-                className="w-full px-4 py-3 bg-white border border-[#D9D0C1] focus:outline-none focus:border-[#B93A32] transition-colors placeholder-[#A8A096]"
+                className="w-full px-4 py-3 bg-white border border-[#D9D0C1] focus:outline-none focus:border-[#B93A32] focus:ring-1 focus:ring-[#B93A32] transition-all placeholder-[#A8A096]"
                 required
               />
             </div>
@@ -122,14 +122,14 @@ export default function Home({ onStartTest, onRestoreHistory }: HomeProps) {
                 <button
                   type="button"
                   onClick={() => setStatus('single')}
-                  className={`flex-1 py-3 border ${status === 'single' ? 'bg-[#F4F1EA] border-[#B93A32] text-[#B93A32]' : 'bg-white border-[#D9D0C1] text-[#7A7268]'} transition-colors font-medium`}
+                  className={`flex-1 py-3 border ${status === 'single' ? 'bg-[#F4F1EA] border-[#B93A32] text-[#B93A32] shadow-sm' : 'bg-white border-[#D9D0C1] text-[#7A7268] hover:border-[#B93A32]/40'} active:scale-[0.99] transition-all font-medium`}
                 >
                   我是单身
                 </button>
                 <button
                   type="button"
                   onClick={() => setStatus('dating')}
-                  className={`flex-1 py-3 border ${status === 'dating' ? 'bg-[#F4F1EA] border-[#B93A32] text-[#B93A32]' : 'bg-white border-[#D9D0C1] text-[#7A7268]'} transition-colors font-medium`}
+                  className={`flex-1 py-3 border ${status === 'dating' ? 'bg-[#F4F1EA] border-[#B93A32] text-[#B93A32] shadow-sm' : 'bg-white border-[#D9D0C1] text-[#7A7268] hover:border-[#B93A32]/40'} active:scale-[0.99] transition-all font-medium`}
                 >
                   恋爱中
                 </button>
@@ -140,13 +140,13 @@ export default function Home({ onStartTest, onRestoreHistory }: HomeProps) {
                 <button 
                   type="button"
                   onClick={() => setShowForm(false)}
-                  className="flex-1 bg-transparent border border-[#5A524A] text-[#5A524A] font-medium py-3 px-6 rounded-sm tracking-widest hover:bg-[#E8E2D5] transition-colors"
+                  className="flex-1 bg-transparent border border-[#5A524A] text-[#5A524A] font-medium py-3 px-6 rounded-sm tracking-widest hover:bg-[#E8E2D5] active:scale-[0.99] transition-all"
                 >
                   返回
                 </button>
                 <button 
                   type="submit"
-                  className="flex-1 bg-[#B93A32] text-white font-medium py-3 px-6 rounded-sm tracking-widest hover:bg-[#A32626] transition-colors shadow-md"
+                  className="flex-1 bg-[#B93A32] text-white font-medium py-3 px-6 rounded-sm tracking-widest hover:bg-[#A32626] active:scale-[0.99] transition-all shadow-md"
                 >
                   开始测算
                 </button>

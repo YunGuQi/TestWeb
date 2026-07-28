@@ -84,7 +84,7 @@ export async function POST(request: Request) {
         rawScores: { L, G, D, S, A, C, R, P, userCombo }
       };
 
-      let recordId = 1;
+      let recordId: string | number = 1;
       try {
         const record = await prisma.testRecord.create({
           data: {
