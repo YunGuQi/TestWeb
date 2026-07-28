@@ -139,11 +139,11 @@ export default function AdminNav() {
   return (
     <>
       {/* ============ Mobile Top Bar (Only visible on screens < md) ============ */}
-      <div className="md:hidden flex flex-col w-full bg-[#F7F6F3] px-3 py-2 border-b border-[#EBEBEB]">
-        <div className="flex items-center justify-between pb-2 border-b border-[#EBEBEB]">
+      <div className="md:hidden flex flex-col w-full bg-white/80 backdrop-blur-md px-3 py-2 border-b border-black/10">
+        <div className="flex items-center justify-between pb-2 border-b border-black/10">
           <div className="flex items-center gap-1.5">
-            <div className="w-6 h-6 rounded-md bg-orange-100 flex items-center justify-center text-xs shadow-sm">🪴</div>
-            <span className="font-bold text-sm tracking-tight text-[#37352F]">PSYCHE CMS</span>
+            <div className="w-6 h-6 rounded-md bg-emerald-100 text-emerald-700 flex items-center justify-center text-xs shadow-sm font-black">⚙️</div>
+            <span className="font-black text-sm tracking-tight text-black">ANAN OPS CONSOLE</span>
           </div>
           <div className="w-44">
             <WorkspaceDropdown 
@@ -164,8 +164,8 @@ export default function AdminNav() {
                 onClick={() => handleNavClick(item.path)}
                 className={`flex items-center gap-1.5 px-3 py-2 text-xs font-bold rounded-lg whitespace-nowrap transition-all touch-manipulation cursor-pointer select-none active:scale-95 ${
                   isActive 
-                    ? 'bg-white text-[#37352F] shadow-sm border border-[#EBEBEB]' 
-                    : 'text-[#787774] hover:bg-[#EBEBEB]/50 hover:text-[#37352F]'
+                    ? 'bg-emerald-500/15 text-emerald-950 font-black shadow-sm border border-emerald-500/30' 
+                    : 'text-gray-600 hover:bg-gray-100 hover:text-black'
                 }`}
               >
                 <span className="text-sm">{item.icon}</span>
@@ -177,16 +177,16 @@ export default function AdminNav() {
       </div>
 
       {/* ============ Desktop Sidebar (Only visible on screens >= md) ============ */}
-      <div className="hidden md:flex flex-col h-full">
+      <div className="hidden md:flex flex-col h-full bg-white/70 backdrop-blur-md">
         <div className="p-4 mb-4">
-          <div className="flex items-center gap-2 px-2 py-3">
-            <div className="w-8 h-8 rounded-lg bg-orange-100 flex items-center justify-center text-sm shadow-sm">🪴</div>
-            <span className="font-bold tracking-tight text-[#37352F]">PSYCHE CMS</span>
+          <div className="flex items-center gap-2.5 px-2 py-3">
+            <div className="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center text-sm shadow-sm font-black">⚙️</div>
+            <span className="font-black tracking-wider text-black">ANAN OPS CONSOLE</span>
           </div>
           
-          <div className="mt-6 px-4">
-            <label className="block text-xs font-semibold text-[#9F9E9B] mb-2 uppercase tracking-wider">
-              Workspace
+          <div className="mt-6 px-2">
+            <label className="block text-[10px] font-mono font-bold text-gray-400 mb-2 uppercase tracking-widest">
+              // WORKSPACE TELEMETRY
             </label>
             <WorkspaceDropdown 
               currentTestId={currentTestId} 
@@ -204,14 +204,14 @@ export default function AdminNav() {
                 key={item.path}
                 type="button"
                 onClick={() => handleNavClick(item.path)}
-                className={`w-full flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-lg transition-all touch-manipulation cursor-pointer select-none active:scale-98 text-left ${
+                className={`w-full flex items-center gap-3 px-3 py-2.5 text-sm transition-all touch-manipulation cursor-pointer select-none active:scale-98 text-left ${
                   isActive 
-                    ? 'bg-white text-[#37352F] shadow-sm' 
-                    : 'text-[#787774] hover:bg-[#EBEBEB]/50 hover:text-[#37352F]'
+                    ? 'bg-emerald-500/15 text-emerald-950 font-black shadow-sm border-l-4 border-emerald-600 rounded-r-lg rounded-l-none' 
+                    : 'text-gray-600 hover:bg-gray-100/70 hover:text-black font-semibold'
                 }`}
               >
-                <span className="text-base">{item.icon}</span>
-                {item.name}
+                <span>{item.icon}</span>
+                <span>{item.name}</span>
               </button>
             );
           })}

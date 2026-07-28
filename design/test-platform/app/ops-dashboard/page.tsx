@@ -112,49 +112,71 @@ export default async function AdminDashboard({ searchParams }: { searchParams: P
 
   return (
     <>
-      <div className="flex items-center gap-2 mb-8">
-        <h1 className="text-[32px] font-bold text-[#37352F]">大盘概览</h1>
+      <div className="flex items-center justify-between mb-8">
+        <div>
+          <div className="font-mono text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">// TELEMETRY METRICS</div>
+          <h1 className="text-3xl font-black tracking-tight text-black">全景运营监控大盘</h1>
+        </div>
+        <div className="hidden sm:flex items-center gap-2 bg-white px-3 py-1.5 border border-black/10 shadow-sm rounded-lg font-mono text-xs font-bold text-gray-600">
+          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+          <span>LIVE STREAM: {testId.toUpperCase()}</span>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <div className="bg-white border border-[#EBEBEB] p-6 rounded-2xl shadow-[0_4px_20px_rgb(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] transition-shadow">
-          <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center mb-4 text-blue-600 text-lg">🎟️</div>
-          <div className="text-[#787774] text-sm font-medium mb-1">当前测试卡密 (总数)</div>
-          <div className="text-3xl font-bold text-[#37352F] mb-2">{codeCount}</div>
-          <div className="text-xs text-[#9F9E9B] font-medium bg-[#F7F6F3] inline-block px-2 py-1 rounded">已使用: {usedCodeCount}</div>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+        {/* 卡密统计监控卡 - 翡翠绿 /impeccable colorize */}
+        <div className="bg-gradient-to-br from-white via-white/90 to-emerald-50/50 border-2 border-emerald-500/30 p-6 rounded-2xl shadow-[0_6px_30px_rgba(16,185,129,0.08)] hover:shadow-[0_10px_36px_rgba(16,185,129,0.12)] hover:-translate-y-0.5 transition-all relative overflow-hidden backdrop-blur-md">
+          <div className="flex items-center justify-between mb-4">
+            <div className="w-10 h-10 rounded-xl bg-emerald-100/80 flex items-center justify-center text-emerald-700 text-lg font-black shadow-sm border border-emerald-200">🎟️</div>
+            <span className="text-[10px] font-mono font-bold bg-emerald-500 text-white px-2 py-0.5 uppercase tracking-widest">ACTIVE CODES</span>
+          </div>
+          <div className="text-gray-500 text-xs font-bold mb-1 uppercase tracking-wider font-mono">// TOTAL ACTIVATION CODES</div>
+          <div className="text-4xl font-black text-black tracking-tight mb-3">{codeCount}</div>
+          <div className="text-xs text-emerald-950 font-bold bg-emerald-100/70 inline-block px-2.5 py-1 rounded-md border border-emerald-300">
+            已分配完成激活: <span className="font-mono font-black">{usedCodeCount}</span> 组
+          </div>
         </div>
         
-        <div className="bg-white border border-[#EBEBEB] p-6 rounded-2xl shadow-[0_4px_20px_rgb(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] transition-shadow">
-          <div className="w-10 h-10 rounded-full bg-green-50 flex items-center justify-center mb-4 text-green-600 text-lg">✅</div>
-          <div className="text-[#787774] text-sm font-medium mb-1">测算完成总数</div>
-          <div className="text-3xl font-bold text-[#37352F]">{testRecordCount}</div>
+        {/* 测算总数监控卡 - 紫罗兰 /impeccable colorize */}
+        <div className="bg-gradient-to-br from-white via-white/90 to-violet-50/50 border-2 border-violet-500/30 p-6 rounded-2xl shadow-[0_6px_30px_rgba(139,92,246,0.08)] hover:shadow-[0_10px_36px_rgba(139,92,246,0.12)] hover:-translate-y-0.5 transition-all relative overflow-hidden backdrop-blur-md">
+          <div className="flex items-center justify-between mb-4">
+            <div className="w-10 h-10 rounded-xl bg-violet-100/80 flex items-center justify-center text-violet-700 text-lg font-black shadow-sm border border-violet-200">⚡</div>
+            <span className="text-[10px] font-mono font-bold bg-violet-600 text-white px-2 py-0.5 uppercase tracking-widest">COMPLETED</span>
+          </div>
+          <div className="text-gray-500 text-xs font-bold mb-1 uppercase tracking-wider font-mono">// TOTAL COMPLETED TESTS</div>
+          <div className="text-4xl font-black text-black tracking-tight mb-3">{testRecordCount}</div>
+          <div className="text-xs text-violet-950 font-bold bg-violet-100/70 inline-block px-2.5 py-1 rounded-md border border-violet-300">
+            所有终端累记提交的完测答卷
+          </div>
         </div>
 
+        {/* 流量监控卡 - 琥珀黄 PVCard */}
         <PVCard initialBaseCount={baseCount} testRecordCount={testRecordCount} testId={testId} />
       </div>
 
       <div className="mb-12">
-        <h2 className="text-xl font-bold text-[#37352F] mb-4 flex items-center gap-2">
-          <span>📈</span> 深度数据分析
+        <h2 className="text-xl font-black text-black mb-5 flex items-center gap-2.5">
+          <span className="w-2.5 h-6 bg-emerald-600 rounded-sm inline-block"></span>
+          <span>📈 深度流量与转化健康度分析</span>
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
-          <div className="bg-[#FDFBF7] border border-[#EBEBEB] p-5 rounded-2xl">
-            <div className="text-[#9F9E9B] text-xs font-semibold mb-2 uppercase tracking-wider flex items-center justify-between">
-              裂变分享率
-              <span title="同一卡密激活多台设备的比例" className="cursor-help">ⓘ</span>
+          <div className="bg-white/85 backdrop-blur-md border border-black/15 p-5 rounded-2xl shadow-sm hover:shadow-md hover:border-black/30 transition-all">
+            <div className="text-gray-400 text-[11px] font-mono font-bold mb-2 uppercase tracking-widest flex items-center justify-between">
+              // 裂变分享率
+              <span title="同一卡密激活多台设备的比例" className="cursor-help text-gray-500">ⓘ</span>
             </div>
-            <div className="text-2xl font-bold text-[#37352F] mb-1">{shareRate}%</div>
-            <div className="text-xs text-[#787774]">平均 <span className="font-mono text-[#37352F] bg-white px-1 py-0.5 rounded border border-[#EBEBEB] mx-0.5">{avgDevicesPerCode}</span> 台设备 / 卡密</div>
+            <div className="text-3xl font-black text-black tracking-tight mb-2">{shareRate}%</div>
+            <div className="text-xs text-gray-600 font-bold">平均 <span className="font-mono text-black bg-gray-100 px-1.5 py-0.5 rounded border border-gray-300 mx-0.5 font-black">{avgDevicesPerCode}</span> 台设备 / 卡密</div>
           </div>
 
-          <div className="bg-[#FDFBF7] border border-[#EBEBEB] p-5 rounded-2xl">
-            <div className="text-[#9F9E9B] text-xs font-semibold mb-2 uppercase tracking-wider flex items-center justify-between">
-              卡密饱和度
-              <span title="已激活设备数 / (卡密数 × 单卡可用次数)" className="cursor-help">ⓘ</span>
+          <div className="bg-white/85 backdrop-blur-md border border-black/15 p-5 rounded-2xl shadow-sm hover:shadow-md hover:border-black/30 transition-all">
+            <div className="text-gray-400 text-[11px] font-mono font-bold mb-2 uppercase tracking-widest flex items-center justify-between">
+              // 卡密饱和度
+              <span title="已激活设备数 / (卡密数 × 单卡可用次数)" className="cursor-help text-gray-500">ⓘ</span>
             </div>
-            <div className="text-2xl font-bold text-[#37352F] mb-2">{saturationRate}%</div>
-            <div className="w-full bg-[#EBEBEB] rounded-full h-1.5">
-              <div className="bg-blue-500 h-1.5 rounded-full" style={{ width: `${Math.min(100, parseFloat(saturationRate))}%` }}></div>
+            <div className="text-3xl font-black text-black tracking-tight mb-3">{saturationRate}%</div>
+            <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden p-0.5 border border-black/10">
+              <div className="bg-gradient-to-r from-emerald-500 to-emerald-400 h-full rounded-full transition-all duration-500" style={{ width: `${Math.min(100, parseFloat(saturationRate))}%` }}></div>
             </div>
           </div>
 

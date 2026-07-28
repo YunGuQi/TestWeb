@@ -44,29 +44,30 @@ export default function PVCard({
   };
 
   return (
-    <div className="bg-white border border-[#EBEBEB] p-6 rounded-2xl shadow-[0_4px_20px_rgb(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] transition-shadow relative">
-      <div className="w-10 h-10 rounded-full bg-purple-50 flex items-center justify-center mb-4 text-purple-600 text-lg">👁️</div>
-      <div className="text-[#787774] text-sm font-medium mb-1 flex items-center gap-1 cursor-help group" title="PV(Page View): 预估总页面访问量，基于基础基数和实际测算人数计算出的模拟热度指标。">
-        预估总 PV
-        <span className="text-[10px] bg-[#EBEBEB] text-[#787774] rounded-full w-4 h-4 flex items-center justify-center font-bold">?</span>
+    <div className="bg-gradient-to-br from-white via-white/90 to-amber-50/50 border-2 border-amber-500/30 p-6 rounded-2xl shadow-[0_6px_30px_rgba(245,158,11,0.08)] hover:shadow-[0_10px_36px_rgba(245,158,11,0.12)] hover:-translate-y-0.5 transition-all relative overflow-hidden backdrop-blur-md">
+      <div className="flex items-center justify-between mb-4">
+        <div className="w-10 h-10 rounded-xl bg-amber-100/80 flex items-center justify-center text-amber-700 text-lg font-black shadow-sm border border-amber-200">👁️</div>
+        <span className="text-[10px] font-mono font-bold bg-amber-500 text-white px-2 py-0.5 uppercase tracking-widest">TRAFFIC PV</span>
       </div>
-      <div className="text-3xl font-bold text-[#37352F] mb-2 flex items-center gap-2">
+      <div className="text-gray-500 text-xs font-bold mb-1 flex items-center gap-1 cursor-help group font-mono uppercase tracking-wider" title="PV(Page View): 预估总页面访问量，基于基础基数和实际测算人数计算出的模拟热度指标。">
+        // ESTIMATED PAGE VIEWS
+        <span className="text-[10px] bg-amber-100 text-amber-800 rounded-full w-4 h-4 flex items-center justify-center font-bold">?</span>
+      </div>
+      <div className="text-4xl font-black text-black tracking-tight mb-3 flex items-center gap-2">
         {totalPV}
         <button 
           onClick={() => {
             setEditValue(baseCount.toString());
             setIsEditing(true);
           }}
-          className="text-sm bg-[#F7F6F3] text-[#787774] hover:text-[#37352F] hover:bg-[#EBEBEB] p-1.5 rounded-lg transition-colors ml-1"
+          className="text-xs bg-amber-100/80 text-amber-900 hover:text-black hover:bg-amber-200 p-1.5 rounded-lg transition-colors ml-1 font-mono font-bold border border-amber-300"
           title="修改基础设定基数"
         >
-          ✏️
+          [修改基数 ✏️]
         </button>
       </div>
-      <div className="absolute top-6 right-6 flex flex-col items-end gap-1">
-        <div className="text-xs text-[#9F9E9B] font-medium bg-[#F7F6F3] inline-block px-2 py-1 rounded">
-          转化率: {conversionRate}%
-        </div>
+      <div className="text-xs text-amber-950 font-bold bg-amber-100/70 inline-block px-2.5 py-1 rounded-md border border-amber-300">
+        完测转化率: <span className="font-mono font-black">{conversionRate}%</span>
       </div>
 
       {isEditing && (
