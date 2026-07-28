@@ -94,9 +94,10 @@ export default function OrderOverlay({ testId, onSuccess }: OrderOverlayProps) {
               <input 
                 value={code} 
                 onChange={(e) => setCode(e.target.value)} 
+                maxLength={20}
                 type="text" 
-                placeholder="请输入你的专属列车激活码..." 
-                className="w-full border-2 border-[#1a1a1a] p-3.5 outline-none focus:bg-yellow-50/80 font-mono font-bold bg-white text-black placeholder-gray-400 rounded transition-colors text-sm shadow-inner" 
+                placeholder="请输入你的专属列车激活码 (至多20字)..." 
+                className="w-full border-2 border-[#1a1a1a] p-3.5 outline-none focus:bg-yellow-50/80 font-mono font-bold bg-white text-black placeholder-gray-400 rounded transition-colors text-sm shadow-inner truncate" 
               />
             </div>
 
@@ -110,7 +111,7 @@ export default function OrderOverlay({ testId, onSuccess }: OrderOverlayProps) {
             <button 
               onClick={handleVerify} 
               disabled={loading} 
-              className="w-full bg-[#1a1a1a] text-[#fdfbf7] font-bold p-4 border-2 border-[#1a1a1a] active:scale-[0.98] transition-all disabled:opacity-50 rounded shadow-[4px_4px_0px_rgba(0,0,0,0.3)] hover:bg-black tracking-widest text-sm"
+              className="w-full min-h-[44px] bg-[#1a1a1a] text-[#fdfbf7] font-bold p-4 border-2 border-[#1a1a1a] active:scale-[0.98] transition-all disabled:opacity-50 rounded shadow-[4px_4px_0px_rgba(0,0,0,0.3)] hover:bg-black tracking-widest text-sm touch-manipulation cursor-pointer flex items-center justify-center"
             >
               {loading ? '列车长核验数据中...' : '出示车票 / 立即检票通过 [CHECK-IN]'}
             </button>

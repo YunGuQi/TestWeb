@@ -1,6 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 interface HomeProps {
   onStartTest: (nickname: string, status: 'single' | 'dating') => void;
@@ -8,6 +10,7 @@ interface HomeProps {
 }
 
 export default function Home({ onStartTest, onRestoreHistory }: HomeProps) {
+  const router = useRouter();
   const [nickname, setNickname] = useState('');
   const [status, setStatus] = useState<'single' | 'dating'>('single');
   const [showForm, setShowForm] = useState(false);
@@ -98,9 +101,15 @@ export default function Home({ onStartTest, onRestoreHistory }: HomeProps) {
           </div>
 
           <div className="flex flex-col items-center gap-3">
-              <div className="flex items-center justify-center gap-6 font-medium">
-                  <button onClick={() => setShowHistory(true)} className="text-xs text-[#5A524A] hover:text-[#B93A32] focus-visible:underline transition-colors underline underline-offset-4 tracking-widest">[ 查看历史档案 ]</button>
-                  <a href="/design/common/lobby.html" className="text-xs text-[#5A524A] hover:text-[#B93A32] focus-visible:underline transition-colors underline underline-offset-4 tracking-widest">[ 探索其他测试 ]</a>
+              <div className="flex items-center justify-center gap-4 font-medium">
+                  <button onClick={() => setShowHistory(true)} className="text-xs text-[#5A524A] hover:text-[#B93A32] focus-visible:underline transition-colors underline underline-offset-4 tracking-widest min-h-[44px] inline-flex items-center justify-center cursor-pointer touch-manipulation active:scale-95 px-3">[ 查看历史档案 ]</button>
+                  <button 
+                    type="button"
+                    onClick={() => router.push('/')} 
+                    className="text-xs text-[#5A524A] hover:text-[#B93A32] focus-visible:underline transition-colors underline underline-offset-4 tracking-widest min-h-[44px] inline-flex items-center justify-center cursor-pointer touch-manipulation active:scale-95 px-3"
+                  >
+                    [ 探索其他测试 ]
+                  </button>
               </div>
           </div>
         </div>
@@ -115,8 +124,9 @@ export default function Home({ onStartTest, onRestoreHistory }: HomeProps) {
                 type="text" 
                 value={nickname}
                 onChange={(e) => setNickname(e.target.value)}
-                placeholder="请输入昵称/称呼" 
-                className="w-full px-4 py-3 bg-white border border-[#D9D0C1] focus:outline-none focus:border-[#B93A32] focus:ring-1 focus:ring-[#B93A32] transition-all placeholder-[#A8A096]"
+                placeholder="请输入昵称/称呼 (至多15字符)" 
+                maxLength={15}
+                className="w-full px-4 py-3 bg-white border border-[#D9D0C1] focus:outline-none focus:border-[#B93A32] focus:ring-1 focus:ring-[#B93A32] transition-all placeholder-[#A8A096] truncate"
                 required
               />
             </div>
@@ -127,14 +137,14 @@ export default function Home({ onStartTest, onRestoreHistory }: HomeProps) {
                 <button
                   type="button"
                   onClick={() => setStatus('single')}
-                  className={`flex-1 py-3 border ${status === 'single' ? 'bg-[#F4F1EA] border-[#B93A32] text-[#B93A32] shadow-sm' : 'bg-white border-[#D9D0C1] text-[#7A7268] hover:border-[#B93A32]/40'} active:scale-[0.99] transition-all font-medium`}
+                  className={`flex-1 min-h-[44px] py-3 border ${status === 'single' ? 'bg-[#F4F1EA] border-[#B93A32] text-[#B93A32] shadow-sm' : 'bg-white border-[#D9D0C1] text-[#7A7268] hover:border-[#B93A32]/40'} active:scale-[0.99] transition-all font-medium touch-manipulation cursor-pointer`}
                 >
                   我是单身
                 </button>
                 <button
                   type="button"
                   onClick={() => setStatus('dating')}
-                  className={`flex-1 py-3 border ${status === 'dating' ? 'bg-[#F4F1EA] border-[#B93A32] text-[#B93A32] shadow-sm' : 'bg-white border-[#D9D0C1] text-[#7A7268] hover:border-[#B93A32]/40'} active:scale-[0.99] transition-all font-medium`}
+                  className={`flex-1 min-h-[44px] py-3 border ${status === 'dating' ? 'bg-[#F4F1EA] border-[#B93A32] text-[#B93A32] shadow-sm' : 'bg-white border-[#D9D0C1] text-[#7A7268] hover:border-[#B93A32]/40'} active:scale-[0.99] transition-all font-medium touch-manipulation cursor-pointer`}
                 >
                   恋爱中
                 </button>

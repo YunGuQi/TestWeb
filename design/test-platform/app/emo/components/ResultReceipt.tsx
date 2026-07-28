@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { results } from '../../../lib/data';
 import * as htmlToImage from 'html-to-image';
 
@@ -38,6 +39,7 @@ interface ResultReceiptProps {
 }
 
 export default function ResultReceipt({ result, onRestart, forcedUnlock }: ResultReceiptProps) {
+  const router = useRouter();
   const [isUnlocked, setIsUnlocked] = useState(forcedUnlock || false);
   const [unlockCode, setUnlockCode] = useState('');
   const [isVerifying, setIsVerifying] = useState(false);
@@ -334,20 +336,27 @@ export default function ResultReceipt({ result, onRestart, forcedUnlock }: Resul
                 <span id="save-icon" className="mr-2"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg></span>
                 <span id="save-text">保存账单截图</span>
             </button>
-            <div className="flex justify-center gap-6 mt-1 mb-2 font-mono font-bold w-full max-w-[340px] mx-auto">
-                <button onClick={onRestart} id="btn-restart" className="text-xs text-gray-400 hover:text-white underline underline-offset-4 decoration-gray-700 transition-colors">[ 重新打印 ]</button>
-                <a href="/" className="text-xs text-gray-400 hover:text-white underline underline-offset-4 decoration-gray-700 transition-colors">[ 查看更多专柜 ]</a>
+            <div className="flex justify-center gap-4 mt-1 mb-2 font-mono font-bold w-full max-w-[340px] mx-auto">
+                <button onClick={onRestart} id="btn-restart" className="text-xs text-gray-400 hover:text-white underline underline-offset-4 decoration-gray-700 transition-colors min-h-[44px] inline-flex items-center justify-center cursor-pointer touch-manipulation active:scale-95 px-3">[ 重新打印 ]</button>
+                <button 
+                  type="button"
+                  onClick={() => router.push('/')} 
+                  id="btn-more" 
+                  className="text-xs text-gray-400 hover:text-white underline underline-offset-4 decoration-gray-700 transition-colors min-h-[44px] inline-flex items-center justify-center cursor-pointer touch-manipulation active:scale-95 px-3"
+                >
+                  [ 查看更多专柜 ]
+                </button>
             </div>
         </div>
         
         <div id="modal-unlock" className="fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 font-sans hidden">
             <div id="modal-unlock-content" className="bg-white border-4 border-black w-full max-w-sm p-6 relative shadow-[8px_8px_0px_#000] scale-95">
-                <button onClick={() => document.getElementById('modal-unlock')?.classList.add('hidden')} id="btn-close-unlock" className="absolute top-4 right-4 text-black hover:scale-110 transition-transform font-bold border-2 border-black w-8 h-8 flex items-center justify-center bg-[#f4f4f4]">X</button>
+                <button onClick={() => document.getElementById('modal-unlock')?.classList.add('hidden')} id="btn-close-unlock" className="absolute top-4 right-4 text-black hover:scale-110 transition-transform font-bold border-2 border-black w-10 h-10 min-h-[44px] flex items-center justify-center bg-[#f4f4f4] touch-manipulation">X</button>
                 <h3 className="text-xl font-bold mb-4 tracking-wider text-black">验证激活码</h3>
                 <p className="text-sm text-gray-600 mb-6 leading-relaxed">感谢对原创心血的认可。为了维持优质的内容产出与服务器运作，本次测算结果请认准小红书唯一官方发布账号：<strong>安安</strong>。</p>
-                <input value={unlockCode} onChange={(e) => setUnlockCode(e.target.value)} id="input-verify" type="text" placeholder="请输入你在小红书收到的激活码" className="w-full border-2 border-black p-3 mb-2 outline-none focus:bg-yellow-50 font-bold bg-white text-black placeholder-gray-400" />
+                <input value={unlockCode} onChange={(e) => setUnlockCode(e.target.value)} maxLength={20} id="input-verify" type="text" placeholder="请输入你在小红书收到的激活码 (至多20字)" className="w-full border-2 border-black p-3 mb-2 outline-none focus:bg-yellow-50 font-bold bg-white text-black placeholder-gray-400 truncate" />
                 {verifyError && <p className="text-red-600 font-bold text-xs mb-4">{verifyError}</p>}
-                <button onClick={handleVerify} disabled={isVerifying} id="btn-verify" className="w-full bg-black text-white font-bold p-3 border-2 border-black active:translate-y-1 transition-transform disabled:opacity-50">
+                <button onClick={handleVerify} disabled={isVerifying} id="btn-verify" className="w-full min-h-[44px] bg-black text-white font-bold p-3 border-2 border-black active:translate-y-1 transition-transform disabled:opacity-50 touch-manipulation cursor-pointer flex items-center justify-center">
                    {isVerifying ? '验证中...' : '提交验证'}
                 </button>
             </div>

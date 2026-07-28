@@ -2,10 +2,12 @@
 
 import { motion } from 'framer-motion';
 import { Compass, Sparkles, Map } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { useQuizStore } from '../lib/store/useQuizStore';
 import { useEffect, useState } from 'react';
 
 export default function LandingPage() {
+  const router = useRouter();
   const startQuiz = useQuizStore((state) => state.startQuiz);
   const { setAnswers, setCurrentStep } = useQuizStore();
   const [onlineCount, setOnlineCount] = useState(1408);
@@ -99,9 +101,15 @@ export default function LandingPage() {
           <span className="font-mono text-[9px] text-gray-400">SERIAL: CN-34-SOUL-EXPRESS</span>
         </div>
 
-        <div className="flex items-center justify-center gap-8 font-mono font-bold mt-4">
-          <button onClick={() => setShowHistory(true)} className="text-xs text-gray-500 hover:text-[#1a1a1a] transition-colors underline underline-offset-4 py-2 px-1">[ 查看历史记录 ]</button>
-          <a href="/" className="text-xs text-gray-500 hover:text-[#1a1a1a] transition-colors underline underline-offset-4 py-2 px-1">[ 探索测试大厅 ]</a>
+        <div className="flex items-center justify-center gap-4 font-mono font-bold mt-4">
+          <button onClick={() => setShowHistory(true)} className="text-xs text-gray-500 hover:text-[#1a1a1a] transition-colors underline underline-offset-4 min-h-[44px] inline-flex items-center justify-center cursor-pointer touch-manipulation active:scale-95 px-3">[ 查看历史记录 ]</button>
+          <button 
+            type="button"
+            onClick={() => router.push('/')} 
+            className="text-xs text-gray-500 hover:text-[#1a1a1a] transition-colors underline underline-offset-4 min-h-[44px] inline-flex items-center justify-center cursor-pointer touch-manipulation active:scale-95 px-3"
+          >
+            [ 探索测试大厅 ]
+          </button>
         </div>
       </motion.div>
 

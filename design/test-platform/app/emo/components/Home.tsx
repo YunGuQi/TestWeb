@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
 interface HomeProps {
   onStartTest: () => void;
@@ -8,6 +9,7 @@ interface HomeProps {
 }
 
 export default function Home({ onStartTest, onRestoreHistory }: HomeProps) {
+  const router = useRouter();
   const [showHistory, setShowHistory] = useState(false);
   const [historyRecords, setHistoryRecords] = useState<any[]>([]);
   const [isEntering, setIsEntering] = useState(false);
@@ -141,9 +143,15 @@ export default function Home({ onStartTest, onRestoreHistory }: HomeProps) {
               </div>
               
               <div className="flex flex-col items-center gap-2">
-                  <div className="flex items-center justify-center gap-8 font-mono font-bold">
-                      <button onClick={() => setShowHistory(true)} className="text-xs text-gray-600 hover:text-black transition-colors underline underline-offset-4">[ 查看历史消费单 ]</button>
-                      <a href="/" className="text-xs text-gray-600 hover:text-black transition-colors underline underline-offset-4">[ 探索其他专柜 ]</a>
+                  <div className="flex items-center justify-center gap-4 font-mono font-bold">
+                      <button onClick={() => setShowHistory(true)} className="text-xs text-gray-600 hover:text-black transition-colors underline underline-offset-4 min-h-[44px] inline-flex items-center justify-center cursor-pointer touch-manipulation active:scale-95 px-3">[ 查看历史消费单 ]</button>
+                      <button 
+                        type="button"
+                        onClick={() => router.push('/')} 
+                        className="text-xs text-gray-600 hover:text-black transition-colors underline underline-offset-4 min-h-[44px] inline-flex items-center justify-center cursor-pointer touch-manipulation active:scale-95 px-3"
+                      >
+                        [ 探索其他专柜 ]
+                      </button>
                   </div>
               </div>
           </div>

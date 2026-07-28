@@ -343,12 +343,12 @@ export default function ResultView({ forcedResultData }: ResultViewProps) {
           保存 / 导出专属超清海报
         </button>
 
-        <div className="flex justify-center gap-6 mt-1 mb-2 font-mono font-bold w-full">
-          <button onClick={() => { reset(); router.push('/city'); }} className="text-xs text-gray-400 hover:text-[#1a1a1a] transition-colors tracking-widest underline underline-offset-4">
+        <div className="flex justify-center gap-4 mt-1 mb-2 font-mono font-bold w-full">
+          <button onClick={() => { reset(); router.push('/city'); }} className="text-xs text-gray-400 hover:text-[#1a1a1a] transition-colors tracking-widest underline underline-offset-4 min-h-[44px] inline-flex items-center justify-center cursor-pointer touch-manipulation active:scale-95 px-3">
             [ 重新购买车票 ]
           </button>
           
-          <button onClick={() => router.push('/')} className="text-xs text-gray-400 hover:text-[#1a1a1a] transition-colors underline underline-offset-4 tracking-widest">
+          <button onClick={() => router.push('/')} className="text-xs text-gray-400 hover:text-[#1a1a1a] transition-colors underline underline-offset-4 tracking-widest min-h-[44px] inline-flex items-center justify-center cursor-pointer touch-manipulation active:scale-95 px-3">
             [ 探索测试大厅 ]
           </button>
         </div>

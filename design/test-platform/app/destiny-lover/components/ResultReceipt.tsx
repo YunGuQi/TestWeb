@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
+import { useRouter } from 'next/navigation';
 import { toPng } from 'html-to-image';
 
 interface ResultReceiptProps {
@@ -10,6 +11,7 @@ interface ResultReceiptProps {
 }
 
 export default function ResultReceipt({ result, userInfo, onRestart }: ResultReceiptProps) {
+  const router = useRouter();
   const [show, setShow] = useState(false);
   const [participantCount, setParticipantCount] = useState(0);
   const [isUnlocked, setIsUnlocked] = useState(false);
@@ -186,18 +188,23 @@ export default function ResultReceipt({ result, userInfo, onRestart }: ResultRec
                   保存档案卡
               </button>
           </div>
-          <a 
-              href="/"
-              className="w-full py-3.5 bg-[#2C2825] text-white text-center text-sm font-medium tracking-widest hover:bg-[#1F1B18] active:scale-[0.99] transition-all shadow-md rounded-sm"
+          <button 
+              type="button"
+              onClick={() => router.push('/')}
+              className="w-full min-h-[44px] py-3.5 bg-[#2C2825] text-white text-center text-sm font-medium tracking-widest hover:bg-[#1F1B18] active:scale-[0.99] transition-all shadow-md rounded-sm touch-manipulation cursor-pointer flex items-center justify-center"
           >
               探索其他测试
-          </a>
+          </button>
       </div>
       
-      {/* 快捷返回大厅 (桌面端辅助) */}
-      <a href="/" className="hidden md:block absolute top-4 left-4 text-[#888] text-xs hover:text-[#8A2B2B] focus-visible:underline transition-colors z-50 tracking-widest">
-        返回探索大厅
-      </a>
+      {/* 快捷返回大厅 */}
+      <button 
+        type="button"
+        onClick={() => router.push('/')} 
+        className="absolute top-4 left-4 text-[#888] text-xs hover:text-[#8A2B2B] focus-visible:underline transition-colors z-50 tracking-widest min-h-[44px] px-3 flex items-center cursor-pointer touch-manipulation"
+      >
+        [ 返回探索大厅 ]
+      </button>
 
       {showModal && (
           <div className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in">
