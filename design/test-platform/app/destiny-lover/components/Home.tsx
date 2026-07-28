@@ -68,28 +68,33 @@ export default function Home({ onStartTest, onRestoreHistory }: HomeProps) {
       <div className="absolute top-0 left-0 w-full h-full opacity-5 pointer-events-none" style={{ backgroundImage: 'radial-gradient(#1F1B18 1px, transparent 1px)', backgroundSize: '20px 20px' }}></div>
       
       {!showForm ? (
-        <div className="max-w-md w-full bg-[#FAF8F5] p-8 md:p-10 shadow-[0_24px_60px_rgba(44,40,37,0.08),0_1px_3px_rgba(0,0,0,0.03)] border border-[#D9D0C1]/80 rounded-sm relative z-10 text-center animate-fade-in-up">
-          <div className="w-16 h-16 border-2 border-[#B93A32] rounded-full flex items-center justify-center mx-auto mb-6 opacity-90 shadow-[0_4px_16px_rgba(185,58,50,0.15)]">
-            <span className="text-[#B93A32] text-sm font-bold tracking-widest leading-tight text-center">月老<br/>办事处</span>
+        <div className="max-w-md w-full bg-[#FAF8F5] p-8 md:p-10 shadow-[0_28px_70px_rgba(44,40,37,0.12),0_2px_6px_rgba(0,0,0,0.04)] border-2 border-[#D9D0C1] rounded-sm relative z-10 text-center animate-fade-in-up">
+          {/* 古典朱砂官印契约头部 */}
+          <div className="inline-block border-2 border-[#B93A32] px-4 py-1.5 mb-5 opacity-90 shadow-[0_4px_20px_rgba(185,58,50,0.2)]">
+            <span className="text-[#B93A32] text-xs font-bold tracking-[0.3em] font-serif uppercase">· 月老办事处 · 红娘档案簿 ·</span>
           </div>
           
-          <h1 className="text-2xl md:text-3xl font-bold mb-4 tracking-wider">解密你的命定恋人档案</h1>
+          <h1 className="text-3xl md:text-4xl font-black mb-3 tracking-widest text-[#2C2825] leading-tight">
+            解密你的<span className="text-[#B93A32] block md:inline mt-1 md:mt-0">命定恋人</span>
+          </h1>
           
-          <p className="text-sm md:text-base leading-relaxed text-[#5A524A] mb-8 text-justify">
+          <div className="w-12 h-0.5 bg-[#B93A32]/40 mx-auto my-5"></div>
+          
+          <p className="text-sm md:text-base leading-relaxed text-[#4A423A] mb-8 text-justify font-normal">
             你是否曾在夜里幻想过那个“对的人”究竟是什么模样？TA 是像你一样喜欢安静，还是能带你探索世界？是你的避风港，还是并肩作战的战友？<br/><br/>
-            不管你现在是单身还是恋爱中，月老办事处的姻缘簿上早已记录了那份命中注定的羁绊。花 3 分钟完成这份灵魂问卷，解锁专属于你的【红娘档案卡】。
+            花 <span className="font-bold text-[#B93A32]">3 分钟</span>完成这份灵魂问卷，解锁月老姻缘簿上早已注定的一对一专属【红娘档案卡】。
           </p>
 
           <button 
             onClick={() => setShowForm(true)}
-            className="w-full bg-[#B93A32] text-white font-medium py-3.5 px-6 rounded-sm tracking-widest hover:bg-[#A32626] active:scale-[0.99] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#B93A32]/40 transition-all shadow-md mb-3"
+            className="w-full bg-[#B93A32] text-white text-lg font-bold py-4 px-6 rounded-sm tracking-[0.25em] hover:bg-[#A32626] active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#B93A32]/40 transition-all shadow-[0_8px_25px_rgba(185,58,50,0.3)] mb-4"
           >
             翻开姻缘簿
           </button>
           
-          <div className="flex items-center justify-center gap-2 text-[11px] text-[#8A8075] font-sans mb-6">
-            <div className="w-1.5 h-1.5 bg-[#B93A32] rounded-full animate-pulse"></div>
-            已有 <span className="font-bold">{participantCount > 0 ? participantCount : '...'}</span> 人解密了红娘档案
+          <div className="flex items-center justify-center gap-2 text-xs text-[#7A7065] font-sans mb-6">
+            <div className="w-2 h-2 bg-[#B93A32] rounded-full animate-pulse"></div>
+            已有 <span className="font-mono font-bold text-[#2C2825]">{participantCount > 0 ? participantCount : '...'}</span> 人解密了红娘档案
           </div>
 
           <div className="flex flex-col items-center gap-3">

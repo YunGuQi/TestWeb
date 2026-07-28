@@ -159,26 +159,34 @@ export default function TestEngine({ userInfo, onBack, onFinish }: TestEnginePro
         {/* 答题卡片区 */}
         <div className="flex-1 w-full max-w-md mx-auto flex flex-col justify-center px-6 pb-20 relative z-20 overflow-hidden">
             <div className={`transition-all duration-300 ease-in-out transform ${isSwiping ? '-translate-x-full opacity-0' : 'translate-x-0 opacity-100'}`}>
-                <h2 className="text-xl md:text-2xl font-bold mb-12 leading-relaxed text-[#2C2825] font-serif text-justify">
+                {/* 签号引语张力强化 */}
+                <div className="flex items-center gap-2 mb-4">
+                  <span className="inline-block bg-[#B93A32] text-white text-[10px] font-mono px-2 py-0.5 tracking-widest uppercase">
+                    第 {currentIndex + 1} 签
+                  </span>
+                  <span className="text-xs text-[#7A7065] tracking-[0.2em] font-serif">· 姻缘问簿 · 灵魂循迹</span>
+                </div>
+
+                <h2 className="text-2xl md:text-3xl font-black mb-10 leading-snug text-[#2C2825] font-serif text-justify tracking-wide">
                     {currentQ.text}
                 </h2>
                 
-                <div className="space-y-6">
+                <div className="space-y-4">
                     {currentQ.options.map((opt: any) => {
                       const isStamped = answers[currentQ.id] === opt.id;
                       return (
                         <button 
                           key={opt.id} 
                           onClick={() => handleSelect(currentQ.id, opt)}
-                          className={`w-full relative text-left p-6 border border-[#D9D0C1]/80 rounded-sm bg-[#FAF8F5]/70 backdrop-blur-sm transition-all duration-300 hover:bg-[#FAF8F5] hover:border-[#B93A32]/60 hover:shadow-[0_8px_25px_rgba(44,40,37,0.05)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#B93A32]/40 active:scale-[0.99] group ${isStamped ? 'scale-[0.99] border-[#B93A32] bg-[#FAF8F5] shadow-sm' : ''}`}
+                          className={`w-full relative text-left p-6 border-2 transition-all duration-300 rounded-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-[#B93A32]/40 active:scale-[0.99] group ${isStamped ? 'scale-[0.99] border-[#B93A32] bg-[#FAF8F5] shadow-[0_8px_30px_rgba(185,58,50,0.12)]' : 'border-[#D9D0C1] bg-[#FAF8F5]/80 hover:bg-[#FAF8F5] hover:border-[#B93A32]/60 hover:shadow-[0_8px_25px_rgba(44,40,37,0.06)]'}`}
                         >
-                          <p className={`text-base md:text-lg leading-relaxed font-serif ${isStamped ? 'text-[#B93A32] font-semibold' : 'text-[#5A524A] group-hover:text-[#2C2825]'}`}>
+                          <p className={`text-base md:text-lg leading-relaxed font-serif ${isStamped ? 'text-[#B93A32] font-bold' : 'text-[#4A423A] group-hover:text-[#2C2825]'}`}>
                             {opt.text}
                           </p>
                           
                           {/* 盖章动效 */}
                           {isStamped && (
-                            <div className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 border-2 border-[#B93A32] text-[#B93A32] text-xs font-bold rounded-full flex items-center justify-center transform rotate-12 animate-stamp shadow-[0_2px_8px_rgba(185,58,50,0.25)]">
+                            <div className="absolute right-4 top-1/2 -translate-y-1/2 w-11 h-11 border-2 border-[#B93A32] text-[#B93A32] text-xs font-bold rounded-full flex items-center justify-center transform rotate-12 animate-stamp shadow-[0_2px_12px_rgba(185,58,50,0.3)] bg-white/90">
                                 缘
                             </div>
                           )}

@@ -79,28 +79,37 @@ export default function ResultReceipt({ result, userInfo, onRestart }: ResultRec
       {/* 背景国风纹理 */}
       <div className="fixed top-0 left-0 w-full h-full opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'radial-gradient(#8A2B2B 1px, transparent 1px)', backgroundSize: '16px 16px' }}></div>
       
-      <div className={`w-full max-w-sm bg-white border border-[#D9D0C1]/80 shadow-[0_24px_60px_rgba(44,40,37,0.08),0_1px_3px_rgba(0,0,0,0.03)] flex flex-col relative rounded-sm transition-all duration-700 ease-out transform ${show ? 'translate-y-0 opacity-100' : 'translate-y-12 opacity-0'}`}>
+      <div className={`w-full max-w-sm bg-white border-2 border-[#8A2B2B] shadow-[0_32px_80px_rgba(138,43,43,0.18),0_4px_12px_rgba(0,0,0,0.06)] flex flex-col relative rounded-sm transition-all duration-700 ease-out transform ${show ? 'translate-y-0 opacity-100' : 'translate-y-12 opacity-0'}`}>
           
-          {/* Header */}
-          <div className="bg-[#8A2B2B] text-white p-6 flex justify-between items-end relative overflow-hidden rounded-t-sm">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-white opacity-5 rounded-full -translate-y-1/2 translate-x-1/3"></div>
+          {/* Header：古典命盘红联契约区 */}
+          <div className="bg-[#8A2B2B] text-white p-7 flex justify-between items-end relative overflow-hidden rounded-t-sm border-b-2 border-[#D99A9A]/30">
+              <div className="absolute top-0 right-0 w-44 h-44 bg-white opacity-5 rounded-full -translate-y-1/3 translate-x-1/3 pointer-events-none"></div>
+              
               <div className="relative z-10">
-                  <div className="text-xs opacity-80 tracking-widest mb-1 font-mono">
-                      档案编号：NO. {result.id?.toString().padStart(3, '0') || '001'}
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="inline-block border border-white/50 px-2 py-0.5 text-[10px] tracking-[0.2em] uppercase font-mono bg-black/10">
+                      NO. {result.id?.toString().padStart(3, '0') || '001'}
+                    </span>
+                    <span className="text-[10px] opacity-75 tracking-widest">· 姻缘簿判词 ·</span>
                   </div>
-                  <h1 className="text-2xl font-bold tracking-wider mb-1">{result.title}</h1>
-                  {result.subtitle && <p className="text-sm opacity-90">{result.subtitle}</p>}
+
+                  <h1 className="text-3xl font-black tracking-widest mb-1.5 drop-shadow-sm">{result.title}</h1>
+                  {result.subtitle && <p className="text-xs opacity-90 tracking-wider font-light">{result.subtitle}</p>}
                   
-                  <div className="mt-3 inline-block bg-white/20 px-2.5 py-1 rounded-sm text-[10px] font-sans tracking-widest backdrop-blur-sm border border-white/30">
-                      你是第 <span className="font-mono font-bold">{participantCount > 0 ? participantCount : '...'}</span> 个解开此姻缘的人
+                  <div className="mt-4 inline-block bg-white/15 px-3 py-1 rounded-sm text-[11px] font-sans tracking-widest backdrop-blur-sm border border-white/40 shadow-inner">
+                      你是第 <span className="font-mono font-bold text-white">{participantCount > 0 ? participantCount : '...'}</span> 个解签测算之人
                   </div>
               </div>
-              <div className="text-5xl opacity-20 font-bold tracking-widest relative z-10" style={{ writingMode: 'vertical-rl' }}>姻缘</div>
+
+              {/* 古典传统契约巨大水印 */}
+              <div className="text-6xl opacity-15 font-black tracking-widest relative z-0 select-none pointer-events-none" style={{ writingMode: 'vertical-rl' }}>命定</div>
           </div>
 
           {/* Content */}
-          <div className="p-6 flex-1 flex flex-col">
-              <h2 className="text-[#555] text-sm tracking-widest mb-6 text-center">「 {userInfo.nickname} 的专属档案 」</h2>
+          <div className="p-7 flex-1 flex flex-col">
+              <div className="inline-block mx-auto mb-7 px-4 py-1 bg-[#8A2B2B]/5 border-y border-[#8A2B2B]/30 text-[#8A2B2B] text-xs tracking-[0.25em] font-serif text-center">
+                「 {userInfo.nickname} · 专属红联档案 」
+              </div>
               
               <div className="flex gap-2 flex-wrap justify-center mb-8">
                   {result.tags?.map((tag: string, idx: number) => (
