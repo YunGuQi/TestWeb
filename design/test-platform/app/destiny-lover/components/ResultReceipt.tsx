@@ -121,28 +121,19 @@ export default function ResultReceipt({ result, userInfo, onRestart }: ResultRec
 
               {/* 雷达数据展示 */}
               {result.radar && result.radar.length > 0 && (
-                <div className="space-y-4 mb-8 px-2">
-                    {result.radar.map((item: any, idx: number) => (
-                      <div key={idx} className="flex justify-between items-center text-sm border-b border-[#F0F0F0] pb-2">
-                          <span className="text-[#5A524A] tracking-widest">{item.label}</span>
-                          <div className="flex items-center gap-3">
-                              <div className="w-24 h-1.5 bg-[#F5F5F5] overflow-hidden rounded-full">
-                                {(() => {
-                                  const pStr = (item.value + ((idx * 17) % 99) * 0.01).toFixed(2);
-                                  return (
-                                    <div className="h-full bg-gradient-to-r from-[#8A2B2B] to-[#D99A9A] transition-all duration-700" style={{ width: `${pStr}%` }}></div>
-                                  );
-                                })()}
-                              </div>
-                              {(() => {
-                                  const pStr = (item.value + ((idx * 17) % 99) * 0.01).toFixed(2);
-                                  return (
-                                    <span className="font-medium text-[#2C2825] w-14 text-right font-mono text-xs">{pStr}%</span>
-                                  );
-                              })()}
-                          </div>
-                      </div>
-                    ))}
+                <div className="space-y-4 mb-8 px-1">
+                    {result.radar.map((item: any, idx: number) => {
+                      const pStr = (item.value + ((idx * 17) % 99) * 0.01).toFixed(2);
+                      return (
+                        <div key={idx} className="flex items-center gap-3 text-sm border-b border-[#F0F0F0] pb-2.5">
+                            <span className="text-[#5A524A] tracking-widest w-20 shrink-0 font-serif text-left">{item.label}</span>
+                            <div className="flex-1 h-2 bg-[#F5F5F5] overflow-hidden rounded-full relative">
+                              <div className="h-full bg-gradient-to-r from-[#8A2B2B] to-[#D99A9A] transition-all duration-700" style={{ width: `${pStr}%` }}></div>
+                            </div>
+                            <span className="font-bold text-[#2C2825] w-14 text-right font-mono text-xs shrink-0">{pStr}%</span>
+                        </div>
+                      );
+                    })}
                 </div>
               )}
 
