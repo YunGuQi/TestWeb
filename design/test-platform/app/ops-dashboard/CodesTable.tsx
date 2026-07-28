@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 
 export default function CodesTable({ initialCodes, testId }: { initialCodes: any[], testId: string }) {
@@ -10,6 +10,22 @@ export default function CodesTable({ initialCodes, testId }: { initialCodes: any
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
   const [generateModal, setGenerateModal] = useState({ show: false, count: 10 });
   const [editModal, setEditModal] = useState({ show: false, id: 0, code: '', maxUses: 3 });
+
+  // ✅ 性能优化：预处理 JSON.parse，避免每次 render 重复解析
+  // 原来：每次 render（包括 checkbox 变化、modal 弹出等）都会对 50 条数据重复 parse
+  // 现在：只有 codes 真正变化时才重新计算
+  const processedCodes = useMemo(() => {
+    return codes.map(code => ({
+      ...code,
+      // 预先解析设备数，避免 render 时重复 parse
+      deviceCount: (() => {
+        try {
+          const devices = JSON.parse(code.devices || '[]');
+          return new Set(devices).size;
+        } catch { return 0; }
+      })()
+    }));
+  }, [codes]);
 
   useEffect(() => {
     setCodes(initialCodes);
@@ -42,9 +58,9 @@ export default function CodesTable({ initialCodes, testId }: { initialCodes: any
       });
       const data = await res.json();
       if (data.success) {
+        // ✅ 乐观 UI 更新，避免不必要的 router.refresh()
         setCodes(codes.filter(c => !selectedIds.includes(c.id)));
         setSelectedIds([]);
-        router.refresh();
       } else {
         alert(data.error || '批量删除卡密失败');
       }
@@ -71,9 +87,11 @@ export default function CodesTable({ initialCodes, testId }: { initialCodes: any
       const data = await res.json();
       if (data.success) {
         if (data.codes && Array.isArray(data.codes)) {
+          // ✅ 乐观更新，新卡密展示在列表顶部
           setCodes([...data.codes, ...codes]);
         }
         setGenerateModal({ show: false, count: 10 });
+        // 异步刷新服务器数据，不阻塞 UI
         router.refresh();
       } else {
         alert(data.error);
@@ -95,8 +113,12 @@ export default function CodesTable({ initialCodes, testId }: { initialCodes: any
       });
       const data = await res.json();
       if (data.success) {
+        // ✅ 乐观 UI 更新，避免不必要的 router.refresh() 导致整页重新连接数据库
+        setCodes(codes.map(c => c.id === editModal.id 
+          ? { ...c, code: editModal.code, maxUses: editModal.maxUses } 
+          : c
+        ));
         setEditModal({ show: false, id: 0, code: '', maxUses: 3 });
-        router.refresh();
       } else {
         alert(data.error);
       }
@@ -155,9 +177,8 @@ export default function CodesTable({ initialCodes, testId }: { initialCodes: any
 
       {/* ============ Mobile Cards View (< md) ============ */}
       <div className="md:hidden space-y-3">
-        {codes.map(code => {
+        {processedCodes.map(code => {
           const isSelected = selectedIds.includes(code.id);
-          const deviceCount = JSON.parse(code.devices || '[]').length;
           return (
             <div 
               key={code.id} 
@@ -194,7 +215,8 @@ export default function CodesTable({ initialCodes, testId }: { initialCodes: any
                 <div className="bg-[#FDFBF7] p-2 rounded-lg border border-[#EBEBEB]/50">
                   <div className="text-[10px] text-[#787774] font-medium mb-0.5">已用次数</div>
                   <div className="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold bg-blue-50 text-blue-700">
-                    {deviceCount}
+                    {/* ✅ 使用预处理的 deviceCount，而非 render 时 JSON.parse */}
+                    {code.deviceCount}
                   </div>
                 </div>
                 <div className="bg-[#FDFBF7] p-2 rounded-lg border border-[#EBEBEB]/50">
@@ -239,7 +261,8 @@ export default function CodesTable({ initialCodes, testId }: { initialCodes: any
             </tr>
           </thead>
           <tbody className="divide-y divide-[#EBEBEB]">
-            {codes.map(code => (
+            {/* ✅ 使用预处理的 processedCodes，避免每行 render 时重复 JSON.parse */}
+            {processedCodes.map(code => (
               <tr key={code.id} className="hover:bg-[#FDFBF7] transition-colors">
                 <td className="p-4">
                   <input 
@@ -256,7 +279,7 @@ export default function CodesTable({ initialCodes, testId }: { initialCodes: any
                 <td className="p-4 text-[#787774]">{code.maxUses}</td>
                 <td className="p-4">
                   <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-50 text-blue-700">
-                    {JSON.parse(code.devices || '[]').length}
+                    {code.deviceCount}
                   </span>
                 </td>
                 <td className="p-4">

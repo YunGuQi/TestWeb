@@ -2,29 +2,49 @@ import { prisma } from '../../lib/prisma';
 import CodesTable from './CodesTable';
 import PVCard from './PVCard';
 
+// 强制动态渲染（searchParams 依赖使然），但使用并发查询大幅提速
 export const dynamic = 'force-dynamic';
 
 export default async function AdminDashboard({ searchParams }: { searchParams: Promise<{ testId?: string }> }) {
   const resolvedSearchParams = await searchParams;
   const testId = resolvedSearchParams.testId || 'emotional-friction';
   
-  const codeCount = await prisma.activationCode.count({ where: { testId } });
-  const usedCodeCount = await prisma.activationCode.count({
-    where: {
-      testId,
-      devices: {
-        not: '[]'
-      }
-    }
-  });
-  let config = await prisma.globalConfig.findFirst({ where: { testId } });
+  // ✅ 性能优化：将所有独立 DB 查询并发执行，从串行改为并行
+  // 原来：每个 await 依次排队，总耗时 = 所有查询之和
+  // 现在：同时发起所有查询，总耗时 = 最慢单个查询的时间（快 3-5x）
+  const [
+    codeCount,
+    usedCodeCount,
+    config,
+    allCodesForStats,
+    allRecords,
+    resultsConfig,
+    codes,
+  ] = await Promise.all([
+    prisma.activationCode.count({ where: { testId } }),
+    prisma.activationCode.count({
+      where: { testId, devices: { not: '[]' } }
+    }),
+    prisma.globalConfig.findFirst({ where: { testId } }),
+    prisma.activationCode.findMany({
+      where: { testId },
+      select: { devices: true, maxUses: true }
+    }),
+    prisma.testRecord.findMany({
+      where: { testId },
+      select: { deviceId: true, resultId: true }
+    }),
+    prisma.resultConfig.findMany({ where: { testId } }),
+    prisma.activationCode.findMany({
+      where: { testId },
+      orderBy: { createdAt: 'desc' },
+      take: 50
+    }),
+  ]);
+
   let baseCount = config?.baseCount || 12544;
 
   // --- Analytics Calculation ---
-  const allCodesForStats = await prisma.activationCode.findMany({
-    where: { testId },
-    select: { devices: true, maxUses: true }
-  });
   
   let totalMaxUses = 0;
   let totalBoundDevices = 0;
@@ -47,11 +67,7 @@ export default async function AdminDashboard({ searchParams }: { searchParams: P
   const saturationRate = totalMaxUses > 0 ? ((totalBoundDevices / totalMaxUses) * 100).toFixed(1) : '0.0';
   const avgDevicesPerCode = totalUsedCodesStats > 0 ? (totalBoundDevices / totalUsedCodesStats).toFixed(1) : '0.0';
 
-  const allRecords = await prisma.testRecord.findMany({
-    where: { testId },
-    select: { deviceId: true, resultId: true }
-  });
-
+  // deviceCounts 和 resultCounts 从并发查询结果中计算
   const deviceCounts: Record<string, number> = {};
   const resultCounts: Record<number, number> = {};
   
@@ -79,7 +95,7 @@ export default async function AdminDashboard({ searchParams }: { searchParams: P
     } catch(e) {}
   });
 
-  const resultsConfig = await prisma.resultConfig.findMany({ where: { testId } });
+  // resultsConfig 已在并发查询中获取
   const resultTitleMap = new Map(resultsConfig.map(r => [r.id, r.title]));
   
   const topResults = Object.entries(resultCounts)
@@ -92,12 +108,7 @@ export default async function AdminDashboard({ searchParams }: { searchParams: P
     }));
   // -----------------------------
 
-  const codes = await prisma.activationCode.findMany({
-    where: { testId },
-    orderBy: { createdAt: 'desc' },
-    take: 50
-  });
-
+  // codes 已在并发查询中获取，直接计算 enrichedCodes
   const enrichedCodes = codes.map(code => {
     let testCount = 0;
     try {

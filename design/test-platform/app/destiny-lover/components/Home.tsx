@@ -67,9 +67,61 @@ export default function Home({ onStartTest, onRestoreHistory }: HomeProps) {
   };
 
   return (
-    <main className="flex-1 flex flex-col justify-center items-center w-full min-h-[100dvh] p-4 relative text-[#2C2825] bg-[#F4F1EA]">
-      <div className="absolute top-0 left-0 w-full h-full opacity-5 pointer-events-none" style={{ backgroundImage: 'radial-gradient(#1F1B18 1px, transparent 1px)', backgroundSize: '20px 20px' }}></div>
-      
+    <main className="flex-1 flex flex-col justify-center items-center w-full min-h-[100dvh] p-4 relative text-[#2C2825] overflow-hidden" style={{ backgroundColor: '#F0EBE0' }}>
+
+      {/* === 第一层：竖向书卷线条（模拟古典竹简纹路） === */}
+      <div className="absolute inset-0 pointer-events-none" style={{
+        backgroundImage: 'repeating-linear-gradient(90deg, rgba(139,110,80,0.07) 0px, transparent 1px, transparent 36px)',
+        backgroundSize: '36px 100%'
+      }}/>
+
+      {/* === 第二层：横向细纹（配合竖线，构成经文纸感方格） === */}
+      <div className="absolute inset-0 pointer-events-none" style={{
+        backgroundImage: 'repeating-linear-gradient(0deg, rgba(139,110,80,0.04) 0px, transparent 1px, transparent 60px)',
+        backgroundSize: '100% 60px'
+      }}/>
+
+      {/* === 第三层：朱砂晕染 - 右上角，命定红线起源处 === */}
+      <div className="absolute pointer-events-none" style={{
+        top: '-80px', right: '-80px',
+        width: '420px', height: '420px',
+        background: 'radial-gradient(circle, rgba(185,58,50,0.13) 0%, rgba(185,58,50,0.06) 40%, transparent 70%)',
+        transform: 'translate3d(0,0,0)',
+      }}/>
+
+      {/* === 第四层：朱砂晕染 - 左下角呼应 === */}
+      <div className="absolute pointer-events-none" style={{
+        bottom: '-60px', left: '-60px',
+        width: '320px', height: '320px',
+        background: 'radial-gradient(circle, rgba(185,58,50,0.09) 0%, rgba(185,58,50,0.04) 45%, transparent 70%)',
+        transform: 'translate3d(0,0,0)',
+      }}/>
+
+      {/* === 第五层：月影装饰大圆环（缓慢旋转，神秘感锚点） === */}
+      <div className="absolute pointer-events-none destiny-moon-ring" style={{
+        top: '50%', left: '50%',
+        width: '520px', height: '520px',
+        marginTop: '-260px', marginLeft: '-260px',
+        border: '1px solid rgba(185,58,50,0.1)',
+        borderRadius: '50%',
+      }}/>
+      <div className="absolute pointer-events-none destiny-moon-ring-2" style={{
+        top: '50%', left: '50%',
+        width: '700px', height: '700px',
+        marginTop: '-350px', marginLeft: '-350px',
+        border: '1px dashed rgba(185,58,50,0.05)',
+        borderRadius: '50%',
+      }}/>
+
+      {/* === 第六层：底部红线流动装饰（月老红线意象） === */}
+      <div className="absolute bottom-0 left-0 w-full pointer-events-none overflow-hidden" style={{ height: '2px' }}>
+        <div className="destiny-redline h-full" style={{ background: 'linear-gradient(90deg, transparent, #B93A32, transparent)' }}/>
+      </div>
+
+      {/* === 第七层：原有点阵（稍增透明度，有层次不抢眼） === */}
+      <div className="absolute inset-0 pointer-events-none" style={{ backgroundImage: 'radial-gradient(rgba(44,40,37,0.2) 1px, transparent 1px)', backgroundSize: '28px 28px', opacity: 0.1 }}/>
+
+
       {!showForm ? (
         <div className="max-w-md w-full bg-[#FAF8F5] p-8 md:p-10 shadow-[0_28px_70px_rgba(44,40,37,0.12),0_2px_6px_rgba(0,0,0,0.04)] border-2 border-[#D9D0C1] rounded-sm relative z-10 text-center animate-fade-in-up">
           {/* 古典朱砂官印契约头部 */}
@@ -219,11 +271,39 @@ export default function Home({ onStartTest, onRestoreHistory }: HomeProps) {
           from { opacity: 0; }
           to { opacity: 1; }
         }
+        /* 月影大环缓慢旋转，带来神秘感流动 */
+        @keyframes moonRotate {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+        /* 红线从左到右流动，象征月老红线牵引 */
+        @keyframes redlineFlow {
+          0%   { transform: translateX(-100%); opacity: 0; }
+          20%  { opacity: 1; }
+          80%  { opacity: 1; }
+          100% { transform: translateX(200%); opacity: 0; }
+        }
         .animate-fade-in-up { animation: fadeInUp 0.6s ease-out forwards; }
         .animate-fade-in { animation: fadeIn 0.4s ease-out forwards; }
         .hide-scrollbar::-webkit-scrollbar { display: none; }
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        /* 月影环动画 — 顺时针慢转 */
+        .destiny-moon-ring {
+          animation: moonRotate 80s linear infinite;
+          transform-origin: center center;
+        }
+        /* 外圈 — 逆时针慢转 */
+        .destiny-moon-ring-2 {
+          animation: moonRotate 120s linear infinite reverse;
+          transform-origin: center center;
+        }
+        /* 红线流动 */
+        .destiny-redline {
+          width: 50%;
+          animation: redlineFlow 5s ease-in-out infinite;
+        }
       `}} />
+
     </main>
   );
 }

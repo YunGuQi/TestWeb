@@ -8,11 +8,12 @@ interface TestEngineProps {
   onFinish: (result: any) => void;
 }
 
+// 各维度背景色（深化，更有古典韵味）
 const bgColors = [
-  '#F4F1EA', // 0-4 (L/G) - 雅白
-  '#F0E5DE', // 5-9 (D/S) - 浅桃
-  '#E6E9E3', // 10-14 (A/C) - 青瓷
-  '#EBE7DF'  // 15-19 (R/P) - 暖灰
+  '#EDE6D6', // 0-4 (L/G) - 古卷米黄
+  '#E8D8CE', // 5-9 (D/S) - 桃花粉瓷
+  '#DDE4DA', // 10-14 (A/C) - 青瓷绿
+  '#E4DDD3'  // 15-19 (R/P) - 暖砚灰
 ];
 
 export default function TestEngine({ userInfo, onBack, onFinish }: TestEngineProps) {
@@ -134,11 +135,25 @@ export default function TestEngine({ userInfo, onBack, onFinish }: TestEnginePro
 
   return (
     <main 
-      className="flex-1 flex flex-col mx-auto w-full relative z-10 min-h-[100dvh] transition-colors duration-700 ease-in-out"
+      className="flex-1 flex flex-col mx-auto w-full relative z-10 min-h-[100dvh] transition-colors duration-700 ease-in-out overflow-hidden"
       style={{ backgroundColor: currentBgColor }}
     >
-        {/* 背景底纹 */}
-        <div className="absolute top-0 left-0 w-full h-full opacity-5 pointer-events-none" style={{ backgroundImage: 'radial-gradient(#1F1B18 1px, transparent 1px)', backgroundSize: '20px 20px' }}></div>
+        {/* === 背景层 1：竖向书卷线条（与首页保持一致的视觉系统） === */}
+        <div className="absolute inset-0 pointer-events-none" style={{
+          backgroundImage: 'repeating-linear-gradient(90deg, rgba(100,75,55,0.06) 0px, transparent 1px, transparent 36px)',
+          backgroundSize: '36px 100%'
+        }}/>
+
+        {/* === 背景层 2：朱砂晕染（右上角，始终存在，增加命定感） === */}
+        <div className="absolute pointer-events-none" style={{
+          top: '-60px', right: '-60px',
+          width: '300px', height: '300px',
+          background: 'radial-gradient(circle, rgba(185,58,50,0.10) 0%, rgba(185,58,50,0.04) 40%, transparent 70%)',
+          transform: 'translate3d(0,0,0)',
+        }}/>
+
+        {/* === 背景层 3：点阵底纹（继承首页系统） === */}
+        <div className="absolute inset-0 pointer-events-none" style={{ backgroundImage: 'radial-gradient(rgba(44,40,37,0.18) 1px, transparent 1px)', backgroundSize: '28px 28px', opacity: 0.08 }}/>
 
         {/* 顶部进度条区 */}
         <div className="w-full max-w-md mx-auto p-6 flex flex-col relative z-20">

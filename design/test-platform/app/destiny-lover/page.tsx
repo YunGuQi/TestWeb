@@ -73,7 +73,7 @@ export default function DestinyLoverApp() {
   };
 
   return (
-    <div className="flex flex-col min-h-[100dvh] bg-[#FAFAFA] text-[#333] font-serif overflow-hidden">
+    <div className="flex flex-col min-h-[100dvh] text-[#333] font-serif overflow-hidden" style={{ backgroundColor: '#F0EBE0' }}>
       {currentView === 'home' && (
         <Home onStartTest={handleStartTest} onRestoreHistory={handleFinishTest} />
       )}

@@ -89,10 +89,34 @@ export default function ResultReceipt({ result, userInfo, onRestart }: ResultRec
   };
 
   return (
-    <main className="flex-1 flex flex-col items-center w-full min-h-[100dvh] py-10 px-4 bg-[#FAFAFA] font-serif relative overflow-y-auto">
-      {/* 背景国风纹理 */}
-      <div className="fixed top-0 left-0 w-full h-full opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'radial-gradient(#8A2B2B 1px, transparent 1px)', backgroundSize: '16px 16px' }}></div>
+    <main className="flex-1 flex flex-col items-center w-full min-h-[100dvh] py-10 px-4 font-serif relative overflow-y-auto overflow-hidden" style={{ backgroundColor: '#EDE6D6' }}>
+
+      {/* === 背景层 1：竖向书卷线条（三页统一） === */}
+      <div className="fixed inset-0 pointer-events-none" style={{
+        backgroundImage: 'repeating-linear-gradient(90deg, rgba(100,75,55,0.06) 0px, transparent 1px, transparent 36px)',
+        backgroundSize: '36px 100%'
+      }}/>
+
+      {/* === 背景层 2：朱砂晕染 - 右上角（结果页情绪更浓，稍强） === */}
+      <div className="fixed pointer-events-none" style={{
+        top: '-100px', right: '-100px',
+        width: '500px', height: '500px',
+        background: 'radial-gradient(circle, rgba(138,43,43,0.14) 0%, rgba(138,43,43,0.06) 45%, transparent 70%)',
+        transform: 'translate3d(0,0,0)',
+      }}/>
+
+      {/* === 背景层 3：左下角晕染 === */}
+      <div className="fixed pointer-events-none" style={{
+        bottom: '-80px', left: '-80px',
+        width: '380px', height: '380px',
+        background: 'radial-gradient(circle, rgba(138,43,43,0.09) 0%, rgba(138,43,43,0.03) 45%, transparent 70%)',
+        transform: 'translate3d(0,0,0)',
+      }}/>
+
+      {/* === 背景层 4：点阵底纹（轻于封面，因为内容更多） === */}
+      <div className="fixed inset-0 pointer-events-none" style={{ backgroundImage: 'radial-gradient(rgba(138,43,43,0.15) 1px, transparent 1px)', backgroundSize: '24px 24px', opacity: 0.08 }}/>
       
+
       <div ref={ticketRef} className={`w-full max-w-sm bg-white border-2 border-[#8A2B2B] shadow-[0_32px_80px_rgba(138,43,43,0.18),0_4px_12px_rgba(0,0,0,0.06)] flex flex-col relative rounded-sm transition-all duration-700 ease-out transform ${show ? 'translate-y-0 opacity-100' : 'translate-y-12 opacity-0'}`}>
           
           {/* Header：古典命盘红联契约区 */}

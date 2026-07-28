@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useTransition, useCallback } from 'react';
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 
 const TESTS = [
@@ -108,6 +108,11 @@ export default function AdminNav() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
+  // ✅ 性能优化：使用 useTransition 实现即时视觉响应
+  // router.push() 后 React 保持当前 UI 可交互，并在后台完成导航，消除「没反应」感
+  const [isPending, startTransition] = useTransition();
+  // 记录当前正在导航到的目标路径
+  const [navigatingTo, setNavigatingTo] = useState<string | null>(null);
   
   const currentTestId = searchParams.get('testId') || 'emotional-friction';
   
@@ -117,17 +122,29 @@ export default function AdminNav() {
     return `${path}?${params.toString()}`;
   };
 
-  const handleTestChange = (newTestId: string) => {
+  const handleTestChange = useCallback((newTestId: string) => {
     const params = new URLSearchParams(searchParams.toString());
     params.set('testId', newTestId);
-    router.push(`${pathname}?${params.toString()}`);
-  };
+    const href = `${pathname}?${params.toString()}`;
+    setNavigatingTo(href);
+    startTransition(() => {
+      router.push(href);
+    });
+  }, [searchParams, pathname, router]);
 
-  const handleNavClick = (path: string) => {
-    if (pathname !== path) {
-      router.push(buildHref(path));
-    }
-  };
+  const handleNavClick = useCallback((path: string) => {
+    if (pathname === path) return;
+    const href = buildHref(path);
+    setNavigatingTo(href);
+    startTransition(() => {
+      router.push(href);
+    });
+  }, [pathname, buildHref, router]);
+
+  // 悬停时预加载页面数据，按下前数据已经就序请在缓冲中
+  const handleNavPrefetch = useCallback((path: string) => {
+    router.prefetch(buildHref(path));
+  }, [buildHref, router]);
 
   const navItems = [
     { name: '概览 (Overview)', shortName: '概览', path: '/ops-dashboard', icon: '📊' },
@@ -157,18 +174,30 @@ export default function AdminNav() {
         <nav className="flex items-center justify-around pt-2 gap-1 overflow-x-auto">
           {navItems.map((item) => {
             const isActive = pathname === item.path;
+            // 是否正在导航到此项
+            const isLoading = isPending && navigatingTo === buildHref(item.path);
             return (
               <button
                 key={item.path}
                 type="button"
                 onClick={() => handleNavClick(item.path)}
+                onMouseEnter={() => handleNavPrefetch(item.path)}
+                disabled={isPending}
                 className={`flex items-center gap-1.5 px-3 py-2 text-xs font-bold rounded-lg whitespace-nowrap transition-all touch-manipulation cursor-pointer select-none active:scale-95 ${
                   isActive 
                     ? 'bg-emerald-500/15 text-emerald-950 font-black shadow-sm border border-emerald-500/30' 
                     : 'text-gray-600 hover:bg-gray-100 hover:text-black'
-                }`}
+                } ${isPending ? 'opacity-70' : ''}`}
               >
-                <span className="text-sm">{item.icon}</span>
+                {/* 导航中显示旋转加载图标 */}
+                {isLoading ? (
+                  <svg className="w-3.5 h-3.5 animate-spin text-emerald-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+                  </svg>
+                ) : (
+                  <span className="text-sm">{item.icon}</span>
+                )}
                 <span>{item.shortName}</span>
               </button>
             );
@@ -199,18 +228,30 @@ export default function AdminNav() {
         <nav className="flex-1 px-3 space-y-1">
           {navItems.map((item) => {
             const isActive = pathname === item.path;
+            // 是否正在导航到此项
+            const isLoading = isPending && navigatingTo === buildHref(item.path);
             return (
               <button
                 key={item.path}
                 type="button"
                 onClick={() => handleNavClick(item.path)}
+                onMouseEnter={() => handleNavPrefetch(item.path)}
+                disabled={isPending}
                 className={`w-full flex items-center gap-3 px-3 py-2.5 text-sm transition-all touch-manipulation cursor-pointer select-none active:scale-98 text-left ${
                   isActive 
                     ? 'bg-emerald-500/15 text-emerald-950 font-black shadow-sm border-l-4 border-emerald-600 rounded-r-lg rounded-l-none' 
                     : 'text-gray-600 hover:bg-gray-100/70 hover:text-black font-semibold'
-                }`}
+                } ${isPending ? 'opacity-70' : ''}`}
               >
-                <span>{item.icon}</span>
+                {/* 导航中显示旋转加载图标 */}
+                {isLoading ? (
+                  <svg className="w-4 h-4 animate-spin text-emerald-600 shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+                  </svg>
+                ) : (
+                  <span>{item.icon}</span>
+                )}
                 <span>{item.name}</span>
               </button>
             );
