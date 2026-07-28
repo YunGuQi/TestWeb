@@ -1,6 +1,7 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
+import { toPng } from 'html-to-image';
 
 interface ResultReceiptProps {
   result: any;
@@ -16,6 +17,7 @@ export default function ResultReceipt({ result, userInfo, onRestart }: ResultRec
   const [unlockCode, setUnlockCode] = useState('');
   const [isVerifying, setIsVerifying] = useState(false);
   const [verifyError, setVerifyError] = useState('');
+  const ticketRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setParticipantCount(Math.floor(Math.random() * 500) + 120);
@@ -66,20 +68,30 @@ export default function ResultReceipt({ result, userInfo, onRestart }: ResultRec
     }
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!isUnlocked) {
       setShowModal(true);
       return;
     }
-    alert('请截图保存您的专属红娘档案');
+    if (!ticketRef.current) return;
+    try {
+      const dataUrl = await toPng(ticketRef.current, { cacheBust: true, style: { transform: 'scale(1)' } });
+      const link = document.createElement('a');
+      link.download = `命定恋人红娘档案_${userInfo.nickname || '我'}.png`;
+      link.href = dataUrl;
+      link.click();
+    } catch (err) {
+      console.error('Failed to save image', err);
+      alert('图片生成失败，请尝试直接截屏保存您的红娘档案');
+    }
   };
 
   return (
-    <main className="flex-1 flex flex-col justify-center items-center w-full min-h-[100dvh] p-4 bg-[#FAFAFA] font-serif relative overflow-y-auto pb-24">
+    <main className="flex-1 flex flex-col items-center w-full min-h-[100dvh] py-10 px-4 bg-[#FAFAFA] font-serif relative overflow-y-auto">
       {/* 背景国风纹理 */}
       <div className="fixed top-0 left-0 w-full h-full opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'radial-gradient(#8A2B2B 1px, transparent 1px)', backgroundSize: '16px 16px' }}></div>
       
-      <div className={`w-full max-w-sm bg-white border-2 border-[#8A2B2B] shadow-[0_32px_80px_rgba(138,43,43,0.18),0_4px_12px_rgba(0,0,0,0.06)] flex flex-col relative rounded-sm transition-all duration-700 ease-out transform ${show ? 'translate-y-0 opacity-100' : 'translate-y-12 opacity-0'}`}>
+      <div ref={ticketRef} className={`w-full max-w-sm bg-white border-2 border-[#8A2B2B] shadow-[0_32px_80px_rgba(138,43,43,0.18),0_4px_12px_rgba(0,0,0,0.06)] flex flex-col relative rounded-sm transition-all duration-700 ease-out transform ${show ? 'translate-y-0 opacity-100' : 'translate-y-12 opacity-0'}`}>
           
           {/* Header：古典命盘红联契约区 */}
           <div className="bg-[#8A2B2B] text-white p-7 flex justify-between items-end relative overflow-hidden rounded-t-sm border-b-2 border-[#D99A9A]/30">
@@ -158,30 +170,28 @@ export default function ResultReceipt({ result, userInfo, onRestart }: ResultRec
           </div>
       </div>
 
-      {/* 底部操作栏 */}
-      <div className={`fixed bottom-6 left-0 w-full px-4 flex justify-center gap-4 transition-all duration-700 delay-500 z-40 ${show ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
-          <div className="max-w-sm w-full flex flex-col gap-3">
-              <div className="flex gap-4">
-                  <button 
-                      onClick={onRestart}
-                      className="flex-1 py-3 bg-white border border-[#8A2B2B] text-[#8A2B2B] text-sm font-medium tracking-widest hover:bg-[#FAF8F5] active:scale-[0.99] transition-all shadow-lg rounded-sm"
-                  >
-                      重新结缘
-                  </button>
-                  <button 
-                      onClick={handleSave}
-                      className="flex-1 py-3 bg-[#8A2B2B] text-white text-sm font-medium tracking-widest hover:bg-[#A32626] active:scale-[0.99] transition-all shadow-lg rounded-sm"
-                  >
-                      保存档案卡
-                  </button>
-              </div>
-              <a 
-                  href="/"
-                  className="w-full py-3 bg-[#2C2825] text-white text-center text-sm font-medium tracking-widest hover:bg-[#1F1B18] active:scale-[0.99] transition-all shadow-lg rounded-sm"
+      {/* 底部操作栏（紧随卡片下方常规页面流，绝不遮盖、截图时不包含） */}
+      <div className={`w-full max-w-sm mt-8 flex flex-col gap-3 transition-all duration-700 delay-500 z-10 ${show ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+          <div className="flex gap-4">
+              <button 
+                  onClick={onRestart}
+                  className="flex-1 py-3.5 bg-white border border-[#8A2B2B] text-[#8A2B2B] text-sm font-medium tracking-widest hover:bg-[#FAF8F5] active:scale-[0.99] transition-all shadow-md rounded-sm"
               >
-                  探索其他测试
-              </a>
+                  重新结缘
+              </button>
+              <button 
+                  onClick={handleSave}
+                  className="flex-1 py-3.5 bg-[#8A2B2B] text-white text-sm font-medium tracking-widest hover:bg-[#A32626] active:scale-[0.99] transition-all shadow-md rounded-sm"
+              >
+                  保存档案卡
+              </button>
           </div>
+          <a 
+              href="/"
+              className="w-full py-3.5 bg-[#2C2825] text-white text-center text-sm font-medium tracking-widest hover:bg-[#1F1B18] active:scale-[0.99] transition-all shadow-md rounded-sm"
+          >
+              探索其他测试
+          </a>
       </div>
       
       {/* 快捷返回大厅 (桌面端辅助) */}
