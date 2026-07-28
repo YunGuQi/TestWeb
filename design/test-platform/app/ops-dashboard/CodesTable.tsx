@@ -10,6 +10,7 @@ export default function CodesTable({ initialCodes, testId }: { initialCodes: any
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
   const [generateModal, setGenerateModal] = useState({ show: false, count: 10 });
   const [editModal, setEditModal] = useState({ show: false, id: 0, code: '', maxUses: 3 });
+  const [batchEditModal, setBatchEditModal] = useState({ show: false, maxUses: 3 });
 
   // ✅ 性能优化：预处理 JSON.parse，避免每次 render 重复解析
   // 原来：每次 render（包括 checkbox 变化、modal 弹出等）都会对 50 条数据重复 parse
@@ -128,6 +129,32 @@ export default function CodesTable({ initialCodes, testId }: { initialCodes: any
     setLoading(false);
   };
 
+  const handleBatchEdit = async () => {
+    if (selectedIds.length === 0) return;
+    setLoading(true);
+    try {
+      const res = await fetch('/api/admin/code/batch_edit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ids: selectedIds, maxUses: batchEditModal.maxUses })
+      });
+      const data = await res.json();
+      if (data.success) {
+        setCodes(codes.map(c => selectedIds.includes(c.id)
+          ? { ...c, maxUses: batchEditModal.maxUses }
+          : c
+        ));
+        setBatchEditModal({ show: false, maxUses: 3 });
+        setSelectedIds([]);
+      } else {
+        alert(data.error || '批量修改失败');
+      }
+    } catch (e: any) {
+      alert('发生异常: ' + e.message);
+    }
+    setLoading(false);
+  };
+
   return (
     <div className="mt-8 text-[#37352F]">
       <div className="flex justify-between items-center mb-6">
@@ -137,6 +164,9 @@ export default function CodesTable({ initialCodes, testId }: { initialCodes: any
             <div className="flex items-center gap-2">
               <button onClick={handleBatchDelete} disabled={loading} className="text-xs font-semibold bg-red-50 text-red-600 border border-red-100 hover:bg-red-100 transition-colors px-3 py-1.5 rounded-md cursor-pointer">
                 批量删除 ({selectedIds.length})
+              </button>
+              <button onClick={() => setBatchEditModal({ show: true, maxUses: 3 })} disabled={loading} className="text-xs font-semibold bg-blue-50 text-blue-600 border border-blue-100 hover:bg-blue-100 transition-colors px-3 py-1.5 rounded-md cursor-pointer">
+                批量修改 ({selectedIds.length})
               </button>
               <button onClick={handleExportCSV} className="text-xs font-semibold bg-green-50 text-green-600 border border-green-100 hover:bg-green-100 transition-colors px-3 py-1.5 rounded-md cursor-pointer">
                 导出已选 ({selectedIds.length})
@@ -337,6 +367,42 @@ export default function CodesTable({ initialCodes, testId }: { initialCodes: any
             <div className="flex justify-end gap-2">
               <button onClick={() => setEditModal({ ...editModal, show: false })} className="px-4 py-2 bg-white border border-[#EBEBEB] text-[#787774] hover:bg-[#F7F6F3] rounded-lg text-sm font-semibold transition-colors">取消</button>
               <button onClick={handleEdit} disabled={loading} className="px-4 py-2 bg-[#37352F] hover:bg-black text-white rounded-lg text-sm font-semibold transition-colors shadow-sm">{loading ? '保存中...' : '确认修改'}</button>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* Batch Edit Modal */}
+      {batchEditModal.show && (
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-in fade-in duration-200">
+          <div className="bg-white rounded-2xl p-6 max-w-sm w-full shadow-xl">
+            <h3 className="text-lg font-bold text-[#37352F] mb-4">批量修改设备数上限</h3>
+            <div className="text-sm text-[#787774] mb-4">
+              已选中 <span className="font-bold text-blue-600">{selectedIds.length}</span> 个卡密。
+            </div>
+            <div className="mb-6">
+              <label className="block text-sm font-semibold text-[#787774] mb-2">新的设备数上限</label>
+              <input 
+                type="number" 
+                value={batchEditModal.maxUses}
+                onChange={e => setBatchEditModal({...batchEditModal, maxUses: parseInt(e.target.value) || 1})}
+                className="w-full border border-[#EBEBEB] p-2.5 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors font-mono"
+                min="1"
+              />
+            </div>
+            <div className="flex justify-end gap-3">
+              <button 
+                onClick={() => setBatchEditModal({ show: false, maxUses: 3 })}
+                className="px-4 py-2 text-sm font-semibold text-[#787774] hover:bg-[#F7F6F3] rounded-lg transition-colors cursor-pointer"
+              >
+                取消
+              </button>
+              <button 
+                onClick={handleBatchEdit}
+                disabled={loading}
+                className="px-4 py-2 text-sm font-bold bg-blue-600 text-white hover:bg-blue-700 rounded-lg transition-colors shadow-sm cursor-pointer disabled:opacity-50"
+              >
+                {loading ? '修改中...' : '确认修改'}
+              </button>
             </div>
           </div>
         </div>

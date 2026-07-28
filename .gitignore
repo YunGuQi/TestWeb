@@ -1,2 +1,13 @@
 .gemini
 .agent
+.agents
+# 本地运营物料与参考资料（不上传 Git）
+参考/
+对标账号/
+帖子物料/
+graphify-out/
+tmp_skill/
+# 本地工具临时文件
+.scratch/
+.codex/
+.mcp.json
