@@ -15,31 +15,43 @@ const ticketStyles = [
     bg: 'bg-[#fdfbf7]',
     text: 'text-[#1a1a1a]',
     border: 'border-[#d1cdc1]',
+    cardBorder: 'border-2 border-[#d1cdc1]',
     divider: 'border-[#b5b1a3]',
-    stampBorder: 'border-red-600 text-red-600',
+    tearStyle: 'border-t-2 border-dashed border-[#b5b1a3]',
+    stampBorder: 'border-red-600 text-red-600 bg-red-500/5',
+    stampTitle: '灵魂归属',
+    stampSub: '已检票/PASS',
+    badgeText: '[ SOUL TICKET ARCHIVE ]',
     tagBg: 'bg-[#1a1a1a] text-[#fdfbf7]',
     barFill: 'bg-[#1a1a1a]',
     barTrack: 'bg-[#e4dfd4] border-[#1a1a1a]/15',
     quoteBg: 'bg-black/5 border-black',
     labelBg: 'bg-black/10 text-black',
     btnBg: 'bg-[#1a1a1a] text-white hover:bg-black',
-    taglineColor: 'border-black'
+    taglineColor: 'border-black',
+    serialPrefix: 'CN-34-SOUL-EXPRESS'
   },
   {
     name: '暗夜赛博',
     sub: '黑客夜行凭证',
-    bg: 'bg-[#121212]',
-    text: 'text-[#f0f0f0]',
-    border: 'border-[#333333]',
-    divider: 'border-[#333333]',
-    stampBorder: 'border-[#00FF66] text-[#00FF66] bg-[#00FF66]/10',
-    tagBg: 'bg-[#00FF66] text-[#121212]',
+    bg: 'bg-[#0d0f0d]',
+    text: 'text-[#00FF66]',
+    border: 'border-[#00FF66]/50',
+    cardBorder: 'border-2 border-[#00FF66] shadow-[0_0_25px_rgba(0,255,102,0.15)]',
+    divider: 'border-[#00FF66]/40',
+    tearStyle: 'border-t-2 border-dotted border-[#00FF66]',
+    stampBorder: 'border-[#00FF66] text-[#00FF66] bg-[#00FF66]/10 shadow-[0_0_15px_rgba(0,255,102,0.3)]',
+    stampTitle: 'CYBER-PASS',
+    stampSub: 'MATCHED/2024',
+    badgeText: '// SYSTEM: NEON-MATRIX //',
+    tagBg: 'bg-[#00FF66] text-[#0d0f0d]',
     barFill: 'bg-[#00FF66]',
-    barTrack: 'bg-[#262626] border-[#00FF66]/30',
+    barTrack: 'bg-[#1a261d] border-[#00FF66]/30',
     quoteBg: 'bg-[#00FF66]/10 border-[#00FF66] text-[#00FF66]',
     labelBg: 'bg-[#00FF66]/20 text-[#00FF66]',
-    btnBg: 'bg-[#00FF66] text-black hover:bg-[#00e65c]',
-    taglineColor: 'border-[#333333]'
+    btnBg: 'bg-[#00FF66] text-black hover:bg-[#00e65c] font-black',
+    taglineColor: 'border-[#00FF66]/30',
+    serialPrefix: 'HEX:0x8F4A-NEON-PASS'
   },
   {
     name: '日落报刊',
@@ -47,15 +59,21 @@ const ticketStyles = [
     bg: 'bg-[#FFF8EE]',
     text: 'text-[#2C1810]',
     border: 'border-[#E0533C]',
-    divider: 'border-[#E0533C]/40',
+    cardBorder: 'border-4 border-[#E0533C]',
+    divider: 'border-[#E0533C]/50',
+    tearStyle: 'border-t-2 border-dashed border-[#E0533C]',
     stampBorder: 'border-[#E0533C] text-[#E0533C] bg-[#E0533C]/10',
+    stampTitle: 'DAILY POST',
+    stampSub: 'TOP MATCH ★',
+    badgeText: '★ SOUL TIMES NO.1 ★',
     tagBg: 'bg-[#E0533C] text-[#FFF8EE]',
     barFill: 'bg-[#E0533C]',
     barTrack: 'bg-[#EEDDCD] border-[#E0533C]/20',
     quoteBg: 'bg-[#E0533C]/10 border-[#E0533C]',
     labelBg: 'bg-[#E0533C]/15 text-[#E0533C]',
     btnBg: 'bg-[#E0533C] text-white hover:bg-[#c94630]',
-    taglineColor: 'border-[#E0533C]/30'
+    taglineColor: 'border-[#E0533C]/30',
+    serialPrefix: 'ISSUE:VOL-8492-POST'
   },
   {
     name: '极简冷淡',
@@ -63,15 +81,21 @@ const ticketStyles = [
     bg: 'bg-white',
     text: 'text-black',
     border: 'border-black',
+    cardBorder: 'border-2 border-black',
     divider: 'border-black',
+    tearStyle: 'border-t-2 border-solid border-black',
     stampBorder: 'border-black text-black bg-black/5',
+    stampTitle: 'ISO-34-VER',
+    stampSub: 'VERIFIED [OK]',
+    badgeText: 'REF: CH-2024-ISO SYSTEM',
     tagBg: 'bg-black text-white',
     barFill: 'bg-black',
     barTrack: 'bg-gray-200 border-black/10',
     quoteBg: 'bg-white border-black text-black',
     labelBg: 'bg-black text-white',
     btnBg: 'bg-black text-white hover:bg-gray-800',
-    taglineColor: 'border-black/20'
+    taglineColor: 'border-black/20',
+    serialPrefix: 'ISO-STD-34-2024'
   },
   {
     name: '千禧霓虹',
@@ -79,15 +103,21 @@ const ticketStyles = [
     bg: 'bg-[#0B0C10]',
     text: 'text-[#45A29E]',
     border: 'border-[#66FCF1]',
+    cardBorder: 'border-2 border-[#66FCF1] shadow-[0_0_20px_rgba(102,252,241,0.2)]',
     divider: 'border-[#45A29E]/50',
+    tearStyle: 'border-t-2 border-dashed border-[#66FCF1]/70',
     stampBorder: 'border-[#66FCF1] text-[#66FCF1] bg-[#66FCF1]/10',
+    stampTitle: 'Y2K-PORTAL',
+    stampSub: 'SYNC: 100%',
+    badgeText: '☆ METAVERSE PORTAL PASS ☆',
     tagBg: 'bg-[#45A29E] text-[#0B0C10]',
     barFill: 'bg-[#66FCF1]',
     barTrack: 'bg-[#1F2833] border-[#66FCF1]/20',
     quoteBg: 'bg-[#1F2833] border-[#45A29E] text-[#66FCF1]',
-    labelBg: 'bg-[#66FCF1]/10 text-[#66FCF1]',
-    btnBg: 'bg-[#66FCF1] text-[#0B0C10] hover:bg-[#45A29E]',
-    taglineColor: 'border-[#45A29E]/30'
+    labelBg: 'bg-[#66FCF1]/15 text-[#66FCF1]',
+    btnBg: 'bg-[#66FCF1] text-[#0B0C10] hover:bg-[#45A29E] font-bold',
+    taglineColor: 'border-[#45A29E]/30',
+    serialPrefix: 'Y2K-WAVE-8492-ID'
   }
 ];
 
@@ -170,7 +200,12 @@ export default function ResultView({ forcedResultData }: ResultViewProps) {
 
     if (!ticketRef.current) return;
     try {
-      const dataUrl = await toPng(ticketRef.current, { cacheBust: true, style: { transform: 'scale(1)' } });
+      const dataUrl = await toPng(ticketRef.current, {
+        cacheBust: true,
+        pixelRatio: 3,
+        quality: 1,
+        style: { transform: 'scale(1)', transformOrigin: 'top left', margin: '0' }
+      });
       const link = document.createElement('a');
       link.download = 'my-city-ticket.png';
       link.href = dataUrl;
@@ -197,7 +232,7 @@ export default function ResultView({ forcedResultData }: ResultViewProps) {
         id="ticket-capture"
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
-        className={`relative ${currentStyle.bg} ${currentStyle.text} w-full flex flex-col overflow-hidden pb-6 rounded shadow-[0_10px_40px_rgba(0,0,0,0.06)] border ${currentStyle.border} transition-colors duration-300`}
+        className={`relative ${currentStyle.bg} ${currentStyle.text} w-full flex flex-col overflow-hidden pb-6 rounded-lg shadow-[0_15px_50px_rgba(0,0,0,0.12)] ${currentStyle.cardBorder} transition-colors duration-300 before:content-[''] before:absolute before:top-[56%] before:-translate-y-1/2 before:-left-4 before:w-8 before:h-8 before:bg-current before:rounded-full before:shadow-[inset_0_2px_4px_rgba(0,0,0,0.4)] before:opacity-15 after:content-[''] after:absolute after:top-[56%] after:-translate-y-1/2 after:-right-4 after:w-8 after:h-8 after:bg-current after:rounded-full after:shadow-[inset_0_2px_4px_rgba(0,0,0,0.4)] after:opacity-15`}
       >
         
         {!isUnlocked && <OrderOverlay testId="city-personality" onSuccess={() => setIsUnlocked(true)} />}
@@ -208,11 +243,17 @@ export default function ResultView({ forcedResultData }: ResultViewProps) {
             {'> 你是本次列车第 '}<span>{rank}</span>{' 位乘车的旅客 <'}
           </div>
           
-          <div className={`absolute top-[35px] right-[20px] border-4 ${currentStyle.stampBorder} rounded-full w-20 h-20 flex items-center justify-center font-bold text-sm -rotate-12 opacity-80 text-center leading-tight transition-colors duration-300`}>
-            灵魂<br/>归属
+          {/* 5风格防伪专属钢印 / 检票戳 */}
+          <div className={`absolute top-[35px] right-[20px] border-4 ${currentStyle.stampBorder} rounded-full w-20 h-20 flex flex-col items-center justify-center font-bold text-xs -rotate-12 opacity-90 text-center leading-tight transition-all duration-300 select-none pointer-events-none z-10`}>
+            <span>{currentStyle.stampTitle}</span>
+            <span className="text-[9px] tracking-widest mt-0.5 opacity-80">{currentStyle.stampSub}</span>
           </div>
 
-          <div className="flex justify-between items-start mb-6 mt-4">
+          <div className="font-mono text-[10px] opacity-60 uppercase tracking-[0.25em] mb-3">
+            {currentStyle.badgeText}
+          </div>
+
+          <div className="flex justify-between items-start mb-6 mt-2">
             <div>
               <div className="font-mono text-xs opacity-70 mb-1">TRAIN NO.</div>
               <div className="font-bold text-lg">M-2024</div>
@@ -231,12 +272,13 @@ export default function ResultView({ forcedResultData }: ResultViewProps) {
           
           <div className="flex flex-wrap gap-2 mt-3">
             {city.tags.map((tag: string, i: number) => (
-              <span key={i} className={`${currentStyle.tagBg} text-xs px-2.5 py-1 font-bold rounded-sm transition-colors duration-300`}>{tag}</span>
+              <span key={i} className={`${currentStyle.tagBg} text-xs px-2.5 py-1 font-bold rounded-sm transition-colors duration-300 shadow-sm`}>{tag}</span>
             ))}
           </div>
         </div>
 
-        <div className={`border-t-2 border-dashed ${currentStyle.divider} mx-4 my-2 transition-colors duration-300`}></div>
+        {/* 撕票边缘虚线/齿线 */}
+        <div className={`mx-4 my-2 transition-colors duration-300 ${currentStyle.tearStyle}`}></div>
 
         {/* Middle Section */}
         <div className="p-6 pb-2">
@@ -273,7 +315,7 @@ export default function ResultView({ forcedResultData }: ResultViewProps) {
             <p className="text-[13px] leading-relaxed font-medium text-justify">{city.desc}</p>
           </div>
           
-          <div className={`mt-5 p-4 ${currentStyle.quoteBg} border-l-4 italic font-bold text-sm transition-colors duration-300`}>
+          <div className={`mt-5 p-4 ${currentStyle.quoteBg} border-l-4 italic font-bold text-sm transition-colors duration-300 rounded-r`}>
             “{city.quote}”
           </div>
         </div>
@@ -289,16 +331,16 @@ export default function ResultView({ forcedResultData }: ResultViewProps) {
               />
             ))}
           </div>
-          <div className="font-mono text-[10px] opacity-50 mt-1 mb-2">NO. 8492039485721</div>
-          <div className={`font-mono text-[9px] opacity-40 text-center tracking-widest mt-1 border-t ${currentStyle.taglineColor} pt-2 w-full`}>
+          <div className="font-mono text-[10px] opacity-60 mt-1 mb-2 font-bold">{currentStyle.serialPrefix}</div>
+          <div className={`font-mono text-[9px] opacity-50 text-center tracking-widest mt-1 border-t ${currentStyle.taglineColor} pt-2 w-full`}>
             * 本档案结果仅供娱乐参考，请凭直觉执行
           </div>
         </div>
       </div>
 
       <div className="w-full mt-8 flex flex-col gap-4 pb-8">
-        <button onClick={handleSave} className={`w-full ${currentStyle.btnBg} py-4 rounded font-bold tracking-widest active:scale-[0.98] transition-all duration-300 shadow-lg`}>
-          长按保存专属车票
+        <button onClick={handleSave} className={`w-full ${currentStyle.btnBg} py-4 rounded font-bold tracking-[0.15em] text-base active:scale-[0.98] transition-all duration-300 shadow-[0_8px_25px_rgba(0,0,0,0.2)]`}>
+          保存 / 导出专属超清海报
         </button>
 
         <div className="flex justify-center gap-6 mt-1 mb-2 font-mono font-bold w-full">
