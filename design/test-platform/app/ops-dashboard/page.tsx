@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import { prisma } from '../../lib/prisma';
 import CodesTable from './CodesTable';
 import PVCard from './PVCard';
@@ -5,10 +6,50 @@ import PVCard from './PVCard';
 // 强制动态渲染（searchParams 依赖使然），但使用并发查询大幅提速
 export const dynamic = 'force-dynamic';
 
+function DashboardSkeleton() {
+  return (
+    <div className="animate-pulse">
+      {/* 标题骨架 */}
+      <div className="flex items-center justify-between mb-8">
+        <div>
+          <div className="h-3 w-32 bg-gray-200 rounded mb-2"/>
+          <div className="h-8 w-48 bg-gray-200 rounded"/>
+        </div>
+        <div className="hidden sm:block h-7 w-40 bg-gray-200 rounded-lg"/>
+      </div>
+      {/* 卡片组骨架 */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+        {[0,1,2].map(i => (
+          <div key={i} className="bg-gray-100/60 p-6 rounded-2xl h-36"/>
+        ))}
+      </div>
+      {/* 分析区骨架 */}
+      <div className="mb-12">
+        <div className="h-6 w-56 bg-gray-200 rounded mb-5"/>
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+          {[0,1,2,3].map(i => (
+            <div key={i} className="bg-gray-100/60 p-5 rounded-2xl h-24"/>
+          ))}
+        </div>
+      </div>
+      {/* 表格骨架 */}
+      <div className="bg-gray-100/60 rounded-2xl h-80"/>
+    </div>
+  );
+}
+
 export default async function AdminDashboard({ searchParams }: { searchParams: Promise<{ testId?: string }> }) {
   const resolvedSearchParams = await searchParams;
   const testId = resolvedSearchParams.testId || 'emotional-friction';
   
+  return (
+    <Suspense key={testId} fallback={<DashboardSkeleton />}>
+      <DashboardContent testId={testId} />
+    </Suspense>
+  );
+}
+
+async function DashboardContent({ testId }: { testId: string }) {
   // ✅ 性能优化：将所有独立 DB 查询并发执行，从串行改为并行
   // 原来：每个 await 依次排队，总耗时 = 所有查询之和
   // 现在：同时发起所有查询，总耗时 = 最慢单个查询的时间（快 3-5x）

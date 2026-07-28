@@ -221,14 +221,7 @@ export default function ResultReceipt({ result, userInfo, onRestart }: ResultRec
           </button>
       </div>
       
-      {/* 快捷返回大厅 */}
-      <button 
-        type="button"
-        onClick={() => router.push('/')} 
-        className="absolute top-4 left-4 text-[#888] text-xs hover:text-[#8A2B2B] focus-visible:underline transition-colors z-50 tracking-widest min-h-[44px] px-3 flex items-center cursor-pointer touch-manipulation"
-      >
-        [ 返回探索大厅 ]
-      </button>
+
 
       {showModal && (
           <div className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in">

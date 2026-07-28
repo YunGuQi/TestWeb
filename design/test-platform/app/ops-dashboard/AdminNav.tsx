@@ -127,18 +127,14 @@ export default function AdminNav() {
     params.set('testId', newTestId);
     const href = `${pathname}?${params.toString()}`;
     setNavigatingTo(href);
-    startTransition(() => {
-      router.push(href);
-    });
+    router.push(href);
   }, [searchParams, pathname, router]);
 
   const handleNavClick = useCallback((path: string) => {
     if (pathname === path) return;
     const href = buildHref(path);
     setNavigatingTo(href);
-    startTransition(() => {
-      router.push(href);
-    });
+    router.push(href);
   }, [pathname, buildHref, router]);
 
   // 悬停时预加载页面数据，按下前数据已经就序请在缓冲中
@@ -159,8 +155,15 @@ export default function AdminNav() {
       <div className="md:hidden flex flex-col w-full bg-white/80 backdrop-blur-md px-3 py-2 border-b border-black/10">
         <div className="flex items-center justify-between pb-2 border-b border-black/10">
           <div className="flex items-center gap-1.5">
-            <div className="w-6 h-6 rounded-md bg-emerald-100 text-emerald-700 flex items-center justify-center text-xs shadow-sm font-black">⚙️</div>
-            <span className="font-black text-sm tracking-tight text-black">ANAN OPS CONSOLE</span>
+            <button 
+              type="button" 
+              onClick={() => router.push('/')}
+              className="flex items-center gap-1 text-[10px] text-gray-600 bg-white border border-gray-300 px-1.5 py-0.5 rounded shadow-sm hover:bg-gray-50"
+            >
+              <span>🏠</span>返回大厅
+            </button>
+            <div className="w-6 h-6 rounded-md bg-emerald-100 text-emerald-700 flex items-center justify-center text-xs shadow-sm font-black ml-1">⚙️</div>
+            <span className="font-black text-[13px] tracking-tight text-black truncate max-w-[100px] sm:max-w-none">ANAN OPS</span>
           </div>
           <div className="w-44">
             <WorkspaceDropdown 
@@ -259,8 +262,16 @@ export default function AdminNav() {
         </nav>
         
         <div className="p-4 border-t border-[#EBEBEB]">
+          <button 
+            type="button" 
+            onClick={() => router.push('/')}
+            className="w-full flex items-center gap-3 px-3 py-2 text-sm text-[#787774] hover:bg-[#EBEBEB]/50 hover:text-[#37352F] rounded-md transition-colors mb-2 touch-manipulation cursor-pointer"
+          >
+            <span className="shrink-0 text-base">🏠</span>
+            <span className="font-bold tracking-wider">返回探索大厅</span>
+          </button>
           <div className="flex items-center gap-3 px-3 py-2 hover:bg-[#EBEBEB]/50 rounded-md cursor-pointer transition-colors">
-            <div className="w-6 h-6 rounded-full bg-gray-200 border border-gray-300"></div>
+            <div className="w-6 h-6 rounded-full bg-gray-200 border border-gray-300 shrink-0"></div>
             <span className="text-sm font-medium text-[#787774]">Admin</span>
           </div>
         </div>

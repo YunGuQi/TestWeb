@@ -68,33 +68,37 @@ export default function Home({ onStartTest, onRestoreHistory }: HomeProps) {
                       <span>EST. / 状态</span>
                   </div>
                   <div className="space-y-2.5 text-[11px] font-bold text-gray-900">
-                      <div className="flex justify-between items-center">
-                          <span className="flex items-center gap-1.5">
-                              <span className="bg-black text-white px-1 py-0.5 text-[10px]">Sen</span>
-                              <span>敏感税 (替人情绪买单)</span>
+                      <div className="flex items-center w-full">
+                          <span className="flex items-center gap-1.5 shrink-0">
+                              <span className="bg-black text-white px-1 py-0.5 text-[10px] shrink-0">Sen</span>
+                              <span className="whitespace-nowrap">敏感税 (替人情绪买单)</span>
                           </span>
-                          <span className="font-mono text-gray-500">........... [PENDING]</span>
+                          <span className="flex-1 mx-2 border-b-[2px] border-dotted border-gray-400 mt-2 mb-1"></span>
+                          <span className="font-mono text-gray-500 shrink-0 whitespace-nowrap">[PENDING]</span>
                       </div>
-                      <div className="flex justify-between items-center">
-                          <span className="flex items-center gap-1.5">
-                              <span className="bg-black text-white px-1 py-0.5 text-[10px]">Rum</span>
-                              <span>反刍税 (深夜后悔内耗)</span>
+                      <div className="flex items-center w-full">
+                          <span className="flex items-center gap-1.5 shrink-0">
+                              <span className="bg-black text-white px-1 py-0.5 text-[10px] shrink-0">Rum</span>
+                              <span className="whitespace-nowrap">反刍税 (深夜后悔内耗)</span>
                           </span>
-                          <span className="font-mono text-gray-500">........... [PENDING]</span>
+                          <span className="flex-1 mx-2 border-b-[2px] border-dotted border-gray-400 mt-2 mb-1"></span>
+                          <span className="font-mono text-gray-500 shrink-0 whitespace-nowrap">[PENDING]</span>
                       </div>
-                      <div className="flex justify-between items-center">
-                          <span className="flex items-center gap-1.5">
-                              <span className="bg-black text-white px-1 py-0.5 text-[10px]">Pls</span>
-                              <span>讨好税 (高额认可支出)</span>
+                      <div className="flex items-center w-full">
+                          <span className="flex items-center gap-1.5 shrink-0">
+                              <span className="bg-black text-white px-1 py-0.5 text-[10px] shrink-0">Pls</span>
+                              <span className="whitespace-nowrap">讨好税 (高额认可支出)</span>
                           </span>
-                          <span className="font-mono text-gray-500">........... [PENDING]</span>
+                          <span className="flex-1 mx-2 border-b-[2px] border-dotted border-gray-400 mt-2 mb-1"></span>
+                          <span className="font-mono text-gray-500 shrink-0 whitespace-nowrap">[PENDING]</span>
                       </div>
-                      <div className="flex justify-between items-center">
-                          <span className="flex items-center gap-1.5">
-                              <span className="bg-black text-white px-1 py-0.5 text-[10px]">Bnd</span>
-                              <span>边界税 (原则底线折旧)</span>
+                      <div className="flex items-center w-full">
+                          <span className="flex items-center gap-1.5 shrink-0">
+                              <span className="bg-black text-white px-1 py-0.5 text-[10px] shrink-0">Bnd</span>
+                              <span className="whitespace-nowrap">边界税 (原则底线折旧)</span>
                           </span>
-                          <span className="font-mono text-gray-500">........... [PENDING]</span>
+                          <span className="flex-1 mx-2 border-b-[2px] border-dotted border-gray-400 mt-2 mb-1"></span>
+                          <span className="font-mono text-gray-500 shrink-0 whitespace-nowrap">[PENDING]</span>
                       </div>
                   </div>
                   <div className="border-t-2 border-dashed border-black mt-4 pt-2 text-[10px] font-bold text-gray-500 flex justify-between items-center">
