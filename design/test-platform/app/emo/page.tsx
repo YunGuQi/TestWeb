@@ -47,7 +47,7 @@ export default function App() {
   };
 
   return (
-    <div className="brutalist-theme flex flex-col min-h-[100dvh]">
+    <div className="brutalist-theme flex flex-col min-h-[100dvh] relative overflow-x-hidden selection:bg-red-600 selection:text-white">
       <BackgroundLayers />
       
       {currentView === 'home' && (

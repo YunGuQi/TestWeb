@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { results } from '../lib/data';
+import { results } from '../../../lib/data';
 import * as htmlToImage from 'html-to-image';
 
 const DanmakuOverlay = ({ danmakuList, isHidden, speedPct, opacityPct }: { danmakuList: string[], isHidden: boolean, speedPct: number, opacityPct: number }) => {
@@ -134,11 +134,10 @@ export default function ResultReceipt({ result, onRestart, forcedUnlock }: Resul
 
     setTimeout(() => {
       const node = receiptRef.current;
-      const width = node.offsetWidth;
-      const height = node.offsetHeight;
-      htmlToImage.toJpeg(node, { 
+      if (!node) return;
+      htmlToImage.toPng(node, { 
         quality: 1, 
-        pixelRatio: window.devicePixelRatio ? window.devicePixelRatio * 2 : 2,
+        pixelRatio: 3,
         backgroundColor: '#fdfdfd',
         cacheBust: true,
         style: {
@@ -148,7 +147,7 @@ export default function ResultReceipt({ result, onRestart, forcedUnlock }: Resul
       })
         .then((dataUrl) => {
           const link = document.createElement('a');
-          link.download = `深度情绪内耗账单_${Date.now()}.jpg`;
+          link.download = `深度情绪内耗明细小票_${Date.now()}.png`;
           link.href = dataUrl;
           link.click();
           if (saveBtn) saveBtn.innerText = '保存成功！';
@@ -162,7 +161,7 @@ export default function ResultReceipt({ result, onRestart, forcedUnlock }: Resul
           if (saveBtn) saveBtn.innerText = '保存失败，请重试';
           setIsGeneratingImage(false);
         });
-    }, 100);
+    }, 150);
   };
 
   const currentDanmakuList = danmakuConfig.content[result.key] && danmakuConfig.content[result.key].length > 0 
@@ -182,9 +181,17 @@ export default function ResultReceipt({ result, onRestart, forcedUnlock }: Resul
             <div ref={receiptRef} className="pr-2 pb-2 w-full max-w-[380px] mx-auto flex flex-col items-center relative z-20 mb-4 mt-2">
                 <div id="poster-container" className="w-full flex flex-col relative z-20 pt-0 bg-black border-2 border-black shadow-[8px_8px_0px_#000]">
                 <div className="receipt-top shrink-0"></div>
-                <div className="receipt-paper px-6 py-4 flex-1 flex flex-col relative overflow-hidden">
+                <div className="receipt-paper px-6 py-5 flex-1 flex flex-col relative overflow-hidden bg-[#fefdfb]">
+                    {/* 红色防伪出纳印戳 PAID IN FULL */}
+                    <div className="absolute top-4 right-3 transform rotate-12 border-4 border-red-600 text-red-600 px-2.5 py-1 font-mono text-[10px] font-black uppercase tracking-widest pointer-events-none opacity-90 shadow-sm flex flex-col items-center leading-none z-30">
+                        <span>PAID IN FULL</span>
+                        <span className="text-[11px] my-0.5 border-t border-b border-red-600 w-full text-center py-0.5 font-sans font-bold">已全额扣缴</span>
+                        <span className="text-[8px]">EMO-TAX 2024</span>
+                    </div>
+
                     <div className="text-center font-mono mb-4 shrink-0">
-                        <h2 className="text-2xl font-black mb-1 tracking-widest text-black">消费结账单</h2>
+                        <div className="text-[10px] text-gray-400 uppercase tracking-widest mb-1">=== THERMAL CHECKOUT ===</div>
+                        <h2 className="text-2xl font-black mb-1 tracking-widest text-black">情绪消费结账单</h2>
                         <p className="text-xs uppercase font-bold text-gray-600">--- EMOTIONAL RECEIPT ---</p>
                         <div className="text-xs text-black mt-2 font-bold bg-gray-100 py-1 inline-block px-3 border border-dashed border-gray-400" id="rank-text">
                            你是第 {danmakuConfig.pv} 个结账完成的顾客
@@ -195,13 +202,13 @@ export default function ResultReceipt({ result, onRestart, forcedUnlock }: Resul
                     
                     <div className="text-center mb-4 mt-2">
                         <div className="text-sm font-bold text-gray-600 mb-1">鉴定结果</div>
-                        <div className="text-2xl font-black bg-black text-white py-2 px-4 inline-block transform -rotate-1" id="res-title">
+                        <div className="text-2xl font-black bg-black text-white py-2 px-4 inline-block transform -rotate-1 shadow-sm" id="res-title">
                             {result.title}
                         </div>
                     </div>
                     <div className="flex flex-wrap justify-center gap-2 mb-4" id="res-tags">
                         {result.tags.split(',').map(tag => (
-                          <span key={tag} className="text-[10px] bg-black text-white px-2 py-1 font-bold">{tag}</span>
+                          <span key={tag} className="text-[10px] bg-black text-white px-2.5 py-1 font-bold">{tag}</span>
                         ))}
                     </div>
                     <div className="border-b-2 border-dashed border-gray-400 mb-4"></div>
