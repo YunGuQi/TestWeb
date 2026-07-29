@@ -1,16 +1,25 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '../../../../lib/prisma';
+import { CITY_QUESTIONS_FALLBACK, CITY_RESULTS_FALLBACK } from '../../../../lib/city-fallback';
 
 export async function POST(req: Request) {
   try {
     const { answers, deviceId } = await req.json(); 
     
-    // 1. Fetch questions from DB
-    const questions = await prisma.question.findMany({
-      where: { testId: 'city-personality' },
-      orderBy: { order: 'asc' },
-      include: { options: true }
-    });
+    // 1. 优先从数据库查询题目，若连通失败或无记录，使用本地常数题库兜底
+    let questions: any[] = [];
+    try {
+      questions = await prisma.question.findMany({
+        where: { testId: 'city-personality' },
+        orderBy: { order: 'asc' },
+        include: { options: true }
+      });
+    } catch (e) {
+      console.warn('DB error reading city questions during submit, fallback to local.');
+    }
+    if (!questions || questions.length === 0) {
+      questions = CITY_QUESTIONS_FALLBACK;
+    }
 
     // 2. Calculate coordinates
     let userCoords = [5, 5, 5, 5, 5]; // Default coords for rhythm, env, temp, social, taste
@@ -19,7 +28,9 @@ export async function POST(req: Request) {
         const q = questions[qIndex];
         if (q && q.options[optIndex]) {
           try {
-            const scoresObj = JSON.parse(q.options[optIndex].scores);
+            const scoresObj = typeof q.options[optIndex].scores === 'string' 
+              ? JSON.parse(q.options[optIndex].scores) 
+              : q.options[optIndex].scores;
             // The mapping is rhythm, env, temp, social, taste
             const delta = [
               scoresObj.rhythm || 0,
@@ -34,10 +45,20 @@ export async function POST(req: Request) {
       });
     }
 
-    // 3. Find closest city
-    const allCities = await prisma.resultConfig.findMany({ where: { testId: 'city-personality' } });
+    // 3. 优先从数据库寻找城市结果，若无则本地结果库兜底
+    let allCities: any[] = [];
+    try {
+      allCities = await prisma.resultConfig.findMany({ where: { testId: 'city-personality' } });
+    } catch (e) {
+      console.warn('DB error reading city results, fallback to local.');
+    }
+    if (!allCities || allCities.length === 0) {
+      allCities = CITY_RESULTS_FALLBACK;
+    }
+
     let minDistance = Infinity;
     let closestCity = null;
+
 
     allCities.forEach((cityObj) => {
       try {
@@ -65,6 +86,22 @@ export async function POST(req: Request) {
         }
       } catch(e) {}
     });
+
+    // 终极安全防范：若没选或匹配计算为空，使用默认工业先锋城市进行完美静态结果返回
+    if (!closestCity) {
+      const fbObj = CITY_RESULTS_FALLBACK[0];
+      const extra = JSON.parse(fbObj.condition);
+      closestCity = {
+        id: extra.id,
+        name: extra.name,
+        title: fbObj.title,
+        desc: fbObj.desc,
+        quote: fbObj.quote,
+        theme: extra.theme,
+        tags: ["效率第一", "不眠城市"],
+        coords: extra.coords
+      };
+    }
 
     // 4. Save to TestRecord first so count is updated
     let recordCount = 1;

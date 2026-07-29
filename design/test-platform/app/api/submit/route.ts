@@ -189,9 +189,14 @@ export async function POST(request: Request) {
 
     // 5. 获取具体结论文本
     const fallbackRes = results.find(r => r.key === resultKey) || results[0];
-    let resConfig = await prisma.resultConfig.findFirst({
-      where: { condition: resultKey, testId }
-    });
+    let resConfig = null;
+    try {
+      resConfig = await prisma.resultConfig.findFirst({
+        where: { condition: resultKey, testId }
+      });
+    } catch (e) {
+      console.warn('DB error reading emo resultConfig, fallback to local data.');
+    }
 
     const finalResult = {
       id: resConfig?.id || 1,
@@ -209,21 +214,28 @@ export async function POST(request: Request) {
       billItems
     };
 
-    // 6. 持久化存入 TestRecord
-    const record = await prisma.testRecord.create({
-      data: {
-        testId,
-        deviceId: deviceId || 'unknown',
-        answers: JSON.stringify(answers),
-        resultId: finalResult.id
-      }
-    });
+    // 6. 持久化存入 TestRecord (断网容灾)
+    let recordId: string | number = 1;
+    try {
+      const record = await prisma.testRecord.create({
+        data: {
+          testId,
+          deviceId: deviceId || 'unknown',
+          answers: JSON.stringify(answers),
+          resultId: finalResult.id
+        }
+      });
+      recordId = record.id;
+    } catch (e) {
+      console.warn('DB error creating testRecord, skipping offline.');
+    }
 
     return NextResponse.json({
       success: true,
-      recordId: record.id,
+      recordId: recordId,
       result: finalResult
     });
+
   } catch (error: any) {
     console.error('Submit error:', error);
     return NextResponse.json({ success: false, error: '提交失败: ' + (error.message || '') }, { status: 500 });

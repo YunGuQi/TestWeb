@@ -1,0 +1,28 @@
+{
+  "envId": "test-backend-d8grj1s21652da209",
+  "framework": {
+    "name": "emotional-friction-test",
+    "plugins": {
+      "server": {
+        "use": "@cloudbase/framework-plugin-container",
+        "inputs": {
+          "serviceName": "emotional-friction",
+          "servicePath": "/",
+          "localAbsolutePath": "./",
+          "uploadType": "package",
+          "containerPort": 80,
+          "cpu": 0.5,
+          "mem": 1,
+          "minNum": 0,
+          "maxNum": 10,
+          "policyType": "cpu",
+          "policyThreshold": 60,
+          "envVariables": {}
+        }
+      }
+    }
+  },
+  "cloudrun": {
+    "name": "emotional-friction-test"
+  }
+}

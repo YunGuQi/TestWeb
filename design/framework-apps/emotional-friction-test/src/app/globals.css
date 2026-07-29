@@ -1,0 +1,120 @@
+@import "tailwindcss";
+
+@theme {
+  --color-brand: #000000;
+  --color-brand-dark: #333333;
+  --font-mono: "JetBrains Mono", "Courier New", Courier, monospace;
+}
+
+@layer base {
+  body {
+    background-color: #1c1c1e;
+    color: #f4f4f5;
+    overflow-x: hidden;
+    -webkit-tap-highlight-color: transparent;
+    /* Dotted background */
+    background-image: radial-gradient(#ffffff 0.5px, transparent 0.5px), radial-gradient(#ffffff 0.5px, #1c1c1e 0.5px);
+    background-size: 20px 20px;
+    background-position: 0 0, 10px 10px;
+    background-attachment: fixed;
+    background-blend-mode: multiply;
+  }
+}
+
+@layer utilities {
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .scroll-snap-x {
+    scroll-snap-type: x mandatory;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .scroll-snap-x::-webkit-scrollbar {
+    display: none;
+  }
+  .snap-center {
+    scroll-snap-align: center;
+  }
+  
+  /* Brutalist Button */
+  .brutalist-btn {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 1rem 1.5rem;
+    background-color: white;
+    color: black;
+    font-weight: bold;
+    font-size: 1.125rem;
+    border: 2px solid black;
+    transition: all 0.1s;
+    box-shadow: 4px 4px 0px #000;
+  }
+  .brutalist-btn:active {
+    box-shadow: 0px 0px 0px #000;
+    transform: translate(4px, 4px);
+  }
+
+  .brutalist-card {
+    border: 4px solid white;
+    background-color: white;
+    color: black;
+    box-shadow: 8px 8px 0px #000;
+  }
+  
+  /* Option Button */
+  .option-btn {
+    width: 100%;
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.1s;
+    background-color: white;
+    color: black;
+    border: 2px solid black;
+    padding: 1rem;
+    box-shadow: 4px 4px 0px #000;
+  }
+  .option-btn:active {
+    box-shadow: 0px 0px 0px #000;
+    transform: translate(4px, 4px);
+  }
+  .option-btn.selected {
+    background-color: black;
+    color: white;
+  }
+
+  /* Receipt Paper Physics */
+  .receipt-container {
+    filter: drop-shadow(0 15px 25px rgba(0,0,0,0.5));
+  }
+  
+  .receipt-paper {
+    background-color: #fdfdfd;
+    color: #000;
+    position: relative;
+    /* subtle noise for thermal paper texture */
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.03'/%3E%3C/svg%3E");
+  }
+
+  .receipt-top {
+    height: 10px;
+    background: radial-gradient(circle at 50% 0%, transparent 5px, #fdfdfd 6px);
+    background-size: 12px 10px;
+    width: 100%;
+  }
+  .receipt-bottom {
+    height: 10px;
+    background: radial-gradient(circle at 50% 100%, transparent 5px, #fdfdfd 6px);
+    background-size: 12px 10px;
+    width: 100%;
+  }
+
+  .text-justify {
+    text-align: justify;
+  }
+}

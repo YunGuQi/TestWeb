@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '../../../lib/prisma';
 import { destinyLoverQuestions } from '../../../lib/destiny-lover-data';
+import { questions as emoQuestions } from '../../../lib/data';
 
 export const dynamic = 'force-dynamic';
 
@@ -24,10 +25,16 @@ export async function GET(request: Request) {
       console.warn('DB connect failed for questions, attempting fallback if available.');
     }
 
-    // 默认优先从数据库动态获取；当且仅当数据库尚未准备好或本地断网连不通云端服务器时，对命定恋人开启本地最新防套路常备常数容灾
-    if ((!questions || questions.length === 0) && testId === 'destiny-lover') {
-      return NextResponse.json({ success: true, questions: destinyLoverQuestions });
+    // 默认优先从数据库动态获取；当且仅当数据库尚未准备好或本地断网连不通云端服务器时，开启不同测评项目的本地常数兜底
+    if (!questions || questions.length === 0) {
+      if (testId === 'destiny-lover') {
+        return NextResponse.json({ success: true, questions: destinyLoverQuestions });
+      }
+      if (testId === 'emotional-friction') {
+        return NextResponse.json({ success: true, questions: emoQuestions });
+      }
     }
+
 
     const formattedQuestions = questions.map(q => ({
       id: q.id.toString(), // 兼容字符串与自增ID

@@ -1,0 +1,33 @@
+{
+  "envId": "test-backend-d8grj1s21652da209",
+  "framework": {
+    "name": "shared-backend",
+    "plugins": {
+      "server": {
+        "use": "@cloudbase/framework-plugin-container",
+        "inputs": {
+          "serviceName": "shared-backend",
+          "servicePath": "/",
+          "localAbsolutePath": "./",
+          "uploadType": "package",
+          "containerPort": 80,
+          "cpu": 0.5,
+          "mem": 1,
+          "minNum": 0,
+          "maxNum": 10,
+          "policyType": "cpu",
+          "policyThreshold": 60,
+          "envVariables": {}
+        }
+      }
+    }
+  },
+  "cloudrun": {
+    "name": "shared-backend"
+  },
+  "functionRoot": "./functions",
+  "functions": [],
+  "ai": {
+    "defaultAgent": "{{env.AI_DEFAULT_AGENT}}"
+  }
+}

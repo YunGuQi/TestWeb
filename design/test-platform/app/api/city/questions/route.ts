@@ -1,13 +1,24 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '../../../../lib/prisma';
+import { CITY_QUESTIONS_FALLBACK } from '../../../../lib/city-fallback';
 
 export async function GET() {
   try {
-    const questions = await prisma.question.findMany({
-      where: { testId: 'city-personality' },
-      orderBy: { order: 'asc' },
-      include: { options: true }
-    });
+    let questions: any[] = [];
+    try {
+      questions = await prisma.question.findMany({
+        where: { testId: 'city-personality' },
+        orderBy: { order: 'asc' },
+        include: { options: true }
+      });
+    } catch (dbError) {
+      console.warn('DB read failed for city questions, using local fallback.');
+    }
+
+    if (!questions || questions.length === 0) {
+      questions = CITY_QUESTIONS_FALLBACK;
+    }
+
 
     const safeQuestions = questions.map((q: any) => ({
       text: q.text,
