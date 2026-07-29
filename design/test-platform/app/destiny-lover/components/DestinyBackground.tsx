@@ -58,7 +58,7 @@ export default function DestinyBackground({ children }: DestinyBackgroundProps) 
 
       {/* 2. 90秒自转仿古天象因缘命盘暗纹 (Astral Stamp) */}
       <div
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[760px] h-[760px] md:w-[960px] md:h-[960px] pointer-events-none opacity-[0.14] z-0 flex items-center justify-center"
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[780px] h-[780px] md:w-[980px] md:h-[980px] pointer-events-none opacity-[0.32] z-0 flex items-center justify-center"
         style={{
           transform: `translate(calc(-50% + ${mousePos.x * -0.4}px), calc(-50% + ${mousePos.y * -0.4}px))`,
           transition: 'transform 0.1s ease-out',
@@ -71,21 +71,21 @@ export default function DestinyBackground({ children }: DestinyBackgroundProps) 
           stroke="currentColor"
         >
           {/* 最外侧十二时辰/天星仪虚线圆 */}
-          <circle cx="300" cy="300" r="280" strokeWidth="0.8" strokeDasharray="6 8" />
-          <circle cx="300" cy="300" r="240" strokeWidth="1" />
-          <circle cx="300" cy="300" r="200" strokeWidth="1.2" strokeDasharray="3 9" />
-          <circle cx="300" cy="300" r="140" strokeWidth="0.8" />
-          <circle cx="300" cy="300" r="80" strokeWidth="1" strokeDasharray="2 4" />
+          <circle cx="300" cy="300" r="280" strokeWidth="1" strokeDasharray="6 8" />
+          <circle cx="300" cy="300" r="240" strokeWidth="1.2" />
+          <circle cx="300" cy="300" r="200" strokeWidth="1.5" strokeDasharray="3 9" />
+          <circle cx="300" cy="300" r="140" strokeWidth="1" />
+          <circle cx="300" cy="300" r="80" strokeWidth="1.2" strokeDasharray="2 4" />
           {/* 八方乾坤连线 */}
           <path
             d="M300 20 L300 580 M20 300 L580 300 M102 102 L498 498 M102 498 L498 102"
-            strokeWidth="0.5"
-            opacity="0.6"
+            strokeWidth="0.8"
+            opacity="0.75"
           />
           {/* 古典几何星相菱格 */}
           <polygon
             points="300,50 330,280 550,300 330,320 300,550 270,320 50,300 270,280"
-            strokeWidth="0.8"
+            strokeWidth="1.2"
             fill="none"
           />
         </svg>
@@ -93,7 +93,7 @@ export default function DestinyBackground({ children }: DestinyBackgroundProps) 
 
       {/* 3. 宿命牵连 · 月老朱砂因缘红绳 (Crimson Cord SVG，带精细视差偏转) */}
       <div
-        className="absolute inset-0 pointer-events-none opacity-45 z-0 flex items-center justify-center"
+        className="absolute inset-0 pointer-events-none opacity-85 z-0 flex items-center justify-center"
         style={{
           transform: `translate(${mousePos.x * 0.8}px, ${mousePos.y * 0.8}px)`,
         }}
@@ -103,19 +103,19 @@ export default function DestinyBackground({ children }: DestinyBackgroundProps) 
           <path
             d="M-100,180 C320,380 680,60 1560,580"
             stroke="#B93A32"
-            strokeWidth="1.6"
+            strokeWidth="2.2"
             strokeDasharray="8 6"
           />
           {/* 交互缠绕交叉细纹 */}
           <path
             d="M-40,760 C440,540 960,860 1520,120"
             stroke="#B93A32"
-            strokeWidth="1.2"
-            opacity="0.75"
+            strokeWidth="1.6"
+            opacity="0.9"
           />
           {/* 红绳端点节点印斑 */}
-          <circle cx="320" cy="275" r="3.5" fill="#B93A32" opacity="0.6" />
-          <circle cx="1080" cy="565" r="3.5" fill="#B93A32" opacity="0.6" />
+          <circle cx="320" cy="275" r="5" fill="#B93A32" opacity="0.8" />
+          <circle cx="1080" cy="565" r="5" fill="#B93A32" opacity="0.8" />
         </svg>
       </div>
 

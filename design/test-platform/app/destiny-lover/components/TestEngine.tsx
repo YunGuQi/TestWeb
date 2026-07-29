@@ -51,7 +51,7 @@ export default function TestEngine({ userInfo, onBack, onFinish }: TestEnginePro
 
   if (isFetching) {
     return (
-      <main className="flex-1 flex flex-col justify-center items-center h-full relative z-10 p-4" style={{ backgroundColor: '#F4F1EA' }}>
+      <main className="flex-1 flex flex-col justify-center items-center h-full relative z-10 p-4 bg-transparent">
          <div className="w-12 h-12 border-4 border-[#B93A32] border-t-transparent rounded-full animate-spin mx-auto mb-6"></div>
          <p className="text-[#5A524A] font-serif tracking-widest text-sm">翻开姻缘簿中...</p>
       </main>
@@ -124,7 +124,7 @@ export default function TestEngine({ userInfo, onBack, onFinish }: TestEnginePro
 
   if (isLoading) {
     return (
-      <main className="flex-1 flex flex-col justify-center items-center h-full relative z-10 p-4 transition-colors duration-700" style={{ backgroundColor: currentBgColor }}>
+      <main className="flex-1 flex flex-col justify-center items-center h-full relative z-10 p-4 transition-colors duration-700 bg-transparent">
          <div className="w-16 h-16 border-2 border-[#B93A32] rounded-full flex items-center justify-center mb-6 animate-pulse opacity-80">
             <span className="text-[#B93A32] text-sm font-bold tracking-widest text-center">推演<br/>天机</span>
          </div>
@@ -134,30 +134,11 @@ export default function TestEngine({ userInfo, onBack, onFinish }: TestEnginePro
   }
 
   return (
-    <main 
-      className="flex-1 flex flex-col mx-auto w-full relative z-10 min-h-[100dvh] transition-colors duration-700 ease-in-out overflow-hidden"
-      style={{ backgroundColor: currentBgColor }}
-    >
-        {/* === 背景层 1：竖向书卷线条（与首页保持一致的视觉系统） === */}
-        <div className="absolute inset-0 pointer-events-none" style={{
-          backgroundImage: 'repeating-linear-gradient(90deg, rgba(100,75,55,0.06) 0px, transparent 1px, transparent 36px)',
-          backgroundSize: '36px 100%'
-        }}/>
-
-        {/* === 背景层 2：朱砂晕染（右上角，始终存在，增加命定感） === */}
-        <div className="absolute pointer-events-none" style={{
-          top: '-60px', right: '-60px',
-          width: '300px', height: '300px',
-          background: 'radial-gradient(circle, rgba(185,58,50,0.10) 0%, rgba(185,58,50,0.04) 40%, transparent 70%)',
-          transform: 'translate3d(0,0,0)',
-        }}/>
-
-        {/* === 背景层 3：点阵底纹（继承首页系统） === */}
-        <div className="absolute inset-0 pointer-events-none" style={{ backgroundImage: 'radial-gradient(rgba(44,40,37,0.18) 1px, transparent 1px)', backgroundSize: '28px 28px', opacity: 0.08 }}/>
-
+    <main className="flex-1 flex flex-col mx-auto w-full relative z-10 min-h-[100dvh] transition-colors duration-700 ease-in-out overflow-hidden bg-transparent">
         {/* 顶部进度条区 */}
         <div className="w-full max-w-md mx-auto p-6 flex flex-col relative z-20">
             <div className="flex items-center justify-between mb-4">
+
                 <button onClick={() => setShowExitModal(true)} className="text-[#8C847A] hover:text-[#B93A32] transition-colors flex items-center gap-1 font-serif text-sm cursor-pointer tracking-wider">
                     <span className="text-lg leading-none mb-1">←</span> 首页
                 </button>
