@@ -10,8 +10,8 @@ export const destinyLoverQuestions = [
   {
     id: "q2", text: "周末出去约会，你通常更喜欢：",
     options: [
-      { id: "o2_1", text: "对方已经做好了完美的攻略，我只要跟着走就行。", scores: { L: 1, G: 0, D: 0, S: 0, A: 0, C: 0, R: 0, P: 0 } },
-      { id: "o2_2", text: "两个人一起商量，或者随性一点走到哪算哪。", scores: { L: 0, G: 1, D: 0, S: 0, A: 0, C: 0, R: 0, P: 0 } }
+      { id: "o2_1", text: "两个人一起商量，或者随性一点走到哪算哪。", scores: { L: 0, G: 1, D: 0, S: 0, A: 0, C: 0, R: 0, P: 0 } },
+      { id: "o2_2", text: "对方已经做好了完美的攻略，我只要跟着走就行。", scores: { L: 1, G: 0, D: 0, S: 0, A: 0, C: 0, R: 0, P: 0 } }
     ]
   },
   {
@@ -24,8 +24,8 @@ export const destinyLoverQuestions = [
   {
     id: "q4", text: "当你们对某件事产生分歧时，你倾向的解决方式是：",
     options: [
-      { id: "o4_1", text: "听有理的一方，只要 TA 能说服我，我就听 TA 的。", scores: { L: 1, G: 0, D: 0, S: 0, A: 0, C: 0, R: 0, P: 0 } },
-      { id: "o4_2", text: "先照顾彼此的感受，互相妥协找个折中方案。", scores: { L: 0, G: 1, D: 0, S: 0, A: 0, C: 0, R: 0, P: 0 } }
+      { id: "o4_1", text: "先照顾彼此的感受，互相妥协找个折中方案。", scores: { L: 0, G: 1, D: 0, S: 0, A: 0, C: 0, R: 0, P: 0 } },
+      { id: "o4_2", text: "听有理的一方，只要 TA 能说服我，我就听 TA 的。", scores: { L: 1, G: 0, D: 0, S: 0, A: 0, C: 0, R: 0, P: 0 } }
     ]
   },
   {
@@ -40,8 +40,8 @@ export const destinyLoverQuestions = [
   {
     id: "q6", text: "对方做什么会让你瞬间心动？",
     options: [
-      { id: "o6_1", text: "大方地当众表达对我的偏爱，从不掩饰。", scores: { L: 0, G: 0, D: 1, S: 0, A: 0, C: 0, R: 0, P: 0 } },
-      { id: "o6_2", text: "悄悄记住了我随口提过的小喜好，并给了我惊喜。", scores: { L: 0, G: 0, D: 0, S: 1, A: 0, C: 0, R: 0, P: 0 } }
+      { id: "o6_1", text: "悄悄记住了我随口提过的小喜好，并给了我惊喜。", scores: { L: 0, G: 0, D: 0, S: 1, A: 0, C: 0, R: 0, P: 0 } },
+      { id: "o6_2", text: "大方地当众表达对我的偏爱，从不掩饰。", scores: { L: 0, G: 0, D: 1, S: 0, A: 0, C: 0, R: 0, P: 0 } }
     ]
   },
   {
@@ -54,8 +54,8 @@ export const destinyLoverQuestions = [
   {
     id: "q8", text: "对于“我爱你”这句话，你的态度是：",
     options: [
-      { id: "o8_1", text: "爱就要大声说出来，每天听都不会腻。", scores: { L: 0, G: 0, D: 1, S: 0, A: 0, C: 0, R: 0, P: 0 } },
-      { id: "o8_2", text: "说不说无所谓，只要行动上能让我感觉到就行。", scores: { L: 0, G: 0, D: 0, S: 1, A: 0, C: 0, R: 0, P: 0 } }
+      { id: "o8_1", text: "说不说无所谓，只要行动上能让我感觉到就行。", scores: { L: 0, G: 0, D: 0, S: 1, A: 0, C: 0, R: 0, P: 0 } },
+      { id: "o8_2", text: "爱就要大声说出来，每天听都不会腻。", scores: { L: 0, G: 0, D: 1, S: 0, A: 0, C: 0, R: 0, P: 0 } }
     ]
   },
   {
@@ -68,8 +68,8 @@ export const destinyLoverQuestions = [
   {
     id: "q10", text: "如果对方想送你礼物，你更希望：",
     options: [
-      { id: "o10_1", text: "直接问我最近想要什么，然后给我买。", scores: { L: 0, G: 0, D: 1, S: 0, A: 0, C: 0, R: 0, P: 0 } },
-      { id: "o10_2", text: "通过平时的观察，偷偷准备一个我觉得很实用的东西。", scores: { L: 0, G: 0, D: 0, S: 1, A: 0, C: 0, R: 0, P: 0 } }
+      { id: "o10_1", text: "通过平时的观察，偷偷准备一个我觉得很实用的东西。", scores: { L: 0, G: 0, D: 0, S: 1, A: 0, C: 0, R: 0, P: 0 } },
+      { id: "o10_2", text: "直接问我最近想要什么，然后给我买。", scores: { L: 0, G: 0, D: 1, S: 0, A: 0, C: 0, R: 0, P: 0 } }
     ]
   },
 
@@ -77,8 +77,8 @@ export const destinyLoverQuestions = [
   {
     id: "q11", text: "难得的小长假，你们更可能怎么度过？",
     options: [
-      { id: "o11_1", text: "去一个没去过的城市旅行，体验当地的风土人情。", scores: { L: 0, G: 0, D: 0, S: 0, A: 1, C: 0, R: 0, P: 0 } },
-      { id: "o11_2", text: "窝在家里看电影、做饭，享受只有两个人的慢时光。", scores: { L: 0, G: 0, D: 0, S: 0, A: 0, C: 1, R: 0, P: 0 } }
+      { id: "o11_1", text: "窝在家里看电影、做饭，享受只有两个人的慢时光。", scores: { L: 0, G: 0, D: 0, S: 0, A: 0, C: 1, R: 0, P: 0 } },
+      { id: "o11_2", text: "去一个没去过的城市旅行，体验当地的风土人情。", scores: { L: 0, G: 0, D: 0, S: 0, A: 1, C: 0, R: 0, P: 0 } }
     ]
   },
   {
@@ -91,8 +91,8 @@ export const destinyLoverQuestions = [
   {
     id: "q13", text: "你向往的约会场景更偏向：",
     options: [
-      { id: "o13_1", text: "去游乐园玩过山车、去听livehouse、或者去滑雪。", scores: { L: 0, G: 0, D: 0, S: 0, A: 1, C: 0, R: 0, P: 0 } },
-      { id: "o13_2", text: "去安静的咖啡馆待一下午，或者一起逛逛宜家。", scores: { L: 0, G: 0, D: 0, S: 0, A: 0, C: 1, R: 0, P: 0 } }
+      { id: "o13_1", text: "去安静的咖啡馆待一下午，或者一起逛逛宜家。", scores: { L: 0, G: 0, D: 0, S: 0, A: 0, C: 1, R: 0, P: 0 } },
+      { id: "o13_2", text: "去游乐园玩过山车、去听livehouse、或者去滑雪。", scores: { L: 0, G: 0, D: 0, S: 0, A: 1, C: 0, R: 0, P: 0 } }
     ]
   },
   {
@@ -105,8 +105,8 @@ export const destinyLoverQuestions = [
   {
     id: "q15", text: "面对生活中突然出现的变化（比如突然下大雨），你希望对方：",
     options: [
-      { id: "o15_1", text: "觉得很刺激，拉着你在雨中狂奔或者立刻找个有趣的地方避雨。", scores: { L: 0, G: 0, D: 0, S: 0, A: 1, C: 0, R: 0, P: 0 } },
-      { id: "o15_2", text: "马上拿出备用伞，或者带你去买热饮驱寒。", scores: { L: 0, G: 0, D: 0, S: 0, A: 0, C: 1, R: 0, P: 0 } }
+      { id: "o15_1", text: "马上拿出备用伞，或者带你去买热饮驱寒。", scores: { L: 0, G: 0, D: 0, S: 0, A: 0, C: 1, R: 0, P: 0 } },
+      { id: "o15_2", text: "觉得很刺激，拉着你在雨中狂奔或者立刻找个有趣的地方避雨。", scores: { L: 0, G: 0, D: 0, S: 0, A: 1, C: 0, R: 0, P: 0 } }
     ]
   },
 
@@ -121,8 +121,8 @@ export const destinyLoverQuestions = [
   {
     id: "q17", text: "你觉得维系一段长久关系，最重要的是：",
     options: [
-      { id: "o17_1", text: "始终保持心动的感觉和精神上的共鸣。", scores: { L: 0, G: 0, D: 0, S: 0, A: 0, C: 0, R: 1, P: 0 } },
-      { id: "o17_2", text: "生活步调一致，能把日子过得安稳妥帖。", scores: { L: 0, G: 0, D: 0, S: 0, A: 0, C: 0, R: 0, P: 1 } }
+      { id: "o17_1", text: "生活步调一致，能把日子过得安稳妥帖。", scores: { L: 0, G: 0, D: 0, S: 0, A: 0, C: 0, R: 0, P: 1 } },
+      { id: "o17_2", text: "始终保持心动的感觉和精神上的共鸣。", scores: { L: 0, G: 0, D: 0, S: 0, A: 0, C: 0, R: 1, P: 0 } }
     ]
   },
   {
@@ -135,15 +135,15 @@ export const destinyLoverQuestions = [
   {
     id: "q19", text: "对方的什么特质最让你觉得有魅力？",
     options: [
-      { id: "o19_1", text: "有有趣的灵魂，脑子里总有奇奇怪怪的好点子。", scores: { L: 0, G: 0, D: 0, S: 0, A: 0, C: 0, R: 1, P: 0 } },
-      { id: "o19_2", text: "情绪稳定，办事靠谱，凡事都有交代。", scores: { L: 0, G: 0, D: 0, S: 0, A: 0, C: 0, R: 0, P: 1 } }
+      { id: "o19_1", text: "情绪稳定，办事靠谱，凡事都有交代。", scores: { L: 0, G: 0, D: 0, S: 0, A: 0, C: 0, R: 0, P: 1 } },
+      { id: "o19_2", text: "有有趣的灵魂，脑子里总有奇奇怪怪的好点子。", scores: { L: 0, G: 0, D: 0, S: 0, A: 0, C: 0, R: 1, P: 0 } }
     ]
   },
   {
     id: "q20", text: "想象一下未来，最让你觉得幸福的画面是：",
     options: [
-      { id: "o20_1", text: "两个人老了以后，还能像小年轻一样牵手去环游世界。", scores: { L: 0, G: 0, D: 0, S: 0, A: 0, C: 0, R: 1, P: 0 } },
-      { id: "o20_2", text: "下班回家，推开门看到桌上有一桌热饭菜。", scores: { L: 0, G: 0, D: 0, S: 0, A: 0, C: 0, R: 0, P: 1 } }
+      { id: "o20_1", text: "下班回家，推开门看到桌上有一桌热饭菜。", scores: { L: 0, G: 0, D: 0, S: 0, A: 0, C: 0, R: 0, P: 1 } },
+      { id: "o20_2", text: "两个人老了以后，还能像小年轻一样牵手去环游世界。", scores: { L: 0, G: 0, D: 0, S: 0, A: 0, C: 0, R: 1, P: 0 } }
     ]
   }
 ];
