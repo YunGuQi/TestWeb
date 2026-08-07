@@ -32,18 +32,18 @@ export default function CodesTable({ initialCodes, testId }: { initialCodes: any
     setCodes(initialCodes);
   }, [initialCodes]);
 
-  const handleExportCSV = () => {
+  const handleExportTXT = () => {
     if (selectedIds.length === 0) return alert('请先勾选需要导出的激活码');
     const codesToExport = codes.filter(c => selectedIds.includes(c.id));
-    let csv = '\uFEFF卡密,设备上限,状态\n';
-    codesToExport.forEach(c => {
-      csv += `${c.code},${c.maxUses},${c.isDisabled ? '已禁用' : '正常'}\n`;
-    });
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    
+    // 阿奇索卡券仓库格式：纯文本，一行一个卡密
+    const txt = codesToExport.map(c => c.code).join('\n');
+    
+    const blob = new Blob([txt], { type: 'text/plain;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = 'activation_codes.csv';
+    link.download = `agiso_codes_${Date.now()}.txt`;
     link.click();
   };
 
@@ -168,8 +168,8 @@ export default function CodesTable({ initialCodes, testId }: { initialCodes: any
               <button onClick={() => setBatchEditModal({ show: true, maxUses: 3 })} disabled={loading} className="text-xs font-semibold bg-blue-50 text-blue-600 border border-blue-100 hover:bg-blue-100 transition-colors px-3 py-1.5 rounded-md cursor-pointer">
                 批量修改 ({selectedIds.length})
               </button>
-              <button onClick={handleExportCSV} className="text-xs font-semibold bg-green-50 text-green-600 border border-green-100 hover:bg-green-100 transition-colors px-3 py-1.5 rounded-md cursor-pointer">
-                导出已选 ({selectedIds.length})
+              <button onClick={handleExportTXT} className="text-xs font-semibold bg-green-50 text-green-600 border border-green-100 hover:bg-green-100 transition-colors px-3 py-1.5 rounded-md cursor-pointer">
+                导出阿奇索 txt ({selectedIds.length})
               </button>
             </div>
           )}

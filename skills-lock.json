@@ -1,6 +1,216 @@
 {
   "version": 1,
   "skills": {
+    "animate": {
+      "source": "emilkowalski/skills",
+      "sourceType": "github",
+      "skillPath": "skills/animate/SKILL.md",
+      "computedHash": "95a455620074de0cd5e57f74bf276645198d04b67ddcd33c783aa51d24063346"
+    },
+    "animation-vocabulary": {
+      "source": "emilkowalski/skills",
+      "sourceType": "github",
+      "skillPath": "skills/animation-vocabulary/SKILL.md",
+      "computedHash": "280c6688ef2568ad92f40c4dc638f0cc5cde0f49bdd6debd097410aa9945f44f"
+    },
+    "apple-design": {
+      "source": "emilkowalski/skills",
+      "sourceType": "github",
+      "skillPath": "skills/apple-design/SKILL.md",
+      "computedHash": "0d19303902efa64eace10e6b183eb29ef3220d424c1a7fd1eafc52adde216932"
+    },
+    "baoyu-article-illustrator": {
+      "source": "JimLiu/baoyu-skills",
+      "sourceType": "github",
+      "skillPath": "skills/baoyu-article-illustrator/SKILL.md",
+      "computedHash": "5f99fc77bdf524fe0cfff36f17844ce6425ae2c45cb139836fe77727dcb65370"
+    },
+    "baoyu-comic": {
+      "source": "JimLiu/baoyu-skills",
+      "sourceType": "github",
+      "skillPath": "skills/baoyu-comic/SKILL.md",
+      "computedHash": "fef2d0ebae8e0cedac48c3d7df4291edc843b5f89b509415a401bbe6b25a2cb9"
+    },
+    "baoyu-compress-image": {
+      "source": "JimLiu/baoyu-skills",
+      "sourceType": "github",
+      "skillPath": "skills/baoyu-compress-image/SKILL.md",
+      "computedHash": "13991e9dbfd3e7b9230e24cc53dbc65101ae8207841034c55a5e93523fabfe70"
+    },
+    "baoyu-cover-image": {
+      "source": "JimLiu/baoyu-skills",
+      "sourceType": "github",
+      "skillPath": "skills/baoyu-cover-image/SKILL.md",
+      "computedHash": "f4534d931bd394e5a4fb0d2c1318a6efd3d9d87dd80027517688dea84ce9e5fd"
+    },
+    "baoyu-danger-gemini-web": {
+      "source": "JimLiu/baoyu-skills",
+      "sourceType": "github",
+      "skillPath": "skills/baoyu-danger-gemini-web/SKILL.md",
+      "computedHash": "bcfaf152bc4a84091b7af868e74b598e51c2473f5399826e08f3897093788ad1"
+    },
+    "baoyu-danger-x-to-markdown": {
+      "source": "JimLiu/baoyu-skills",
+      "sourceType": "github",
+      "skillPath": "skills/baoyu-danger-x-to-markdown/SKILL.md",
+      "computedHash": "add54a4786070f422995ba0d991240f9e94f95d5a51579c6d27809b63d69d83f"
+    },
+    "baoyu-diagram": {
+      "source": "JimLiu/baoyu-skills",
+      "sourceType": "github",
+      "skillPath": "skills/baoyu-diagram/SKILL.md",
+      "computedHash": "91fb9e4164d3536bd7f7a625321805a6c9e1eab0a22056ad38a560fe0e7019fe"
+    },
+    "baoyu-electron-extract": {
+      "source": "JimLiu/baoyu-skills",
+      "sourceType": "github",
+      "skillPath": "skills/baoyu-electron-extract/SKILL.md",
+      "computedHash": "44ebe2142e3f8b292b171b36016802899b0d7157dc9e8866f68d87e40f3685fb"
+    },
+    "baoyu-format-markdown": {
+      "source": "JimLiu/baoyu-skills",
+      "sourceType": "github",
+      "skillPath": "skills/baoyu-format-markdown/SKILL.md",
+      "computedHash": "a8690ae5e05ddcc995247146cedc76f0aad634ad20eb860e367774058dda270e"
+    },
+    "baoyu-image-gen": {
+      "source": "JimLiu/baoyu-skills",
+      "sourceType": "github",
+      "skillPath": "skills/baoyu-image-gen/SKILL.md",
+      "computedHash": "72a813bcc5e7e0e3314f1af4993f18968f5a0841372feb64619d4fa08c2d4ada"
+    },
+    "baoyu-infographic": {
+      "source": "JimLiu/baoyu-skills",
+      "sourceType": "github",
+      "skillPath": "skills/baoyu-infographic/SKILL.md",
+      "computedHash": "f6121cbf49a3e2ef62aa69b79d09f98786d2f90b6bb450aa42ebaaa1fd76d4ab"
+    },
+    "baoyu-markdown-to-html": {
+      "source": "JimLiu/baoyu-skills",
+      "sourceType": "github",
+      "skillPath": "skills/baoyu-markdown-to-html/SKILL.md",
+      "computedHash": "b3f0f70a4aeea75d42b1e11b132973c9b523ebf4218df29ea58b32a0f86becd3"
+    },
+    "baoyu-post-to-wechat": {
+      "source": "JimLiu/baoyu-skills",
+      "sourceType": "github",
+      "skillPath": "skills/baoyu-post-to-wechat/SKILL.md",
+      "computedHash": "7a0f70d5115bf1907783201d6d86e72f2665bd206056109ff5816c651dd0ac64"
+    },
+    "baoyu-post-to-weibo": {
+      "source": "JimLiu/baoyu-skills",
+      "sourceType": "github",
+      "skillPath": "skills/baoyu-post-to-weibo/SKILL.md",
+      "computedHash": "0106daec8d1a9a54909c8946e2e99a8b2be5cd8c9f899f314cd35c6ab3e13250"
+    },
+    "baoyu-post-to-x": {
+      "source": "JimLiu/baoyu-skills",
+      "sourceType": "github",
+      "skillPath": "skills/baoyu-post-to-x/SKILL.md",
+      "computedHash": "60e83ba382161a03f4da8fd5dcf68f4e9fc00db7a423934c5cf29bba7316364c"
+    },
+    "baoyu-slide-deck": {
+      "source": "JimLiu/baoyu-skills",
+      "sourceType": "github",
+      "skillPath": "skills/baoyu-slide-deck/SKILL.md",
+      "computedHash": "57d4bdc8db537c94f0b5683c11618c936ce23e37dad5f14516c1ba7d154dd380"
+    },
+    "baoyu-translate": {
+      "source": "JimLiu/baoyu-skills",
+      "sourceType": "github",
+      "skillPath": "skills/baoyu-translate/SKILL.md",
+      "computedHash": "93576bcc8c96a4b95f16f955150f7c79879f0fba83ed7c805443884ffee444ec"
+    },
+    "baoyu-url-to-markdown": {
+      "source": "JimLiu/baoyu-skills",
+      "sourceType": "github",
+      "skillPath": "skills/baoyu-url-to-markdown/SKILL.md",
+      "computedHash": "50a998784d39f27eb81a7b6440fd580fcaa65bf5a550b58c768cbd039dc1e01a"
+    },
+    "baoyu-wechat-summary": {
+      "source": "JimLiu/baoyu-skills",
+      "sourceType": "github",
+      "skillPath": "skills/baoyu-wechat-summary/SKILL.md",
+      "computedHash": "383c03e4cee987ab4ab078fc1b0e46db242c29e1defe21821156136ce305dec1"
+    },
+    "baoyu-xhs-images": {
+      "source": "JimLiu/baoyu-skills",
+      "sourceType": "github",
+      "skillPath": "skills/baoyu-xhs-images/SKILL.md",
+      "computedHash": "9d6a2e17da3252205a23187a0ab7cf37b32c59145f944105cf2c26647bc47a56"
+    },
+    "baoyu-youtube-transcript": {
+      "source": "JimLiu/baoyu-skills",
+      "sourceType": "github",
+      "skillPath": "skills/baoyu-youtube-transcript/SKILL.md",
+      "computedHash": "3decb46af0c05a5d7256d1330e34dc11214db94f74fc89bc4b06bfeac757f357"
+    },
+    "creator-buddy": {
+      "source": "SpaceZephyr/creator-buddy",
+      "sourceType": "github",
+      "skillPath": "SKILL.md",
+      "computedHash": "bd97f272623269b35d50881c1a5b644f64dfb65572a3bb639b58657ad38c55e9"
+    },
+    "emil-design-eng": {
+      "source": "emilkowalski/skills",
+      "sourceType": "github",
+      "skillPath": "skills/emil-design-eng/SKILL.md",
+      "computedHash": "87067d79205fdedc6d682891027dd9c7335486c4b4dc2e785638941a9d2e6061"
+    },
+    "find-animation-opportunities": {
+      "source": "emilkowalski/skills",
+      "sourceType": "github",
+      "skillPath": "skills/find-animation-opportunities/SKILL.md",
+      "computedHash": "c6b1d0f6d03a11f8772b1cef4ca5cc88301ae8641ac2697c85ffa87eb458e40a"
+    },
+    "guizang-material-illustration": {
+      "source": "op7418/guizang-material-illustration",
+      "sourceType": "github",
+      "skillPath": "SKILL.md",
+      "computedHash": "517189667158b3a07485a9dc65298483cac0713e6f7546bec79e21519e54e337"
+    },
+    "guizang-social-card-skill": {
+      "source": "op7418/guizang-social-card-skill",
+      "sourceType": "github",
+      "skillPath": "SKILL.md",
+      "computedHash": "ace5ad142b82987cd790e82d506d8040a67a65b21c2599ae2ff96d9cd997f592"
+    },
+    "ian-xiaohei-illustrations": {
+      "source": "helloianneo/ian-xiaohei-illustrations",
+      "sourceType": "github",
+      "skillPath": "SKILL.md",
+      "computedHash": "9679a17fbf8aa0ec6fd7ab8458ba22a57f535d7511c95c5a6499767478746f4d"
+    },
+    "improve-animations": {
+      "source": "emilkowalski/skills",
+      "sourceType": "github",
+      "skillPath": "skills/improve-animations/SKILL.md",
+      "computedHash": "9cd956e91139211efa5e17fc5e1675b9a3f711ef38cbc92aa8f3fa5b626b7e12"
+    },
+    "ip-all-png-template": {
+      "source": "uncle11/xfc-ip-all-png-template",
+      "sourceType": "github",
+      "skillPath": "SKILL.md",
+      "computedHash": "ae44ce0f5746967a9cd92ffbeb2e4592a80ad8da28fd1ea764d2106e4720e399"
+    },
+    "pick-ui-library": {
+      "source": "emilkowalski/skills",
+      "sourceType": "github",
+      "skillPath": "skills/pick-ui-library/SKILL.md",
+      "computedHash": "1a0a6819d13fb5361cf5cdc923f46a1effc37cb61ecb908419eedb0e11f428fe"
+    },
+    "prototype": {
+      "source": "emilkowalski/skills",
+      "sourceType": "github",
+      "skillPath": "skills/prototype/SKILL.md",
+      "computedHash": "b1216a31a08fb02871f5b4ace7f31d0a1e2d9c86ddca74a37ed97d975f7bcaa2"
+    },
+    "review-animations": {
+      "source": "emilkowalski/skills",
+      "sourceType": "github",
+      "skillPath": "skills/review-animations/SKILL.md",
+      "computedHash": "6f8d633d7884c1390eff7af4bfaf7a450e798f117e1d49a555e00819dc877f64"
+    },
     "xiaohongshu": {
       "source": "zhjiang22/openclaw-xhs",
       "sourceType": "github",
