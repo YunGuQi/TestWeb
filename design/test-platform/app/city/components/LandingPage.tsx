@@ -117,7 +117,7 @@ export default function LandingPage() {
           <button onClick={() => setShowHistory(true)} className="text-xs text-gray-500 hover:text-[#1a1a1a] transition-colors underline underline-offset-4 min-h-[44px] inline-flex items-center justify-center cursor-pointer touch-manipulation active:scale-95 px-3">[ 查看历史记录 ]</button>
           <button 
             type="button"
-            onClick={() => router.push('/')} 
+            onClick={() => window.location.href = 'https://xhslink.com/m/Atwtf3Cy6FR'} 
             className="text-xs text-gray-500 hover:text-[#1a1a1a] transition-colors underline underline-offset-4 min-h-[44px] inline-flex items-center justify-center cursor-pointer touch-manipulation active:scale-95 px-3"
           >
             [ 探索测试大厅 ]

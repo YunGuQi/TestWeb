@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>千帆声明图</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #333;
+        }
+        .poster {
+            width: 1200px;
+            height: 1200px;
+            background-color: #FAF8F4;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 50px 80px;
+            box-sizing: border-box;
+            position: relative;
+        }
+        .title {
+            color: #1a2f2b;
+            font-size: 56px;
+            font-weight: 900;
+            margin-bottom: 45px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            letter-spacing: 4px;
+        }
+        .sparkle {
+            color: #d8b88d;
+        }
+        .card-container {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+        .card {
+            background-color: #ffffff;
+            border-radius: 20px;
+            padding: 35px 45px;
+            display: flex;
+            align-items: flex-start;
+            gap: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
+        }
+        .card-number {
+            width: 48px;
+            height: 48px;
+            background-color: #1a2f2b;
+            color: #ffffff;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+        .card-content {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .card-title {
+            color: #1a2f2b;
+            font-size: 32px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .card-title .icon {
+            color: #d8b88d;
+            font-size: 24px;
+        }
+        .card-text {
+            color: #666666;
+            font-size: 24px;
+            line-height: 1.6;
+        }
+        .bottom-card {
+            width: 100%;
+            margin-top: 35px;
+            background-color: #FFF9EE;
+            border: 2px dashed #d8b88d;
+            border-radius: 20px;
+            padding: 35px 45px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .bottom-card-content {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .bottom-card-title {
+            color: #1a2f2b;
+            font-size: 28px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .bottom-card-icon {
+            width: 32px;
+            height: 32px;
+            background-color: #1a2f2b;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 16px;
+        }
+        .bottom-card-text {
+            color: #666666;
+            font-size: 22px;
+            line-height: 1.6;
+        }
+        .heart-icon {
+            color: #d8b88d;
+            font-size: 64px;
+        }
+    </style>
+</head>
+<body>
+    <div id="poster" class="poster">
+        <div class="title">
+            版权声明 & 价格说明 <span class="sparkle">✦</span>
+        </div>
+
+        <div class="card-container">
+            <!-- Card 1 -->
+            <div class="card">
+                <div class="card-number">1</div>
+                <div class="card-content">
+                    <div class="card-title">版权说明 <span class="icon">✦</span></div>
+                    <div class="card-text">
+                        本店所有内容的版权归原版权人和权利人所有。如有侵犯版权，请联系本店，请及时联系我们，我们将在第一时间进行修改或下架处理。
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 2 -->
+            <div class="card">
+                <div class="card-number">2</div>
+                <div class="card-content">
+                    <div class="card-title">价格说明 <span class="icon">✦</span></div>
+                    <div class="card-text">
+                        店铺所收取费用仅用于覆盖资料整理的时间成本，人工成本以及店铺的基础运营支出，而非售卖链接费用。
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Card 3 -->
+            <div class="card">
+                <div class="card-number">3</div>
+                <div class="card-content">
+                    <div class="card-title">退换说明 <span class="icon">✦</span></div>
+                    <div class="card-text">
+                        本店商品可复制性较高，为保护知识产权，售出后不支持七天无理由退款，请谅解。
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bottom-card">
+            <div class="bottom-card-content">
+                <div class="bottom-card-title">
+                    <div class="bottom-card-icon">⚠</div>
+                    温馨提示 <span class="icon" style="color: #d8b88d; font-size: 20px;">✦</span>
+                </div>
+                <div class="bottom-card-text">
+                    购买前请仔细阅读商品详情，确认是您需要的测试产品，如有疑问可随时咨询客服。祝您生活愉快！
+                </div>
+            </div>
+            <div class="heart-icon">♡</div>
+        </div>
+    </div>
+</body>
+</html>

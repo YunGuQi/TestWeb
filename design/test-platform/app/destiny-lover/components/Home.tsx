@@ -153,7 +153,7 @@ export default function Home({ onStartTest, onRestoreHistory }: HomeProps) {
                   <button onClick={() => setShowHistory(true)} className="text-xs text-[#5A524A] hover:text-[#B93A32] focus-visible:underline transition-colors underline underline-offset-4 tracking-widest min-h-[44px] inline-flex items-center justify-center cursor-pointer touch-manipulation active:scale-95 px-3">[ 查看历史档案 ]</button>
                   <button 
                     type="button"
-                    onClick={() => router.push('/')} 
+                    onClick={() => window.location.href = 'https://xhslink.com/m/Atwtf3Cy6FR'} 
                     className="text-xs text-[#5A524A] hover:text-[#B93A32] focus-visible:underline transition-colors underline underline-offset-4 tracking-widest min-h-[44px] inline-flex items-center justify-center cursor-pointer touch-manipulation active:scale-95 px-3"
                   >
                     [ 探索其他测试 ]

@@ -163,7 +163,7 @@ export default function Home({ onStartTest, onRestoreHistory }: HomeProps) {
                       <button onClick={() => setShowHistory(true)} className="text-xs text-gray-600 hover:text-black transition-colors underline underline-offset-4 min-h-[44px] inline-flex items-center justify-center cursor-pointer touch-manipulation active:scale-95 px-3">[ 查看历史消费单 ]</button>
                       <button 
                         type="button"
-                        onClick={() => router.push('/')} 
+                        onClick={() => window.location.href = 'https://xhslink.com/m/Atwtf3Cy6FR'} 
                         className="text-xs text-gray-600 hover:text-black transition-colors underline underline-offset-4 min-h-[44px] inline-flex items-center justify-center cursor-pointer touch-manipulation active:scale-95 px-3"
                       >
                         [ 探索其他专柜 ]
