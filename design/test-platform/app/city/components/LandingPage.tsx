@@ -56,7 +56,19 @@ export default function LandingPage() {
         </div>
 
         <h1 className="text-4xl sm:text-5xl font-black tracking-tight mb-2 text-[#1a1a1a]">心灵逃跑车票</h1>
-        <p className="font-mono text-xs sm:text-sm text-gray-500 mb-6 uppercase tracking-[0.2em]">ONE-WAY TICKET TO YOUR SOUL</p>
+        <p className="font-mono text-xs sm:text-sm text-gray-500 mb-5 uppercase tracking-[0.2em]">ONE-WAY TICKET TO YOUR SOUL</p>
+
+        {/* 性格城市匹配二次元探险海报大图 */}
+        <div className="relative mb-5 mx-auto overflow-hidden rounded border-2 border-[#1a1a1a] shadow-[0_6px_18px_rgba(0,0,0,0.15)] max-h-[220px] md:max-h-[250px] bg-[#eef2eb] group w-full">
+          <img 
+            src="/images/city-match-cover.png" 
+            alt="性格城市匹配·精神老家测试海报" 
+            className="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-105"
+          />
+          <div className="absolute top-2 right-2 bg-[#1a1a1a] text-emerald-400 text-[10px] font-mono font-bold px-2.5 py-0.5 rounded shadow">
+            🧭 DESTINATION IDENTIFIED
+          </div>
+        </div>
 
         <div className="text-left w-full bg-black/[0.04] border border-black/10 p-4 rounded text-xs sm:text-sm text-gray-700 mb-6 font-mono leading-relaxed shadow-inner">
           <div className="flex justify-between border-b border-black/10 pb-2 mb-2 font-bold text-[#1a1a1a]">

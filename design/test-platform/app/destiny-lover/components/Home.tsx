@@ -82,7 +82,54 @@ export default function Home({ onStartTest, onRestoreHistory }: HomeProps) {
             解密你的<span className="text-[#B93A32] block md:inline mt-1 md:mt-0">命定恋人</span>
           </h1>
           
-          <div className="w-12 h-0.5 bg-[#B93A32]/40 mx-auto my-5"></div>
+          <div className="w-12 h-0.5 bg-[#B93A32]/40 mx-auto my-4"></div>
+          
+          {/* 命定恋人二次元主题封面大图（无字底图 + 前端超清矢量叠字架构） */}
+          <div className="relative mb-6 mx-auto overflow-hidden rounded-md border-2 border-[#B93A32]/80 shadow-[0_12px_32px_rgba(185,58,50,0.15)] max-h-[260px] md:max-h-[300px] bg-[#1C1715] group">
+            <img 
+              src="/images/destiny-lover-cover.png" 
+              alt="月老办事处·命定恋人海报" 
+              className="w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-105"
+            />
+            
+            {/* 顶部招牌 —— 前端高精度矢量中文字体渲染，终结 AI 模糊与错别字 */}
+            <div className="absolute top-2 left-1/2 -translate-x-1/2 bg-gradient-to-r from-[#8A231C]/90 via-[#B93A32] to-[#8A231C]/90 text-[#FFE9BE] border border-[#FFD384]/60 px-4 py-1 rounded-full shadow-lg backdrop-blur-[2px] flex items-center gap-1.5 z-10">
+              <span className="text-[10px] text-[#FFD384]">★</span>
+              <span className="text-xs md:text-sm font-black tracking-[0.2em] font-serif drop-shadow">命 定 恋 人</span>
+              <span className="text-[10px] text-[#FFD384]">★</span>
+            </div>
+
+            {/* 四方看点标签卡 —— 极致清晰、像素级锐利的四大评价维度 */}
+            <div className="absolute top-10 left-2 bg-[#FAF8F5]/95 border border-[#B93A32]/60 px-2.5 py-1 rounded shadow-md backdrop-blur-sm transform -rotate-2 hover:scale-105 transition-transform">
+              <div className="text-[10px] font-bold text-[#B93A32] tracking-wider font-sans">【灵魂共振】</div>
+              <div className="text-[9px] text-[#4A423A] scale-95 origin-left">秒懂你的奇奇怪怪</div>
+            </div>
+
+            <div className="absolute top-10 right-2 bg-[#FAF8F5]/95 border border-[#B93A32]/60 px-2.5 py-1 rounded shadow-md backdrop-blur-sm transform rotate-2 hover:scale-105 transition-transform text-right">
+              <div className="text-[10px] font-bold text-[#B93A32] tracking-wider font-sans">【强导 vs 护宠】</div>
+              <div className="text-[9px] text-[#4A423A] scale-95 origin-right">专属甜宠或被爆改</div>
+            </div>
+
+            <div className="absolute bottom-9 left-2 bg-[#FAF8F5]/95 border border-[#B93A32]/60 px-2.5 py-1 rounded shadow-md backdrop-blur-sm transform rotate-1 hover:scale-105 transition-transform">
+              <div className="text-[10px] font-bold text-[#B93A32] tracking-wider font-sans">【粘人平衡仪】</div>
+              <div className="text-[9px] text-[#4A423A] scale-95 origin-left">24小时贴贴vs独立空间</div>
+            </div>
+
+            <div className="absolute bottom-9 right-2 bg-[#FAF8F5]/95 border border-[#B93A32]/60 px-2.5 py-1 rounded shadow-md backdrop-blur-sm transform -rotate-1 hover:scale-105 transition-transform text-right">
+              <div className="text-[10px] font-bold text-[#B93A32] tracking-wider font-sans">【仪式烟火气】</div>
+              <div className="text-[9px] text-[#4A423A] scale-95 origin-right">偶像剧浪漫与吃香喝辣</div>
+            </div>
+
+            {/* 底部浮层与官方认证勋章 */}
+            <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent pt-6 pb-2 flex items-center justify-between px-3 z-10">
+              <span className="text-white/90 text-[10px] font-bold tracking-widest bg-[#B93A32]/90 px-2.5 py-0.5 rounded-sm border border-white/20">
+                🏷️ 月老办事处认证
+              </span>
+              <span className="text-[#FFE9BE] text-[10px] font-bold tracking-wider font-mono">
+                ✨ 2026 OFFICIAL TEST
+              </span>
+            </div>
+          </div>
           
           <p className="text-sm md:text-base leading-relaxed text-[#4A423A] mb-8 text-justify font-normal">
             你是否曾在夜里幻想过那个“对的人”究竟是什么模样？TA 是像你一样喜欢安静，还是能带你探索世界？是你的避风港，还是并肩作战的战友？<br/><br/>

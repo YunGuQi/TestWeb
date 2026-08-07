@@ -57,6 +57,18 @@ export default function Home({ onStartTest, onRestoreHistory }: HomeProps) {
               
               <div className="w-full border-t-2 border-dashed border-black my-4"></div>
               
+              {/* 深度情绪内耗主题海报大图 */}
+              <div className="relative mb-5 mx-auto overflow-hidden border-2 border-black shadow-[4px_4px_0px_#000] max-h-[220px] md:max-h-[250px] bg-[#f0eff5] group">
+                <img 
+                  src="/images/emo-test-cover.png" 
+                  alt="深度情绪内耗·精神大体检海报" 
+                  className="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-105"
+                />
+                <div className="absolute top-2 right-2 bg-red-600 text-white text-[10px] font-mono font-bold px-2 py-0.5 border border-black shadow">
+                  LOW BATTERY
+                </div>
+              </div>
+              
               <p className="font-mono text-xs text-gray-800 leading-relaxed font-bold bg-yellow-100/70 py-2 px-3 border border-black inline-block mb-6">
                   [系统警告] 你的每一次纠结，都在暗中标好了价格
               </p>

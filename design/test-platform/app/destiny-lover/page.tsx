@@ -5,11 +5,31 @@ import Home from './components/Home';
 import TestEngine from './components/TestEngine';
 import ResultReceipt from './components/ResultReceipt';
 import DestinyBackground from './components/DestinyBackground';
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 
 export default function DestinyLoverApp() {
   const [currentView, setCurrentView] = useState<'home' | 'test' | 'result'>('home');
   const [userInfo, setUserInfo] = useState<{ nickname: string; status: 'single' | 'dating' }>({ nickname: '', status: 'single' });
   const [result, setResult] = useState<any>(null);
+
+  const reduce = useReducedMotion();
+
+  const pageVariants = {
+    initial: { 
+      opacity: 0, 
+      transform: reduce ? "translateY(0px) scale(1)" : "translateY(16px) scale(0.98)" 
+    },
+    animate: { 
+      opacity: 1, 
+      transform: "translateY(0px) scale(1)",
+      transition: { duration: 0.3, ease: [0.23, 1, 0.32, 1] }
+    },
+    exit: { 
+      opacity: 0, 
+      transform: reduce ? "translateY(0px) scale(1)" : "translateY(-16px) scale(0.98)",
+      transition: { duration: 0.2, ease: [0.23, 1, 0.32, 1] }
+    }
+  };
 
   useEffect(() => {
     // History state management to match city/emo tests
@@ -75,25 +95,33 @@ export default function DestinyLoverApp() {
 
   return (
     <DestinyBackground>
-      {currentView === 'home' && (
-        <Home onStartTest={handleStartTest} onRestoreHistory={handleFinishTest} />
-      )}
+      <AnimatePresence mode="wait">
+        {currentView === 'home' && (
+          <motion.div key="home" variants={pageVariants} initial="initial" animate="animate" exit="exit" className="w-full h-full flex flex-col flex-1">
+            <Home onStartTest={handleStartTest} onRestoreHistory={handleFinishTest} />
+          </motion.div>
+        )}
 
-      {currentView === 'test' && (
-        <TestEngine 
-          userInfo={userInfo}
-          onBack={() => navigateTo('home')} 
-          onFinish={handleFinishTest} 
-        />
-      )}
+        {currentView === 'test' && (
+          <motion.div key="test" variants={pageVariants} initial="initial" animate="animate" exit="exit" className="w-full h-full flex flex-col flex-1">
+            <TestEngine 
+              userInfo={userInfo}
+              onBack={() => navigateTo('home')} 
+              onFinish={handleFinishTest} 
+            />
+          </motion.div>
+        )}
 
-      {currentView === 'result' && (
-        <ResultReceipt 
-          result={result} 
-          userInfo={userInfo}
-          onRestart={handleRestart} 
-        />
-      )}
+        {currentView === 'result' && (
+          <motion.div key="result" variants={pageVariants} initial="initial" animate="animate" exit="exit" className="w-full h-full flex flex-col flex-1">
+            <ResultReceipt 
+              result={result} 
+              userInfo={userInfo}
+              onRestart={handleRestart} 
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
     </DestinyBackground>
   );
 }
