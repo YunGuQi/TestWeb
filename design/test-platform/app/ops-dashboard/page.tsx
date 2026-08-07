@@ -79,7 +79,7 @@ async function DashboardContent({ testId }: { testId: string }) {
     prisma.activationCode.findMany({
       where: { testId },
       orderBy: { createdAt: 'desc' },
-      take: 50
+      take: 2000
     }),
   ]);
 
