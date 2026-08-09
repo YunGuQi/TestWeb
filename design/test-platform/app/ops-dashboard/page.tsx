@@ -44,9 +44,34 @@ export default async function AdminDashboard({ searchParams }: { searchParams: P
   
   return (
     <Suspense key={testId} fallback={<DashboardSkeleton />}>
-      <DashboardContent testId={testId} />
+      <DashboardContentWrapper testId={testId} />
     </Suspense>
   );
+}
+
+async function DashboardContentWrapper({ testId }: { testId: string }) {
+  try {
+    return await DashboardContent({ testId });
+  } catch (error: any) {
+    console.error('Failed to load dashboard:', error);
+    return (
+      <div className="bg-red-50 border-l-4 border-red-500 p-8 my-10 max-w-4xl mx-auto rounded shadow-sm">
+        <h2 className="text-2xl font-bold text-red-700 mb-4">🚨 数据库连接失败</h2>
+        <p className="text-red-600 mb-2">后台数据大盘需要连接到您的宝塔 MySQL 数据库才能工作，但当前连接失败。</p>
+        <p className="text-gray-700 font-mono text-sm mb-4">错误信息: {error.message || '未知连接错误'}</p>
+        <div className="bg-white p-4 rounded border border-red-200">
+          <h3 className="font-bold text-gray-800 mb-2">修复步骤：</h3>
+          <ol className="list-decimal pl-5 text-gray-700 space-y-1">
+            <li>登录您的 <strong>Vercel</strong> 后台，进入本项目。</li>
+            <li>点击顶部 <strong>Settings</strong>，在左侧选择 <strong>Environment Variables</strong>。</li>
+            <li>添加或更新名为 <code>DATABASE_URL</code> 的变量，值为您宝塔 MySQL 的连接字符串。</li>
+            <li>添加或更新名为 <code>ADMIN_LOGIN_PASSWORD</code> 的变量（作为您的后台密码）。</li>
+            <li>重新部署 (Redeploy) 即可恢复大盘数据。</li>
+          </ol>
+        </div>
+      </div>
+    );
+  }
 }
 
 async function DashboardContent({ testId }: { testId: string }) {
