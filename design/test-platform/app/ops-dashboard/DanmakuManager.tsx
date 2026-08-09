@@ -1,7 +1,10 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useAdminStore } from '../../lib/store/admin-store';
+
 export default function DanmakuManager({ testId, initialResults }: { testId: string, initialResults: any[] }) {
+  const { isUnlocked } = useAdminStore();
   const [speed, setSpeed] = useState(50);
   const [opacity, setOpacity] = useState(70);
   const [contentMap, setContentMap] = useState<Record<string, string>>({});
@@ -137,8 +140,9 @@ export default function DanmakuManager({ testId, initialResults }: { testId: str
                 <textarea 
                   className="w-full h-36 border border-[#EBEBEB] p-3 rounded-lg text-sm text-[#787774] outline-none focus:border-blue-300 focus:ring-2 focus:ring-blue-100 transition-all resize-none bg-[#FDFBF7]"
                   placeholder="在此输入，每行一条弹幕..."
-                  value={contentMap[r.condition] ?? ''}
+                  value={isUnlocked ? (contentMap[r.condition] ?? '') : '敏感弹幕词条已被隐藏...'}
                   onChange={(e) => setContentMap({...contentMap, [r.condition]: e.target.value})}
+                  disabled={!isUnlocked}
                 />
               </div>
               );
@@ -147,13 +151,15 @@ export default function DanmakuManager({ testId, initialResults }: { testId: str
         </div>
 
         <div className="flex justify-end pt-6 border-t border-[#EBEBEB]">
-          <button 
-            onClick={handleSave} 
-            disabled={isSaving}
-            className="px-6 py-2.5 bg-[#37352F] hover:bg-black text-white text-sm font-semibold rounded-lg shadow-sm disabled:bg-gray-300 transition-colors"
-          >
-            {isSaving ? '保存中...' : '保存弹幕配置'}
-          </button>
+          {isUnlocked && (
+            <button 
+              onClick={handleSave} 
+              disabled={isSaving}
+              className="px-6 py-2.5 bg-[#37352F] hover:bg-black text-white text-sm font-semibold rounded-lg shadow-sm disabled:bg-gray-300 transition-colors"
+            >
+              {isSaving ? '保存中...' : '保存弹幕配置'}
+            </button>
+          )}
         </div>
       </div>
     </div>

@@ -1,4 +1,4 @@
-import './globals.css'
+// import './globals.css' // Bypassing Next.js CSS bug
 
 export const metadata = {
   title: '深度情绪内耗测试',
@@ -19,6 +19,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="zh">
+      <head>
+        <link rel="stylesheet" href="/main.css" />
+      </head>
       <body>{children}</body>
     </html>
   )

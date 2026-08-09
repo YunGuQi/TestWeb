@@ -1,8 +1,10 @@
 'use client';
 
 import { useState } from 'react';
+import { useAdminStore } from '../../../lib/store/admin-store';
 
 export default function ResultsClient({ initialResults }: { initialResults: any[] }) {
+  const { isUnlocked } = useAdminStore();
   const [results, setResults] = useState(initialResults);
   const [editRes, setEditRes] = useState<any>(null);
   const [loading, setLoading] = useState(false);
@@ -51,13 +53,13 @@ export default function ResultsClient({ initialResults }: { initialResults: any[
               </span>
             </div>
             
-            <p className="text-sm font-semibold text-[#787774] mb-3">条件 / 标识: <span className="text-[#37352F]">{r.condition}</span></p>
+            <p className="text-sm font-semibold text-[#787774] mb-3">条件 / 标识: <span className="text-[#37352F]">{isUnlocked ? r.condition : '***'}</span></p>
             
             <div className="text-sm bg-[#FDFBF7] p-4 rounded-xl border border-[#EBEBEB] text-[#787774] flex-1 mb-5">
-              {r.desc}
+              {isUnlocked ? r.desc : '敏感结论建议已被隐藏...'}
             </div>
             
-            {r.imageUrl && (
+            {isUnlocked && r.imageUrl && (
               <div className="mb-5">
                 <div 
                   onClick={() => setPreviewImage(r.imageUrl)}
@@ -72,12 +74,14 @@ export default function ResultsClient({ initialResults }: { initialResults: any[
               </div>
             )}
             
-            <button 
-              onClick={() => setEditRes(r)}
-              className="mt-auto bg-[#F7F6F3] text-[#787774] border border-[#EBEBEB] py-2.5 rounded-xl text-sm font-semibold hover:bg-[#EBEBEB] hover:text-[#37352F] transition-colors"
-            >
-              编辑此结果
-            </button>
+            {isUnlocked && (
+              <button 
+                onClick={() => setEditRes(r)}
+                className="mt-auto bg-[#F7F6F3] text-[#787774] border border-[#EBEBEB] py-2.5 rounded-xl text-sm font-semibold hover:bg-[#EBEBEB] hover:text-[#37352F] transition-colors"
+              >
+                编辑此结果
+              </button>
+            )}
           </div>
         ))}
       </div>

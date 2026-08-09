@@ -2,9 +2,11 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
+import { useAdminStore } from '../../lib/store/admin-store';
 
 export default function CodesTable({ initialCodes, testId }: { initialCodes: any[], testId: string }) {
   const router = useRouter();
+  const { isUnlocked } = useAdminStore();
   const [codes, setCodes] = useState(initialCodes);
   const [loading, setLoading] = useState(false);
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
@@ -160,7 +162,7 @@ export default function CodesTable({ initialCodes, testId }: { initialCodes: any
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-xl font-bold flex flex-wrap items-center gap-2 sm:gap-4 text-[#37352F]">
           <span>卡密详细列表</span>
-          {selectedIds.length > 0 && (
+          {isUnlocked && selectedIds.length > 0 && (
             <div className="flex items-center gap-2">
               <button onClick={handleBatchDelete} disabled={loading} className="text-xs font-semibold bg-red-50 text-red-600 border border-red-100 hover:bg-red-100 transition-colors px-3 py-1.5 rounded-md cursor-pointer">
                 批量删除 ({selectedIds.length})
@@ -174,12 +176,14 @@ export default function CodesTable({ initialCodes, testId }: { initialCodes: any
             </div>
           )}
         </h2>
-        <button 
-          onClick={() => setGenerateModal({ show: true, count: 10 })}
-          className="bg-white border border-[#EBEBEB] hover:bg-[#F7F6F3] transition-colors text-[#37352F] px-4 py-2 rounded-md font-semibold text-sm shadow-sm flex items-center gap-2 shrink-0"
-        >
-          <span>✨</span> 一键生成
-        </button>
+        {isUnlocked && (
+          <button 
+            onClick={() => setGenerateModal({ show: true, count: 10 })}
+            className="bg-white border border-[#EBEBEB] hover:bg-[#F7F6F3] transition-colors text-[#37352F] px-4 py-2 rounded-md font-semibold text-sm shadow-sm flex items-center gap-2 shrink-0"
+          >
+            <span>✨</span> 一键生成
+          </button>
+        )}
       </div>
 
       {/* ============ Mobile Select All Bar (< md) ============ */}
@@ -218,23 +222,29 @@ export default function CodesTable({ initialCodes, testId }: { initialCodes: any
             >
               <div className="flex items-center justify-between pb-3 border-b border-[#EBEBEB]/60 mb-3">
                 <div className="flex items-center gap-2.5">
-                  <input 
-                    type="checkbox"
-                    checked={isSelected}
-                    onChange={(e) => {
-                      if (e.target.checked) setSelectedIds([...selectedIds, code.id]);
-                      else setSelectedIds(selectedIds.filter(id => id !== code.id));
-                    }}
-                    className="rounded border-[#EBEBEB] text-blue-500 focus:ring-blue-500"
-                  />
-                  <span className="font-mono font-bold text-base text-[#37352F] tracking-wide">{code.code}</span>
+                  {isUnlocked && (
+                    <input 
+                      type="checkbox"
+                      checked={isSelected}
+                      onChange={(e) => {
+                        if (e.target.checked) setSelectedIds([...selectedIds, code.id]);
+                        else setSelectedIds(selectedIds.filter(id => id !== code.id));
+                      }}
+                      className="rounded border-[#EBEBEB] text-blue-500 focus:ring-blue-500"
+                    />
+                  )}
+                  <span className="font-mono font-bold text-base text-[#37352F] tracking-wide">
+                    {isUnlocked ? code.code : '****-****-****-****'}
+                  </span>
                 </div>
-                <button 
-                  onClick={() => setEditModal({ show: true, id: code.id, code: code.code, maxUses: code.maxUses })}
-                  className="text-xs font-semibold text-[#787774] hover:text-[#37352F] bg-[#F7F6F3] hover:bg-[#EBEBEB] transition-colors px-3 py-1.5 rounded-lg border border-[#EBEBEB] shadow-sm cursor-pointer"
-                >
-                  修改上限
-                </button>
+                {isUnlocked && (
+                  <button 
+                    onClick={() => setEditModal({ show: true, id: code.id, code: code.code, maxUses: code.maxUses })}
+                    className="text-xs font-semibold text-[#787774] hover:text-[#37352F] bg-[#F7F6F3] hover:bg-[#EBEBEB] transition-colors px-3 py-1.5 rounded-lg border border-[#EBEBEB] shadow-sm cursor-pointer"
+                  >
+                    修改上限
+                  </button>
+                )}
               </div>
 
               <div className="grid grid-cols-3 gap-2 py-1 mb-2 text-center">
@@ -295,17 +305,21 @@ export default function CodesTable({ initialCodes, testId }: { initialCodes: any
             {processedCodes.map(code => (
               <tr key={code.id} className="hover:bg-[#FDFBF7] transition-colors">
                 <td className="p-4">
-                  <input 
-                    type="checkbox"
-                    checked={selectedIds.includes(code.id)}
-                    onChange={(e) => {
-                      if (e.target.checked) setSelectedIds([...selectedIds, code.id]);
-                      else setSelectedIds(selectedIds.filter(id => id !== code.id));
-                    }}
-                    className="rounded border-[#EBEBEB] text-blue-500 focus:ring-blue-500"
-                  />
+                  {isUnlocked && (
+                    <input 
+                      type="checkbox"
+                      checked={selectedIds.includes(code.id)}
+                      onChange={(e) => {
+                        if (e.target.checked) setSelectedIds([...selectedIds, code.id]);
+                        else setSelectedIds(selectedIds.filter(id => id !== code.id));
+                      }}
+                      className="rounded border-[#EBEBEB] text-blue-500 focus:ring-blue-500"
+                    />
+                  )}
                 </td>
-                <td className="p-4 font-mono font-medium text-[#37352F]">{code.code}</td>
+                <td className="p-4 font-mono font-medium text-[#37352F]">
+                  {isUnlocked ? code.code : '****-****-****-****'}
+                </td>
                 <td className="p-4 text-[#787774]">{code.maxUses}</td>
                 <td className="p-4">
                   <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-50 text-blue-700">
@@ -319,12 +333,14 @@ export default function CodesTable({ initialCodes, testId }: { initialCodes: any
                 </td>
                 <td className="p-4 text-[#9F9E9B] text-xs font-mono">{new Date(code.createdAt).toLocaleString()}</td>
                 <td className="p-4">
-                  <button 
-                    onClick={() => setEditModal({ show: true, id: code.id, code: code.code, maxUses: code.maxUses })}
-                    className="text-xs font-medium text-[#787774] hover:text-[#37352F] bg-[#F7F6F3] hover:bg-[#EBEBEB] transition-colors px-2.5 py-1 rounded-md border border-[#EBEBEB]"
-                  >
-                    修改
-                  </button>
+                  {isUnlocked && (
+                    <button 
+                      onClick={() => setEditModal({ show: true, id: code.id, code: code.code, maxUses: code.maxUses })}
+                      className="text-xs font-medium text-[#787774] hover:text-[#37352F] bg-[#F7F6F3] hover:bg-[#EBEBEB] transition-colors px-2.5 py-1 rounded-md border border-[#EBEBEB]"
+                    >
+                      修改
+                    </button>
+                  )}
                 </td>
               </tr>
             ))}

@@ -2,11 +2,21 @@ import { NextResponse } from 'next/server';
 import { prisma } from '../../../lib/prisma';
 import { destinyLoverQuestions } from '../../../lib/destiny-lover-data';
 import { questions as emoQuestions } from '../../../lib/data';
+import { verifySignature } from '../../../lib/security';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET(request: Request) {
   try {
+    const timestamp = request.headers.get('x-timestamp');
+    const signature = request.headers.get('x-sign');
+    
+    // Validate signature using fixed payload for GET requests
+    const isValid = await verifySignature(timestamp, signature, "GET_QUESTIONS", 120);
+    
+    if (!isValid) {
+      return NextResponse.json({ success: false, error: 'Unauthorized signature' }, { status: 403 });
+    }
     const { searchParams } = new URL(request.url);
     const testId = searchParams.get('testId') || 'emotional-friction';
     

@@ -5,7 +5,7 @@ export async function POST(request: Request) {
   try {
     const { password } = await request.json();
 
-    if (password === 'jiasite') {
+    if (password === process.env.ADMIN_LOGIN_PASSWORD) {
       const response = NextResponse.json({ success: true });
       
       // Set auth cookie (httpOnly=false and secure=false to prevent reverse proxy/CDN dropping cookie)

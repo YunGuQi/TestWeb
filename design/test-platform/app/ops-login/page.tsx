@@ -152,7 +152,7 @@ export default function AdminLogin() {
               SYS-LOCK · ACCESS RESTRICTED
             </span>
           </div>
-          <span className="text-[10px] font-mono text-white/30">
+          <span className="text-[10px] font-mono text-white/30" suppressHydrationWarning>
             {new Date().toISOString().slice(0,19).replace('T',' ')} UTC
           </span>
         </div>

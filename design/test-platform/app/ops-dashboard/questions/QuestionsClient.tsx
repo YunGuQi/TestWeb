@@ -1,8 +1,10 @@
 'use client';
 
 import { useState } from 'react';
+import { useAdminStore } from '../../../lib/store/admin-store';
 
 export default function QuestionsClient({ initialQuestions }: { initialQuestions: any[] }) {
+  const { isUnlocked } = useAdminStore();
   const [questions, setQuestions] = useState(initialQuestions);
   const [editQ, setEditQ] = useState<{ show: boolean, id: number, text: string }>({ show: false, id: 0, text: '' });
   const [editOpt, setEditOpt] = useState<{ show: boolean, id: number, text: string, scores: any }>({ show: false, id: 0, text: '', scores: {} });
@@ -63,30 +65,34 @@ export default function QuestionsClient({ initialQuestions }: { initialQuestions
             <div className="flex justify-between items-start mb-4">
               <h2 className="text-lg font-bold flex items-start gap-3">
                 <span className="text-[#9F9E9B] font-mono mt-0.5">Q{q.order}</span>
-                <span className="text-[#37352F] leading-snug">{q.text}</span>
+                <span className="text-[#37352F] leading-snug">{isUnlocked ? q.text : '敏感题目内容已隐藏...'}</span>
               </h2>
-              <button 
-                onClick={() => setEditQ({ show: true, id: q.id, text: q.text })}
-                className="shrink-0 text-xs font-medium text-[#787774] hover:text-[#37352F] bg-[#F7F6F3] hover:bg-[#EBEBEB] transition-colors px-3 py-1.5 rounded-lg border border-[#EBEBEB]"
-              >
-                编辑题目
-              </button>
+              {isUnlocked && (
+                <button 
+                  onClick={() => setEditQ({ show: true, id: q.id, text: q.text })}
+                  className="shrink-0 text-xs font-medium text-[#787774] hover:text-[#37352F] bg-[#F7F6F3] hover:bg-[#EBEBEB] transition-colors px-3 py-1.5 rounded-lg border border-[#EBEBEB]"
+                >
+                  编辑题目
+                </button>
+              )}
             </div>
             
             <div className="mt-4 space-y-3">
               {q.options.map((opt: any) => (
                 <div key={opt.id} className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 bg-[#FDFBF7] p-3.5 rounded-xl border border-[#EBEBEB] hover:border-[#D9D9D9] transition-colors">
-                  <span className="font-medium text-[#37352F] text-sm leading-relaxed w-full sm:w-auto flex-1 sm:mr-4">{opt.text}</span>
+                  <span className="font-medium text-[#37352F] text-sm leading-relaxed w-full sm:w-auto flex-1 sm:mr-4">{isUnlocked ? opt.text : '选项内容已隐藏...'}</span>
                   <div className="flex items-center justify-between sm:justify-end gap-3 w-full sm:w-auto pt-2 sm:pt-0 border-t sm:border-t-0 border-[#EBEBEB]/60">
                     <span className="font-mono text-xs text-[#787774] bg-white border border-[#EBEBEB] px-2.5 py-1 rounded-lg shadow-sm break-all max-w-[240px] sm:max-w-md overflow-x-auto">
-                      {opt.scores}
+                      {isUnlocked ? opt.scores : '***'}
                     </span>
-                    <button 
-                      onClick={() => setEditOpt({ show: true, id: opt.id, text: opt.text, scores: JSON.parse(opt.scores) })}
-                      className="shrink-0 text-xs font-medium text-[#787774] hover:text-[#37352F] bg-white hover:bg-[#F7F6F3] transition-colors px-3 py-1.5 rounded-lg border border-[#EBEBEB] shadow-sm cursor-pointer"
-                    >
-                      修改
-                    </button>
+                    {isUnlocked && (
+                      <button 
+                        onClick={() => setEditOpt({ show: true, id: opt.id, text: opt.text, scores: JSON.parse(opt.scores) })}
+                        className="shrink-0 text-xs font-medium text-[#787774] hover:text-[#37352F] bg-white hover:bg-[#F7F6F3] transition-colors px-3 py-1.5 rounded-lg border border-[#EBEBEB] shadow-sm cursor-pointer"
+                      >
+                        修改
+                      </button>
+                    )}
                   </div>
                 </div>
               ))}

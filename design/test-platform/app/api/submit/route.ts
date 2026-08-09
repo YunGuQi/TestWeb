@@ -2,10 +2,21 @@ import { NextResponse } from 'next/server';
 import { prisma } from '../../../lib/prisma';
 import { questions, results } from '../../../lib/data';
 import { destinyLoverQuestions, destinyLoverResults } from '../../../lib/destiny-lover-data';
+import { verifySignature } from '../../../lib/security';
 
 export async function POST(request: Request) {
   try {
-    const body = await request.json();
+    const rawBody = await request.text();
+    const body = JSON.parse(rawBody);
+    
+    const timestamp = request.headers.get('x-timestamp');
+    const signature = request.headers.get('x-sign');
+    
+    const isValid = await verifySignature(timestamp, signature, rawBody, 120);
+    if (!isValid) {
+      return NextResponse.json({ success: false, error: 'Unauthorized signature' }, { status: 403 });
+    }
+
     const { deviceId, answers, testId = 'emotional-friction' } = body;
 
     if (!answers || typeof answers !== 'object') {
@@ -99,10 +110,15 @@ export async function POST(request: Request) {
         console.warn('DB connect failed during testRecord create. Gracefully continuing.');
       }
 
+      const strippedResult = { ...finalResult };
+      delete strippedResult.description;
+      delete strippedResult.quote;
+      delete strippedResult.radar;
+
       return NextResponse.json({
         success: true,
         recordId: recordId,
-        result: finalResult
+        result: strippedResult // 返回剥离了敏感数据的结果
       });
     }
     // ==== 原有 emo 算分分支 ====

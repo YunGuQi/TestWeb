@@ -2,6 +2,7 @@
 
 import { useState, useTransition, useCallback } from 'react';
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
+import { useAdminStore } from '../../lib/store/admin-store';
 
 const TESTS = [
   { id: 'emotional-friction', name: '深度情绪内耗测算', icon: '🔥', tag: 'EMO' },
@@ -113,6 +114,9 @@ export default function AdminNav() {
   const [isPending, startTransition] = useTransition();
   // 记录当前正在导航到的目标路径
   const [navigatingTo, setNavigatingTo] = useState<string | null>(null);
+  const { isUnlocked, unlock, lock } = useAdminStore();
+  const [showUnlockModal, setShowUnlockModal] = useState(false);
+  const [unlockCode, setUnlockCode] = useState('');
   
   const currentTestId = searchParams.get('testId') || 'emotional-friction';
   
@@ -141,6 +145,25 @@ export default function AdminNav() {
   const handleNavPrefetch = useCallback((path: string) => {
     router.prefetch(buildHref(path));
   }, [buildHref, router]);
+
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/admin/logout', { method: 'POST' });
+      window.location.href = '/ops-login';
+    } catch (err) {
+      console.error('Logout failed', err);
+    }
+  };
+
+  const handleUnlockSubmit = () => {
+    if (unlockCode === process.env.NEXT_PUBLIC_ADMIN_PRIVACY_PASSWORD) {
+      unlock();
+      setShowUnlockModal(false);
+      setUnlockCode('');
+    } else {
+      alert('密码错误');
+    }
+  };
 
   const navItems = [
     { name: '概览 (Overview)', shortName: '概览', path: '/ops-dashboard', icon: '📊' },
@@ -262,6 +285,26 @@ export default function AdminNav() {
         </nav>
         
         <div className="p-4 border-t border-[#EBEBEB]">
+          <div className="flex items-center gap-2 mb-2">
+            <button 
+              type="button" 
+              onClick={() => isUnlocked ? lock() : setShowUnlockModal(true)}
+              className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 text-sm rounded-md transition-colors touch-manipulation cursor-pointer ${
+                isUnlocked ? 'bg-amber-100 text-amber-700 hover:bg-amber-200' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
+              }`}
+            >
+              <span className="shrink-0 text-base">{isUnlocked ? '🔓' : '👁️'}</span>
+              <span className="font-bold tracking-wider">{isUnlocked ? '关闭隐私' : '开启隐私'}</span>
+            </button>
+            <button 
+              type="button" 
+              onClick={handleLogout}
+              className="flex-none px-3 py-2 text-sm bg-red-50 text-red-600 hover:bg-red-100 rounded-md transition-colors touch-manipulation cursor-pointer font-bold"
+            >
+              🚪 退出
+            </button>
+          </div>
+          
           <button 
             type="button" 
             onClick={() => router.push('/')}
@@ -276,6 +319,41 @@ export default function AdminNav() {
           </div>
         </div>
       </div>
+
+      {showUnlockModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+          <div className="bg-white rounded-2xl p-6 w-full max-w-sm shadow-[0_20px_40px_rgba(0,0,0,0.2)] border border-gray-100 text-center">
+            <div className="text-3xl mb-4">👁️</div>
+            <h3 className="text-xl font-bold text-gray-900 mb-2">解锁隐私模式</h3>
+            <p className="text-sm text-gray-500 mb-6">请输入超级密码查看或修改敏感数据</p>
+            <input 
+              type="password"
+              value={unlockCode}
+              onChange={(e) => setUnlockCode(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && handleUnlockSubmit()}
+              placeholder="请输入隐私密码"
+              className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 mb-6 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white transition-all font-mono"
+            />
+            <div className="flex gap-3">
+              <button 
+                onClick={() => {
+                  setShowUnlockModal(false);
+                  setUnlockCode('');
+                }}
+                className="flex-1 py-3 bg-gray-100 text-gray-700 font-bold rounded-xl hover:bg-gray-200 transition-colors"
+              >
+                取消
+              </button>
+              <button 
+                onClick={handleUnlockSubmit}
+                className="flex-1 py-3 bg-emerald-600 text-white font-bold rounded-xl hover:emerald-700 transition-colors shadow-sm"
+              >
+                解锁
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }
