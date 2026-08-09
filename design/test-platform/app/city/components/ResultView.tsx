@@ -291,7 +291,8 @@ export default function ResultView({ forcedResultData }: ResultViewProps) {
               { label: '社交', value: userCoords[3] ?? 5 },
               { label: '品味', value: userCoords[4] ?? 5 }
             ].map((dim, i) => {
-              let pct = (dim.value / 10) * 100;
+              // 城市测试中，基础分为5，10道题单题最高可加2分，总分理论上限为25分
+              let pct = (dim.value / 25) * 100;
               if (pct < 10) pct = 10;
               const hash = ((dim.value * 13.5 + rank * 7.3 + i * 3.1) % 1) * 0.99;
               let calcPct = pct + hash;
@@ -311,11 +312,27 @@ export default function ResultView({ forcedResultData }: ResultViewProps) {
             })}
           </div>
 
-          <div className="font-mono text-xs opacity-70 mb-3">DIAGNOSTIC REPORT</div>
+          <div className="font-mono text-xs opacity-70 mb-4">DIAGNOSTIC REPORT</div>
           
-          <div className="mb-4">
-            <div className={`font-bold text-xs mb-1 ${currentStyle.labelBg} inline-block px-2 py-0.5 rounded font-mono transition-colors duration-300`}>【灵魂基调】</div>
-            <p className="text-[13px] leading-relaxed font-medium text-justify">{city.desc}</p>
+          <div className="mb-4 flex flex-col gap-4">
+            {(city.desc || '').split('【').map((part: string, idx: number) => {
+              if (!part.trim()) return null;
+              if (idx === 0) {
+                return <p key={idx} className="text-[13px] leading-relaxed font-medium text-justify opacity-90">{part.trim()}</p>;
+              }
+              const [title, ...contentParts] = part.split('】');
+              const content = contentParts.join('】').trim();
+              return (
+                <div key={idx} className={`relative p-4 pt-7 mt-3 rounded-sm border ${currentStyle.taglineColor} bg-transparent shadow-sm`}>
+                   <div className={`absolute -top-3 left-3 px-3 py-1 font-bold text-xs rounded-full border ${currentStyle.taglineColor} ${currentStyle.labelBg} shadow-sm`}>
+                     {title}
+                   </div>
+                   <p className="text-[13px] leading-relaxed font-medium text-justify opacity-90">
+                     {content}
+                   </p>
+                </div>
+              );
+            })}
           </div>
           
           <div className={`mt-5 p-4 ${currentStyle.quoteBg} border-l-4 italic font-bold text-sm transition-colors duration-300 rounded-r`}>

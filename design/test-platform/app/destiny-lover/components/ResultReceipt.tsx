@@ -120,11 +120,11 @@ export default function ResultReceipt({ result, userInfo, onRestart }: ResultRec
 
           {/* Content */}
           <div className="p-7 flex-1 flex flex-col">
-              <div className="inline-block mx-auto mb-7 px-4 py-1 bg-[#8A2B2B]/5 border-y border-[#8A2B2B]/30 text-[#8A2B2B] text-xs tracking-[0.25em] font-serif text-center">
+              <div className="inline-block mx-auto mb-5 px-4 py-1 bg-[#8A2B2B]/5 border-y border-[#8A2B2B]/30 text-[#8A2B2B] text-xs tracking-[0.25em] font-serif text-center">
                 「 {userInfo.nickname} · 专属红联档案 」
               </div>
               
-              <div className="flex gap-2 flex-wrap justify-center mb-8">
+              <div className="flex gap-2 flex-wrap justify-center mb-6">
                   {result.tags?.map((tag: string, idx: number) => (
                     <span key={idx} className="text-xs text-[#8A2B2B] border border-[#8A2B2B]/60 bg-[#8A2B2B]/5 px-3 py-1 rounded-full">
                       {tag.replace('#', '')}
@@ -134,7 +134,7 @@ export default function ResultReceipt({ result, userInfo, onRestart }: ResultRec
 
               {/* 雷达数据展示 */}
               {result.radar && result.radar.length > 0 && (
-                <div className="space-y-4 mb-8 px-1">
+                <div className="space-y-4 mb-5 px-1">
                     {result.radar.map((item: any, idx: number) => {
                       let calcVal = item.value + ((idx * 17) % 99) * 0.01;
                       if (calcVal >= 100 || item.value >= 100) {
@@ -165,12 +165,37 @@ export default function ResultReceipt({ result, userInfo, onRestart }: ResultRec
                           </button>
                       </div>
                   )}
-                  <p className="text-sm leading-loose text-[#444] mb-6 text-justify">
-                      {result.description}
-                  </p>
-                  <div className="bg-[#FAF8F5] p-4 text-[#8A2B2B] text-sm italic border-l-2 border-[#8A2B2B] rounded-r-sm">
-                      {result.quote}
-                  </div>
+                  {result.description ? (
+                    <div className="flex flex-col gap-5 mb-6 px-1">
+                      {result.description.split('【').map((part: string, idx: number) => {
+                        if (!part.trim()) return null;
+                        if (idx === 0) {
+                          return (
+                            <p key={idx} className="text-[13px] leading-loose text-[#5c4a4a] text-justify tracking-wide mb-1">
+                              {part.trim()}
+                            </p>
+                          );
+                        }
+                        const [title, ...contentParts] = part.split('】');
+                        const content = contentParts.join('】').trim();
+                        return (
+                          <div key={idx} className="relative">
+                            <div className="flex items-center gap-2 mb-2">
+                              <span className="w-1.5 h-1.5 bg-[#8A2B2B] rotate-45 shrink-0"></span>
+                              <h4 className="font-bold text-[#8A2B2B] text-[13px] tracking-widest">{title}</h4>
+                              <div className="h-px bg-[#8A2B2B]/20 flex-1"></div>
+                            </div>
+                            <p className="text-[13px] leading-loose text-[#5c4a4a] text-justify bg-[#FAF8F5] px-4 py-3 border-l-2 border-[#8A2B2B]/40 rounded-r-sm shadow-sm">
+                              {content}
+                            </p>
+                          </div>
+                        );
+                      })}
+                      <div className="bg-[#8A2B2B]/5 px-4 py-3 mt-1 text-[#8A2B2B] text-[13px] font-bold italic border border-[#8A2B2B]/20 rounded-sm text-center shadow-sm">
+                          {result.quote}
+                      </div>
+                    </div>
+                  ) : null}
               </div>
           </div>
       </div>
