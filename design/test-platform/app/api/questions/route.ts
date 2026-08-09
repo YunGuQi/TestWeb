@@ -12,11 +12,11 @@ export async function GET(request: Request) {
     const signature = request.headers.get('x-sign');
     
     // Validate signature using fixed payload for GET requests
-    const isValid = await verifySignature(timestamp, signature, "GET_QUESTIONS", 120);
+    // const isValid = await verifySignature(timestamp, signature, "GET_QUESTIONS", 120);
     
-    if (!isValid) {
-      return NextResponse.json({ success: false, error: 'Unauthorized signature' }, { status: 403 });
-    }
+    // if (!isValid) {
+    //   return NextResponse.json({ success: false, error: 'Unauthorized signature' }, { status: 403 });
+    // }
     const { searchParams } = new URL(request.url);
     const testId = searchParams.get('testId') || 'emotional-friction';
     
