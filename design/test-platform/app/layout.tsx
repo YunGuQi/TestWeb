@@ -1,4 +1,4 @@
-import './globals.css'
+import '../public/main.css'
 
 export const metadata = {
   title: '深度情绪内耗测试',
