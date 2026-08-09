@@ -111,14 +111,15 @@ export async function POST(request: Request) {
       }
 
       const strippedResult = { ...finalResult };
-      delete strippedResult.description;
-      delete strippedResult.quote;
-      delete strippedResult.radar;
+      // 修复：取消剥离详细数据，否则已解锁的前端也会显示空白
+      // delete strippedResult.description;
+      // delete strippedResult.quote;
+      // delete strippedResult.radar;
 
       return NextResponse.json({
         success: true,
         recordId: recordId,
-        result: strippedResult // 返回剥离了敏感数据的结果
+        result: strippedResult 
       });
     }
     // ==== 原有 emo 算分分支 ====

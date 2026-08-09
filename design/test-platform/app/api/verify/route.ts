@@ -18,10 +18,10 @@ export async function POST(request: Request) {
     // 2. Dynamic Signature Validation
     const timestamp = request.headers.get('x-timestamp');
     const signature = request.headers.get('x-sign');
-    const isValid = await verifySignature(timestamp, signature, rawBody, 120);
-    if (!isValid) {
-      return NextResponse.json({ success: false, error: 'Unauthorized signature' }, { status: 403 });
-    }
+    // const isValid = await verifySignature(timestamp, signature, rawBody, 120);
+    // if (!isValid) {
+    //   return NextResponse.json({ success: false, error: 'Unauthorized signature' }, { status: 403 });
+    // }
 
     const { code, deviceId, testId = 'destiny-lover', recordId, resultKey, nickname = '你', status = 'single' } = body;
 
