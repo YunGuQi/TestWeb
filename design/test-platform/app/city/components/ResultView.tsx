@@ -329,8 +329,10 @@ export default function ResultView({ forcedResultData }: ResultViewProps) {
               const content = contentParts.join('】').trim();
               return (
                 <div key={idx} className={`relative p-4 pt-7 mt-3 rounded-sm border ${currentStyle.taglineColor} bg-transparent shadow-sm`}>
-                   <div className={`absolute -top-3 left-3 px-3 py-1 font-bold text-xs rounded-full border ${currentStyle.taglineColor} ${currentStyle.labelBg} shadow-sm`}>
-                     {title}
+                   <div className={`absolute -top-3 left-3 font-bold text-xs rounded-full border ${currentStyle.taglineColor} ${currentStyle.bg} shadow-sm overflow-hidden`}>
+                     <div className={`px-3 py-1 w-full h-full ${currentStyle.labelBg}`}>
+                       {title}
+                     </div>
                    </div>
                    <p className="text-[13px] leading-relaxed font-medium text-justify opacity-90">
                      {content}

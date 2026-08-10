@@ -51,11 +51,11 @@
 只修改了业务代码（如 `.tsx`、`.css` 或 `api` 路由），不需要重新上传 `node_modules`。
 
 **操作步骤**：
-1. 本地执行 `npm run build`，让 Next.js 将最新的改动编译到 `.next` 文件夹中。
-   - **注意**：如果不执行 build，你上传的永远是旧代码。
-2. 将 `.next` 文件夹单独打成压缩包。
-   - PowerShell 命令：`Compress-Archive -Path .next -DestinationPath update_next.zip -Force`
-3. 上传 `update_next.zip` 到宝塔目录。
+1. **【血泪踩坑警告】本地必须先执行 `npm run build`**，让 Next.js 将最新的改动编译到 `.next` 文件夹中。
+   - **坑点**：Vercel 是从 GitHub 拉取代码并在云端自动 `build`，因此 Vercel 上看到的永远是对的。但在宝塔，打包脚本（如 Python 脚本）只是单纯地打包 `.next` 文件夹。如果你修改完代码**忘记执行 build 就直接打包**，宝塔那边上传解压重启后依然是旧代码！
+2. 运行增量打包脚本 `python pack_update.py`，生成极轻量级的 `update.zip`。
+   - 这比单独压缩 `.next` 更严谨，因为它会顺带把可能更新过的 `public` 和 `package.json` 也打包进去。
+3. 上传 `update.zip` 到宝塔网站根目录。
 4. 在宝塔中将旧的 `.next` 文件夹删除或改名备份。
 5. 解压 `update_next.zip`。
 6. 在宝塔【Node项目】中点击重启，整个过程只需几秒钟。

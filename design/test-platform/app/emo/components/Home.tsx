@@ -42,8 +42,8 @@ export default function Home({ onStartTest, onRestoreHistory }: HomeProps) {
   }, []);
 
   return (
-    <main id="view-home" className="relative w-full max-w-lg mx-auto min-h-[100dvh] flex flex-col pt-[max(24px,env(safe-area-inset-top))] pb-[max(24px,env(safe-area-inset-bottom))] px-5 justify-center z-10">
-      <div id="home-content" className="w-full">
+    <main id="view-home" className="relative w-full max-w-lg mx-auto min-h-[100dvh] flex flex-col pt-[max(24px,env(safe-area-inset-top))] pb-[max(64px,env(safe-area-inset-bottom))] px-5 justify-center z-10 overflow-y-auto">
+      <div id="home-content" className="w-full my-auto py-8">
           <div className="text-center mb-10 brutalist-card p-6 sm:p-8 transform -rotate-1 border-4 border-black bg-[#fefdfb] shadow-[8px_8px_0px_#000] relative overflow-hidden">
               {/* 热敏纸小票顶部锯齿装饰 */}
               <div className="absolute top-0 left-0 right-0 h-2 bg-[radial-gradient(circle_at_10px_-5px,#000_10px,transparent_11px)] bg-[length:20px_20px] opacity-10 pointer-events-none" />
