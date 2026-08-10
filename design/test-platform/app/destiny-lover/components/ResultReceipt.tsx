@@ -227,10 +227,10 @@ export default function ResultReceipt({ result, userInfo, onRestart }: ResultRec
           </div>
           <button 
               type="button"
-              onClick={() => window.location.href = 'https://xhslink.com/m/Atwtf3Cy6FR'} 
+              onClick={() => window.location.href = '/'} 
               className="w-full min-h-[44px] py-3.5 bg-[#2C2825] text-white text-center text-sm font-medium tracking-widest hover:bg-[#1F1B18] active:scale-[0.99] transition-all shadow-md rounded-sm touch-manipulation cursor-pointer flex items-center justify-center"
           >
-              探索其他测试
+              返回测试大厅
           </button>
       </div>
       

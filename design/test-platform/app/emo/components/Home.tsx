@@ -156,7 +156,7 @@ export default function Home({ onStartTest, onRestoreHistory }: HomeProps) {
                         onClick={() => window.location.href = 'https://xhslink.com/m/Atwtf3Cy6FR'} 
                         className="text-xs text-gray-600 hover:text-black transition-colors underline underline-offset-4 min-h-[44px] inline-flex items-center justify-center cursor-pointer touch-manipulation active:scale-95 px-3"
                       >
-                        [ 探索其他专柜 ]
+                        [ 前往安安的特卖专柜 ]
                       </button>
                   </div>
               </div>

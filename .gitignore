@@ -11,3 +11,6 @@ tmp_skill/
 .scratch/
 .codex/
 .mcp.json
+
+# 忽略打包生成的部署文件
+*.zip

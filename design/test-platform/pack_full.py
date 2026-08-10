@@ -4,7 +4,7 @@ import time
 
 def create_full_zip():
     zip_name = 'deploy_full.zip'
-    targets = ['.next', 'public', 'package.json', 'package-lock.json', 'prisma', 'node_modules']
+    targets = ['.next', 'public', 'package.json', 'package-lock.json', 'prisma', 'node_modules', '.env']
     
     print(f"Creating {zip_name} (this may take a minute)...")
     

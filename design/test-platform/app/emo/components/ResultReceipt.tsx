@@ -352,11 +352,11 @@ export default function ResultReceipt({ result, onRestart, forcedUnlock }: Resul
                 <button onClick={onRestart} id="btn-restart" className="text-xs text-gray-400 hover:text-white underline underline-offset-4 decoration-gray-700 transition-colors min-h-[44px] inline-flex items-center justify-center cursor-pointer touch-manipulation active:scale-95 px-3">[ 重新打印 ]</button>
                 <button 
                   type="button"
-                  onClick={() => window.location.href = 'https://xhslink.com/m/Atwtf3Cy6FR'} 
+                  onClick={() => window.location.href = '/'} 
                   id="btn-more" 
                   className="text-xs text-gray-400 hover:text-white underline underline-offset-4 decoration-gray-700 transition-colors min-h-[44px] inline-flex items-center justify-center cursor-pointer touch-manipulation active:scale-95 px-3"
                 >
-                  [ 查看更多专柜 ]
+                  [ 逛逛购物大厅 ]
                 </button>
             </div>
         </div>

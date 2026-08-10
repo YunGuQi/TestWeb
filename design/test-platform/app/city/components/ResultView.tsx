@@ -368,8 +368,8 @@ export default function ResultView({ forcedResultData }: ResultViewProps) {
             [ 重新购买车票 ]
           </button>
           
-          <button onClick={() => window.location.href = 'https://xhslink.com/m/Atwtf3Cy6FR'} className="text-xs text-gray-400 hover:text-[#1a1a1a] transition-colors underline underline-offset-4 tracking-widest min-h-[44px] inline-flex items-center justify-center cursor-pointer touch-manipulation active:scale-95 px-3">
-            [ 探索测试大厅 ]
+          <button onClick={() => window.location.href = '/'} className="text-xs text-gray-400 hover:text-[#1a1a1a] transition-colors underline underline-offset-4 tracking-widest min-h-[44px] inline-flex items-center justify-center cursor-pointer touch-manipulation active:scale-95 px-3">
+            [ 返回测试枢纽大厅 ]
           </button>
         </div>
       </div>

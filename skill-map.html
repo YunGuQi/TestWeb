@@ -1,0 +1,4074 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="swiss">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WAYFINDER // IMPECCABLE AI Agent 全维技能指挥控制中心</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* [主题模式 1] 🌑 赛博黑曜石 (Cyber Obsidian - 默认) */
+        :root[data-theme="swiss"] {
+            --bg-canvas: #040507;
+            --bg-surface: rgba(15, 19, 28, 0.75);
+            --bg-surface-elevated: rgba(23, 29, 43, 0.88);
+            --bg-surface-hover: rgba(30, 38, 56, 0.94);
+            
+            --border-subtle: rgba(255, 255, 255, 0.07);
+            --border-default: rgba(255, 255, 255, 0.12);
+            --border-hover: rgba(255, 255, 255, 0.28);
+            --border-accent: #a855f7;
+            
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --text-tertiary: #64748b;
+            --text-accent: #38bdf8;
+            
+            --bg-grad-1: rgba(168, 85, 247, 0.18);
+            --bg-grad-2: rgba(6, 182, 212, 0.08);
+            --bg-grad-3: rgba(244, 63, 94, 0.06);
+            --grid-color: rgba(255, 255, 255, 0.02);
+            
+            --shadow-subtle: 0 4px 20px -2px rgba(0, 0, 0, 0.6);
+            --shadow-elevated: 0 20px 45px -10px rgba(0, 0, 0, 0.85), 0 0 20px rgba(168, 85, 247, 0.1);
+        }
+
+        /* [主题模式 2] ☀️ 极简白釉 (Swiss Light / Clean Minimal) */
+        :root[data-theme="swiss"] {
+            --bg-canvas: #f8fafc;
+            --bg-surface: rgba(255, 255, 255, 0.85);
+            --bg-surface-elevated: #ffffff;
+            --bg-surface-hover: #ffffff;
+            
+            --border-subtle: rgba(15, 23, 42, 0.06);
+            --border-default: rgba(15, 23, 42, 0.12);
+            --border-hover: rgba(15, 23, 42, 0.3);
+            --border-accent: #6366f1;
+            
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --text-tertiary: #94a3b8;
+            --text-accent: #4f46e5;
+            
+            --bg-grad-1: rgba(99, 102, 241, 0.08);
+            --bg-grad-2: rgba(14, 165, 233, 0.05);
+            --bg-grad-3: rgba(244, 63, 94, 0.04);
+            --grid-color: rgba(15, 23, 42, 0.035);
+            
+            --shadow-subtle: 0 4px 15px -2px rgba(15, 23, 42, 0.05);
+            --shadow-elevated: 0 20px 35px -8px rgba(15, 23, 42, 0.1), 0 0 15px rgba(99, 102, 241, 0.06);
+        }
+
+        /* [主题模式 3] 🌌 终端矩阵绿 (Matrix Terminal) */
+        :root[data-theme="matrix"] {
+            --bg-canvas: #020804;
+            --bg-surface: rgba(5, 18, 10, 0.82);
+            --bg-surface-elevated: rgba(9, 28, 15, 0.92);
+            --bg-surface-hover: rgba(14, 40, 22, 0.96);
+            
+            --border-subtle: rgba(34, 197, 94, 0.15);
+            --border-default: rgba(34, 197, 94, 0.28);
+            --border-hover: rgba(34, 197, 94, 0.7);
+            --border-accent: #22c55e;
+            
+            --text-primary: #4ade80;
+            --text-secondary: #22c55e;
+            --text-tertiary: #15803d;
+            --text-accent: #86efac;
+            
+            --bg-grad-1: rgba(34, 197, 94, 0.14);
+            --bg-grad-2: rgba(16, 185, 129, 0.06);
+            --bg-grad-3: rgba(5, 150, 105, 0.05);
+            --grid-color: rgba(34, 197, 94, 0.04);
+            
+            --shadow-subtle: 0 4px 20px -2px rgba(0, 0, 0, 0.8);
+            --shadow-elevated: 0 20px 45px -10px rgba(0, 0, 0, 0.9), 0 0 25px rgba(34, 197, 94, 0.25);
+        }
+
+        /* [主题模式 4] 🎨 晚霞琥珀 (Sunset Horizon) */
+        :root[data-theme="sunset"] {
+            --bg-canvas: #0c080d;
+            --bg-surface: rgba(22, 16, 26, 0.75);
+            --bg-surface-elevated: rgba(32, 24, 38, 0.88);
+            --bg-surface-hover: rgba(43, 33, 52, 0.94);
+            
+            --border-subtle: rgba(251, 146, 60, 0.1);
+            --border-default: rgba(251, 146, 60, 0.2);
+            --border-hover: rgba(251, 146, 60, 0.5);
+            --border-accent: #f97316;
+            
+            --text-primary: #fff7ed;
+            --text-secondary: #fdba74;
+            --text-tertiary: #c2410c;
+            --text-accent: #fb923c;
+            
+            --bg-grad-1: rgba(249, 115, 22, 0.18);
+            --bg-grad-2: rgba(236, 72, 153, 0.1);
+            --bg-grad-3: rgba(168, 85, 247, 0.08);
+            --grid-color: rgba(251, 146, 60, 0.025);
+            
+            --shadow-subtle: 0 4px 20px -2px rgba(0, 0, 0, 0.7);
+            --shadow-elevated: 0 20px 45px -10px rgba(0, 0, 0, 0.85), 0 0 20px rgba(249, 115, 22, 0.15);
+        }
+
+        :root {
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 18px;
+            --radius-xl: 24px;
+            --transition-smooth: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--bg-canvas);
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            padding-bottom: 120px;
+            background-image: 
+                radial-gradient(circle at 50% 0%, var(--bg-grad-1) 0%, transparent 60%),
+                radial-gradient(circle at 15% 30%, var(--bg-grad-2) 0%, transparent 40%),
+                radial-gradient(circle at 85% 70%, var(--bg-grad-3) 0%, transparent 45%),
+                linear-gradient(var(--grid-color) 1px, transparent 1px),
+                linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
+            background-size: 100% 100%, 100% 100%, 100% 100%, 32px 32px, 32px 32px;
+            background-attachment: fixed;
+            transition: background-color 0.35s ease, color 0.35s ease;
+        }
+
+        .header {
+            position: sticky; top: 0; z-index: 50;
+            background: var(--bg-surface);
+            backdrop-filter: blur(28px);
+            border-bottom: 1px solid var(--border-subtle);
+            padding: 1.15rem 0;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            transition: var(--transition-smooth);
+        }
+
+        .container {
+            max-width: 1440px; margin: 0 auto; padding: 0 2.5rem;
+            position: relative; z-index: 10;
+        }
+
+        .header-inner {
+            display: flex; justify-content: space-between; align-items: center;
+            gap: 1.5rem; flex-wrap: wrap;
+        }
+
+        .brand-block { display: flex; align-items: center; gap: 16px; }
+
+        .brand-mark {
+            width: 44px; height: 44px; border-radius: var(--radius-md);
+            background: linear-gradient(135deg, #38bdf8, #a855f7, #f43f5e);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 20px; font-weight: 800; color: #fff;
+            box-shadow: 0 0 25px rgba(168, 85, 247, 0.5), inset 0 2px 4px rgba(255,255,255,0.3);
+            font-family: 'JetBrains Mono', monospace;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .brand-text h1 {
+            font-size: 1.32rem; font-weight: 800; letter-spacing: -0.025em;
+            color: var(--text-primary);
+            display: flex; align-items: center; gap: 10px;
+        }
+
+        .brand-badge {
+            font-size: 0.68rem; font-family: 'JetBrains Mono', monospace;
+            background: rgba(56, 189, 248, 0.15); color: #38bdf8;
+            border: 1px solid rgba(56, 189, 248, 0.4);
+            padding: 2px 8px; border-radius: 6px; text-transform: uppercase;
+        }
+
+        .brand-text p {
+            font-size: 0.8rem; color: var(--text-secondary); font-weight: 500;
+            margin-top: 2px;
+        }
+
+        .metrics-bar {
+            display: flex; gap: 12px; align-items: center; flex-wrap: wrap;
+        }
+
+        .theme-switcher {
+            display: flex; align-items: center; gap: 6px;
+            background: var(--bg-surface-elevated);
+            border: 1px solid var(--border-default);
+            padding: 4px; border-radius: 14px;
+            backdrop-filter: blur(16px);
+        }
+
+        .theme-btn {
+            background: transparent; border: none; color: var(--text-secondary);
+            padding: 6px 12px; border-radius: 10px; font-size: 0.78rem; font-weight: 600;
+            cursor: pointer; transition: var(--transition-smooth);
+            display: flex; align-items: center; gap: 5px;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .theme-btn:hover { color: var(--text-primary); background: rgba(255,255,255,0.06); }
+        .theme-btn.active {
+            background: var(--text-primary); color: var(--bg-canvas);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.25); font-weight: 800;
+        }
+
+        .metric-card {
+            background: var(--bg-surface-elevated);
+            border: 1px solid var(--border-default);
+            padding: 8px 16px; border-radius: var(--radius-md);
+            font-size: 0.8rem; color: var(--text-secondary);
+            display: flex; align-items: center; gap: 8px;
+            backdrop-filter: blur(12px);
+        }
+
+        .metric-card strong {
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--text-primary); font-size: 1rem; font-weight: 700;
+            background: linear-gradient(90deg, var(--text-accent), #c084fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .toolbar {
+            margin: 2.5rem 0 2rem 0;
+            display: flex; flex-direction: column; gap: 1.4rem;
+        }
+
+        .search-box { position: relative; width: 100%; }
+
+        .search-input {
+            width: 100%; padding: 18px 24px 18px 52px;
+            background: var(--bg-surface);
+            border: 1px solid var(--border-default);
+            border-radius: var(--radius-lg);
+            color: var(--text-primary);
+            font-size: 1rem; font-family: inherit;
+            outline: none; transition: var(--transition-smooth);
+            box-shadow: var(--shadow-subtle);
+            backdrop-filter: blur(16px);
+        }
+
+        .search-input:focus {
+            border-color: var(--border-accent);
+            background: var(--bg-surface-elevated);
+            box-shadow: 0 0 0 4px rgba(168, 85, 247, 0.18), 0 0 30px rgba(168, 85, 247, 0.15);
+        }
+
+        .search-input::placeholder { color: var(--text-tertiary); }
+
+        .search-icon {
+            position: absolute; left: 20px; top: 50%; transform: translateY(-50%);
+            color: var(--text-accent); font-size: 20px; pointer-events: none;
+        }
+
+        .filter-section {
+            display: flex; flex-direction: column; gap: 1rem;
+            background: var(--bg-surface);
+            border: 1px solid var(--border-subtle);
+            padding: 1.25rem 1.5rem;
+            border-radius: var(--radius-lg);
+            backdrop-filter: blur(16px);
+        }
+
+        .filter-row {
+            display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+        }
+
+        .filter-label {
+            font-size: 0.75rem; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 0.08em; color: var(--text-tertiary);
+            min-width: 95px;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .segmented-btn {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border-default);
+            color: var(--text-secondary);
+            padding: 7px 16px; border-radius: var(--radius-sm);
+            font-size: 0.85rem; font-weight: 500;
+            cursor: pointer; transition: var(--transition-smooth);
+            display: flex; align-items: center; gap: 8px;
+        }
+
+        .segmented-btn:hover {
+            background: rgba(255, 255, 255, 0.09);
+            color: var(--text-primary);
+            border-color: var(--border-hover);
+            transform: translateY(-1px);
+        }
+
+        .segmented-btn.active {
+            background: var(--text-primary);
+            color: var(--bg-canvas);
+            border-color: var(--text-primary);
+            font-weight: 700;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .segmented-btn.submod-btn {
+            background: rgba(168, 85, 247, 0.08);
+            border-color: rgba(168, 85, 247, 0.25);
+            color: var(--text-primary);
+            font-size: 0.82rem;
+        }
+        .segmented-btn.submod-btn:hover {
+            background: rgba(168, 85, 247, 0.16);
+            border-color: rgba(168, 85, 247, 0.5);
+        }
+        .segmented-btn.submod-btn.active {
+            background: var(--border-accent);
+            color: #fff;
+            border-color: var(--border-accent);
+            box-shadow: 0 0 20px rgba(168, 85, 247, 0.4);
+        }
+
+        .badge-count {
+            background: rgba(0, 0, 0, 0.25);
+            padding: 2px 7px; border-radius: 6px;
+            font-size: 0.72rem; font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+        }
+
+        .segmented-btn.active .badge-count {
+            background: rgba(0, 0, 0, 0.15);
+            color: inherit;
+        }
+        .segmented-btn.submod-btn.active .badge-count {
+            background: rgba(0, 0, 0, 0.35);
+            color: #fff;
+        }
+
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(430px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .skill-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-default);
+            border-radius: var(--radius-xl);
+            padding: 1.6rem;
+            display: flex; flex-direction: column; justify-content: space-between;
+            gap: 1.2rem;
+            transition: var(--transition-smooth);
+            cursor: pointer;
+            box-shadow: var(--shadow-subtle);
+            position: relative; overflow: hidden;
+            backdrop-filter: blur(20px);
+        }
+
+        .skill-card::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 2px;
+            background: linear-gradient(90deg, transparent, var(--accent-color, #a855f7), transparent);
+            opacity: 0.7; transition: var(--transition-smooth);
+        }
+
+        .skill-card:hover {
+            background: var(--bg-surface-elevated);
+            border-color: var(--border-hover);
+            transform: translateY(-4px) scale(1.006);
+            box-shadow: var(--shadow-elevated);
+        }
+
+        .skill-card:hover::before { opacity: 1; height: 3px; }
+
+        .card-header {
+            display: flex; justify-content: space-between; align-items: flex-start;
+            gap: 12px;
+        }
+
+        .skill-name {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.15rem; font-weight: 700;
+            color: var(--text-primary);
+            display: flex; align-items: center; gap: 6px;
+            letter-spacing: -0.015em;
+        }
+
+        .skill-slash { color: var(--text-accent); font-weight: 800; }
+
+        .scope-tag {
+            font-size: 0.72rem; font-weight: 700;
+            padding: 4px 10px; border-radius: 6px;
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-default);
+            white-space: nowrap;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .skill-body {
+            font-size: 0.9rem; color: var(--text-secondary);
+            line-height: 1.65;
+            display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;
+            overflow: hidden; white-space: pre-wrap;
+        }
+
+        .submod-badge-card {
+            display: inline-block;
+            font-size: 0.75rem;
+            color: var(--text-primary);
+            background: rgba(168, 85, 247, 0.15);
+            border: 1px solid rgba(168, 85, 247, 0.35);
+            padding: 4px 12px;
+            border-radius: 8px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .card-commands-bar {
+            display: flex; flex-wrap: wrap; gap: 7px;
+            margin-top: 6px;
+        }
+
+        .cmd-pill {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border-default);
+            color: var(--text-primary); font-size: 0.76rem;
+            font-family: 'JetBrains Mono', monospace;
+            padding: 5px 12px; border-radius: 8px;
+            display: inline-flex; align-items: center; gap: 6px;
+            transition: var(--transition-smooth);
+            cursor: pointer;
+        }
+
+        .cmd-pill:hover {
+            background: rgba(168, 85, 247, 0.28);
+            border-color: rgba(168, 85, 247, 0.6);
+            color: var(--text-primary); transform: scale(1.04);
+            box-shadow: 0 0 12px rgba(168, 85, 247, 0.3);
+        }
+
+        .cmd-pill-desc {
+            font-family: 'Inter', sans-serif;
+            color: var(--text-tertiary);
+            font-size: 0.72rem;
+        }
+        .cmd-pill:hover .cmd-pill-desc { color: inherit; }
+
+        .card-footer {
+            display: flex; justify-content: space-between; align-items: center;
+            border-top: 1px solid var(--border-subtle);
+            padding-top: 1rem;
+        }
+
+        .cat-indicator {
+            display: flex; align-items: center; gap: 8px;
+            font-size: 0.78rem; font-weight: 600; color: var(--text-secondary);
+        }
+
+        .cat-dot {
+            width: 8px; height: 8px; border-radius: 50%;
+            background-color: var(--accent-color, #38bdf8);
+            box-shadow: 0 0 8px var(--accent-color, #38bdf8);
+        }
+
+        .card-actions { display: flex; gap: 8px; }
+
+        .btn-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-default);
+            color: var(--text-secondary);
+            padding: 7px 14px; border-radius: var(--radius-sm);
+            font-size: 0.78rem; font-weight: 600;
+            cursor: pointer; transition: var(--transition-smooth);
+            display: flex; align-items: center; gap: 6px;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .btn-card:hover {
+            background: rgba(255, 255, 255, 0.12);
+            color: var(--text-primary); border-color: var(--border-hover);
+        }
+
+        .btn-card.highlight {
+            background: linear-gradient(135deg, rgba(168, 85, 247, 0.22), rgba(6, 182, 212, 0.15));
+            border-color: rgba(168, 85, 247, 0.45);
+            color: var(--text-primary); font-weight: 700;
+        }
+        .btn-card.highlight:hover {
+            background: linear-gradient(135deg, rgba(168, 85, 247, 0.4), rgba(6, 182, 212, 0.3));
+            box-shadow: 0 0 15px rgba(168, 85, 247, 0.3);
+        }
+
+        .empty-view {
+            grid-column: 1 / -1;
+            padding: 6rem 1rem; text-align: center;
+            background: var(--bg-surface);
+            border: 1px solid var(--border-default);
+            border-radius: var(--radius-xl);
+        }
+        .empty-view h3 { font-size: 1.3rem; font-weight: 700; margin-bottom: 0.5rem; }
+        .empty-view p { color: var(--text-tertiary); font-size: 0.95rem; }
+
+        .toast {
+            position: fixed; bottom: 32px; right: 32px;
+            background: var(--text-primary);
+            color: var(--bg-canvas);
+            padding: 16px 26px; border-radius: var(--radius-md);
+            font-weight: 700; font-size: 0.95rem;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.7);
+            transform: translateY(100px); opacity: 0;
+            transition: var(--transition-smooth);
+            z-index: 1000;
+            max-width: 520px;
+        }
+        .toast.show { transform: translateY(0); opacity: 1; }
+
+        .modal-backdrop {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(4, 5, 7, 0.88);
+            backdrop-filter: blur(20px);
+            display: flex; align-items: center; justify-content: center;
+            z-index: 100; opacity: 0; pointer-events: none;
+            transition: var(--transition-smooth); padding: 1.5rem;
+        }
+        .modal-backdrop.open { opacity: 1; pointer-events: auto; }
+
+        .modal-content {
+            background: var(--bg-surface-elevated);
+            border: 1px solid var(--border-hover);
+            border-radius: 24px;
+            width: 100%; max-width: 950px; padding: 2.8rem;
+            max-height: 88vh; overflow-y: auto;
+            position: relative;
+            transform: scale(0.96); transition: var(--transition-smooth);
+            box-shadow: 0 30px 70px -15px rgba(0, 0, 0, 0.9);
+        }
+        .modal-backdrop.open .modal-content { transform: scale(1); }
+
+        .modal-close {
+            position: absolute; top: 1.8rem; right: 1.8rem;
+            background: rgba(255,255,255,0.05); border: 1px solid var(--border-default);
+            color: var(--text-tertiary); font-size: 1.4rem; cursor: pointer;
+            width: 38px; height: 38px; border-radius: 10px; transition: var(--transition-smooth);
+        }
+        .modal-close:hover { background: rgba(244, 63, 94, 0.2); border-color: #f43f5e; color: #fff; }
+
+        .modal-title {
+            font-family: 'JetBrains Mono', monospace; font-size: 1.5rem; font-weight: 800;
+            color: var(--text-primary); margin-bottom: 0.75rem;
+        }
+
+        .modal-meta-row { display: flex; gap: 10px; margin-bottom: 1.5rem; flex-wrap: wrap; }
+
+        .modal-section-title {
+            font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.08em;
+            color: var(--text-accent); font-weight: 800; margin: 1.8rem 0 0.8rem 0;
+            display: block; font-family: 'JetBrains Mono', monospace;
+        }
+
+        .modal-desc-box {
+            font-size: 0.95rem; line-height: 1.8; color: var(--text-primary);
+            background: rgba(0, 0, 0, 0.25);
+            border: 1px solid var(--border-default);
+            border-radius: var(--radius-md);
+            padding: 1.4rem; margin-bottom: 1.5rem;
+            white-space: pre-wrap;
+        }
+
+        .cmd-table-container {
+            border: 1px solid var(--border-default);
+            border-radius: var(--radius-md);
+            overflow: hidden; margin-bottom: 1.8rem;
+            background: rgba(0, 0, 0, 0.25);
+        }
+
+        .cmd-group-header {
+            background: linear-gradient(90deg, rgba(168, 85, 247, 0.2), rgba(6, 182, 212, 0.08));
+            padding: 12px 20px;
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            border-bottom: 1px solid var(--border-subtle);
+            display: flex; align-items: center; gap: 8px;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .cmd-row {
+            display: flex; justify-content: space-between; align-items: center;
+            gap: 16px; padding: 15px 20px;
+            border-bottom: 1px solid var(--border-subtle);
+            transition: var(--transition-smooth);
+        }
+
+        .cmd-row:last-child { border-bottom: none; }
+        .cmd-row:hover { background: rgba(255, 255, 255, 0.04); }
+
+        .cmd-left {
+            display: flex; flex-direction: column; gap: 5px;
+        }
+
+        .cmd-syntax {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.96rem; font-weight: 700; color: var(--text-accent);
+        }
+
+        .cmd-action-desc {
+            font-size: 0.86rem; color: var(--text-secondary); line-height: 1.6;
+        }
+
+        .cmd-btn-copy {
+            background: rgba(168, 85, 247, 0.18);
+            border: 1px solid rgba(168, 85, 247, 0.45);
+            color: var(--text-primary); font-size: 0.82rem; font-weight: 700;
+            padding: 9px 18px; border-radius: var(--radius-sm);
+            cursor: pointer; white-space: nowrap; transition: var(--transition-smooth);
+            font-family: 'JetBrains Mono', monospace;
+            display: flex; align-items: center; gap: 6px;
+        }
+
+        .cmd-btn-copy:hover {
+            background: rgba(168, 85, 247, 0.35);
+            border-color: rgba(168, 85, 247, 0.8);
+            box-shadow: 0 0 15px rgba(168, 85, 247, 0.4);
+        }
+
+        .path-display {
+            font-family: 'JetBrains Mono', monospace; font-size: 0.84rem;
+            color: var(--text-secondary); background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border-default);
+            padding: 14px 16px; border-radius: var(--radius-sm);
+            word-break: break-all; margin-bottom: 1.8rem;
+        }
+
+        .path-display-label {
+            font-size: 0.7rem; text-transform: uppercase; color: var(--text-tertiary);
+            font-weight: 700; margin-bottom: 6px; display: block;
+        }
+
+        .modal-actions-bar {
+            display: flex; justify-content: flex-end; gap: 12px;
+        }
+
+        .btn-primary {
+            background: var(--text-primary);
+            color: var(--bg-canvas); border: none;
+            padding: 12px 26px; border-radius: var(--radius-sm);
+            font-weight: 700; font-size: 0.92rem;
+            cursor: pointer; transition: var(--transition-smooth);
+            display: flex; align-items: center; gap: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        .btn-primary:hover { opacity: 0.92; transform: translateY(-2px); }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="container header-inner">
+            <div class="brand-block">
+                <div class="brand-mark">/</div>
+                <div class="brand-text">
+                    <h1>AI Agent 全栈技能控制台 <span class="brand-badge">WAYFINDER // IMPECCABLE</span></h1>
+                    <p>科幻级全域技能图谱 · 工作流子模块航线指挥台</p>
+                </div>
+            </div>
+            <div class="metrics-bar">
+                <div class="theme-switcher">
+                    <button class="theme-btn" onclick="setTheme('obsidian', this)" title="默认深色：赛博黑曜石与炫紫色微粒">
+                        🌑 赛博黑曜石
+                    </button>
+                    <button class="theme-btn active" onclick="setTheme('swiss', this)" title="明亮干净：瑞士排版白底与高级深灰文字">
+                        ☀️ 极简白釉
+                    </button>
+                    <button class="theme-btn" onclick="setTheme('matrix', this)" title="致敬骇客：绿墨终端矩阵荧光绿">
+                        🌌 矩阵绿墨
+                    </button>
+                    <button class="theme-btn" onclick="setTheme('sunset', this)" title="温润夜晚：橙红色暖阳霞光">
+                        🎨 晚霞琥珀
+                    </button>
+                </div>
+                <div class="metric-card">
+                    载入库总容量: <strong id="stat-total">0</strong> 核心模块
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="toolbar">
+            <div class="search-box">
+                <span class="search-icon">⚡</span>
+                <input type="text" id="search-input" class="search-input" placeholder="输入名称、指令或中文自然任务描述检索 (如 求职信, 脑暴, 代码审查, UI重构, 诊断)...">
+            </div>
+
+            <div class="filter-section">
+                <div class="filter-row" id="scope-filters">
+                    <span class="filter-label">作用域空间</span>
+                </div>
+                <div class="filter-row" id="category-filters">
+                    <span class="filter-label">能力领域</span>
+                </div>
+                <div class="filter-row" id="submodule-filters">
+                    <span class="filter-label">业务航线模块</span>
+                </div>
+            </div>
+        </section>
+
+        <section id="skills-grid" class="skills-grid"></section>
+    </main>
+
+    <div id="modal-backdrop" class="modal-backdrop" onclick="closeModal(event)">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <button class="modal-close" onclick="closeModal()">×</button>
+            <div class="modal-title" id="modal-title"></div>
+            <div class="modal-meta-row" id="modal-meta"></div>
+            
+            <span class="modal-section-title">// 技能全域解析与生产规范</span>
+            <div class="modal-desc-box" id="modal-desc"></div>
+            
+            <span class="modal-section-title">// 航向可执行指令表 (点击精准复制去除中括号的纯正斜杠命令)</span>
+            <div class="cmd-table-container" id="modal-commands"></div>
+
+            <div class="path-display">
+                <span class="path-display-label">物理文件路径 (SKILL.md)</span>
+                <code id="modal-path"></code>
+            </div>
+            <div class="modal-actions-bar">
+                <button class="btn-card" onclick="copyModalPath()">📋 复制物理路径</button>
+                <button class="btn-primary" onclick="copyModalWakeup()">⚡ 立即执行指令 (复制自然调用唤醒词)</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" class="toast">指令已成功复制</div>
+
+    <script>
+        const SKILLS_DATA = [
+  {
+    "name": "ask-matt",
+    "description": "【技能功能与用途解析】本技能为 `ask-matt` 专属自动化工作流与拓展工具集，可在相关场景中调用辅助完成专项开发或内容构筑。\n\n【原始英文说明】Ask which skill or flow fits your situation. A router over the skills in this repo.",
+    "scope": "mattpocock",
+    "category": "核心研发工作流 (Matt Flow)",
+    "subModule": "💡 头脑风暴与需求澄清",
+    "categoryColor": "#a855f7",
+    "path": "C:\\Users\\GU\\.gemini\\config\\skills\\ask-matt\\SKILL.md",
+    "wakeupPrompt": "请调用 /ask-matt 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "ask-matt",
+        "desc": "调用 ask-matt 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /ask-matt 技能，帮我处理以下任务要求：",
+        "group": "💡 头脑风暴与需求澄清"
+      }
+    ]
+  },
+  {
+    "name": "batch-grill-me",
+    "description": "【技能功能与用途解析】本技能为 `batch-grill-me` 专属自动化工作流与拓展工具集，可在相关场景中调用辅助完成专项开发或内容构筑。\n\n【原始英文说明】A relentless interview that asks every frontier question at once, round by round.",
+    "scope": "mattpocock",
+    "category": "核心研发工作流 (Matt Flow)",
+    "subModule": "💡 头脑风暴与需求澄清",
+    "categoryColor": "#a855f7",
+    "path": "C:\\Users\\GU\\.gemini\\config\\skills\\batch-grill-me\\SKILL.md",
+    "wakeupPrompt": "请调用 /batch-grill-me 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "batch-grill-me",
+        "desc": "调用 batch-grill-me 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /batch-grill-me 技能，帮我处理以下任务要求：",
+        "group": "💡 头脑风暴与需求澄清"
+      }
+    ]
+  },
+  {
+    "name": "best-minds",
+    "description": "【世界顶级专家思维模拟器】不问‘你怎么看’，而是探寻‘世界上谁是最强领域的超级脑？TA会如何决断？’。模拟顶尖专家视角解决极其复杂的构想与难题。\n\n【原始描述】模拟器思维：不问\"你怎么看\"，而是问\"世界上谁最懂这个？TA 会怎么说？\"。触发词：最强大脑、顶级专家、世界级、best minds、谁最懂这个",
+    "scope": "全局技能 (Global)",
+    "category": "研发辅助与运维工具",
+    "subModule": "🔧 系统通用模块",
+    "categoryColor": "#38bdf8",
+    "path": "C:\\Users\\GU\\.gemini\\config\\skills\\best-minds\\SKILL.md",
+    "wakeupPrompt": "请调用 /best-minds 技能，模拟世界上在这个领域实力最强、最具洞察力的大脑帮我评估这个构想方案",
+    "commands": [
+      {
+        "cmd": "最强大脑 [问题/方案]",
+        "desc": "呼叫全域顶尖专家脑暴：让 AI 不再仅凭常规思路，而是模拟该领域最懂的顶级世界专家进行会诊。",
+        "wakeup": "请调用 /best-minds 技能，模拟世界上在这个领域实力最强、最具洞察力的大脑帮我评估这个构想方案",
+        "group": "💡 头脑风暴与需求澄清"
+      },
+      {
+        "cmd": "谁最懂这个 [议题]",
+        "desc": "定位学术/工程界权威：寻找世界最佳理论或开源之父视角为你敲定技术方案。",
+        "wakeup": "请调用 /best-minds 技能，告诉我世界上谁最懂这个领域，并用 TA 的视角帮我直接拍板解决架构难题",
+        "group": "💡 头脑风暴与需求澄清"
+      }
+    ]
+  },
+  {
+    "name": "claude-handoff",
+    "description": "【技能功能与用途解析】本技能为 `claude-handoff` 专属自动化工作流与拓展工具集，可在相关场景中调用辅助完成专项开发或内容构筑。\n\n【原始英文说明】Hand the current conversation off to a fresh background agent that picks up the work immediately.",
+    "scope": "mattpocock",
+    "category": "核心研发工作流 (Matt Flow)",
+    "subModule": "⚙️ 通用研发工具",
+    "categoryColor": "#a855f7",
+    "path": "C:\\Users\\GU\\.gemini\\config\\skills\\claude-handoff\\SKILL.md",
+    "wakeupPrompt": "请调用 /claude-handoff 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "claude-handoff",
+        "desc": "调用 claude-handoff 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /claude-handoff 技能，帮我处理以下任务要求：",
+        "group": "⚙️ 通用研发工具"
+      }
+    ]
+  },
+  {
+    "name": "code-review",
+    "description": "【双轴双视角并行代码审查】同时从‘规范遵循度(Standards)’与‘需求还原度(Spec)’两个维度并发审查 PR 或分支代码，输出精准并排对比报告。\n\n【原始描述】Review the changes since a fixed point (commit, branch, tag, or merge-base) along two axes — Standards (does the code follow this repo's documented coding standards?) and Spec (does the code match what the originating issue/PRD asked for?). Runs both reviews in parallel sub-agents and reports them side by side. Use when the user wants to review a branch, a PR, work-in-progress changes, or asks to \"review since X\".",
+    "scope": "mattpocock",
+    "category": "核心研发工作流 (Matt Flow)",
+    "subModule": "🔍 代码审查与提交质量",
+    "categoryColor": "#a855f7",
+    "path": "C:\\Users\\GU\\.gemini\\config\\skills\\code-review\\SKILL.md",
+    "wakeupPrompt": "请调用 /code-review 技能，帮我从【开发规范遵循度】和【需求还原契合度】双向审查这段变更代码",
+    "commands": [
+      {
+        "cmd": "code-review since [branch/commit]",
+        "desc": "并发双轴代码审查：同时校验当前改动是否符合工程规范并且完全实现了需求说明书要求。",
+        "wakeup": "请调用 /code-review 技能，帮我从【开发规范遵循度】和【需求还原契合度】双向审查这段变更代码",
+        "group": "🔍 代码审查与提交质量"
+      }
+    ]
+  },
+  {
+    "name": "codebase-design",
+    "description": "【模块设计与深度解耦架构】利用深入浅出的模块设计词汇，对代码库进行高内聚低耦合改造、边界定义、接缝切分和可测试性设计。\n\n【原始描述】Shared vocabulary for designing deep modules. Use when the user wants to design or improve a module's interface, find deepening opportunities, decide where a seam goes, make code more testable or AI-navigable, or when another skill needs the deep-module vocabulary.",
+    "scope": "mattpocock",
+    "category": "核心研发工作流 (Matt Flow)",
+    "subModule": "💻 架构设计与系统图谱",
+    "categoryColor": "#a855f7",
+    "path": "C:\\Users\\GU\\.gemini\\config\\skills\\codebase-design\\SKILL.md",
+    "wakeupPrompt": "请调用 /codebase-design 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "codebase-design",
+        "desc": "调用 codebase-design 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /codebase-design 技能，帮我处理以下任务要求：",
+        "group": "💻 架构设计与系统图谱"
+      }
+    ]
+  },
+  {
+    "name": "continuous-learning",
+    "description": "【技能功能与用途解析】本技能为 `continuous-learning` 专属自动化工作流与拓展工具集，可在相关场景中调用辅助完成专项开发或内容构筑。\n\n【原始英文说明】Automatically extract reusable patterns from Claude Code sessions and save them as learned skills for future use.",
+    "scope": "全局技能 (Global)",
+    "category": "研发辅助与运维工具",
+    "subModule": "🔧 系统通用模块",
+    "categoryColor": "#38bdf8",
+    "path": "C:\\Users\\GU\\.gemini\\config\\skills\\continuous-learning\\SKILL.md",
+    "wakeupPrompt": "请调用 /continuous-learning 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "continuous-learning",
+        "desc": "调用 continuous-learning 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /continuous-learning 技能，帮我处理以下任务要求：",
+        "group": "🔧 系统通用模块"
+      }
+    ]
+  },
+  {
+    "name": "continuous-learning-v2",
+    "description": "【技能功能与用途解析】本技能为 `continuous-learning-v2` 专属自动化工作流与拓展工具集，可在相关场景中调用辅助完成专项开发或内容构筑。\n\n【原始英文说明】Instinct-based learning system that observes sessions via hooks, creates atomic instincts with confidence scoring, and evolves them into skills/commands/agents.",
+    "scope": "全局技能 (Global)",
+    "category": "研发辅助与运维工具",
+    "subModule": "🔧 系统通用模块",
+    "categoryColor": "#38bdf8",
+    "path": "C:\\Users\\GU\\.gemini\\config\\skills\\continuous-learning-v2\\SKILL.md",
+    "wakeupPrompt": "请调用 /continuous-learning-v2 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "continuous-learning-v2",
+        "desc": "调用 continuous-learning-v2 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /continuous-learning-v2 技能，帮我处理以下任务要求：",
+        "group": "🔧 系统通用模块"
+      }
+    ]
+  },
+  {
+    "name": "design-an-interface",
+    "description": "【技能功能与用途解析】本技能为 `design-an-interface` 专属自动化工作流与拓展工具集，可在相关场景中调用辅助完成专项开发或内容构筑。\n\n【原始英文说明】Generate multiple radically different interface designs for a module using parallel sub-agents. Use when user wants to design an API, explore interface options, compare module shapes, or mentions \"design it twice\".",
+    "scope": "全局技能 (Global)",
+    "category": "前端UI与现代美学",
+    "subModule": "🛠️ 页面打磨与响应自适",
+    "categoryColor": "#22d3ee",
+    "path": "C:\\Users\\GU\\.gemini\\config\\skills\\design-an-interface\\SKILL.md",
+    "wakeupPrompt": "请调用 /design-an-interface 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "design-an-interface",
+        "desc": "调用 design-an-interface 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /design-an-interface 技能，帮我处理以下任务要求：",
+        "group": "🛠️ 页面打磨与响应自适"
+      }
+    ]
+  },
+  {
+    "name": "diagnose",
+    "description": "【深度根因排查与回归诊断】采用‘复现→精简→假设→插桩→修复→回归检测’的闭环严密逻辑，专门攻克顽固疑难杂症与性能退化。\n\n【原始描述】Disciplined diagnosis loop for hard bugs and performance regressions. Reproduce → minimise → hypothesise → instrument → fix → regression-test. Use when user says \"diagnose this\" / \"debug this\", reports a bug, says something is broken/throwing/failing, or describes a performance regression.",
+    "scope": "mattpocock",
+    "category": "核心研发工作流 (Matt Flow)",
+    "subModule": "🐞 Bug排查与性能诊断",
+    "categoryColor": "#a855f7",
+    "path": "C:\\Users\\GU\\.gemini\\config\\skills\\diagnose\\SKILL.md",
+    "wakeupPrompt": "请调用 /diagnose 技能，以高度严谨的科学诊断循环帮我排查并彻底解决该异常或报错根因",
+    "commands": [
+      {
+        "cmd": "diagnose this [error/bug]",
+        "desc": "严格排障闭环：立即执行复现→精简→假想→插桩检测→根因修复→回归测试的闭环。",
+        "wakeup": "请调用 /diagnose 技能，以高度严谨的科学诊断循环帮我排查并彻底解决该异常或报错根因",
+        "group": "🐞 Bug排查与性能诊断"
+      }
+    ]
+  },
+  {
+    "name": "diagnosing-bugs",
+    "description": "【疑难 Bug 自动化会诊流水线】专注于系统级崩溃、静默报错、运行缓慢及状态断裂的层层排查与系统性调试。\n\n【原始描述】Diagnosis loop for hard bugs and performance regressions. Use when the user says \"diagnose\"/\"debug this\", or reports something broken/throwing/failing/slow.",
+    "scope": "mattpocock",
+    "category": "核心研发工作流 (Matt Flow)",
+    "subModule": "⚙️ 通用研发工具",
+    "categoryColor": "#a855f7",
+    "path": "C:\\Users\\GU\\.gemini\\config\\skills\\diagnosing-bugs\\SKILL.md",
+    "wakeupPrompt": "请调用 /diagnosing-bugs 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "diagnosing-bugs",
+        "desc": "调用 diagnosing-bugs 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /diagnosing-bugs 技能，帮我处理以下任务要求：",
+        "group": "⚙️ 通用研发工具"
+      }
+    ]
+  },
+  {
+    "name": "aippt",
+    "description": "AIPPT - 从文章生成精美 PPT 的完整工作流。文章内容 → ASCII PPT 框架 → AI 生图 → 完整 PPT。",
+    "scope": "全局技能 (Global)",
+    "category": "视觉生成与办公文档",
+    "subModule": "🖼️ 插画生成与社交卡片",
+    "categoryColor": "#fb923c",
+    "path": "C:\\Users\\GU\\.gemini\\config\\skills\\docs-AIPPT2-main\\SKILL.md",
+    "wakeupPrompt": "请调用 /aippt 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "aippt",
+        "desc": "调用 aippt 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /aippt 技能，帮我处理以下任务要求：",
+        "group": "🖼️ 插画生成与社交卡片"
+      }
+    ]
+  },
+  {
+    "name": "docx",
+    "description": "【技能功能与用途解析】本技能为 `docx` 专属自动化工作流与拓展工具集，可在相关场景中调用辅助完成专项开发或内容构筑。\n\n【原始英文说明】Comprehensive document creation, editing, and analysis with support for tracked changes, comments, formatting preservation, and text extraction. When Claude needs to work with professional documents (.docx files) for: (1) Creating new documents, (2) Modifying or editing content, (3) Working with tracked changes, (4) Adding comments, or any other document tasks",
+    "scope": "全局技能 (Global)",
+    "category": "视觉生成与办公文档",
+    "subModule": "📑 办公排版与数据报告",
+    "categoryColor": "#fb923c",
+    "path": "C:\\Users\\GU\\.gemini\\config\\skills\\docs-docx\\SKILL.md",
+    "wakeupPrompt": "请调用 /docx 技能，帮我创建并排版一份规范美观、带目录与清晰段落间距的 Word 办公文档",
+    "commands": [
+      {
+        "cmd": "docx create [file]",
+        "desc": "创建排版精良的 Word 文档：自带封面、专业层级标题目录与优雅间距。",
+        "wakeup": "请调用 /docx 技能，帮我创建并排版一份规范美观、带目录与清晰段落间距的 Word 办公文档",
+        "group": "📑 文档编排与报告导出"
+      },
+      {
+        "cmd": "docx edit [file]",
+        "desc": "精准编辑 .docx 文本：在保留所有既有样式、表格格式的情况下精准插入或改写内容。",
+        "wakeup": "请调用 /docx 技能，在完整保留原有排版格式和表格结构的前提下修改并优化这段 Word 文字内容",
+        "group": "📑 文档编排与报告导出"
+      },
+      {
+        "cmd": "docx track [file]",
+        "desc": "修订追踪模式：以标准 Track Changes 模式向文档添加修改痕迹与评审建议。",
+        "wakeup": "请调用 /docx 技能，开启 Word 修订追踪（Track Changes）模式，为当前文档提出专业修改建议",
+        "group": "📑 文档编排与报告导出"
+      }
+    ]
+  },
+  {
+    "name": "pdf",
+    "description": "【技能功能与用途解析】本技能为 `pdf` 专属自动化工作流与拓展工具集，可在相关场景中调用辅助完成专项开发或内容构筑。\n\n【原始英文说明】Comprehensive PDF manipulation toolkit for extracting text and tables, creating new PDFs, merging/splitting documents, and handling forms. When Claude needs to fill in a PDF form or programmatically process, generate, or analyze PDF documents at scale.",
+    "scope": "全局技能 (Global)",
+    "category": "视觉生成与办公文档",
+    "subModule": "📑 办公排版与数据报告",
+    "categoryColor": "#fb923c",
+    "path": "C:\\Users\\GU\\.gemini\\config\\skills\\docs-pdf\\SKILL.md",
+    "wakeupPrompt": "请调用 /pdf 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "pdf",
+        "desc": "调用 pdf 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /pdf 技能，帮我处理以下任务要求：",
+        "group": "📑 办公排版与数据报告"
+      }
+    ]
+  },
+  {
+    "name": "pptx",
+    "description": "【技能功能与用途解析】本技能为 `pptx` 专属自动化工作流与拓展工具集，可在相关场景中调用辅助完成专项开发或内容构筑。\n\n【原始英文说明】Presentation creation, editing, and analysis. When Claude needs to work with presentations (.pptx files) for: (1) Creating new presentations, (2) Modifying or editing content, (3) Working with layouts, (4) Adding comments or speaker notes, or any other presentation tasks",
+    "scope": "全局技能 (Global)",
+    "category": "视觉生成与办公文档",
+    "subModule": "📑 办公排版与数据报告",
+    "categoryColor": "#fb923c",
+    "path": "C:\\Users\\GU\\.gemini\\config\\skills\\docs-pptx\\SKILL.md",
+    "wakeupPrompt": "请调用 /pptx 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "pptx",
+        "desc": "调用 pptx 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /pptx 技能，帮我处理以下任务要求：",
+        "group": "📑 办公排版与数据报告"
+      }
+    ]
+  },
+  {
+    "name": "xlsx",
+    "description": "【技能功能与用途解析】本技能为 `xlsx` 专属自动化工作流与拓展工具集，可在相关场景中调用辅助完成专项开发或内容构筑。\n\n【原始英文说明】Comprehensive spreadsheet creation, editing, and analysis with support for formulas, formatting, data analysis, and visualization. When Claude needs to work with spreadsheets (.xlsx, .xlsm, .csv, .tsv, etc) for: (1) Creating new spreadsheets with formulas and formatting, (2) Reading or analyzing data, (3) Modify existing spreadsheets while preserving formulas, (4) Data analysis and visualization in spreadsheets, or (5) Recalculating formulas",
+    "scope": "全局技能 (Global)",
+    "category": "视觉生成与办公文档",
+    "subModule": "📑 办公排版与数据报告",
+    "categoryColor": "#fb923c",
+    "path": "C:\\Users\\GU\\.gemini\\config\\skills\\docs-xlsx\\SKILL.md",
+    "wakeupPrompt": "请调用 /xlsx 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "xlsx",
+        "desc": "调用 xlsx 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /xlsx 技能，帮我处理以下任务要求：",
+        "group": "📑 办公排版与数据报告"
+      }
+    ]
+  },
+  {
+    "name": "domain-modeling",
+    "description": "【技能功能与用途解析】本技能为 `domain-modeling` 专属自动化工作流与拓展工具集，可在相关场景中调用辅助完成专项开发或内容构筑。\n\n【原始英文说明】Build and sharpen a project's domain model. Use when the user wants to pin down domain terminology or a ubiquitous language, record an architectural decision, or when another skill needs to maintain the domain model.",
+    "scope": "mattpocock",
+    "category": "核心研发工作流 (Matt Flow)",
+    "subModule": "💻 架构设计与系统图谱",
+    "categoryColor": "#a855f7",
+    "path": "C:\\Users\\GU\\.gemini\\config\\skills\\domain-modeling\\SKILL.md",
+    "wakeupPrompt": "请调用 /domain-modeling 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "domain-modeling",
+        "desc": "调用 domain-modeling 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /domain-modeling 技能，帮我处理以下任务要求：",
+        "group": "💻 架构设计与系统图谱"
+      }
+    ]
+  },
+  {
+    "name": "edit-article",
+    "description": "【技能功能与用途解析】本技能为 `edit-article` 专属自动化工作流与拓展工具集，可在相关场景中调用辅助完成专项开发或内容构筑。\n\n【原始英文说明】Edit and improve articles by restructuring sections, improving clarity, and tightening prose. Use when user wants to edit, revise, or improve an article draft.",
+    "scope": "全局技能 (Global)",
+    "category": "研发辅助与运维工具",
+    "subModule": "🔧 系统通用模块",
+    "categoryColor": "#38bdf8",
+    "path": "C:\\Users\\GU\\.gemini\\config\\skills\\edit-article\\SKILL.md",
+    "wakeupPrompt": "请调用 /edit-article 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "edit-article",
+        "desc": "调用 edit-article 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /edit-article 技能，帮我处理以下任务要求：",
+        "group": "🔧 系统通用模块"
+      }
+    ]
+  },
+  {
+    "name": "find-skills",
+    "description": "【技能功能与用途解析】本技能为 `find-skills` 专属自动化工作流与拓展工具集，可在相关场景中调用辅助完成专项开发或内容构筑。\n\n【原始英文说明】Helps users discover and install agent skills when they ask questions like \"how do I do X\", \"find a skill for X\", \"is there a skill that can...\", or express interest in extending capabilities. This skill should be used when the user is looking for functionality that might exist as an installable skill.",
+    "scope": "全局技能 (Global)",
+    "category": "研发辅助与运维工具",
+    "subModule": "🔧 系统通用模块",
+    "categoryColor": "#38bdf8",
+    "path": "C:\\Users\\GU\\.gemini\\config\\skills\\find-skills\\SKILL.md",
+    "wakeupPrompt": "请调用 /find-skills 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "find-skills",
+        "desc": "调用 find-skills 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /find-skills 技能，帮我处理以下任务要求：",
+        "group": "🔧 系统通用模块"
+      }
+    ]
+  },
+  {
+    "name": "frontend-patterns",
+    "description": "【技能功能与用途解析】本技能为 `frontend-patterns` 专属自动化工作流与拓展工具集，可在相关场景中调用辅助完成专项开发或内容构筑。\n\n【原始英文说明】Frontend development patterns for React, Next.js, state management, performance optimization, and UI best practices.",
+    "scope": "全局技能 (Global)",
+    "category": "前端UI与现代美学",
+    "subModule": "🛠️ 页面打磨与响应自适",
+    "categoryColor": "#22d3ee",
+    "path": "C:\\Users\\GU\\.gemini\\config\\skills\\frontend-patterns\\SKILL.md",
+    "wakeupPrompt": "请调用 /frontend-patterns 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "frontend-patterns",
+        "desc": "调用 frontend-patterns 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /frontend-patterns 技能，帮我处理以下任务要求：",
+        "group": "🛠️ 页面打磨与响应自适"
+      }
+    ]
+  },
+  {
+    "name": "git-guardrails-claude-code",
+    "description": "【技能功能与用途解析】本技能为 `git-guardrails-claude-code` 专属自动化工作流与拓展工具集，可在相关场景中调用辅助完成专项开发或内容构筑。\n\n【原始英文说明】Set up Claude Code hooks to block dangerous git commands (push, reset --hard, clean, branch -D, etc.) before they execute. Use when user wants to prevent destructive git operations, add git safety hooks, or block git push/reset in Claude Code.",
+    "scope": "全局技能 (Global)",
+    "category": "研发辅助与运维工具",
+    "subModule": "🔧 系统通用模块",
+    "categoryColor": "#38bdf8",
+    "path": "C:\\Users\\GU\\.gemini\\config\\skills\\git-guardrails-claude-code\\SKILL.md",
+    "wakeupPrompt": "请调用 /git-guardrails-claude-code 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "git-guardrails-claude-code",
+        "desc": "调用 git-guardrails-claude-code 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /git-guardrails-claude-code 技能，帮我处理以下任务要求：",
+        "group": "🔧 系统通用模块"
+      }
+    ]
+  },
+  {
+    "name": "graphify-windows",
+    "description": "【技能功能与用途解析】本技能为 `graphify-windows` 专属自动化工作流与拓展工具集，可在相关场景中调用辅助完成专项开发或内容构筑。\n\n【原始英文说明】Use for any question about a codebase, its architecture, file relationships, or project content — especially when graphify-out/ exists, where the question should be treated as a graphify query first. Turns any input (code, docs, papers, images, videos) into a persistent knowledge graph with god nodes, community detection, and query/path/explain tools.",
+    "scope": "全局技能 (Global)",
+    "category": "研发辅助与运维工具",
+    "subModule": "💻 架构设计与系统图谱",
+    "categoryColor": "#38bdf8",
+    "path": "C:\\Users\\GU\\.gemini\\config\\skills\\graphify\\SKILL.md",
+    "wakeupPrompt": "请调用 /graphify-windows 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "graphify-windows",
+        "desc": "调用 graphify-windows 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /graphify-windows 技能，帮我处理以下任务要求：",
+        "group": "💻 架构设计与系统图谱"
+      }
+    ]
+  },
+  {
+    "name": "brainstorming",
+    "description": "【需求与创意深度脑暴先锋】在执行任何核心研发或创造性功能前自动触发，彻底挖掘用户真正意图，通过探针问答排查架构权衡与遗漏场景。\n\n【原始描述】You MUST use this before any creative work - creating features, building components, adding functionality, or modifying behavior. Explores user intent, requirements and design before implementation.",
+    "scope": "mattpocock",
+    "category": "核心研发工作流 (Matt Flow)",
+    "subModule": "💡 头脑风暴与需求澄清",
+    "categoryColor": "#a855f7",
+    "path": "C:\\Users\\GU\\.gemini\\config\\skills\\grill-brainstorming\\SKILL.md",
+    "wakeupPrompt": "请调用 /brainstorming 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "brainstorming",
+        "desc": "调用 brainstorming 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /brainstorming 技能，帮我处理以下任务要求：",
+        "group": "💡 头脑风暴与需求澄清"
+      }
+    ]
+  },
+  {
+    "name": "interview-me",
+    "description": "【技能功能与用途解析】本技能为 `interview-me` 专属自动化工作流与拓展工具集，可在相关场景中调用辅助完成专项开发或内容构筑。\n\n【原始英文说明】Extracts what the user actually wants instead of what they think they should want. Achieves this through one-question-at-a-time interview until ~95% confidence about the underlying intent. Use when an ask is underspecified (\"build me X\" without \"for whom\" or \"why now\"), when the user explicitly invokes (\"interview me\", \"grill me\", \"are we sure?\", \"stress-test my thinking\"), or when you catch yourself silently filling in ambiguous requirements before any plan, spec, or code exists.",
+    "scope": "全局技能 (Global)",
+    "category": "研发辅助与运维工具",
+    "subModule": "🔧 系统通用模块",
+    "categoryColor": "#38bdf8",
+    "path": "C:\\Users\\GU\\.gemini\\config\\skills\\grill-interview-me\\SKILL.md",
+    "wakeupPrompt": "请调用 /interview-me 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "interview-me",
+        "desc": "调用 interview-me 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /interview-me 技能，帮我处理以下任务要求：",
+        "group": "🔧 系统通用模块"
+      }
+    ]
+  },
+  {
+    "name": "grill-me",
+    "description": "【技能功能与用途解析】本技能为 `grill-me` 专属自动化工作流与拓展工具集，可在相关场景中调用辅助完成专项开发或内容构筑。\n\n【原始英文说明】A relentless interview to sharpen a plan or design.",
+    "scope": "mattpocock",
+    "category": "核心研发工作流 (Matt Flow)",
+    "subModule": "💡 头脑风暴与需求澄清",
+    "categoryColor": "#a855f7",
+    "path": "C:\\Users\\GU\\.gemini\\config\\skills\\grill-me\\SKILL.md",
+    "wakeupPrompt": "请调用 /grill-me 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "grill-me",
+        "desc": "调用 grill-me 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /grill-me 技能，帮我处理以下任务要求：",
+        "group": "💡 头脑风暴与需求澄清"
+      }
+    ]
+  },
+  {
+    "name": "grill-with-docs",
+    "description": "【技能功能与用途解析】本技能为 `grill-with-docs` 专属自动化工作流与拓展工具集，可在相关场景中调用辅助完成专项开发或内容构筑。\n\n【原始英文说明】A relentless interview to sharpen a plan or design, which also creates docs (ADR's and glossary) as we go.",
+    "scope": "mattpocock",
+    "category": "核心研发工作流 (Matt Flow)",
+    "subModule": "💡 头脑风暴与需求澄清",
+    "categoryColor": "#a855f7",
+    "path": "C:\\Users\\GU\\.gemini\\config\\skills\\grill-with-docs\\SKILL.md",
+    "wakeupPrompt": "请调用 /grill-with-docs 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "grill-with-docs",
+        "desc": "调用 grill-with-docs 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /grill-with-docs 技能，帮我处理以下任务要求：",
+        "group": "💡 头脑风暴与需求澄清"
+      }
+    ]
+  },
+  {
+    "name": "grilling",
+    "description": "【技能功能与用途解析】本技能为 `grilling` 专属自动化工作流与拓展工具集，可在相关场景中调用辅助完成专项开发或内容构筑。\n\n【原始英文说明】Grill the user relentlessly about a plan, decision, or idea. Use when the user wants to stress-test their thinking, or uses any 'grill' trigger phrases.",
+    "scope": "mattpocock",
+    "category": "核心研发工作流 (Matt Flow)",
+    "subModule": "💡 头脑风暴与需求澄清",
+    "categoryColor": "#a855f7",
+    "path": "C:\\Users\\GU\\.gemini\\config\\skills\\grilling\\SKILL.md",
+    "wakeupPrompt": "请调用 /grilling 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "grilling",
+        "desc": "调用 grilling 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /grilling 技能，帮我处理以下任务要求：",
+        "group": "💡 头脑风暴与需求澄清"
+      }
+    ]
+  },
+  {
+    "name": "handoff",
+    "description": "【技能功能与用途解析】本技能为 `handoff` 专属自动化工作流与拓展工具集，可在相关场景中调用辅助完成专项开发或内容构筑。\n\n【原始英文说明】Compact the current conversation into a handoff document for another agent to pick up.",
+    "scope": "mattpocock",
+    "category": "核心研发工作流 (Matt Flow)",
+    "subModule": "⚙️ 通用研发工具",
+    "categoryColor": "#a855f7",
+    "path": "C:\\Users\\GU\\.gemini\\config\\skills\\handoff\\SKILL.md",
+    "wakeupPrompt": "请调用 /handoff 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "handoff",
+        "desc": "调用 handoff 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /handoff 技能，帮我处理以下任务要求：",
+        "group": "⚙️ 通用研发工具"
+      }
+    ]
+  },
+  {
+    "name": "i-have-adhd",
+    "description": "【技能功能与用途解析】本技能为 `i-have-adhd` 专属自动化工作流与拓展工具集，可在相关场景中调用辅助完成专项开发或内容构筑。\n\n【原始英文说明】Shape output for a reader with ADHD: lead with the next action, number multi-step work, restate state across turns, suppress tangents, give specific time estimates, make wins visible. Invoke with /i-have-adhd; stays on until \"stop adhd mode\".",
+    "scope": "全局技能 (Global)",
+    "category": "研发辅助与运维工具",
+    "subModule": "🔧 系统通用模块",
+    "categoryColor": "#38bdf8",
+    "path": "C:\\Users\\GU\\.gemini\\config\\skills\\i-have-adhd\\SKILL.md",
+    "wakeupPrompt": "请调用 /i-have-adhd 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "i-have-adhd",
+        "desc": "调用 i-have-adhd 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /i-have-adhd 技能，帮我处理以下任务要求：",
+        "group": "🔧 系统通用模块"
+      }
+    ]
+  },
+  {
+    "name": "implement",
+    "description": "【技能功能与用途解析】本技能为 `implement` 专属自动化工作流与拓展工具集，可在相关场景中调用辅助完成专项开发或内容构筑。\n\n【原始英文说明】Implement a piece of work based on a spec or set of tickets.",
+    "scope": "mattpocock",
+    "category": "核心研发工作流 (Matt Flow)",
+    "subModule": "🧪 TDD 与代码实现",
+    "categoryColor": "#a855f7",
+    "path": "C:\\Users\\GU\\.gemini\\config\\skills\\implement\\SKILL.md",
+    "wakeupPrompt": "请调用 /implement 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "implement",
+        "desc": "调用 implement 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /implement 技能，帮我处理以下任务要求：",
+        "group": "🧪 TDD 与代码实现"
+      }
+    ]
+  },
+  {
+    "name": "improve-codebase-architecture",
+    "description": "【技能功能与用途解析】本技能为 `improve-codebase-architecture` 专属自动化工作流与拓展工具集，可在相关场景中调用辅助完成专项开发或内容构筑。\n\n【原始英文说明】Scan a codebase for deepening opportunities, present them as a visual HTML report, then grill through whichever one you pick.",
+    "scope": "全局技能 (Global)",
+    "category": "研发辅助与运维工具",
+    "subModule": "🔧 系统通用模块",
+    "categoryColor": "#38bdf8",
+    "path": "C:\\Users\\GU\\.gemini\\config\\skills\\improve-codebase-architecture\\SKILL.md",
+    "wakeupPrompt": "请调用 /improve-codebase-architecture 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "improve-codebase-architecture",
+        "desc": "调用 improve-codebase-architecture 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /improve-codebase-architecture 技能，帮我处理以下任务要求：",
+        "group": "🔧 系统通用模块"
+      }
+    ]
+  },
+  {
+    "name": "iterative-retrieval",
+    "description": "【技能功能与用途解析】本技能为 `iterative-retrieval` 专属自动化工作流与拓展工具集，可在相关场景中调用辅助完成专项开发或内容构筑。\n\n【原始英文说明】Pattern for progressively refining context retrieval to solve the subagent context problem",
+    "scope": "全局技能 (Global)",
+    "category": "研发辅助与运维工具",
+    "subModule": "🔧 系统通用模块",
+    "categoryColor": "#38bdf8",
+    "path": "C:\\Users\\GU\\.gemini\\config\\skills\\iterative-retrieval\\SKILL.md",
+    "wakeupPrompt": "请调用 /iterative-retrieval 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "iterative-retrieval",
+        "desc": "调用 iterative-retrieval 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /iterative-retrieval 技能，帮我处理以下任务要求：",
+        "group": "🔧 系统通用模块"
+      }
+    ]
+  },
+  {
+    "name": "karpathy-guidelines",
+    "description": "【技能功能与用途解析】本技能为 `karpathy-guidelines` 专属自动化工作流与拓展工具集，可在相关场景中调用辅助完成专项开发或内容构筑。\n\n【原始英文说明】Behavioral guidelines to reduce common LLM coding mistakes. Use when writing, reviewing, or refactoring code to avoid overcomplication, make surgical changes, surface assumptions, and define verifiable success criteria.",
+    "scope": "mattpocock",
+    "category": "核心研发工作流 (Matt Flow)",
+    "subModule": "🧪 TDD 与代码实现",
+    "categoryColor": "#a855f7",
+    "path": "C:\\Users\\GU\\.gemini\\config\\skills\\karpathy-guidelines\\SKILL.md",
+    "wakeupPrompt": "请调用 /karpathy-guidelines 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "karpathy-guidelines",
+        "desc": "调用 karpathy-guidelines 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /karpathy-guidelines 技能，帮我处理以下任务要求：",
+        "group": "🧪 TDD 与代码实现"
+      }
+    ]
+  },
+  {
+    "name": "loop-me",
+    "description": "【技能功能与用途解析】本技能为 `loop-me` 专属自动化工作流与拓展工具集，可在相关场景中调用辅助完成专项开发或内容构筑。\n\n【原始英文说明】Grill me about specs for the workflows I want to build, within this workspace.",
+    "scope": "全局技能 (Global)",
+    "category": "研发辅助与运维工具",
+    "subModule": "🔧 系统通用模块",
+    "categoryColor": "#38bdf8",
+    "path": "C:\\Users\\GU\\.gemini\\config\\skills\\loop-me\\SKILL.md",
+    "wakeupPrompt": "请调用 /loop-me 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "loop-me",
+        "desc": "调用 loop-me 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /loop-me 技能，帮我处理以下任务要求：",
+        "group": "🔧 系统通用模块"
+      }
+    ]
+  },
+  {
+    "name": "migrate-to-shoehorn",
+    "description": "【技能功能与用途解析】本技能为 `migrate-to-shoehorn` 专属自动化工作流与拓展工具集，可在相关场景中调用辅助完成专项开发或内容构筑。\n\n【原始英文说明】Migrate test files from `as` type assertions to @total-typescript/shoehorn. Use when user mentions shoehorn, wants to replace `as` in tests, or needs partial test data.",
+    "scope": "全局技能 (Global)",
+    "category": "研发辅助与运维工具",
+    "subModule": "🔧 系统通用模块",
+    "categoryColor": "#38bdf8",
+    "path": "C:\\Users\\GU\\.gemini\\config\\skills\\migrate-to-shoehorn\\SKILL.md",
+    "wakeupPrompt": "请调用 /migrate-to-shoehorn 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "migrate-to-shoehorn",
+        "desc": "调用 migrate-to-shoehorn 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /migrate-to-shoehorn 技能，帮我处理以下任务要求：",
+        "group": "🔧 系统通用模块"
+      }
+    ]
+  },
+  {
+    "name": "obsidian-vault",
+    "description": "【技能功能与用途解析】本技能为 `obsidian-vault` 专属自动化工作流与拓展工具集，可在相关场景中调用辅助完成专项开发或内容构筑。\n\n【原始英文说明】Search, create, and manage notes in the Obsidian vault with wikilinks and index notes. Use when user wants to find, create, or organize notes in Obsidian.",
+    "scope": "全局技能 (Global)",
+    "category": "视觉生成与办公文档",
+    "subModule": "📑 办公排版与数据报告",
+    "categoryColor": "#fb923c",
+    "path": "C:\\Users\\GU\\.gemini\\config\\skills\\obsidian-vault\\SKILL.md",
+    "wakeupPrompt": "请调用 /obsidian-vault 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "obsidian-vault",
+        "desc": "调用 obsidian-vault 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /obsidian-vault 技能，帮我处理以下任务要求：",
+        "group": "📑 办公排版与数据报告"
+      }
+    ]
+  },
+  {
+    "name": "prototype",
+    "description": "【技能功能与用途解析】本技能为 `prototype` 专属自动化工作流与拓展工具集，可在相关场景中调用辅助完成专项开发或内容构筑。\n\n【原始英文说明】Build a throwaway prototype to answer a design question. Use when the user wants to sanity-check whether a state model or logic feels right, or explore what a UI should look like.",
+    "scope": "emilkowalski",
+    "category": "核心研发工作流 (Matt Flow)",
+    "subModule": "💻 架构设计与系统图谱",
+    "categoryColor": "#a855f7",
+    "path": "C:\\Users\\GU\\.gemini\\config\\skills\\prototype\\SKILL.md",
+    "wakeupPrompt": "请调用 /prototype 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "prototype",
+        "desc": "调用 prototype 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /prototype 技能，帮我处理以下任务要求：",
+        "group": "💻 架构设计与系统图谱"
+      }
+    ]
+  },
+  {
+    "name": "qa",
+    "description": "【技能功能与用途解析】本技能为 `qa` 专属自动化工作流与拓展工具集，可在相关场景中调用辅助完成专项开发或内容构筑。\n\n【原始英文说明】Interactive QA session where user reports bugs or issues conversationally, and the agent files GitHub issues. Explores the codebase in the background for context and domain language. Use when user wants to report bugs, do QA, file issues conversationally, or mentions \"QA session\".",
+    "scope": "全局技能 (Global)",
+    "category": "研发辅助与运维工具",
+    "subModule": "🔧 系统通用模块",
+    "categoryColor": "#38bdf8",
+    "path": "C:\\Users\\GU\\.gemini\\config\\skills\\qa\\SKILL.md",
+    "wakeupPrompt": "请调用 /qa 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "qa",
+        "desc": "调用 qa 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /qa 技能，帮我处理以下任务要求：",
+        "group": "🔧 系统通用模块"
+      }
+    ]
+  },
+  {
+    "name": "request-refactor-plan",
+    "description": "【技能功能与用途解析】本技能为 `request-refactor-plan` 专属自动化工作流与拓展工具集，可在相关场景中调用辅助完成专项开发或内容构筑。\n\n【原始英文说明】Create a detailed refactor plan with tiny commits via user interview, then file it as a GitHub issue. Use when user wants to plan a refactor, create a refactoring RFC, or break a refactor into safe incremental steps.",
+    "scope": "全局技能 (Global)",
+    "category": "研发辅助与运维工具",
+    "subModule": "🔧 系统通用模块",
+    "categoryColor": "#38bdf8",
+    "path": "C:\\Users\\GU\\.gemini\\config\\skills\\request-refactor-plan\\SKILL.md",
+    "wakeupPrompt": "请调用 /request-refactor-plan 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "request-refactor-plan",
+        "desc": "调用 request-refactor-plan 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /request-refactor-plan 技能，帮我处理以下任务要求：",
+        "group": "🔧 系统通用模块"
+      }
+    ]
+  },
+  {
+    "name": "research",
+    "description": "【技能功能与用途解析】本技能为 `research` 专属自动化工作流与拓展工具集，可在相关场景中调用辅助完成专项开发或内容构筑。\n\n【原始英文说明】Investigate a question against high-trust primary sources and capture the findings as a Markdown file in the repo. Use when the user wants a topic researched, docs or API facts gathered, or reading legwork delegated to a background agent.",
+    "scope": "全局技能 (Global)",
+    "category": "研发辅助与运维工具",
+    "subModule": "🔧 系统通用模块",
+    "categoryColor": "#38bdf8",
+    "path": "C:\\Users\\GU\\.gemini\\config\\skills\\research\\SKILL.md",
+    "wakeupPrompt": "请调用 /research 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "research",
+        "desc": "调用 research 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /research 技能，帮我处理以下任务要求：",
+        "group": "🔧 系统通用模块"
+      }
+    ]
+  },
+  {
+    "name": "resolving-merge-conflicts",
+    "description": "【技能功能与用途解析】本技能为 `resolving-merge-conflicts` 专属自动化工作流与拓展工具集，可在相关场景中调用辅助完成专项开发或内容构筑。\n\n【原始英文说明】Use when you need to resolve an in-progress git merge/rebase conflict.",
+    "scope": "全局技能 (Global)",
+    "category": "研发辅助与运维工具",
+    "subModule": "🔧 系统通用模块",
+    "categoryColor": "#38bdf8",
+    "path": "C:\\Users\\GU\\.gemini\\config\\skills\\resolving-merge-conflicts\\SKILL.md",
+    "wakeupPrompt": "请调用 /resolving-merge-conflicts 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "resolving-merge-conflicts",
+        "desc": "调用 resolving-merge-conflicts 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /resolving-merge-conflicts 技能，帮我处理以下任务要求：",
+        "group": "🔧 系统通用模块"
+      }
+    ]
+  },
+  {
+    "name": "scaffold-exercises",
+    "description": "【技能功能与用途解析】本技能为 `scaffold-exercises` 专属自动化工作流与拓展工具集，可在相关场景中调用辅助完成专项开发或内容构筑。\n\n【原始英文说明】Create exercise directory structures with sections, problems, solutions, and explainers that pass linting. Use when user wants to scaffold exercises, create exercise stubs, or set up a new course section.",
+    "scope": "全局技能 (Global)",
+    "category": "研发辅助与运维工具",
+    "subModule": "🔧 系统通用模块",
+    "categoryColor": "#38bdf8",
+    "path": "C:\\Users\\GU\\.gemini\\config\\skills\\scaffold-exercises\\SKILL.md",
+    "wakeupPrompt": "请调用 /scaffold-exercises 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "scaffold-exercises",
+        "desc": "调用 scaffold-exercises 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /scaffold-exercises 技能，帮我处理以下任务要求：",
+        "group": "🔧 系统通用模块"
+      }
+    ]
+  },
+  {
+    "name": "setup-matt-pocock-skills",
+    "description": "【技能功能与用途解析】本技能为 `setup-matt-pocock-skills` 专属自动化工作流与拓展工具集，可在相关场景中调用辅助完成专项开发或内容构筑。\n\n【原始英文说明】Configure this repo for the engineering skills — set up its issue tracker, triage label vocabulary, and domain doc layout. Run once before first use of the other engineering skills.",
+    "scope": "mattpocock",
+    "category": "核心研发工作流 (Matt Flow)",
+    "subModule": "⚙️ 通用研发工具",
+    "categoryColor": "#a855f7",
+    "path": "C:\\Users\\GU\\.gemini\\config\\skills\\setup-matt-pocock-skills\\SKILL.md",
+    "wakeupPrompt": "请调用 /setup-matt-pocock-skills 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "setup-matt-pocock-skills",
+        "desc": "调用 setup-matt-pocock-skills 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /setup-matt-pocock-skills 技能，帮我处理以下任务要求：",
+        "group": "⚙️ 通用研发工具"
+      }
+    ]
+  },
+  {
+    "name": "setup-pre-commit",
+    "description": "【技能功能与用途解析】本技能为 `setup-pre-commit` 专属自动化工作流与拓展工具集，可在相关场景中调用辅助完成专项开发或内容构筑。\n\n【原始英文说明】Set up Husky pre-commit hooks with lint-staged (Prettier), type checking, and tests in the current repo. Use when user wants to add pre-commit hooks, set up Husky, configure lint-staged, or add commit-time formatting/typechecking/testing.",
+    "scope": "全局技能 (Global)",
+    "category": "研发辅助与运维工具",
+    "subModule": "🔧 系统通用模块",
+    "categoryColor": "#38bdf8",
+    "path": "C:\\Users\\GU\\.gemini\\config\\skills\\setup-pre-commit\\SKILL.md",
+    "wakeupPrompt": "请调用 /setup-pre-commit 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "setup-pre-commit",
+        "desc": "调用 setup-pre-commit 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /setup-pre-commit 技能，帮我处理以下任务要求：",
+        "group": "🔧 系统通用模块"
+      }
+    ]
+  },
+  {
+    "name": "setup-ts-deep-modules",
+    "description": "【技能功能与用途解析】本技能为 `setup-ts-deep-modules` 专属自动化工作流与拓展工具集，可在相关场景中调用辅助完成专项开发或内容构筑。\n\n【原始英文说明】Wire dependency-cruiser into a TypeScript repo so each package is a deep module — implementation hidden in subfolders, reachable only through its entry-point files. User-invoked.",
+    "scope": "mattpocock",
+    "category": "核心研发工作流 (Matt Flow)",
+    "subModule": "⚙️ 通用研发工具",
+    "categoryColor": "#a855f7",
+    "path": "C:\\Users\\GU\\.gemini\\config\\skills\\setup-ts-deep-modules\\SKILL.md",
+    "wakeupPrompt": "请调用 /setup-ts-deep-modules 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "setup-ts-deep-modules",
+        "desc": "调用 setup-ts-deep-modules 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /setup-ts-deep-modules 技能，帮我处理以下任务要求：",
+        "group": "⚙️ 通用研发工具"
+      }
+    ]
+  },
+  {
+    "name": "skill-creator",
+    "description": "【技能功能与用途解析】本技能为 `skill-creator` 专属自动化工作流与拓展工具集，可在相关场景中调用辅助完成专项开发或内容构筑。\n\n【原始英文说明】Guide for creating effective skills. This skill should be used when users want to create a new skill (or update an existing skill) that extends Claude's capabilities with specialized knowledge, workflows, or tool integrations.",
+    "scope": "全局技能 (Global)",
+    "category": "运营创作与自媒体",
+    "subModule": "✍️ 爆款策划与文案创编",
+    "categoryColor": "#f43f5e",
+    "path": "C:\\Users\\GU\\.gemini\\config\\skills\\skill-creator\\SKILL.md",
+    "wakeupPrompt": "请调用 /skill-creator 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "skill-creator",
+        "desc": "调用 skill-creator 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /skill-creator 技能，帮我处理以下任务要求：",
+        "group": "✍️ 爆款策划与文案创编"
+      }
+    ]
+  },
+  {
+    "name": "tdd",
+    "description": "【测试驱动开发 (TDD) 极客】坚持先红后绿再重构（Red-Green-Refactor）的开发定律，先写单元与集成测试，再完善逻辑。\n\n【原始描述】Test-driven development. Use when the user wants to build features or fix bugs test-first, mentions \"red-green-refactor\", or wants integration tests.",
+    "scope": "mattpocock",
+    "category": "核心研发工作流 (Matt Flow)",
+    "subModule": "🧪 TDD 与代码实现",
+    "categoryColor": "#a855f7",
+    "path": "C:\\Users\\GU\\.gemini\\config\\skills\\tdd\\SKILL.md",
+    "wakeupPrompt": "请调用 /tdd 技能，严格按照测试驱动开发（TDD 先红后绿再重构）的流程为我编写实现该特性功能",
+    "commands": [
+      {
+        "cmd": "tdd [feature/bug]",
+        "desc": "测试驱动开发模式：强行遵从红（红灯报错）→ 绿（最低修复通过）→ 重构（提炼优雅架构）原则。",
+        "wakeup": "请调用 /tdd 技能，严格按照测试驱动开发（TDD 先红后绿再重构）的流程为我编写实现该特性功能",
+        "group": "🧪 TDD 与代码实现"
+      }
+    ]
+  },
+  {
+    "name": "teach",
+    "description": "【技能功能与用途解析】本技能为 `teach` 专属自动化工作流与拓展工具集，可在相关场景中调用辅助完成专项开发或内容构筑。\n\n【原始英文说明】Teach the user a new skill or concept, within this workspace.",
+    "scope": "全局技能 (Global)",
+    "category": "研发辅助与运维工具",
+    "subModule": "🔧 系统通用模块",
+    "categoryColor": "#38bdf8",
+    "path": "C:\\Users\\GU\\.gemini\\config\\skills\\teach\\SKILL.md",
+    "wakeupPrompt": "请调用 /teach 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "teach",
+        "desc": "调用 teach 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /teach 技能，帮我处理以下任务要求：",
+        "group": "🔧 系统通用模块"
+      }
+    ]
+  },
+  {
+    "name": "to-questionnaire",
+    "description": "【技能功能与用途解析】本技能为 `to-questionnaire` 专属自动化工作流与拓展工具集，可在相关场景中调用辅助完成专项开发或内容构筑。\n\n【原始英文说明】Turn a decision you can't fully answer into a questionnaire for someone else to fill in.",
+    "scope": "mattpocock",
+    "category": "核心研发工作流 (Matt Flow)",
+    "subModule": "💡 头脑风暴与需求澄清",
+    "categoryColor": "#a855f7",
+    "path": "C:\\Users\\GU\\.gemini\\config\\skills\\to-questionnaire\\SKILL.md",
+    "wakeupPrompt": "请调用 /to-questionnaire 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "to-questionnaire",
+        "desc": "调用 to-questionnaire 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /to-questionnaire 技能，帮我处理以下任务要求：",
+        "group": "💡 头脑风暴与需求澄清"
+      }
+    ]
+  },
+  {
+    "name": "to-spec",
+    "description": "【技能功能与用途解析】本技能为 `to-spec` 专属自动化工作流与拓展工具集，可在相关场景中调用辅助完成专项开发或内容构筑。\n\n【原始英文说明】Turn the current conversation into a spec and publish it to the project issue tracker — no interview, just synthesis of what you've already discussed.",
+    "scope": "mattpocock",
+    "category": "核心研发工作流 (Matt Flow)",
+    "subModule": "💡 头脑风暴与需求澄清",
+    "categoryColor": "#a855f7",
+    "path": "C:\\Users\\GU\\.gemini\\config\\skills\\to-spec\\SKILL.md",
+    "wakeupPrompt": "请调用 /to-spec 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "to-spec",
+        "desc": "调用 to-spec 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /to-spec 技能，帮我处理以下任务要求：",
+        "group": "💡 头脑风暴与需求澄清"
+      }
+    ]
+  },
+  {
+    "name": "to-tickets",
+    "description": "【技能功能与用途解析】本技能为 `to-tickets` 专属自动化工作流与拓展工具集，可在相关场景中调用辅助完成专项开发或内容构筑。\n\n【原始英文说明】Break a plan, spec, or the current conversation into a set of tracer-bullet tickets, each declaring its blocking edges, published to the configured tracker — edges as text in one file per ticket locally, or native blocking links on a real tracker.",
+    "scope": "mattpocock",
+    "category": "核心研发工作流 (Matt Flow)",
+    "subModule": "⚙️ 通用研发工具",
+    "categoryColor": "#a855f7",
+    "path": "C:\\Users\\GU\\.gemini\\config\\skills\\to-tickets\\SKILL.md",
+    "wakeupPrompt": "请调用 /to-tickets 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "to-tickets",
+        "desc": "调用 to-tickets 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /to-tickets 技能，帮我处理以下任务要求：",
+        "group": "⚙️ 通用研发工具"
+      }
+    ]
+  },
+  {
+    "name": "triage",
+    "description": "【技能功能与用途解析】本技能为 `triage` 专属自动化工作流与拓展工具集，可在相关场景中调用辅助完成专项开发或内容构筑。\n\n【原始英文说明】Move issues and external PRs through a state machine of triage roles — categorise, verify, grill if needed, and write agent-ready briefs.",
+    "scope": "mattpocock",
+    "category": "核心研发工作流 (Matt Flow)",
+    "subModule": "🐞 Bug排查与性能诊断",
+    "categoryColor": "#a855f7",
+    "path": "C:\\Users\\GU\\.gemini\\config\\skills\\triage\\SKILL.md",
+    "wakeupPrompt": "请调用 /triage 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "triage",
+        "desc": "调用 triage 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /triage 技能，帮我处理以下任务要求：",
+        "group": "🐞 Bug排查与性能诊断"
+      }
+    ]
+  },
+  {
+    "name": "ubiquitous-language",
+    "description": "【技能功能与用途解析】本技能为 `ubiquitous-language` 专属自动化工作流与拓展工具集，可在相关场景中调用辅助完成专项开发或内容构筑。\n\n【原始英文说明】Extract a DDD-style ubiquitous language glossary from the current conversation, flagging ambiguities and proposing canonical terms. Saves to UBIQUITOUS_LANGUAGE.md. Use when user wants to define domain terms, build a glossary, harden terminology, create a ubiquitous language, or mentions \"domain model\" or \"DDD\".",
+    "scope": "mattpocock",
+    "category": "核心研发工作流 (Matt Flow)",
+    "subModule": "⚙️ 通用研发工具",
+    "categoryColor": "#a855f7",
+    "path": "C:\\Users\\GU\\.gemini\\config\\skills\\ubiquitous-language\\SKILL.md",
+    "wakeupPrompt": "请调用 /ubiquitous-language 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "ubiquitous-language",
+        "desc": "调用 ubiquitous-language 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /ubiquitous-language 技能，帮我处理以下任务要求：",
+        "group": "⚙️ 通用研发工具"
+      }
+    ]
+  },
+  {
+    "name": "understand-anything-knowledge-graph",
+    "description": "【技能功能与用途解析】本技能为 `understand-anything-knowledge-graph` 专属自动化工作流与拓展工具集，可在相关场景中调用辅助完成专项开发或内容构筑。\n\n【原始英文说明】Turn any codebase into an interactive knowledge graph using Claude Code skills — explore, search, and ask questions about any project visually.",
+    "scope": "全局技能 (Global)",
+    "category": "研发辅助与运维工具",
+    "subModule": "🔧 系统通用模块",
+    "categoryColor": "#38bdf8",
+    "path": "C:\\Users\\GU\\.gemini\\config\\skills\\understand-anything-knowledge-graph\\SKILL.md",
+    "wakeupPrompt": "请调用 /understand-anything-knowledge-graph 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "understand-anything-knowledge-graph",
+        "desc": "调用 understand-anything-knowledge-graph 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /understand-anything-knowledge-graph 技能，帮我处理以下任务要求：",
+        "group": "🔧 系统通用模块"
+      }
+    ]
+  },
+  {
+    "name": "using-agent-skills",
+    "description": "【技能功能与用途解析】本技能为 `using-agent-skills` 专属自动化工作流与拓展工具集，可在相关场景中调用辅助完成专项开发或内容构筑。\n\n【原始英文说明】Discovers and invokes agent skills. Use when starting a session or when you need to discover which skill applies to the current task. This is the meta-skill that governs how all other skills are discovered and invoked.",
+    "scope": "全局技能 (Global)",
+    "category": "研发辅助与运维工具",
+    "subModule": "🔧 系统通用模块",
+    "categoryColor": "#38bdf8",
+    "path": "C:\\Users\\GU\\.gemini\\config\\skills\\using-agent-skills\\SKILL.md",
+    "wakeupPrompt": "请调用 /using-agent-skills 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "using-agent-skills",
+        "desc": "调用 using-agent-skills 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /using-agent-skills 技能，帮我处理以下任务要求：",
+        "group": "🔧 系统通用模块"
+      }
+    ]
+  },
+  {
+    "name": "wayfinder",
+    "description": "【技能功能与用途解析】本技能为 `wayfinder` 专属自动化工作流与拓展工具集，可在相关场景中调用辅助完成专项开发或内容构筑。\n\n【原始英文说明】Plan a huge chunk of work — more than one agent session can hold — as a shared map of decision tickets on your issue tracker, and resolve them one at a time until the way to the destination is clear.",
+    "scope": "mattpocock",
+    "category": "核心研发工作流 (Matt Flow)",
+    "subModule": "⚙️ 通用研发工具",
+    "categoryColor": "#a855f7",
+    "path": "C:\\Users\\GU\\.gemini\\config\\skills\\wayfinder\\SKILL.md",
+    "wakeupPrompt": "请调用 /wayfinder 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "wayfinder",
+        "desc": "调用 wayfinder 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /wayfinder 技能，帮我处理以下任务要求：",
+        "group": "⚙️ 通用研发工具"
+      }
+    ]
+  },
+  {
+    "name": "wizard",
+    "description": "【技能功能与用途解析】本技能为 `wizard` 专属自动化工作流与拓展工具集，可在相关场景中调用辅助完成专项开发或内容构筑。\n\n【原始英文说明】Generate an interactive bash wizard that walks a human through a manual procedure — third-party setup, a one-off migration, an A→B state transition — opening URLs, capturing values, confirming each step, and writing .env files and GitHub Actions secrets.",
+    "scope": "全局技能 (Global)",
+    "category": "研发辅助与运维工具",
+    "subModule": "🔧 系统通用模块",
+    "categoryColor": "#38bdf8",
+    "path": "C:\\Users\\GU\\.gemini\\config\\skills\\wizard\\SKILL.md",
+    "wakeupPrompt": "请调用 /wizard 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "wizard",
+        "desc": "调用 wizard 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /wizard 技能，帮我处理以下任务要求：",
+        "group": "🔧 系统通用模块"
+      }
+    ]
+  },
+  {
+    "name": "write-a-skill",
+    "description": "【技能功能与用途解析】本技能为 `write-a-skill` 专属自动化工作流与拓展工具集，可在相关场景中调用辅助完成专项开发或内容构筑。\n\n【原始英文说明】Create new agent skills with proper structure, progressive disclosure, and bundled resources. Use when user wants to create, write, or build a new skill.",
+    "scope": "全局技能 (Global)",
+    "category": "研发辅助与运维工具",
+    "subModule": "🔧 系统通用模块",
+    "categoryColor": "#38bdf8",
+    "path": "C:\\Users\\GU\\.gemini\\config\\skills\\write-a-skill\\SKILL.md",
+    "wakeupPrompt": "请调用 /write-a-skill 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "write-a-skill",
+        "desc": "调用 write-a-skill 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /write-a-skill 技能，帮我处理以下任务要求：",
+        "group": "🔧 系统通用模块"
+      }
+    ]
+  },
+  {
+    "name": "writing-beats",
+    "description": "【技能功能与用途解析】本技能为 `writing-beats` 专属自动化工作流与拓展工具集，可在相关场景中调用辅助完成专项开发或内容构筑。\n\n【原始英文说明】Writing, exploit — assemble raw material into a journey of beats, grounding each term before a beat leans on it.",
+    "scope": "全局技能 (Global)",
+    "category": "研发辅助与运维工具",
+    "subModule": "🔧 系统通用模块",
+    "categoryColor": "#38bdf8",
+    "path": "C:\\Users\\GU\\.gemini\\config\\skills\\writing-beats\\SKILL.md",
+    "wakeupPrompt": "请调用 /writing-beats 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "writing-beats",
+        "desc": "调用 writing-beats 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /writing-beats 技能，帮我处理以下任务要求：",
+        "group": "🔧 系统通用模块"
+      }
+    ]
+  },
+  {
+    "name": "writing-fragments",
+    "description": "【技能功能与用途解析】本技能为 `writing-fragments` 专属自动化工作流与拓展工具集，可在相关场景中调用辅助完成专项开发或内容构筑。\n\n【原始英文说明】Writing, explore — mine raw fragments, no structure yet.",
+    "scope": "全局技能 (Global)",
+    "category": "研发辅助与运维工具",
+    "subModule": "🔧 系统通用模块",
+    "categoryColor": "#38bdf8",
+    "path": "C:\\Users\\GU\\.gemini\\config\\skills\\writing-fragments\\SKILL.md",
+    "wakeupPrompt": "请调用 /writing-fragments 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "writing-fragments",
+        "desc": "调用 writing-fragments 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /writing-fragments 技能，帮我处理以下任务要求：",
+        "group": "🔧 系统通用模块"
+      }
+    ]
+  },
+  {
+    "name": "writing-great-skills",
+    "description": "【技能功能与用途解析】本技能为 `writing-great-skills` 专属自动化工作流与拓展工具集，可在相关场景中调用辅助完成专项开发或内容构筑。\n\n【原始英文说明】Reference for writing and editing skills well — the vocabulary and principles that make a skill predictable.",
+    "scope": "全局技能 (Global)",
+    "category": "研发辅助与运维工具",
+    "subModule": "🔧 系统通用模块",
+    "categoryColor": "#38bdf8",
+    "path": "C:\\Users\\GU\\.gemini\\config\\skills\\writing-great-skills\\SKILL.md",
+    "wakeupPrompt": "请调用 /writing-great-skills 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "writing-great-skills",
+        "desc": "调用 writing-great-skills 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /writing-great-skills 技能，帮我处理以下任务要求：",
+        "group": "🔧 系统通用模块"
+      }
+    ]
+  },
+  {
+    "name": "writing-shape",
+    "description": "【技能功能与用途解析】本技能为 `writing-shape` 专属自动化工作流与拓展工具集，可在相关场景中调用辅助完成专项开发或内容构筑。\n\n【原始英文说明】Writing, exploit — shape raw material into an article, paragraph by paragraph.",
+    "scope": "全局技能 (Global)",
+    "category": "研发辅助与运维工具",
+    "subModule": "🔧 系统通用模块",
+    "categoryColor": "#38bdf8",
+    "path": "C:\\Users\\GU\\.gemini\\config\\skills\\writing-shape\\SKILL.md",
+    "wakeupPrompt": "请调用 /writing-shape 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "writing-shape",
+        "desc": "调用 writing-shape 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /writing-shape 技能，帮我处理以下任务要求：",
+        "group": "🔧 系统通用模块"
+      }
+    ]
+  },
+  {
+    "name": "xhs-browser-publisher",
+    "description": "使用内置浏览器智能体 (browser_subagent) 可靠地发布小红书笔记，完美绕过 Playwright 在 Windows 下的中文输入乱码 Bug 以及系统本地文件上传拦截。当用户要求使用内置浏览器自动化发布小红书帖子时使用此技能。",
+    "scope": "全局技能 (Global)",
+    "category": "运营创作与自媒体",
+    "subModule": "🚀 发布闭环与运营风控",
+    "categoryColor": "#f43f5e",
+    "path": "C:\\Users\\GU\\.gemini\\config\\skills\\xhs-browser-publisher\\SKILL.md",
+    "wakeupPrompt": "请调用 /xhs-browser-publisher 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "xhs-browser-publisher",
+        "desc": "调用 xhs-browser-publisher 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /xhs-browser-publisher 技能，帮我处理以下任务要求：",
+        "group": "🚀 发布闭环与运营风控"
+      }
+    ]
+  },
+  {
+    "name": "brandkit",
+    "description": "【技能功能与用途解析】本技能为 `brandkit` 专属自动化工作流与拓展工具集，可在相关场景中调用辅助完成专项开发或内容构筑。\n\n【原始英文说明】Premium brand-kit image generation skill for creating high-end brand-guidelines boards, logo systems, identity decks, and visual-world presentations. Trained for minimalist, cinematic, editorial, dark-tech, luxury, cultural, security, gaming, developer-tool, and consumer-app brand systems. Optimized for intentional logo concepting, refined composition, sparse typography, strong symbolic meaning, premium mockups, art-directed imagery, and flexible grid layouts.",
+    "scope": "taste",
+    "category": "视觉生成与办公文档",
+    "subModule": "🖼️ 插画生成与社交卡片",
+    "categoryColor": "#fb923c",
+    "path": "C:\\Users\\GU\\.gemini\\config\\skills\\taste\\brandkit\\SKILL.md",
+    "wakeupPrompt": "请调用 /brandkit 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "brandkit",
+        "desc": "调用 brandkit 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /brandkit 技能，帮我处理以下任务要求：",
+        "group": "🖼️ 插画生成与社交卡片"
+      }
+    ]
+  },
+  {
+    "name": "industrial-brutalist-ui",
+    "description": "【技能功能与用途解析】本技能为 `industrial-brutalist-ui` 专属自动化工作流与拓展工具集，可在相关场景中调用辅助完成专项开发或内容构筑。\n\n【原始英文说明】Raw mechanical interfaces fusing Swiss typographic print with military terminal aesthetics. Rigid grids, extreme type scale contrast, utilitarian color, analog degradation effects. For data-heavy dashboards, portfolios, or editorial sites that need to feel like declassified blueprints.",
+    "scope": "taste",
+    "category": "前端UI与现代美学",
+    "subModule": "🎨 视觉重构与张力突破",
+    "categoryColor": "#22d3ee",
+    "path": "C:\\Users\\GU\\.gemini\\config\\skills\\taste\\brutalist-skill\\SKILL.md",
+    "wakeupPrompt": "请调用 /industrial-brutalist-ui 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "industrial-brutalist-ui",
+        "desc": "调用 industrial-brutalist-ui 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /industrial-brutalist-ui 技能，帮我处理以下任务要求：",
+        "group": "🎨 视觉重构与张力突破"
+      }
+    ]
+  },
+  {
+    "name": "frontend-design",
+    "description": "【技能功能与用途解析】本技能为 `frontend-design` 专属自动化工作流与拓展工具集，可在相关场景中调用辅助完成专项开发或内容构筑。\n\n【原始英文说明】",
+    "scope": "taste",
+    "category": "前端UI与现代美学",
+    "subModule": "🛠️ 页面打磨与响应自适",
+    "categoryColor": "#22d3ee",
+    "path": "C:\\Users\\GU\\.gemini\\config\\skills\\taste\\frontend-design\\SKILL.md",
+    "wakeupPrompt": "请调用 /frontend-design 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "frontend-design",
+        "desc": "调用 frontend-design 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /frontend-design 技能，帮我处理以下任务要求：",
+        "group": "🛠️ 页面打磨与响应自适"
+      }
+    ]
+  },
+  {
+    "name": "gpt-taste",
+    "description": "【技能功能与用途解析】本技能为 `gpt-taste` 专属自动化工作流与拓展工具集，可在相关场景中调用辅助完成专项开发或内容构筑。\n\n【原始英文说明】Elite UX/UI & Advanced GSAP Motion Engineer. Enforces Python-driven true randomization for layout variance, strict AIDA page structure, wide editorial typography (bans 6-line wraps), gapless bento grids, strict GSAP ScrollTriggers (pinning, stacking, scrubbing), inline micro-images, and massive section spacing.",
+    "scope": "taste",
+    "category": "前端UI与现代美学",
+    "subModule": "🛠️ 页面打磨与响应自适",
+    "categoryColor": "#22d3ee",
+    "path": "C:\\Users\\GU\\.gemini\\config\\skills\\taste\\gpt-tasteskill\\SKILL.md",
+    "wakeupPrompt": "请调用 /gpt-taste 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "gpt-taste",
+        "desc": "调用 gpt-taste 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /gpt-taste 技能，帮我处理以下任务要求：",
+        "group": "🛠️ 页面打磨与响应自适"
+      }
+    ]
+  },
+  {
+    "name": "image-to-code",
+    "description": "【技能功能与用途解析】本技能为 `image-to-code` 专属自动化工作流与拓展工具集，可在相关场景中调用辅助完成专项开发或内容构筑。\n\n【原始英文说明】Elite website image-to-code skill for Codex. For visually important web tasks, it must first generate the design image(s) itself, deeply analyze them, then implement the website to match them as closely as possible. In Codex, it must prefer large, readable, section-specific images instead of tiny compressed boards, generate fresh standalone images for sections or detail views instead of cropping old ones, avoid lazy under-generation, avoid cards-inside-cards-inside-cards UI, and keep the hero clean, spacious, readable, and visible on a small laptop.",
+    "scope": "taste",
+    "category": "视觉生成与办公文档",
+    "subModule": "🖼️ 插画生成与社交卡片",
+    "categoryColor": "#fb923c",
+    "path": "C:\\Users\\GU\\.gemini\\config\\skills\\taste\\image-to-code-skill\\SKILL.md",
+    "wakeupPrompt": "请调用 /image-to-code 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "image-to-code",
+        "desc": "调用 image-to-code 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /image-to-code 技能，帮我处理以下任务要求：",
+        "group": "🖼️ 插画生成与社交卡片"
+      }
+    ]
+  },
+  {
+    "name": "imagegen-frontend-mobile",
+    "description": "【技能功能与用途解析】本技能为 `imagegen-frontend-mobile` 专属自动化工作流与拓展工具集，可在相关场景中调用辅助完成专项开发或内容构筑。\n\n【原始英文说明】Elite mobile app image-generation skill for creating premium, app-native screen concepts and flows. Designed for iOS, Android, and cross-platform mobile products. Prioritizes clean hierarchy, comfortably readable text, strong multi-screen consistency, controlled color palettes, non-generic creative direction, textured surfaces, image-led composition, tasteful custom iconography, and clean phone mockup framing. By default, screens should be shown inside a subtle premium iPhone or similar phone mockup with a visible frame, while the main focus stays on the app content itself. This skill generates images only. It does not write code.",
+    "scope": "taste",
+    "category": "视觉生成与办公文档",
+    "subModule": "🖼️ 插画生成与社交卡片",
+    "categoryColor": "#fb923c",
+    "path": "C:\\Users\\GU\\.gemini\\config\\skills\\taste\\imagegen-frontend-mobile\\SKILL.md",
+    "wakeupPrompt": "请调用 /imagegen-frontend-mobile 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "imagegen-frontend-mobile",
+        "desc": "调用 imagegen-frontend-mobile 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /imagegen-frontend-mobile 技能，帮我处理以下任务要求：",
+        "group": "🖼️ 插画生成与社交卡片"
+      }
+    ]
+  },
+  {
+    "name": "imagegen-frontend-web",
+    "description": "【技能功能与用途解析】本技能为 `imagegen-frontend-web` 专属自动化工作流与拓展工具集，可在相关场景中调用辅助完成专项开发或内容构筑。\n\n【原始英文说明】Elite frontend image-direction skill for generating premium, conversion-aware website design references. CRITICAL OUTPUT RULE — generate ONE separate horizontal image FOR EVERY section. A landing page with 8 sections produces 8 images. Never compress multiple sections into one image. Enforces composition variety (not always left-text / right-image), background-image freedom, varied CTAs, varied hero scales (giant / mid / mini minimalist), narrative concept spine, second-read moments, and a single consistent palette across all images. Optimized for landing pages, marketing sites, and product comps that developers or coding models can accurately recreate.",
+    "scope": "taste",
+    "category": "视觉生成与办公文档",
+    "subModule": "🖼️ 插画生成与社交卡片",
+    "categoryColor": "#fb923c",
+    "path": "C:\\Users\\GU\\.gemini\\config\\skills\\taste\\imagegen-frontend-web\\SKILL.md",
+    "wakeupPrompt": "请调用 /imagegen-frontend-web 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "imagegen-frontend-web",
+        "desc": "调用 imagegen-frontend-web 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /imagegen-frontend-web 技能，帮我处理以下任务要求：",
+        "group": "🖼️ 插画生成与社交卡片"
+      }
+    ]
+  },
+  {
+    "name": "minimalist-ui",
+    "description": "【技能功能与用途解析】本技能为 `minimalist-ui` 专属自动化工作流与拓展工具集，可在相关场景中调用辅助完成专项开发或内容构筑。\n\n【原始英文说明】Clean editorial-style interfaces. Warm monochrome palette, typographic contrast, flat bento grids, muted pastels. No gradients, no heavy shadows.",
+    "scope": "taste",
+    "category": "前端UI与现代美学",
+    "subModule": "📐 布局排版与审美品评",
+    "categoryColor": "#22d3ee",
+    "path": "C:\\Users\\GU\\.gemini\\config\\skills\\taste\\minimalist-skill\\SKILL.md",
+    "wakeupPrompt": "请调用 /minimalist-ui 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "minimalist-ui",
+        "desc": "调用 minimalist-ui 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /minimalist-ui 技能，帮我处理以下任务要求：",
+        "group": "📐 布局排版与审美品评"
+      }
+    ]
+  },
+  {
+    "name": "full-output-enforcement",
+    "description": "【技能功能与用途解析】本技能为 `full-output-enforcement` 专属自动化工作流与拓展工具集，可在相关场景中调用辅助完成专项开发或内容构筑。\n\n【原始英文说明】Overrides default LLM truncation behavior. Enforces complete code generation, bans placeholder patterns, and handles token-limit splits cleanly. Apply to any task requiring exhaustive, unabridged output.",
+    "scope": "taste",
+    "category": "前端UI与现代美学",
+    "subModule": "🛠️ 页面打磨与响应自适",
+    "categoryColor": "#22d3ee",
+    "path": "C:\\Users\\GU\\.gemini\\config\\skills\\taste\\output-skill\\SKILL.md",
+    "wakeupPrompt": "请调用 /full-output-enforcement 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "full-output-enforcement",
+        "desc": "调用 full-output-enforcement 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /full-output-enforcement 技能，帮我处理以下任务要求：",
+        "group": "🛠️ 页面打磨与响应自适"
+      }
+    ]
+  },
+  {
+    "name": "redesign-existing-projects",
+    "description": "【技能功能与用途解析】本技能为 `redesign-existing-projects` 专属自动化工作流与拓展工具集，可在相关场景中调用辅助完成专项开发或内容构筑。\n\n【原始英文说明】Upgrades existing websites and apps to premium quality. Audits current design, identifies generic AI patterns, and applies high-end design standards without breaking functionality. Works with any CSS framework or vanilla CSS.",
+    "scope": "taste",
+    "category": "前端UI与现代美学",
+    "subModule": "🎨 视觉重构与张力突破",
+    "categoryColor": "#22d3ee",
+    "path": "C:\\Users\\GU\\.gemini\\config\\skills\\taste\\redesign-skill\\SKILL.md",
+    "wakeupPrompt": "请调用 /redesign-existing-projects 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "redesign-existing-projects",
+        "desc": "调用 redesign-existing-projects 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /redesign-existing-projects 技能，帮我处理以下任务要求：",
+        "group": "🎨 视觉重构与张力突破"
+      }
+    ]
+  },
+  {
+    "name": "high-end-visual-design",
+    "description": "【技能功能与用途解析】本技能为 `high-end-visual-design` 专属自动化工作流与拓展工具集，可在相关场景中调用辅助完成专项开发或内容构筑。\n\n【原始英文说明】Teaches the AI to design like a high-end agency. Defines the exact fonts, spacing, shadows, card structures, and animations that make a website feel expensive. Blocks all the common defaults that make AI designs look cheap or generic.",
+    "scope": "taste",
+    "category": "前端UI与现代美学",
+    "subModule": "🎨 视觉重构与张力突破",
+    "categoryColor": "#22d3ee",
+    "path": "C:\\Users\\GU\\.gemini\\config\\skills\\taste\\soft-skill\\SKILL.md",
+    "wakeupPrompt": "请调用 /high-end-visual-design 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "high-end-visual-design",
+        "desc": "调用 high-end-visual-design 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /high-end-visual-design 技能，帮我处理以下任务要求：",
+        "group": "🎨 视觉重构与张力突破"
+      }
+    ]
+  },
+  {
+    "name": "stitch-design-taste",
+    "description": "【技能功能与用途解析】本技能为 `stitch-design-taste` 专属自动化工作流与拓展工具集，可在相关场景中调用辅助完成专项开发或内容构筑。\n\n【原始英文说明】Semantic Design System Skill for Google Stitch. Generates agent-friendly DESIGN.md files that enforce premium, anti-generic UI standards — strict typography, calibrated color, asymmetric layouts, perpetual micro-motion, and hardware-accelerated performance.",
+    "scope": "taste",
+    "category": "前端UI与现代美学",
+    "subModule": "🛠️ 页面打磨与响应自适",
+    "categoryColor": "#22d3ee",
+    "path": "C:\\Users\\GU\\.gemini\\config\\skills\\taste\\stitch-skill\\SKILL.md",
+    "wakeupPrompt": "请调用 /stitch-design-taste 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "stitch-design-taste",
+        "desc": "调用 stitch-design-taste 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /stitch-design-taste 技能，帮我处理以下任务要求：",
+        "group": "🛠️ 页面打磨与响应自适"
+      }
+    ]
+  },
+  {
+    "name": "design-taste-frontend",
+    "description": "【技能功能与用途解析】本技能为 `design-taste-frontend` 专属自动化工作流与拓展工具集，可在相关场景中调用辅助完成专项开发或内容构筑。\n\n【原始英文说明】Anti-slop frontend skill for landing pages, portfolios, and redesigns. The agent reads the brief, infers the right design direction, and ships interfaces that do not look templated. Real design systems when applicable, audit-first on redesigns, strict pre-flight check.",
+    "scope": "taste",
+    "category": "前端UI与现代美学",
+    "subModule": "🛠️ 页面打磨与响应自适",
+    "categoryColor": "#22d3ee",
+    "path": "C:\\Users\\GU\\.gemini\\config\\skills\\taste\\taste-skill\\SKILL.md",
+    "wakeupPrompt": "请调用 /design-taste-frontend 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "design-taste-frontend",
+        "desc": "调用 design-taste-frontend 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /design-taste-frontend 技能，帮我处理以下任务要求：",
+        "group": "🛠️ 页面打磨与响应自适"
+      }
+    ]
+  },
+  {
+    "name": "design-taste-frontend-v1",
+    "description": "【技能功能与用途解析】本技能为 `design-taste-frontend-v1` 专属自动化工作流与拓展工具集，可在相关场景中调用辅助完成专项开发或内容构筑。\n\n【原始英文说明】The original v1 taste-skill, preserved for projects depending on its exact behavior. The current default is `design-taste-frontend` (v2 experimental), which is a substantial rewrite. Use this v1 install name only if you need exact backward compatibility.",
+    "scope": "taste",
+    "category": "前端UI与现代美学",
+    "subModule": "🛠️ 页面打磨与响应自适",
+    "categoryColor": "#22d3ee",
+    "path": "C:\\Users\\GU\\.gemini\\config\\skills\\taste\\taste-skill-v1\\SKILL.md",
+    "wakeupPrompt": "请调用 /design-taste-frontend-v1 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "design-taste-frontend-v1",
+        "desc": "调用 design-taste-frontend-v1 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /design-taste-frontend-v1 技能，帮我处理以下任务要求：",
+        "group": "🛠️ 页面打磨与响应自适"
+      }
+    ]
+  },
+  {
+    "name": "overleaf-integration",
+    "description": "【技能功能与用途解析】本技能为 `overleaf-integration` 专属自动化工作流与拓展工具集，可在相关场景中调用辅助完成专项开发或内容构筑。\n\n【原始英文说明】Create and manage Overleaf LaTeX documents. Use when transcribing handwritten work to LaTeX, creating academic documents, homework solutions, problem sets, or any LaTeX/Overleaf operations. Handles PDF/image to LaTeX conversion. Homework transcription workflow.",
+    "scope": "academic-paper-writer",
+    "category": "研发辅助与运维工具",
+    "subModule": "🔧 系统通用模块",
+    "categoryColor": "#38bdf8",
+    "path": "E:\\AI\\Antigravity\\academic-paper-writer\\.agent\\skills\\academic-overleaf-integration\\SKILL.md",
+    "wakeupPrompt": "请调用 /overleaf-integration 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "overleaf-integration",
+        "desc": "调用 overleaf-integration 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /overleaf-integration 技能，帮我处理以下任务要求：",
+        "group": "🔧 系统通用模块"
+      }
+    ]
+  },
+  {
+    "name": "academic-paper-writer",
+    "description": "学术论文撰写技能，用于系统性指导完成学术论文的全流程撰写。当用户需要撰写开题报告、文献综述、论文正文、摘要等学术内容时使用此技能。支持本科、硕士、博士等各类学术论文。",
+    "scope": "academic-paper-writer",
+    "category": "研发辅助与运维工具",
+    "subModule": "🔧 系统通用模块",
+    "categoryColor": "#38bdf8",
+    "path": "E:\\AI\\Antigravity\\academic-paper-writer\\.agent\\skills\\academic-paper-writer\\SKILL.md",
+    "wakeupPrompt": "请调用 /academic-paper-writer 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "academic-paper-writer",
+        "desc": "调用 academic-paper-writer 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /academic-paper-writer 技能，帮我处理以下任务要求：",
+        "group": "🔧 系统通用模块"
+      }
+    ]
+  },
+  {
+    "name": "academic-paper-writing-basic",
+    "description": "专业的学术论文初撰写技能。严格遵循\"反AI模式\"（无过渡词、节奏控制），支持完整论文、开题报告、文献综述（真实引用检测）及计算机专业代码匹配大纲生成。",
+    "scope": "academic-paper-writer",
+    "category": "研发辅助与运维工具",
+    "subModule": "🔧 系统通用模块",
+    "categoryColor": "#38bdf8",
+    "path": "E:\\AI\\Antigravity\\academic-paper-writer\\.agent\\skills\\academic-paper-writing-basic\\SKILL.md",
+    "wakeupPrompt": "请调用 /academic-paper-writing-basic 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "academic-paper-writing-basic",
+        "desc": "调用 academic-paper-writing-basic 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /academic-paper-writing-basic 技能，帮我处理以下任务要求：",
+        "group": "🔧 系统通用模块"
+      }
+    ]
+  },
+  {
+    "name": "academic-researcher",
+    "description": "【技能功能与用途解析】本技能为 `academic-researcher` 专属自动化工作流与拓展工具集，可在相关场景中调用辅助完成专项开发或内容构筑。\n\n【原始英文说明】|",
+    "scope": "academic-paper-writer",
+    "category": "研发辅助与运维工具",
+    "subModule": "🔧 系统通用模块",
+    "categoryColor": "#38bdf8",
+    "path": "E:\\AI\\Antigravity\\academic-paper-writer\\.agent\\skills\\academic-researcher\\SKILL.md",
+    "wakeupPrompt": "请调用 /academic-researcher 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "academic-researcher",
+        "desc": "调用 academic-researcher 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /academic-researcher 技能，帮我处理以下任务要求：",
+        "group": "🔧 系统通用模块"
+      }
+    ]
+  },
+  {
+    "name": "scientific-slides",
+    "description": "【技能功能与用途解析】本技能为 `scientific-slides` 专属自动化工作流与拓展工具集，可在相关场景中调用辅助完成专项开发或内容构筑。\n\n【原始英文说明】Build slide decks and presentations for research talks. Use this for making PowerPoint slides, conference presentations, seminar talks, research presentations, thesis defense slides, or any scientific talk. Provides slide structure, design templates, timing guidance, and visual validation. Works with PowerPoint and LaTeX Beamer.",
+    "scope": "academic-paper-writer",
+    "category": "研发辅助与运维工具",
+    "subModule": "🔧 系统通用模块",
+    "categoryColor": "#38bdf8",
+    "path": "E:\\AI\\Antigravity\\academic-paper-writer\\.agent\\skills\\academic-scientific-slides\\SKILL.md",
+    "wakeupPrompt": "请调用 /scientific-slides 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "scientific-slides",
+        "desc": "调用 scientific-slides 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /scientific-slides 技能，帮我处理以下任务要求：",
+        "group": "🔧 系统通用模块"
+      }
+    ]
+  },
+  {
+    "name": "deep-learning",
+    "description": "根据学习主题和范围，搜集权威的书单、博客、网站、框架、论文等学习资料，支持论文自动下载",
+    "scope": "academic-paper-writer",
+    "category": "研发辅助与运维工具",
+    "subModule": "🔧 系统通用模块",
+    "categoryColor": "#38bdf8",
+    "path": "E:\\AI\\Antigravity\\academic-paper-writer\\.agent\\skills\\academic-paper-writer\\deep-learning\\SKILL.md",
+    "wakeupPrompt": "请调用 /deep-learning 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "deep-learning",
+        "desc": "调用 deep-learning 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /deep-learning 技能，帮我处理以下任务要求：",
+        "group": "🔧 系统通用模块"
+      }
+    ]
+  },
+  {
+    "name": "pdf2md-academic",
+    "description": "学术 PDF 转 Markdown 工具：将含公式、图表、引用的学术论文 PDF 转换为排版整洁的 Markdown。触发词：/pdf2md、PDF转Markdown、论文转MD",
+    "scope": "academic-paper-writer",
+    "category": "视觉生成与办公文档",
+    "subModule": "📑 办公排版与数据报告",
+    "categoryColor": "#fb923c",
+    "path": "E:\\AI\\Antigravity\\academic-paper-writer\\.agent\\skills\\academic-paper-writer\\pdf2md-academic\\skill.md",
+    "wakeupPrompt": "请调用 /pdf2md-academic 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "pdf2md-academic",
+        "desc": "调用 pdf2md-academic 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /pdf2md-academic 技能，帮我处理以下任务要求：",
+        "group": "📑 办公排版与数据报告"
+      }
+    ]
+  },
+  {
+    "name": "to-issues",
+    "description": "【技能功能与用途解析】本技能为 `to-issues` 专属自动化工作流与拓展工具集，可在相关场景中调用辅助完成专项开发或内容构筑。\n\n【原始英文说明】Break a plan, spec, or PRD into independently-grabbable issues on the project issue tracker using tracer-bullet vertical slices. Use when user wants to convert a plan into issues, create implementation tickets, or break down work into issues.",
+    "scope": "APP",
+    "category": "研发辅助与运维工具",
+    "subModule": "🔧 系统通用模块",
+    "categoryColor": "#38bdf8",
+    "path": "E:\\AI\\Antigravity\\APP\\.agent\\skills\\to-issues\\SKILL.md",
+    "wakeupPrompt": "请调用 /to-issues 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "to-issues",
+        "desc": "调用 to-issues 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /to-issues 技能，帮我处理以下任务要求：",
+        "group": "🔧 系统通用模块"
+      }
+    ]
+  },
+  {
+    "name": "to-prd",
+    "description": "【技能功能与用途解析】本技能为 `to-prd` 专属自动化工作流与拓展工具集，可在相关场景中调用辅助完成专项开发或内容构筑。\n\n【原始英文说明】Turn the current conversation context into a PRD and publish it to the project issue tracker. Use when user wants to create a PRD from the current context.",
+    "scope": "APP",
+    "category": "研发辅助与运维工具",
+    "subModule": "🔧 系统通用模块",
+    "categoryColor": "#38bdf8",
+    "path": "E:\\AI\\Antigravity\\APP\\.agent\\skills\\to-prd\\SKILL.md",
+    "wakeupPrompt": "请调用 /to-prd 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "to-prd",
+        "desc": "调用 to-prd 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /to-prd 技能，帮我处理以下任务要求：",
+        "group": "🔧 系统通用模块"
+      }
+    ]
+  },
+  {
+    "name": "huashu-nuwa",
+    "description": "【技能功能与用途解析】本技能为 `huashu-nuwa` 专属自动化工作流与拓展工具集，可在相关场景中调用辅助完成专项开发或内容构筑。\n\n【原始英文说明】|",
+    "scope": "hotSpot",
+    "category": "研发辅助与运维工具",
+    "subModule": "🔧 系统通用模块",
+    "categoryColor": "#38bdf8",
+    "path": "E:\\AI\\Antigravity\\hotSpot\\.agent\\skills\\huashu-nuwa\\SKILL.md",
+    "wakeupPrompt": "请调用 /huashu-nuwa 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "huashu-nuwa",
+        "desc": "调用 huashu-nuwa 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /huashu-nuwa 技能，帮我处理以下任务要求：",
+        "group": "🔧 系统通用模块"
+      }
+    ]
+  },
+  {
+    "name": "last30days",
+    "description": "【技能功能与用途解析】本技能为 `last30days` 专属自动化工作流与拓展工具集，可在相关场景中调用辅助完成专项开发或内容构筑。\n\n【原始英文说明】Research what people actually say about any topic in the last 30 days. Pulls posts and engagement from Reddit, X, YouTube, TikTok, Hacker News, Polymarket, GitHub, and the web.",
+    "scope": "hotSpot",
+    "category": "研发辅助与运维工具",
+    "subModule": "🔧 系统通用模块",
+    "categoryColor": "#38bdf8",
+    "path": "E:\\AI\\Antigravity\\hotSpot\\.agent\\skills\\last30days\\SKILL.md",
+    "wakeupPrompt": "请调用 /last30days 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "last30days",
+        "desc": "调用 last30days 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /last30days 技能，帮我处理以下任务要求：",
+        "group": "🔧 系统通用模块"
+      }
+    ]
+  },
+  {
+    "name": "zhangxuefeng-perspective",
+    "description": "【技能功能与用途解析】本技能为 `zhangxuefeng-perspective` 专属自动化工作流与拓展工具集，可在相关场景中调用辅助完成专项开发或内容构筑。\n\n【原始英文说明】|",
+    "scope": "hotSpot",
+    "category": "研发辅助与运维工具",
+    "subModule": "⚙️ 通用研发工具",
+    "categoryColor": "#38bdf8",
+    "path": "E:\\AI\\Antigravity\\hotSpot\\.agent\\skills\\zhangxuefeng-perspective\\SKILL.md",
+    "wakeupPrompt": "请调用 /zhangxuefeng-perspective 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "zhangxuefeng-perspective",
+        "desc": "调用 zhangxuefeng-perspective 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /zhangxuefeng-perspective 技能，帮我处理以下任务要求：",
+        "group": "⚙️ 通用研发工具"
+      }
+    ]
+  },
+  {
+    "name": "andrej-karpathy-perspective",
+    "description": "【技能功能与用途解析】本技能为 `andrej-karpathy-perspective` 专属自动化工作流与拓展工具集，可在相关场景中调用辅助完成专项开发或内容构筑。\n\n【原始英文说明】|",
+    "scope": "hotSpot",
+    "category": "核心研发工作流 (Matt Flow)",
+    "subModule": "🧪 TDD 与代码实现",
+    "categoryColor": "#a855f7",
+    "path": "E:\\AI\\Antigravity\\hotSpot\\.agent\\skills\\huashu-nuwa\\examples\\andrej-karpathy-perspective\\SKILL.md",
+    "wakeupPrompt": "请调用 /andrej-karpathy-perspective 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "andrej-karpathy-perspective",
+        "desc": "调用 andrej-karpathy-perspective 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /andrej-karpathy-perspective 技能，帮我处理以下任务要求：",
+        "group": "🧪 TDD 与代码实现"
+      }
+    ]
+  },
+  {
+    "name": "elon-musk-perspective",
+    "description": "【技能功能与用途解析】本技能为 `elon-musk-perspective` 专属自动化工作流与拓展工具集，可在相关场景中调用辅助完成专项开发或内容构筑。\n\n【原始英文说明】|",
+    "scope": "hotSpot",
+    "category": "研发辅助与运维工具",
+    "subModule": "⚙️ 通用研发工具",
+    "categoryColor": "#38bdf8",
+    "path": "E:\\AI\\Antigravity\\hotSpot\\.agent\\skills\\huashu-nuwa\\examples\\elon-musk-perspective\\SKILL.md",
+    "wakeupPrompt": "请调用 /elon-musk-perspective 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "elon-musk-perspective",
+        "desc": "调用 elon-musk-perspective 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /elon-musk-perspective 技能，帮我处理以下任务要求：",
+        "group": "⚙️ 通用研发工具"
+      }
+    ]
+  },
+  {
+    "name": "feynman-perspective",
+    "description": "【技能功能与用途解析】本技能为 `feynman-perspective` 专属自动化工作流与拓展工具集，可在相关场景中调用辅助完成专项开发或内容构筑。\n\n【原始英文说明】|",
+    "scope": "hotSpot",
+    "category": "研发辅助与运维工具",
+    "subModule": "⚙️ 通用研发工具",
+    "categoryColor": "#38bdf8",
+    "path": "E:\\AI\\Antigravity\\hotSpot\\.agent\\skills\\huashu-nuwa\\examples\\feynman-perspective\\SKILL.md",
+    "wakeupPrompt": "请调用 /feynman-perspective 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "feynman-perspective",
+        "desc": "调用 feynman-perspective 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /feynman-perspective 技能，帮我处理以下任务要求：",
+        "group": "⚙️ 通用研发工具"
+      }
+    ]
+  },
+  {
+    "name": "ilya-sutskever-perspective",
+    "description": "【技能功能与用途解析】本技能为 `ilya-sutskever-perspective` 专属自动化工作流与拓展工具集，可在相关场景中调用辅助完成专项开发或内容构筑。\n\n【原始英文说明】|",
+    "scope": "hotSpot",
+    "category": "研发辅助与运维工具",
+    "subModule": "⚙️ 通用研发工具",
+    "categoryColor": "#38bdf8",
+    "path": "E:\\AI\\Antigravity\\hotSpot\\.agent\\skills\\huashu-nuwa\\examples\\ilya-sutskever-perspective\\SKILL.md",
+    "wakeupPrompt": "请调用 /ilya-sutskever-perspective 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "ilya-sutskever-perspective",
+        "desc": "调用 ilya-sutskever-perspective 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /ilya-sutskever-perspective 技能，帮我处理以下任务要求：",
+        "group": "⚙️ 通用研发工具"
+      }
+    ]
+  },
+  {
+    "name": "mrbeast-perspective",
+    "description": "【技能功能与用途解析】本技能为 `mrbeast-perspective` 专属自动化工作流与拓展工具集，可在相关场景中调用辅助完成专项开发或内容构筑。\n\n【原始英文说明】|",
+    "scope": "hotSpot",
+    "category": "研发辅助与运维工具",
+    "subModule": "⚙️ 通用研发工具",
+    "categoryColor": "#38bdf8",
+    "path": "E:\\AI\\Antigravity\\hotSpot\\.agent\\skills\\huashu-nuwa\\examples\\mrbeast-perspective\\SKILL.md",
+    "wakeupPrompt": "请调用 /mrbeast-perspective 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "mrbeast-perspective",
+        "desc": "调用 mrbeast-perspective 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /mrbeast-perspective 技能，帮我处理以下任务要求：",
+        "group": "⚙️ 通用研发工具"
+      }
+    ]
+  },
+  {
+    "name": "munger-perspective",
+    "description": "【技能功能与用途解析】本技能为 `munger-perspective` 专属自动化工作流与拓展工具集，可在相关场景中调用辅助完成专项开发或内容构筑。\n\n【原始英文说明】|",
+    "scope": "hotSpot",
+    "category": "研发辅助与运维工具",
+    "subModule": "⚙️ 通用研发工具",
+    "categoryColor": "#38bdf8",
+    "path": "E:\\AI\\Antigravity\\hotSpot\\.agent\\skills\\huashu-nuwa\\examples\\munger-perspective\\SKILL.md",
+    "wakeupPrompt": "请调用 /munger-perspective 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "munger-perspective",
+        "desc": "调用 munger-perspective 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /munger-perspective 技能，帮我处理以下任务要求：",
+        "group": "⚙️ 通用研发工具"
+      }
+    ]
+  },
+  {
+    "name": "naval-perspective",
+    "description": "【技能功能与用途解析】本技能为 `naval-perspective` 专属自动化工作流与拓展工具集，可在相关场景中调用辅助完成专项开发或内容构筑。\n\n【原始英文说明】|",
+    "scope": "hotSpot",
+    "category": "研发辅助与运维工具",
+    "subModule": "⚙️ 通用研发工具",
+    "categoryColor": "#38bdf8",
+    "path": "E:\\AI\\Antigravity\\hotSpot\\.agent\\skills\\huashu-nuwa\\examples\\naval-perspective\\SKILL.md",
+    "wakeupPrompt": "请调用 /naval-perspective 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "naval-perspective",
+        "desc": "调用 naval-perspective 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /naval-perspective 技能，帮我处理以下任务要求：",
+        "group": "⚙️ 通用研发工具"
+      }
+    ]
+  },
+  {
+    "name": "paul-graham-perspective",
+    "description": "【技能功能与用途解析】本技能为 `paul-graham-perspective` 专属自动化工作流与拓展工具集，可在相关场景中调用辅助完成专项开发或内容构筑。\n\n【原始英文说明】|",
+    "scope": "hotSpot",
+    "category": "研发辅助与运维工具",
+    "subModule": "⚙️ 通用研发工具",
+    "categoryColor": "#38bdf8",
+    "path": "E:\\AI\\Antigravity\\hotSpot\\.agent\\skills\\huashu-nuwa\\examples\\paul-graham-perspective\\SKILL.md",
+    "wakeupPrompt": "请调用 /paul-graham-perspective 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "paul-graham-perspective",
+        "desc": "调用 paul-graham-perspective 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /paul-graham-perspective 技能，帮我处理以下任务要求：",
+        "group": "⚙️ 通用研发工具"
+      }
+    ]
+  },
+  {
+    "name": "steve-jobs-perspective",
+    "description": "【技能功能与用途解析】本技能为 `steve-jobs-perspective` 专属自动化工作流与拓展工具集，可在相关场景中调用辅助完成专项开发或内容构筑。\n\n【原始英文说明】|",
+    "scope": "hotSpot",
+    "category": "研发辅助与运维工具",
+    "subModule": "⚙️ 通用研发工具",
+    "categoryColor": "#38bdf8",
+    "path": "E:\\AI\\Antigravity\\hotSpot\\.agent\\skills\\huashu-nuwa\\examples\\steve-jobs-perspective\\SKILL.md",
+    "wakeupPrompt": "请调用 /steve-jobs-perspective 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "steve-jobs-perspective",
+        "desc": "调用 steve-jobs-perspective 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /steve-jobs-perspective 技能，帮我处理以下任务要求：",
+        "group": "⚙️ 通用研发工具"
+      }
+    ]
+  },
+  {
+    "name": "sun-yuchen-perspective",
+    "description": "【技能功能与用途解析】本技能为 `sun-yuchen-perspective` 专属自动化工作流与拓展工具集，可在相关场景中调用辅助完成专项开发或内容构筑。\n\n【原始英文说明】|",
+    "scope": "hotSpot",
+    "category": "研发辅助与运维工具",
+    "subModule": "⚙️ 通用研发工具",
+    "categoryColor": "#38bdf8",
+    "path": "E:\\AI\\Antigravity\\hotSpot\\.agent\\skills\\huashu-nuwa\\examples\\sun-yuchen-perspective\\SKILL.md",
+    "wakeupPrompt": "请调用 /sun-yuchen-perspective 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "sun-yuchen-perspective",
+        "desc": "调用 sun-yuchen-perspective 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /sun-yuchen-perspective 技能，帮我处理以下任务要求：",
+        "group": "⚙️ 通用研发工具"
+      }
+    ]
+  },
+  {
+    "name": "taleb-perspective",
+    "description": "【技能功能与用途解析】本技能为 `taleb-perspective` 专属自动化工作流与拓展工具集，可在相关场景中调用辅助完成专项开发或内容构筑。\n\n【原始英文说明】|",
+    "scope": "hotSpot",
+    "category": "研发辅助与运维工具",
+    "subModule": "⚙️ 通用研发工具",
+    "categoryColor": "#38bdf8",
+    "path": "E:\\AI\\Antigravity\\hotSpot\\.agent\\skills\\huashu-nuwa\\examples\\taleb-perspective\\SKILL.md",
+    "wakeupPrompt": "请调用 /taleb-perspective 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "taleb-perspective",
+        "desc": "调用 taleb-perspective 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /taleb-perspective 技能，帮我处理以下任务要求：",
+        "group": "⚙️ 通用研发工具"
+      }
+    ]
+  },
+  {
+    "name": "trump-perspective",
+    "description": "【技能功能与用途解析】本技能为 `trump-perspective` 专属自动化工作流与拓展工具集，可在相关场景中调用辅助完成专项开发或内容构筑。\n\n【原始英文说明】|",
+    "scope": "hotSpot",
+    "category": "研发辅助与运维工具",
+    "subModule": "⚙️ 通用研发工具",
+    "categoryColor": "#38bdf8",
+    "path": "E:\\AI\\Antigravity\\hotSpot\\.agent\\skills\\huashu-nuwa\\examples\\trump-perspective\\SKILL.md",
+    "wakeupPrompt": "请调用 /trump-perspective 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "trump-perspective",
+        "desc": "调用 trump-perspective 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /trump-perspective 技能，帮我处理以下任务要求：",
+        "group": "⚙️ 通用研发工具"
+      }
+    ]
+  },
+  {
+    "name": "x-mastery-mentor",
+    "description": "【技能功能与用途解析】本技能为 `x-mastery-mentor` 专属自动化工作流与拓展工具集，可在相关场景中调用辅助完成专项开发或内容构筑。\n\n【原始英文说明】|",
+    "scope": "hotSpot",
+    "category": "研发辅助与运维工具",
+    "subModule": "🔧 系统通用模块",
+    "categoryColor": "#38bdf8",
+    "path": "E:\\AI\\Antigravity\\hotSpot\\.agent\\skills\\huashu-nuwa\\examples\\x-mastery-mentor\\SKILL.md",
+    "wakeupPrompt": "请调用 /x-mastery-mentor 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "x-mastery-mentor",
+        "desc": "调用 x-mastery-mentor 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /x-mastery-mentor 技能，帮我处理以下任务要求：",
+        "group": "🔧 系统通用模块"
+      }
+    ]
+  },
+  {
+    "name": "zhang-yiming-perspective",
+    "description": "【技能功能与用途解析】本技能为 `zhang-yiming-perspective` 专属自动化工作流与拓展工具集，可在相关场景中调用辅助完成专项开发或内容构筑。\n\n【原始英文说明】|",
+    "scope": "hotSpot",
+    "category": "研发辅助与运维工具",
+    "subModule": "⚙️ 通用研发工具",
+    "categoryColor": "#38bdf8",
+    "path": "E:\\AI\\Antigravity\\hotSpot\\.agent\\skills\\huashu-nuwa\\examples\\zhang-yiming-perspective\\SKILL.md",
+    "wakeupPrompt": "请调用 /zhang-yiming-perspective 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "zhang-yiming-perspective",
+        "desc": "调用 zhang-yiming-perspective 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /zhang-yiming-perspective 技能，帮我处理以下任务要求：",
+        "group": "⚙️ 通用研发工具"
+      }
+    ]
+  },
+  {
+    "name": "vision-flow-config",
+    "description": "强制执行视觉检测工位流程配置的规范（algDef.json, Parameters, DftParamMapping）。在创建新视觉工位、修改算法拓扑、修复参数不匹配或调试流程执行错误时使用。",
+    "scope": "program",
+    "category": "研发辅助与运维工具",
+    "subModule": "🔧 系统通用模块",
+    "categoryColor": "#38bdf8",
+    "path": "E:\\AI\\Antigravity\\program\\.agent\\skills\\vision-flow-config\\SKILL.md",
+    "wakeupPrompt": "请调用 /vision-flow-config 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "vision-flow-config",
+        "desc": "调用 vision-flow-config 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /vision-flow-config 技能，帮我处理以下任务要求：",
+        "group": "🔧 系统通用模块"
+      }
+    ]
+  },
+  {
+    "name": "resume-interview-assistant",
+    "description": "基于简历深度分析、生成定制化面试问题（中英文）、设计自我介绍环节并输出结构化评估报告。Use when 面试官需要基于简历准备面试提问清单，或候选人需要根据简历模拟面试。",
+    "scope": "resume",
+    "category": "研发辅助与运维工具",
+    "subModule": "🔧 系统通用模块",
+    "categoryColor": "#38bdf8",
+    "path": "E:\\AI\\Antigravity\\resume\\.agent\\skills\\resume-interview-assistant\\SKILL.md",
+    "wakeupPrompt": "请调用 /resume-interview-assistant 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "resume-interview-assistant",
+        "desc": "调用 resume-interview-assistant 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /resume-interview-assistant 技能，帮我处理以下任务要求：",
+        "group": "🔧 系统通用模块"
+      }
+    ]
+  },
+  {
+    "name": "resume-letter-writer",
+    "description": "帮助用户撰写高质量、无AI感的定制化自荐信（含军转、小升初、幼升小）。Use when 用户要求撰写自荐信、转业信或入学申请书时。",
+    "scope": "resume",
+    "category": "研发辅助与运维工具",
+    "subModule": "🔧 系统通用模块",
+    "categoryColor": "#38bdf8",
+    "path": "E:\\AI\\Antigravity\\resume\\.agent\\skills\\resume-letter-writer\\SKILL.md",
+    "wakeupPrompt": "请调用 /resume-letter-writer 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "resume-letter-writer",
+        "desc": "调用 resume-letter-writer 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /resume-letter-writer 技能，帮我处理以下任务要求：",
+        "group": "🔧 系统通用模块"
+      }
+    ]
+  },
+  {
+    "name": "resume-optimizer",
+    "description": "简历优化技能,用于优化简历内容。当用户需要优化简历、改进简历表述、调整简历格式或根据特定岗位定制简历时使用此技能。适用于各类职位的简历优化,特别是互联网大厂职位申请。",
+    "scope": "resume",
+    "category": "研发辅助与运维工具",
+    "subModule": "🔧 系统通用模块",
+    "categoryColor": "#38bdf8",
+    "path": "E:\\AI\\Antigravity\\resume\\.agent\\skills\\resume-optimizer\\SKILL.md",
+    "wakeupPrompt": "请调用 /resume-optimizer 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "resume-optimizer",
+        "desc": "调用 resume-optimizer 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /resume-optimizer 技能，帮我处理以下任务要求：",
+        "group": "🔧 系统通用模块"
+      }
+    ]
+  },
+  {
+    "name": "resume-optimizer-v2",
+    "description": "【技能功能与用途解析】本技能为 `resume-optimizer-v2` 专属自动化工作流与拓展工具集，可在相关场景中调用辅助完成专项开发或内容构筑。\n\n【原始英文说明】Optimize, reformat, and tailor resumes using STAR/PAR methods and professional phrasing. Use when the user wants to optimize a resume, rewrite work experiences, or tailor it for specific job roles.",
+    "scope": "resume",
+    "category": "研发辅助与运维工具",
+    "subModule": "🔧 系统通用模块",
+    "categoryColor": "#38bdf8",
+    "path": "E:\\AI\\Antigravity\\resume\\.agent\\skills\\resume-optimizer-v2\\SKILL.md",
+    "wakeupPrompt": "请调用 /resume-optimizer-v2 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "resume-optimizer-v2",
+        "desc": "调用 resume-optimizer-v2 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /resume-optimizer-v2 技能，帮我处理以下任务要求：",
+        "group": "🔧 系统通用模块"
+      }
+    ]
+  },
+  {
+    "name": "resume-optimizer-v3",
+    "description": "优化、重新排版并使用STAR法则及专业话术定制简历。当用户要求“优化简历”、重写工作经历、为特定岗位定制简历或请求简历润色时使用。",
+    "scope": "resume",
+    "category": "研发辅助与运维工具",
+    "subModule": "🔧 系统通用模块",
+    "categoryColor": "#38bdf8",
+    "path": "E:\\AI\\Antigravity\\resume\\.agent\\skills\\resume-optimizer-v3\\SKILL.md",
+    "wakeupPrompt": "请调用 /resume-optimizer-v3 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "resume-optimizer-v3",
+        "desc": "调用 resume-optimizer-v3 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /resume-optimizer-v3 技能，帮我处理以下任务要求：",
+        "group": "🔧 系统通用模块"
+      }
+    ]
+  },
+  {
+    "name": "banner-design",
+    "description": "【技能功能与用途解析】本技能为 `banner-design` 专属自动化工作流与拓展工具集，可在相关场景中调用辅助完成专项开发或内容构筑。\n\n【原始英文说明】Design banners for social media, ads, website heroes, creative assets, and print. Multiple art direction options with AI-generated visuals. Actions: design, create, generate banner. Platforms: Facebook, Twitter/X, LinkedIn, YouTube, Instagram, Google Display, website hero, print. Styles: minimalist, gradient, bold typography, photo-based, illustrated, geometric, retro, glassmorphism, 3D, neon, duotone, editorial, collage. Uses ui-ux-pro-max, frontend-design, ai-artist, ai-multimodal skills.",
+    "scope": "参考",
+    "category": "前端UI与现代美学",
+    "subModule": "🛠️ 页面打磨与响应自适",
+    "categoryColor": "#22d3ee",
+    "path": "E:\\AI\\Antigravity\\参考\\.agents\\skills\\banner-design\\SKILL.md",
+    "wakeupPrompt": "请调用 /banner-design 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "banner-design",
+        "desc": "调用 banner-design 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /banner-design 技能，帮我处理以下任务要求：",
+        "group": "🛠️ 页面打磨与响应自适"
+      }
+    ]
+  },
+  {
+    "name": "brand",
+    "description": "【技能功能与用途解析】本技能为 `brand` 专属自动化工作流与拓展工具集，可在相关场景中调用辅助完成专项开发或内容构筑。\n\n【原始英文说明】Brand voice, visual identity, messaging frameworks, asset management, brand consistency. Activate for branded content, tone of voice, marketing assets, brand compliance, style guides.",
+    "scope": "参考",
+    "category": "研发辅助与运维工具",
+    "subModule": "🔧 系统通用模块",
+    "categoryColor": "#38bdf8",
+    "path": "E:\\AI\\Antigravity\\参考\\.agents\\skills\\brand\\SKILL.md",
+    "wakeupPrompt": "请调用 /brand 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "brand",
+        "desc": "调用 brand 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /brand 技能，帮我处理以下任务要求：",
+        "group": "🔧 系统通用模块"
+      }
+    ]
+  },
+  {
+    "name": "design",
+    "description": "【技能功能与用途解析】本技能为 `design` 专属自动化工作流与拓展工具集，可在相关场景中调用辅助完成专项开发或内容构筑。\n\n【原始英文说明】Comprehensive design skill: brand identity, design tokens, UI styling, logo generation (55 styles, Gemini AI), corporate identity program (50 deliverables, CIP mockups), HTML presentations (Chart.js), banner design (22 styles, social/ads/web/print), icon design (15 styles, SVG, Gemini 3.1 Pro), social photos (HTML→screenshot, multi-platform). Actions: design logo, create CIP, generate mockups, build slides, design banner, generate icon, create social photos, social media images, brand identity, design system. Platforms: Facebook, Twitter, LinkedIn, YouTube, Instagram, Pinterest, TikTok, Threads, Google Ads.",
+    "scope": "参考",
+    "category": "前端UI与现代美学",
+    "subModule": "🛠️ 页面打磨与响应自适",
+    "categoryColor": "#22d3ee",
+    "path": "E:\\AI\\Antigravity\\参考\\.agents\\skills\\design\\SKILL.md",
+    "wakeupPrompt": "请调用 /design 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "design",
+        "desc": "调用 design 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /design 技能，帮我处理以下任务要求：",
+        "group": "🛠️ 页面打磨与响应自适"
+      }
+    ]
+  },
+  {
+    "name": "design-system",
+    "description": "【技能功能与用途解析】本技能为 `design-system` 专属自动化工作流与拓展工具集，可在相关场景中调用辅助完成专项开发或内容构筑。\n\n【原始英文说明】Token architecture, component specifications, and slide generation. Three-layer tokens (primitive→semantic→component), CSS variables, spacing/typography scales, component specs, strategic slide creation. Use for design tokens, systematic design, brand-compliant presentations.",
+    "scope": "参考",
+    "category": "前端UI与现代美学",
+    "subModule": "🛠️ 页面打磨与响应自适",
+    "categoryColor": "#22d3ee",
+    "path": "E:\\AI\\Antigravity\\参考\\.agents\\skills\\design-system\\SKILL.md",
+    "wakeupPrompt": "请调用 /design-system 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "design-system",
+        "desc": "调用 design-system 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /design-system 技能，帮我处理以下任务要求：",
+        "group": "🛠️ 页面打磨与响应自适"
+      }
+    ]
+  },
+  {
+    "name": "slides",
+    "description": "【技能功能与用途解析】本技能为 `slides` 专属自动化工作流与拓展工具集，可在相关场景中调用辅助完成专项开发或内容构筑。\n\n【原始英文说明】Create strategic HTML presentations with Chart.js, design tokens, responsive layouts, copywriting formulas, and contextual slide strategies.",
+    "scope": "参考",
+    "category": "研发辅助与运维工具",
+    "subModule": "🔧 系统通用模块",
+    "categoryColor": "#38bdf8",
+    "path": "E:\\AI\\Antigravity\\参考\\.agents\\skills\\slides\\SKILL.md",
+    "wakeupPrompt": "请调用 /slides 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "slides",
+        "desc": "调用 slides 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /slides 技能，帮我处理以下任务要求：",
+        "group": "🔧 系统通用模块"
+      }
+    ]
+  },
+  {
+    "name": "ui-styling",
+    "description": "【技能功能与用途解析】本技能为 `ui-styling` 专属自动化工作流与拓展工具集，可在相关场景中调用辅助完成专项开发或内容构筑。\n\n【原始英文说明】Create beautiful, accessible user interfaces with shadcn/ui components (built on Radix UI + Tailwind), Tailwind CSS utility-first styling, and canvas-based visual designs. Use when building user interfaces, implementing design systems, creating responsive layouts, adding accessible components (dialogs, dropdowns, forms, tables), customizing themes and colors, implementing dark mode, generating visual designs and posters, or establishing consistent styling patterns across applications.",
+    "scope": "参考",
+    "category": "研发辅助与运维工具",
+    "subModule": "🔧 系统通用模块",
+    "categoryColor": "#38bdf8",
+    "path": "E:\\AI\\Antigravity\\参考\\.agents\\skills\\ui-styling\\SKILL.md",
+    "wakeupPrompt": "请调用 /ui-styling 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "ui-styling",
+        "desc": "调用 ui-styling 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /ui-styling 技能，帮我处理以下任务要求：",
+        "group": "🔧 系统通用模块"
+      }
+    ]
+  },
+  {
+    "name": "ui-ux-pro-max",
+    "description": "【技能功能与用途解析】本技能为 `ui-ux-pro-max` 专属自动化工作流与拓展工具集，可在相关场景中调用辅助完成专项开发或内容构筑。\n\n【原始英文说明】Comprehensive design guide for web and mobile applications. Contains 67 styles, 161 color palettes, 57 font pairings, 99 UX guidelines, and 25 chart types across 16 technology stacks.",
+    "scope": "参考",
+    "category": "研发辅助与运维工具",
+    "subModule": "🔧 系统通用模块",
+    "categoryColor": "#38bdf8",
+    "path": "E:\\AI\\Antigravity\\参考\\.agents\\skills\\ui-ux-pro-max\\SKILL.md",
+    "wakeupPrompt": "请调用 /ui-ux-pro-max 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "ui-ux-pro-max",
+        "desc": "调用 ui-ux-pro-max 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /ui-ux-pro-max 技能，帮我处理以下任务要求：",
+        "group": "🔧 系统通用模块"
+      }
+    ]
+  },
+  {
+    "name": "framework-html-converter",
+    "description": "当用户希望将现代框架（React/Next.js/Vue）转换为单文件 HTML，或者反过来将单文件 HTML 升级为完整框架时使用。当用户索要这些转换操作的提示词（Prompt）模板时，也请调用此技能。",
+    "scope": "小红书",
+    "category": "研发辅助与运维工具",
+    "subModule": "🔧 系统通用模块",
+    "categoryColor": "#38bdf8",
+    "path": "E:\\AI\\Antigravity\\小红书\\.agent\\skills\\framework-html-converter\\SKILL.md",
+    "wakeupPrompt": "请调用 /framework-html-converter 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "framework-html-converter",
+        "desc": "调用 framework-html-converter 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /framework-html-converter 技能，帮我处理以下任务要求：",
+        "group": "🔧 系统通用模块"
+      }
+    ]
+  },
+  {
+    "name": "impeccable",
+    "description": "【高阶 UI/UX 极致美学大师】专攻前端界面设计、重构、审美审计、动效增强、极简提炼、色调优化或大胆升级。支持 bolder(大胆放大) / overdrive(超频突破) / polish / critique 等 18 个强大子命令。\n\n【原始描述】Use when the user wants to design, redesign, shape, critique, audit, polish, clarify, distill, harden, optimize, adapt, animate, colorize, extract, or otherwise improve a frontend interface. Covers websites, landing pages, dashboards, product UI, app shells, components, forms, settings, onboarding, and empty states. Handles UX review, visual hierarchy, information architecture, cognitive load, accessibility, performance, responsive behavior, theming, anti-patterns, typography, fonts, spacing, layout, alignment, color, motion, micro-interactions, UX copy, error states, edge cases, i18n, and reusable design systems or tokens. Also use for bland designs that need to become bolder or more delightful, loud designs that should become quieter, live browser iteration on UI elements, or ambitious visual effects that should feel technically extraordinary. Not for backend-only or non-UI tasks.",
+    "scope": "impeccable",
+    "category": "前端UI与现代美学",
+    "subModule": "🛠️ 页面打磨与响应自适",
+    "categoryColor": "#22d3ee",
+    "path": "E:\\AI\\Antigravity\\小红书\\.agent\\skills\\impeccable\\SKILL.md",
+    "wakeupPrompt": "请调用 /impeccable craft 技能，帮我完全重塑并高定重构该前端界面的视觉美学",
+    "commands": [
+      {
+        "cmd": "impeccable craft [feature]",
+        "desc": "高阶 UI/UX 极致视觉重构：开启大奖级设计总监水准，全面重塑页面质感与光影规范。",
+        "wakeup": "请调用 /impeccable craft 技能，帮我完全重塑并高定重构该前端界面的视觉美学",
+        "group": "🎨 视觉重构与突破模块"
+      },
+      {
+        "cmd": "impeccable bolder [target]",
+        "desc": "视觉张力放大：针对平淡、安全、毫无记忆点的枯燥界面进行更有力度的设计强化。",
+        "wakeup": "请调用 /impeccable bolder 技能，为当前平淡无奇的界面增加震撼有力的极客视觉冲击",
+        "group": "🎨 视觉重构与突破模块"
+      },
+      {
+        "cmd": "impeccable overdrive [target]",
+        "desc": "超频极限突破：打破常规开发限制，对目标组件注入前卫、炫酷且极致出众的现代视觉美学。",
+        "wakeup": "请调用 /impeccable overdrive 技能，突破常规框架极限，重新设计更具震撼力与精美光影的 UI 组件",
+        "group": "🎨 视觉重构与突破模块"
+      },
+      {
+        "cmd": "impeccable colorize [target]",
+        "desc": "战略性色彩激活：为单调沉闷的页面合理配置强视觉锚点的品牌主题配色。",
+        "wakeup": "请调用 /impeccable colorize 技能，为黑白枯燥的界面注入富有品味且突显重点功能的品牌配色",
+        "group": "🎨 视觉重构与突破模块"
+      },
+      {
+        "cmd": "impeccable audit [target]",
+        "desc": "视觉与技术品质审计：对响应式表现、A11y 无障碍兼容性及排版层级进行打分与诊断。",
+        "wakeup": "请调用 /impeccable audit 技能，帮我审计页面代码的响应式布局、无障碍访问性以及视觉层级缺陷",
+        "group": "📐 布局与排版审计模块"
+      },
+      {
+        "cmd": "impeccable critique [target]",
+        "desc": "专业 UX 启迪与点评：以设计总监眼光对现有设计给出系统化评分与改进建议。",
+        "wakeup": "请调用 /impeccable critique 技能，以顶级设计总监的眼光帮我系统性点评现有 UX 并给出修改指导",
+        "group": "📐 布局与排版审计模块"
+      },
+      {
+        "cmd": "impeccable typeset [target]",
+        "desc": "排版缩放与字体调校：建立具有严谨节奏感和强烈层级表达的现代字体缩放步长。",
+        "wakeup": "请调用 /impeccable typeset 技能，优化该页面的字体缩放阶梯、行高间距与现代排版层级",
+        "group": "📐 布局与排版审计模块"
+      },
+      {
+        "cmd": "impeccable layout [target]",
+        "desc": "空间与韵律优化：校正负空间留白、栅格对齐度与内容呼吸感。",
+        "wakeup": "请调用 /impeccable layout 技能，重新梳理页面的网格栅格对齐、视觉负空间和内容阅读韵律",
+        "group": "📐 布局与排版审计模块"
+      },
+      {
+        "cmd": "impeccable animate [target]",
+        "desc": "高阶微动效注入：添加基于实际使用心流的 GSAP / CSS 丝滑过渡与空间弹性回弹。",
+        "wakeup": "请调用 /impeccable animate 技能，为交互关键链路追加丝滑且自然连贯的动画与物理弹性过渡",
+        "group": "⚡ 微交互与体验雕琢模块"
+      },
+      {
+        "cmd": "impeccable delight [target]",
+        "desc": "惊喜交互雕琢：为关键互动节点添加令人印象深刻的小触点反馈。",
+        "wakeup": "请调用 /impeccable delight 技能，在核心转化点或按钮反馈上加入令人称叹的小巧愉悦细节",
+        "group": "⚡ 微交互与体验雕琢模块"
+      },
+      {
+        "cmd": "impeccable onboard [target]",
+        "desc": "新手导引与零态体验：专为产品首次运行、引导页及空数据卡片构建极佳引导体验。",
+        "wakeup": "请调用 /impeccable onboard 技能，专门为首次访问新手引导流程及空数据状态卡片设计流畅交互",
+        "group": "⚡ 微交互与体验雕琢模块"
+      },
+      {
+        "cmd": "impeccable live",
+        "desc": "浏览器实时迭代：直接选择页面 DOM 元素在线生成并比对各种设计备选变体。",
+        "wakeup": "请调用 /impeccable live 技能，开启浏览器在线变体迭代模式，实时比对不同组件设计方案",
+        "group": "⚡ 微交互与体验雕琢模块"
+      },
+      {
+        "cmd": "impeccable polish [target]",
+        "desc": "交付前精研打磨：在保持原有架构不变的前提下，对布局对齐、微交互与动效做最后精修。",
+        "wakeup": "请调用 /impeccable polish 技能，在不改变业务逻辑前提下帮我对 UI 对齐、间距与微交互进行最后高定精打磨",
+        "group": "🛠️ 优化与多端自适应模块"
+      },
+      {
+        "cmd": "impeccable quieter [target]",
+        "desc": "降噪克制降调：把过于繁杂、艳俗高饱和的视觉元素重构为克制、沉稳优雅的色调。",
+        "wakeup": "请调用 /impeccable quieter 技能，将画面中过度喧闹及饱和的装饰元素降噪改造成低调雅致的设计",
+        "group": "🛠️ 优化与多端自适应模块"
+      },
+      {
+        "cmd": "impeccable distill [target]",
+        "desc": "去繁就简提炼：剥离冗余的装饰与层级，回归产品交互功能本质。",
+        "wakeup": "请调用 /impeccable distill 技能，帮我剥离多余繁杂的信息层，精炼提纯到最直观的产品交互本质",
+        "group": "🛠️ 优化与多端自适应模块"
+      },
+      {
+        "cmd": "impeccable harden [target]",
+        "desc": "工整化生产准备：补充边界条件、多语言自适应及容错空状态 UI。",
+        "wakeup": "请调用 /impeccable harden 技能，协助完善多语言适配、极低分辨率容错及边界空数据界面表现",
+        "group": "🛠️ 优化与多端自适应模块"
+      },
+      {
+        "cmd": "impeccable adapt [target]",
+        "desc": "全设备响应式适配：确保从超宽显示器到移动端原生手势屏幕上的等比完美展示。",
+        "wakeup": "请调用 /impeccable adapt 技能，使当前页面完美兼容各种移动端屏幕、平板与超宽桌面分辨率",
+        "group": "🛠️ 优化与多端自适应模块"
+      },
+      {
+        "cmd": "impeccable optimize [target]",
+        "desc": "渲染与交互优化：排查 UI 卡顿、抖动以及重绘瓶颈。",
+        "wakeup": "请调用 /impeccable optimize 技能，诊断并解决前端页面卡顿、回流抖动与加载耗时问题",
+        "group": "🛠️ 优化与多端自适应模块"
+      }
+    ]
+  },
+  {
+    "name": "xhs-auto-operator",
+    "description": "小红书自动化运营端到端流水线。整合爆款挖掘、前端测试设计、物料生成到闭环发布。当用户需要一条龙式、端到端的完成一个全新的小红书引流测试项目时使用此技能。",
+    "scope": "小红书",
+    "category": "运营创作与自媒体",
+    "subModule": "✍️ 爆款策划与文案创编",
+    "categoryColor": "#f43f5e",
+    "path": "E:\\AI\\Antigravity\\小红书\\.agent\\skills\\xhs-auto-operator\\SKILL.md",
+    "wakeupPrompt": "请调用 /xhs-auto-operator 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "xhs-auto-operator",
+        "desc": "调用 xhs-auto-operator 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /xhs-auto-operator 技能，帮我处理以下任务要求：",
+        "group": "✍️ 爆款策划与文案创编"
+      }
+    ]
+  },
+  {
+    "name": "xhs-auto-operator-v2",
+    "description": "小红书趣味心理测试端到端全流程操盘。包含爆款挖掘、测试设计、带订单验证的源码生成及物料发布。当用户要求做心理测试、开发趣味测试、模仿爆款测试或生成小红书测试帖子时使用。",
+    "scope": "小红书",
+    "category": "运营创作与自媒体",
+    "subModule": "✍️ 爆款策划与文案创编",
+    "categoryColor": "#f43f5e",
+    "path": "E:\\AI\\Antigravity\\小红书\\.agent\\skills\\xhs-auto-operator-v2\\SKILL.md",
+    "wakeupPrompt": "请调用 /xhs-auto-operator-v2 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "xhs-auto-operator-v2",
+        "desc": "调用 xhs-auto-operator-v2 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /xhs-auto-operator-v2 技能，帮我处理以下任务要求：",
+        "group": "✍️ 爆款策划与文案创编"
+      }
+    ]
+  },
+  {
+    "name": "xhs-content-creator",
+    "description": "小红书内容全流程创作。提供小红书从策略规划到排版发布的端到端内容创作工作流。当用户需要写小红书笔记、规划社交媒体内容、将长文转为小红书风格、写爆款钩子或优化排版格式时使用。",
+    "scope": "小红书",
+    "category": "运营创作与自媒体",
+    "subModule": "✍️ 爆款策划与文案创编",
+    "categoryColor": "#f43f5e",
+    "path": "E:\\AI\\Antigravity\\小红书\\.agent\\skills\\xhs-content-creator\\SKILL.md",
+    "wakeupPrompt": "请调用 /xhs-content-creator 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "xhs-content-creator",
+        "desc": "调用 xhs-content-creator 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /xhs-content-creator 技能，帮我处理以下任务要求：",
+        "group": "✍️ 爆款策划与文案创编"
+      }
+    ]
+  },
+  {
+    "name": "xhs-note-analyzer",
+    "description": "分析小红书笔记的内容质量、违规敏感词、医疗红线、广告感及逻辑硬伤。当用户要求“分析小红书笔记”、“检查违规”、“评估商业化”，或文案生成完毕需要强制合规扫描时使用。",
+    "scope": "小红书",
+    "category": "运营创作与自媒体",
+    "subModule": "🚀 发布闭环与运营风控",
+    "categoryColor": "#f43f5e",
+    "path": "E:\\AI\\Antigravity\\小红书\\.agent\\skills\\xhs-note-analyzer\\SKILL.md",
+    "wakeupPrompt": "请调用 /xhs-note-analyzer 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "xhs-note-analyzer",
+        "desc": "调用 xhs-note-analyzer 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /xhs-note-analyzer 技能，帮我处理以下任务要求：",
+        "group": "🚀 发布闭环与运营风控"
+      }
+    ]
+  },
+  {
+    "name": "xhs-openclaw",
+    "description": "【技能功能与用途解析】本技能为 `xhs-openclaw` 专属自动化工作流与拓展工具集，可在相关场景中调用辅助完成专项开发或内容构筑。\n\n【原始英文说明】|",
+    "scope": "小红书",
+    "category": "运营创作与自媒体",
+    "subModule": "🔎 热点抓取与舆情分析",
+    "categoryColor": "#f43f5e",
+    "path": "E:\\AI\\Antigravity\\小红书\\.agent\\skills\\xhs-openclaw\\SKILL.md",
+    "wakeupPrompt": "请调用 /xhs-openclaw 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "xhs-openclaw",
+        "desc": "调用 xhs-openclaw 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /xhs-openclaw 技能，帮我处理以下任务要求：",
+        "group": "🔎 热点抓取与舆情分析"
+      }
+    ]
+  },
+  {
+    "name": "creator-buddy",
+    "description": "创作者全域内容搜索总控 Skill。用户发送平台名+关键词、平台链接，或要求分析博主、文章风格、热度、点赞、收藏、评论、爆款原因、选题方向时触发；根据平台和任务自动路由到小红书热门笔记、全域内容搜索、公众号爆款搜索、公众号赛道分析等分支 Skill。",
+    "scope": "小红书",
+    "category": "运营创作与自媒体",
+    "subModule": "✍️ 爆款策划与文案创编",
+    "categoryColor": "#f43f5e",
+    "path": "E:\\AI\\Antigravity\\小红书\\.agents\\skills\\creator-buddy\\SKILL.md",
+    "wakeupPrompt": "请调用 /creator-buddy 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "creator-buddy",
+        "desc": "调用 creator-buddy 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /creator-buddy 技能，帮我处理以下任务要求：",
+        "group": "✍️ 爆款策划与文案创编"
+      }
+    ]
+  },
+  {
+    "name": "guizang-material-illustration",
+    "description": "Generate Guizang-style material illustrations, labeled explanatory visuals, material-styled chart illustrations, and data-first editorial images from articles, notes, product concepts, workplace reports, creator posts, tutorials, school materials, humanities topics, science explanations, screenshots, or chart data. Use when the user asks for 配图, 带字插图, 解释图, 图解插画, 概念拆解图, 图表美化, 数据图美化, 3D 图表, 汇报配图, 内容配图, 小学课文配图, 生物/化学/物理解释图, 人文类配图, process/loop/system diagrams, or wants GPT-Image / image generation to create supporting images that can sit inside social cards, docs, slides, PPTs, or posts.",
+    "scope": "小红书",
+    "category": "运营创作与自媒体",
+    "subModule": "🚀 发布闭环与运营风控",
+    "categoryColor": "#f43f5e",
+    "path": "E:\\AI\\Antigravity\\小红书\\.agents\\skills\\guizang-material-illustration\\SKILL.md",
+    "wakeupPrompt": "请调用 /guizang-material-illustration 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "guizang-material-illustration",
+        "desc": "调用 guizang-material-illustration 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /guizang-material-illustration 技能，帮我处理以下任务要求：",
+        "group": "🚀 发布闭环与运营风控"
+      }
+    ]
+  },
+  {
+    "name": "guizang-social-card-skill",
+    "description": "Generate Guizang-style social card image sets, Live Photo motion cards, material-first Live Photo puzzle layouts, triple Live Photo collages, long-video-to-Live-Photo treatments, and WeChat official account cover pairs from articles, scripts, screenshots, product notes, subtitles, photos, or user-supplied videos. Use when the user asks for 小红书图文, Rednote/Xiaohongshu images, social cards, carousel images, 3:4 covers, Live Photo, 实况照片, 单视频实况拼图, 二宫格实况拼图, 三连实况拼图, 四宫格实况拼图, 微信公众号封面, WeChat 21:9 + 1:1 covers, Swiss Style, or magazine-style social images.",
+    "scope": "小红书",
+    "category": "运营创作与自媒体",
+    "subModule": "🚀 发布闭环与运营风控",
+    "categoryColor": "#f43f5e",
+    "path": "E:\\AI\\Antigravity\\小红书\\.agents\\skills\\guizang-social-card-skill\\SKILL.md",
+    "wakeupPrompt": "请调用 /guizang-social-card-skill 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "guizang-social-card-skill",
+        "desc": "调用 guizang-social-card-skill 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /guizang-social-card-skill 技能，帮我处理以下任务要求：",
+        "group": "🚀 发布闭环与运营风控"
+      }
+    ]
+  },
+  {
+    "name": "ian-xiaohei-illustrations",
+    "description": "生成 Ian 风格的中文正文配图。用于用户要求为中文文章、帖子、博客、Notion 文档、工作流文档、方法论、流程、结构、状态、隐喻或观点生成“怪诞”“手绘”“正文配图”“文章插图”“配图建议”“shot list”“去标题/改图”等任务；默认启用双IP兼容模式（预设优先：绿蝶翡翠少女，兼顾原生：小黑 IP），纯白手绘线稿、大量留白、少量翡翠绿与红橙蓝批注，简洁清爽但天马行空的视觉风格。",
+    "scope": "小红书",
+    "category": "运营创作与自媒体",
+    "subModule": "🚀 发布闭环与运营风控",
+    "categoryColor": "#f43f5e",
+    "path": "E:\\AI\\Antigravity\\小红书\\.agents\\skills\\ian-xiaohei-illustrations\\SKILL.md",
+    "wakeupPrompt": "请调用 /ian-xiaohei-illustrations 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "ian-xiaohei-illustrations",
+        "desc": "调用 ian-xiaohei-illustrations 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /ian-xiaohei-illustrations 技能，帮我处理以下任务要求：",
+        "group": "🚀 发布闭环与运营风控"
+      }
+    ]
+  },
+  {
+    "name": "baoyu-article-illustrator",
+    "description": "Analyzes article structure, identifies positions requiring visual aids, generates illustrations with Type × Style × Palette three-dimension approach. Use when user asks to \"illustrate article\", \"add images\", \"generate images for article\", or \"为文章配图\".",
+    "scope": "小红书",
+    "category": "运营创作与自媒体",
+    "subModule": "🚀 发布闭环与运营风控",
+    "categoryColor": "#f43f5e",
+    "path": "E:\\AI\\Antigravity\\小红书\\.agents\\skills\\baoyu\\baoyu-article-illustrator\\SKILL.md",
+    "wakeupPrompt": "请调用 /baoyu-article-illustrator 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "baoyu-article-illustrator",
+        "desc": "调用 baoyu-article-illustrator 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /baoyu-article-illustrator 技能，帮我处理以下任务要求：",
+        "group": "🚀 发布闭环与运营风控"
+      }
+    ]
+  },
+  {
+    "name": "baoyu-comic",
+    "description": "Knowledge comic creator supporting multiple art styles and tones. Creates original educational comics with detailed panel layouts and batch-capable image generation. Use when user asks to create \"知识漫画\", \"教育漫画\", \"biography comic\", \"tutorial comic\", or \"Logicomix-style comic\".",
+    "scope": "小红书",
+    "category": "运营创作与自媒体",
+    "subModule": "🚀 发布闭环与运营风控",
+    "categoryColor": "#f43f5e",
+    "path": "E:\\AI\\Antigravity\\小红书\\.agents\\skills\\baoyu\\baoyu-comic\\SKILL.md",
+    "wakeupPrompt": "请调用 /baoyu-comic 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "baoyu-comic",
+        "desc": "调用 baoyu-comic 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /baoyu-comic 技能，帮我处理以下任务要求：",
+        "group": "🚀 发布闭环与运营风控"
+      }
+    ]
+  },
+  {
+    "name": "baoyu-cover-image",
+    "description": "【技能功能与用途解析】本技能为 `baoyu-cover-image` 专属自动化工作流与拓展工具集，可在相关场景中调用辅助完成专项开发或内容构筑。\n\n【原始英文说明】Generates article cover images with 5 dimensions (type, palette, rendering, text, mood) combining 11 color palettes and 7 rendering styles. Supports cinematic (2.35:1), widescreen (16:9), and square (1:1) aspects. Use when user asks to \"generate cover image\", \"create article cover\", or \"make cover\".",
+    "scope": "小红书",
+    "category": "运营创作与自媒体",
+    "subModule": "🚀 发布闭环与运营风控",
+    "categoryColor": "#f43f5e",
+    "path": "E:\\AI\\Antigravity\\小红书\\.agents\\skills\\baoyu\\baoyu-cover-image\\SKILL.md",
+    "wakeupPrompt": "请调用 /baoyu-cover-image 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "baoyu-cover-image",
+        "desc": "调用 baoyu-cover-image 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /baoyu-cover-image 技能，帮我处理以下任务要求：",
+        "group": "🚀 发布闭环与运营风控"
+      }
+    ]
+  },
+  {
+    "name": "baoyu-diagram",
+    "description": "Create professional, dark-themed SVG diagrams of any type — architecture diagrams, flowcharts, sequence diagrams, structural diagrams, mind maps, timelines, illustrative/conceptual diagrams, and more. Use this skill whenever the user asks for any kind of technical or conceptual diagram, visualization of a system, process flow, data flow, component relationship, network topology, decision tree, org chart, state machine, or any visual representation of structure/logic/process. Also trigger when the user says \"画个图\" \"画一个架构图\" \"diagram\" \"flowchart\" \"sequence diagram\" \"draw me a ...\" or uploads content and asks to visualize it. Output is always a standalone .svg file.",
+    "scope": "小红书",
+    "category": "运营创作与自媒体",
+    "subModule": "🚀 发布闭环与运营风控",
+    "categoryColor": "#f43f5e",
+    "path": "E:\\AI\\Antigravity\\小红书\\.agents\\skills\\baoyu\\baoyu-diagram\\SKILL.md",
+    "wakeupPrompt": "请调用 /baoyu-diagram 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "baoyu-diagram",
+        "desc": "调用 baoyu-diagram 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /baoyu-diagram 技能，帮我处理以下任务要求：",
+        "group": "🚀 发布闭环与运营风控"
+      }
+    ]
+  },
+  {
+    "name": "baoyu-format-markdown",
+    "description": "【技能功能与用途解析】本技能为 `baoyu-format-markdown` 专属自动化工作流与拓展工具集，可在相关场景中调用辅助完成专项开发或内容构筑。\n\n【原始英文说明】Formats plain text or markdown files with frontmatter, titles, summaries, headings, bold, lists, and code blocks. Use when user asks to \"format markdown\", \"beautify article\", \"add formatting\", or improve article layout. Outputs to {filename}-formatted.md.",
+    "scope": "小红书",
+    "category": "运营创作与自媒体",
+    "subModule": "🚀 发布闭环与运营风控",
+    "categoryColor": "#f43f5e",
+    "path": "E:\\AI\\Antigravity\\小红书\\.agents\\skills\\baoyu\\baoyu-format-markdown\\SKILL.md",
+    "wakeupPrompt": "请调用 /baoyu-format-markdown 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "baoyu-format-markdown",
+        "desc": "调用 baoyu-format-markdown 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /baoyu-format-markdown 技能，帮我处理以下任务要求：",
+        "group": "🚀 发布闭环与运营风控"
+      }
+    ]
+  },
+  {
+    "name": "baoyu-image-gen",
+    "description": "【技能功能与用途解析】本技能为 `baoyu-image-gen` 专属自动化工作流与拓展工具集，可在相关场景中调用辅助完成专项开发或内容构筑。\n\n【原始英文说明】AI image generation with OpenAI GPT Image 2, Azure OpenAI, Google, OpenRouter, DashScope, Z.AI GLM-Image, MiniMax, Jimeng, Seedream, Replicate and Agnes APIs. Supports text-to-image, reference images, aspect ratios, and batch generation from saved prompt files. Sequential by default; use batch parallel generation when the user already has multiple prompts or wants stable multi-image throughput. Use when user asks to generate, create, or draw images.",
+    "scope": "小红书",
+    "category": "运营创作与自媒体",
+    "subModule": "🚀 发布闭环与运营风控",
+    "categoryColor": "#f43f5e",
+    "path": "E:\\AI\\Antigravity\\小红书\\.agents\\skills\\baoyu\\baoyu-image-gen\\SKILL.md",
+    "wakeupPrompt": "请调用 /baoyu-image-gen 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "baoyu-image-gen",
+        "desc": "调用 baoyu-image-gen 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /baoyu-image-gen 技能，帮我处理以下任务要求：",
+        "group": "🚀 发布闭环与运营风控"
+      }
+    ]
+  },
+  {
+    "name": "baoyu-infographic",
+    "description": "Generate professional infographics with 21 layout types and 22 visual styles. Analyzes content, recommends layout×style combinations, and generates publication-ready infographics. Use when user asks to create \"infographic\", \"信息图\", \"visual summary\", \"可视化\", or \"高密度信息大图\".",
+    "scope": "小红书",
+    "category": "运营创作与自媒体",
+    "subModule": "🚀 发布闭环与运营风控",
+    "categoryColor": "#f43f5e",
+    "path": "E:\\AI\\Antigravity\\小红书\\.agents\\skills\\baoyu\\baoyu-infographic\\SKILL.md",
+    "wakeupPrompt": "请调用 /baoyu-infographic 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "baoyu-infographic",
+        "desc": "调用 baoyu-infographic 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /baoyu-infographic 技能，帮我处理以下任务要求：",
+        "group": "🚀 发布闭环与运营风控"
+      }
+    ]
+  },
+  {
+    "name": "baoyu-post-to-wechat",
+    "description": "Posts content to WeChat Official Account (微信公众号) via API or Chrome CDP. Supports article posting (文章) with HTML, markdown, or plain text input, and image-text posting (贴图, formerly 图文) with multiple images. Markdown article workflows default to converting ordinary external links into bottom citations for WeChat-friendly output. Use when user mentions \"发布公众号\", \"post to wechat\", \"微信公众号\", or \"贴图/图文/文章\".",
+    "scope": "小红书",
+    "category": "运营创作与自媒体",
+    "subModule": "🚀 发布闭环与运营风控",
+    "categoryColor": "#f43f5e",
+    "path": "E:\\AI\\Antigravity\\小红书\\.agents\\skills\\baoyu\\baoyu-post-to-wechat\\SKILL.md",
+    "wakeupPrompt": "请调用 /baoyu-post-to-wechat 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "baoyu-post-to-wechat",
+        "desc": "调用 baoyu-post-to-wechat 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /baoyu-post-to-wechat 技能，帮我处理以下任务要求：",
+        "group": "🚀 发布闭环与运营风控"
+      }
+    ]
+  },
+  {
+    "name": "baoyu-xhs-images",
+    "description": "Generates infographic image card series with 12 visual styles, 8 layouts, and 3 color palettes. Breaks content into 1-10 cartoon-style image cards optimized for social media engagement. Use when user mentions \"小红书图片\", \"小红书种草\", \"小绿书\", \"微信图文\", \"微信贴图\", \"image cards\", \"图片卡片\", baoyu-xhs-images, or wants social media infographic series.",
+    "scope": "小红书",
+    "category": "运营创作与自媒体",
+    "subModule": "🚀 发布闭环与运营风控",
+    "categoryColor": "#f43f5e",
+    "path": "E:\\AI\\Antigravity\\小红书\\.agents\\skills\\baoyu\\baoyu-xhs-images\\SKILL.md",
+    "wakeupPrompt": "请调用 /baoyu-xhs-images 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "baoyu-xhs-images",
+        "desc": "调用 baoyu-xhs-images 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /baoyu-xhs-images 技能，帮我处理以下任务要求：",
+        "group": "🚀 发布闭环与运营风控"
+      }
+    ]
+  },
+  {
+    "name": "baokuan-article-analysis",
+    "description": "Fetch and analyze WeChat Official Account hot articles / 公众号爆款文章 by sector or keywords. Use when the user asks for 爆款文章分析, 赛道爆款, 公众号爆款数据, reading counts, likes, shares, comments, title patterns, writing style, 爆款原因分析, or writing references for content creation.",
+    "scope": "小红书",
+    "category": "研发辅助与运维工具",
+    "subModule": "🔧 系统通用模块",
+    "categoryColor": "#38bdf8",
+    "path": "E:\\AI\\Antigravity\\小红书\\.agents\\skills\\creator-buddy\\skills\\baokuan-article-analysis\\SKILL.md",
+    "wakeupPrompt": "请调用 /baokuan-article-analysis 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "baokuan-article-analysis",
+        "desc": "调用 baokuan-article-analysis 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /baokuan-article-analysis 技能，帮我处理以下任务要求：",
+        "group": "🔧 系统通用模块"
+      }
+    ]
+  },
+  {
+    "name": "baokuan-title-generator",
+    "description": "科技/AI/互联网领域的公众号 10 万+ 爆款标题生成器。输入一篇文章、一段内容或一个主题，先建内容简报，再按多种方法产出多个候选标题，逐个评分、标风险、按用途分角色推荐，并给 A/B 测试建议。当用户说\"起标题\"\"想个爆款标题\"\"这篇文章叫什么好\"\"标题优化\"\"标题改写\"\"多组标题\"\"标题评分\"\"10万+标题\"时触发。方法论提炼自 100 篇真实科技类爆文标题。",
+    "scope": "小红书",
+    "category": "研发辅助与运维工具",
+    "subModule": "🔧 系统通用模块",
+    "categoryColor": "#38bdf8",
+    "path": "E:\\AI\\Antigravity\\小红书\\.agents\\skills\\creator-buddy\\skills\\baokuan-title-generator\\SKILL.md",
+    "wakeupPrompt": "请调用 /baokuan-title-generator 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "baokuan-title-generator",
+        "desc": "调用 baokuan-title-generator 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /baokuan-title-generator 技能，帮我处理以下任务要求：",
+        "group": "🔧 系统通用模块"
+      }
+    ]
+  },
+  {
+    "name": "global-content-search",
+    "description": "全域内容搜索｜当提到小红书/B站/抖音关键词搜索、笔记/视频详情、评论、博主/UP主作品监控时使用。优先基于 Agent Reach / OpenCLI / bili-cli / 公开只读接口访问；Agent Reach 不可用时，小红书可用 Guaikei API 作为最后兜底。",
+    "scope": "小红书",
+    "category": "研发辅助与运维工具",
+    "subModule": "🔧 系统通用模块",
+    "categoryColor": "#38bdf8",
+    "path": "E:\\AI\\Antigravity\\小红书\\.agents\\skills\\creator-buddy\\skills\\global-content-search\\SKILL.md",
+    "wakeupPrompt": "请调用 /global-content-search 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "global-content-search",
+        "desc": "调用 global-content-search 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /global-content-search 技能，帮我处理以下任务要求：",
+        "group": "🔧 系统通用模块"
+      }
+    ]
+  },
+  {
+    "name": "gzh-explosive-content-detector",
+    "description": "为公众号文章创作打造的专业数据洞察工具。全网持续收录每日爆款文章，收录依据：低粉高阅读、阅读靠前、数据增长中、原创靠前，助力号主获取数据参考。",
+    "scope": "小红书",
+    "category": "研发辅助与运维工具",
+    "subModule": "🔧 系统通用模块",
+    "categoryColor": "#38bdf8",
+    "path": "E:\\AI\\Antigravity\\小红书\\.agents\\skills\\creator-buddy\\skills\\gzh-explosive-content-detector\\SKILL.md",
+    "wakeupPrompt": "请调用 /gzh-explosive-content-detector 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "gzh-explosive-content-detector",
+        "desc": "调用 gzh-explosive-content-detector 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /gzh-explosive-content-detector 技能，帮我处理以下任务要求：",
+        "group": "🔧 系统通用模块"
+      }
+    ]
+  },
+  {
+    "name": "xiaohongshu-search",
+    "description": "小红书热门笔记搜索工具，支持关键词搜索获取热门内容数据，基于数据评分排序推荐热门笔记，助力创作者发现热门趋势、获取创作灵感。仅在主Agent中执行,不派发给子Agent。",
+    "scope": "小红书",
+    "category": "研发辅助与运维工具",
+    "subModule": "🔧 系统通用模块",
+    "categoryColor": "#38bdf8",
+    "path": "E:\\AI\\Antigravity\\小红书\\.agents\\skills\\creator-buddy\\skills\\xhs-hotnotes\\SKILL.md",
+    "wakeupPrompt": "请调用 /xiaohongshu-search 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "xiaohongshu-search",
+        "desc": "调用 xiaohongshu-search 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /xiaohongshu-search 技能，帮我处理以下任务要求：",
+        "group": "🔧 系统通用模块"
+      }
+    ]
+  },
+  {
+    "name": "space-xhs-account-audit",
+    "description": "小红书账号整体诊断与竞品对标。对一个或多个小红书账号做量化体检——定位清晰度、内容垂直度、封面统一性、标题钩子率、更新节奏、互动率、爆款率、粉丝转化效率八个维度打分，定位卡点并给出可执行改动。当用户说\"账号诊断\"\"帮我看看我的号\"\"我的号没起色/不涨粉/流量下滑\"\"主页体检\"\"账号定位有问题吗\"\"竞品账号分析\"\"对标账号拆解\"\"这个博主为什么能起来\"\"帮我和竞品比一比\"，或直接贴出小红书主页链接/主页截图要求分析时触发。支持有数据源（GUAIKEI_API_TOKEN / SOCIALDATAX_API_KEY）的量化分析和无数据源的截图定性诊断两条路径。只做分析参谋，不做发布、不刷互动、不批量起号。",
+    "scope": "小红书",
+    "category": "运营创作与自媒体",
+    "subModule": "🚀 发布闭环与运营风控",
+    "categoryColor": "#f43f5e",
+    "path": "E:\\AI\\Antigravity\\小红书\\.agents\\skills\\creator-buddy\\xhs-Skills\\space-xhs-account-audit\\SKILL.md",
+    "wakeupPrompt": "请调用 /space-xhs-account-audit 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "space-xhs-account-audit",
+        "desc": "调用 space-xhs-account-audit 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /space-xhs-account-audit 技能，帮我处理以下任务要求：",
+        "group": "🚀 发布闭环与运营风控"
+      }
+    ]
+  },
+  {
+    "name": "space-xhs-buddy",
+    "description": "小红书创作总控台。判断用户当前卡在哪一环，路由到对应的专项技能，并把多步骤工作流串起来执行。当用户说\"做小红书\"\"帮我运营小红书\"\"小红书从头到尾走一遍\"\"我想开始做小红书\"\"小红书全流程\"\"不知道从哪下手\"\"帮我搞小红书\"，或同时提出跨多个环节的需求（如\"帮我想选题顺便写出来配好图\"）时触发。单一环节的需求应直接使用对应专项技能，不必经过本技能。",
+    "scope": "小红书",
+    "category": "运营创作与自媒体",
+    "subModule": "🚀 发布闭环与运营风控",
+    "categoryColor": "#f43f5e",
+    "path": "E:\\AI\\Antigravity\\小红书\\.agents\\skills\\creator-buddy\\xhs-Skills\\space-xhs-buddy\\SKILL.md",
+    "wakeupPrompt": "请调用 /space-xhs-buddy 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "space-xhs-buddy",
+        "desc": "调用 space-xhs-buddy 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /space-xhs-buddy 技能，帮我处理以下任务要求：",
+        "group": "🚀 发布闭环与运营风控"
+      }
+    ]
+  },
+  {
+    "name": "space-xhs-cover",
+    "description": "根据主题、标题、人像或产品素材和可选背景，使用 Codex 内置 image_gen 制作 3:4 小红书封面。支持提炼封面标题、原创风格推荐、字体与配色选择、主体保真、背景合成、装饰说明，以及单张或多张变体；不需要 API Key。用户提出“做小红书封面”“给笔记配首图”“参考这张图做封面”“把人物放进封面”“做几版封面”时使用。",
+    "scope": "小红书",
+    "category": "运营创作与自媒体",
+    "subModule": "🚀 发布闭环与运营风控",
+    "categoryColor": "#f43f5e",
+    "path": "E:\\AI\\Antigravity\\小红书\\.agents\\skills\\creator-buddy\\xhs-Skills\\space-xhs-cover\\SKILL.md",
+    "wakeupPrompt": "请调用 /space-xhs-cover 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "space-xhs-cover",
+        "desc": "调用 space-xhs-cover 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /space-xhs-cover 技能，帮我处理以下任务要求：",
+        "group": "🚀 发布闭环与运营风控"
+      }
+    ]
+  },
+  {
+    "name": "space-xhs-hotspot",
+    "description": "小红书热点搜集与选题判断。按关键词/赛道拉取近期高互动笔记，输出热点表格、趋势判断和可直接开写的选题建议。当用户说\"小红书热点\"\"小红书最近火什么\"\"查一下 XX 赛道的爆款\"\"小红书选题\"\"找小红书素材\"\"这个词在小红书热不热\"\"小红书热榜/热门笔记/爆款笔记\"\"帮我看看小红书数据\"时触发。也适用于用户报出一个赛道词（如\"减脂餐\"\"通勤穿搭\"\"AI 工具\"）并问\"能不能写\"的场景。多数据源自动降级：红狐 API / socialdatax CLI / 怪壳 CLI，均未配置时走 WebSearch 手动兜底。",
+    "scope": "小红书",
+    "category": "运营创作与自媒体",
+    "subModule": "🚀 发布闭环与运营风控",
+    "categoryColor": "#f43f5e",
+    "path": "E:\\AI\\Antigravity\\小红书\\.agents\\skills\\creator-buddy\\xhs-Skills\\space-xhs-hotspot\\SKILL.md",
+    "wakeupPrompt": "请调用 /space-xhs-hotspot 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "space-xhs-hotspot",
+        "desc": "调用 space-xhs-hotspot 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /space-xhs-hotspot 技能，帮我处理以下任务要求：",
+        "group": "🚀 发布闭环与运营风控"
+      }
+    ]
+  },
+  {
+    "name": "space-xhs-image",
+    "description": "根据用户提供的文章、教程、SOP、清单或主题，使用 Codex 内置 image_gen 生图模型生成 3:4 小红书信息图与组图。固定采用轻盈 AI 产品信息图风：白色或浅薰衣草背景、黑色大标题、紫蓝与青柠绿强调、圆角卡片、线性科技图标、流程/对比/清单模块；支持单图和 6–9 张系列图，不需要 API Key 或外部生图后端。用户说“做小红书图片”“按内容生成组图”“做科技感信息图”“做类似这种图”“用 Codex 生图”“做封面和内页图”等请求时触发。",
+    "scope": "小红书",
+    "category": "运营创作与自媒体",
+    "subModule": "🚀 发布闭环与运营风控",
+    "categoryColor": "#f43f5e",
+    "path": "E:\\AI\\Antigravity\\小红书\\.agents\\skills\\creator-buddy\\xhs-Skills\\space-xhs-image\\SKILL.md",
+    "wakeupPrompt": "请调用 /space-xhs-image 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "space-xhs-image",
+        "desc": "调用 space-xhs-image 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /space-xhs-image 技能，帮我处理以下任务要求：",
+        "group": "🚀 发布闭环与运营风控"
+      }
+    ]
+  },
+  {
+    "name": "space-xhs-note-analytics",
+    "description": "小红书个人笔记数据复盘——基于用户自己创作者后台（创作中心/蒲公英）的笔记数据，做漏斗定位、卡点归因和多篇横向规律发现。当用户说\"笔记数据复盘\"\"这条为什么没流量\"\"帮我看看这条数据\"\"小红书数据分析\"\"曝光高但没人点\"\"涨粉不行\"\"哪类内容该加码\"\"我导出了后台数据帮我看看\"，或直接贴出后台数据截图/CSV/Excel/几个数字时使用。只分析用户自己账号的笔记表现，不抓取平台数据、不做刷量。",
+    "scope": "小红书",
+    "category": "运营创作与自媒体",
+    "subModule": "🚀 发布闭环与运营风控",
+    "categoryColor": "#f43f5e",
+    "path": "E:\\AI\\Antigravity\\小红书\\.agents\\skills\\creator-buddy\\xhs-Skills\\space-xhs-note-analytics\\SKILL.md",
+    "wakeupPrompt": "请调用 /space-xhs-note-analytics 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "space-xhs-note-analytics",
+        "desc": "调用 space-xhs-note-analytics 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /space-xhs-note-analytics 技能，帮我处理以下任务要求：",
+        "group": "🚀 发布闭环与运营风控"
+      }
+    ]
+  },
+  {
+    "name": "space-xhs-positioning",
+    "description": "小红书起号定位顾问。用引导式对话帮真人创作者定下\"做什么方向、给谁看、靠什么活下去\"，产出赛道选择、定位句、人设三件套（账号名/简介/视觉）、内容支柱与前 20 篇选题、冷启动路径。当用户说\"想做小红书但不知道做什么\"\"帮我定位\"\"起号\"\"小红书发什么方向\"\"账号定位\"\"不知道发什么\"\"从零开始做小红书\"\"我适合做什么赛道\"\"小红书怎么起步\"\"重新定位一下账号\"时触发。也适用于用户只丢来一句自我介绍（职业/爱好/资源）并问\"我能做小红书吗\"。不做批量起号、矩阵养号、虚假人设。",
+    "scope": "小红书",
+    "category": "运营创作与自媒体",
+    "subModule": "🚀 发布闭环与运营风控",
+    "categoryColor": "#f43f5e",
+    "path": "E:\\AI\\Antigravity\\小红书\\.agents\\skills\\creator-buddy\\xhs-Skills\\space-xhs-positioning\\SKILL.md",
+    "wakeupPrompt": "请调用 /space-xhs-positioning 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "space-xhs-positioning",
+        "desc": "调用 space-xhs-positioning 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /space-xhs-positioning 技能，帮我处理以下任务要求：",
+        "group": "🚀 发布闭环与运营风控"
+      }
+    ]
+  },
+  {
+    "name": "space-xhs-title",
+    "description": "小红书爆款标题生成器。输入一个主题、一篇笔记草稿，或一条现成标题，先建内容简报，再按小红书特有的 15 种标题方法批量产出候选，逐条评分（含搜索词覆盖、人群指向性、收藏动机）、标合规风险、按用途分角色推荐，并给 A/B 测试建议。当用户说\"小红书标题\"\"起个笔记标题\"\"帮我想小红书爆款标题\"\"这条笔记叫什么好\"\"标题优化/改写\"\"标题没人点\"\"怎么让人搜到我\"\"标题评分\"时触发。区别于公众号标题：更短、更口语、强搜索、强人群标签、emoji 标配。",
+    "scope": "小红书",
+    "category": "运营创作与自媒体",
+    "subModule": "🚀 发布闭环与运营风控",
+    "categoryColor": "#f43f5e",
+    "path": "E:\\AI\\Antigravity\\小红书\\.agents\\skills\\creator-buddy\\xhs-Skills\\space-xhs-title\\SKILL.md",
+    "wakeupPrompt": "请调用 /space-xhs-title 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "space-xhs-title",
+        "desc": "调用 space-xhs-title 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /space-xhs-title 技能，帮我处理以下任务要求：",
+        "group": "🚀 发布闭环与运营风控"
+      }
+    ]
+  },
+  {
+    "name": "space-xhs-writer",
+    "description": "小红书笔记正文撰写。输入主题/产品/经历/素材，产出可直接发布的小红书正文（含开头 3 行、分段骨架、结尾互动、标签组合、合规自检）。覆盖种草测评、干货教程、个人故事、合集清单、避雷拔草、好物分享、经验复盘 7 种笔记类型。当用户说\"写小红书\"\"小红书文案\"\"发笔记\"\"笔记正文\"\"种草文\"\"种草笔记\"\"避雷帖\"\"干货笔记\"\"帮我写篇小红书\"\"这个怎么发小红书\"\"小红书怎么写\"\"笔记体检\"\"改成小红书风格\"时触发。标题批量生成交给 space-xhs-title，封面/配图交给 xhs-html。",
+    "scope": "小红书",
+    "category": "运营创作与自媒体",
+    "subModule": "✍️ 爆款策划与文案创编",
+    "categoryColor": "#f43f5e",
+    "path": "E:\\AI\\Antigravity\\小红书\\.agents\\skills\\creator-buddy\\xhs-Skills\\space-xhs-writer\\SKILL.md",
+    "wakeupPrompt": "请调用 /space-xhs-writer 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "space-xhs-writer",
+        "desc": "调用 space-xhs-writer 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /space-xhs-writer 技能，帮我处理以下任务要求：",
+        "group": "✍️ 爆款策划与文案创编"
+      }
+    ]
+  },
+  {
+    "name": "xhs-html",
+    "description": "将用户提供的文章、笔记、教程、SOP、清单、网页内容或本地文档，拆解并排版成小红书 3:4 多页图文 HTML。默认生成一个包含 6 张以上 1080×1440 页面、可逐页截图的完整自包含 HTML；支持 62 种品牌设计风格，开工前向用户提供匹配的风格候选和 6/7/8/9 张页数方案供选择。适用于“做小红书图文”“把内容转成小红书卡片”“生成多页小红书 HTML”“做 3:4 知识卡片”“根据文章排成小红书组图”“做教程图文”“做可截图 HTML”等请求。",
+    "scope": "小红书",
+    "category": "运营创作与自媒体",
+    "subModule": "🚀 发布闭环与运营风控",
+    "categoryColor": "#f43f5e",
+    "path": "E:\\AI\\Antigravity\\小红书\\.agents\\skills\\creator-buddy\\xhs-Skills\\xhs-html\\SKILL.md",
+    "wakeupPrompt": "请调用 /xhs-html 技能，帮我处理以下任务要求：",
+    "commands": [
+      {
+        "cmd": "xhs-html",
+        "desc": "调用 xhs-html 工作流库，处理相关技术和内容任务。",
+        "wakeup": "请调用 /xhs-html 技能，帮我处理以下任务要求：",
+        "group": "🚀 发布闭环与运营风控"
+      }
+    ]
+  },
+  {
+    "name": "animate",
+    "description": "【技能功能与用途解析】从零开始构建高质量动画与过渡动效。自动决策动画是否应该存在、使用什么工具、属性、曲线和持续时间，以及如何打断和退出。\n\n【原始描述】Build an animation from scratch, making the decisions in the order that determines whether it feels right — should it animate at all, what purpose, which tool, which properties, which curve and duration...",
+    "scope": "emilkowalski",
+    "category": "前端工程与动效开发",
+    "subModule": "✨ UI/UX 与交互打磨",
+    "categoryColor": "#a855f7",
+    "path": "E:\\AI\\Antigravity\\小红书\\.agents\\skills\\animate\\SKILL.md",
+    "wakeupPrompt": "请调用 /animate 技能，帮我给这个组件加一个合适的动画",
+    "commands": [
+      {
+        "cmd": "animate [组件描述]",
+        "desc": "为特定 UI 组件设计并生成从零开始的动画代码。",
+        "wakeup": "请调用 /animate 技能，帮我给这个组件加一个合适的动画",
+        "group": "✨ UI/UX 与交互打磨"
+      }
+    ]
+  },
+  {
+    "name": "animation-vocabulary",
+    "description": "【技能功能与用途解析】动效词汇逆向查询字典。能够将模糊的动画描述（如“弹出时那个弹跳的东西”）翻译成行业标准术语。\n\n【原始描述】Reverse-lookup glossary that turns a vague description of a web animation or motion effect into its exact term...",
+    "scope": "emilkowalski",
+    "category": "前端工程与动效开发",
+    "subModule": "✨ UI/UX 与交互打磨",
+    "categoryColor": "#38bdf8",
+    "path": "E:\\AI\\Antigravity\\小红书\\.agents\\skills\\animation-vocabulary\\SKILL.md",
+    "wakeupPrompt": "请调用 /animation-vocabulary 技能，告诉我这种动效叫什么名字",
+    "commands": [
+      {
+        "cmd": "animation-vocabulary [模糊描述]",
+        "desc": "将口语化的动效描述翻译成专业术语，方便与设计师沟通或 Prompt 编写。",
+        "wakeup": "请调用 /animation-vocabulary 技能，告诉我这种动效叫什么名字",
+        "group": "✨ UI/UX 与交互打磨"
+      }
+    ]
+  },
+  {
+    "name": "apple-design",
+    "description": "【技能功能与用途解析】苹果风格设计与流体动效指南。指导你在 Web 中实现苹果般的手势驱动 UI、弹性动画、滑动交互、阻尼感与高级排版。\n\n【原始描述】Apple's approach to interface design and fluid, physical motion, translated for the web...",
+    "scope": "emilkowalski",
+    "category": "前端工程与动效开发",
+    "subModule": "✨ UI/UX 与交互打磨",
+    "categoryColor": "#f43f5e",
+    "path": "E:\\AI\\Antigravity\\小红书\\.agents\\skills\\apple-design\\SKILL.md",
+    "wakeupPrompt": "请调用 /apple-design 技能，帮我审阅或重构这个组件的交互体验",
+    "commands": [
+      {
+        "cmd": "apple-design [任务]",
+        "desc": "应用 Apple 级别的界面设计准则与流体动效。适用于构建弹窗、手势交互和高级质感 UI。",
+        "wakeup": "请调用 /apple-design 技能，帮我审阅或重构这个组件的交互体验",
+        "group": "✨ UI/UX 与交互打磨"
+      }
+    ]
+  },
+  {
+    "name": "emil-design-eng",
+    "description": "【技能功能与用途解析】Emil Kowalski 的顶级 UI 打磨哲学核心。包含组件设计、动画决策以及如何让软件细节感觉高级的各种原则。\n\n【原始描述】This skill encodes Emil Kowalski's philosophy on UI polish, component design, animation decisions, and the invisible details that make software feel great.",
+    "scope": "emilkowalski",
+    "category": "前端工程与动效开发",
+    "subModule": "✨ UI/UX 与交互打磨",
+    "categoryColor": "#fb923c",
+    "path": "E:\\AI\\Antigravity\\小红书\\.agents\\skills\\emil-design-eng\\SKILL.md",
+    "wakeupPrompt": "请调用 /emil-design-eng 技能，帮我审阅这段代码以提升组件质感",
+    "commands": [
+      {
+        "cmd": "emil-design-eng [任务]",
+        "desc": "使用 Emil Kowalski 的哲学审视前端代码与组件设计细节。",
+        "wakeup": "请调用 /emil-design-eng 技能，帮我审阅这段代码以提升组件质感",
+        "group": "✨ UI/UX 与交互打磨"
+      }
+    ]
+  },
+  {
+    "name": "find-animation-opportunities",
+    "description": "【技能功能与用途解析】寻找代码库中应该添加动效的机会。只会建议精准的动效数值，同时会阻止在不该加的地方滥用动画。\n\n【原始描述】Search a codebase or UI for places that don't animate but should, and reject everything that shouldn't...",
+    "scope": "emilkowalski",
+    "category": "前端工程与动效开发",
+    "subModule": "✨ UI/UX 与交互打磨",
+    "categoryColor": "#a855f7",
+    "path": "E:\\AI\\Antigravity\\小红书\\.agents\\skills\\find-animation-opportunities\\SKILL.md",
+    "wakeupPrompt": "请调用 /find-animation-opportunities 技能，帮我看看这个页面还有哪里可以加动画",
+    "commands": [
+      {
+        "cmd": "find-animation-opportunities [路径/页面]",
+        "desc": "扫描现有页面或代码，寻找能够增加微交互的机会点。",
+        "wakeup": "请调用 /find-animation-opportunities 技能，帮我看看这个页面还有哪里可以加动画",
+        "group": "✨ UI/UX 与交互打磨"
+      }
+    ]
+  },
+  {
+    "name": "improve-animations",
+    "description": "【技能功能与用途解析】动效审计与重构顾问。对代码库中的所有动画进行整体审核，找出不流畅或体验差的动效，并提供优先级修复方案。\n\n【原始描述】Survey a codebase's animation and motion code as a senior motion advisor, then produce a prioritized audit and self-contained implementation plans...",
+    "scope": "emilkowalski",
+    "category": "前端工程与动效开发",
+    "subModule": "✨ UI/UX 与交互打磨",
+    "categoryColor": "#22c55e",
+    "path": "E:\\AI\\Antigravity\\小红书\\.agents\\skills\\improve-animations\\SKILL.md",
+    "wakeupPrompt": "请调用 /improve-animations 技能，帮我审计整个项目的动效并提出优化方案",
+    "commands": [
+      {
+        "cmd": "improve-animations [项目路径]",
+        "desc": "对项目内的动效进行全域审计与重构建议规划。",
+        "wakeup": "请调用 /improve-animations 技能，帮我审计整个项目的动效并提出优化方案",
+        "group": "✨ UI/UX 与交互打磨"
+      }
+    ]
+  },
+  {
+    "name": "pick-ui-library",
+    "description": "【技能功能与用途解析】前端技术栈选型顾问。当你想实现特定功能（如拖拽、虚拟列表、状态管理、无头 UI）时，它会提供经品味筛选的最佳实践库（如 base-ui, sonner, zustand, framer-motion）。\n\n【原始描述】Pick the right library for a given frontend task from a curated, opinionated list...",
+    "scope": "emilkowalski",
+    "category": "前端工程与动效开发",
+    "subModule": "📦 架构与技术选型",
+    "categoryColor": "#38bdf8",
+    "path": "E:\\AI\\Antigravity\\小红书\\.agents\\skills\\pick-ui-library\\SKILL.md",
+    "wakeupPrompt": "请调用 /pick-ui-library 技能，推荐实现 [任务] 最合适的库",
+    "commands": [
+      {
+        "cmd": "pick-ui-library [前端需求]",
+        "desc": "查询实现某项功能最好的前端库推荐及接入建议。",
+        "wakeup": "请调用 /pick-ui-library 技能，推荐实现 [任务] 最合适的库",
+        "group": "📦 架构与技术选型"
+      }
+    ]
+  },
+  {
+    "name": "review-animations",
+    "description": "【技能功能与用途解析】严苛的动效代码 Review 专家。针对修改的动画代码进行审核，强制要求 UI 动效低于 300ms、禁止错误使用 ease-in，确保流畅度达到业界顶级。\n\n【原始描述】Reviews animation and motion code against a high craft bar derived from Emil Kowalski's design engineering philosophy. Default to flagging; approval is earned.",
+    "scope": "emilkowalski",
+    "category": "前端工程与动效开发",
+    "subModule": "✨ UI/UX 与交互打磨",
+    "categoryColor": "#fb923c",
+    "path": "E:\\AI\\Antigravity\\小红书\\.agents\\skills\\review-animations\\SKILL.md",
+    "wakeupPrompt": "请调用 /review-animations 技能，Review 我这段包含动画的代码",
+    "commands": [
+      {
+        "cmd": "review-animations [代码/Diff]",
+        "desc": "严格审查动画代码并强制对齐最佳实践与性能指标。",
+        "wakeup": "请调用 /review-animations 技能，Review 我这段包含动画的代码",
+        "group": "✨ UI/UX 与交互打磨"
+      }
+    ]
+  }
+];
+
+        let currentScope = "all";
+        let currentCat = "all";
+        let currentSubMod = "all";
+        let currentSearch = "";
+        let activeModalItem = null;
+
+        function setTheme(themeName, btnElement) {
+            document.documentElement.setAttribute("data-theme", themeName);
+            localStorage.setItem("wayfinder_theme", themeName);
+            
+            document.querySelectorAll(".theme-btn").forEach(b => b.classList.remove("active"));
+            if (btnElement) {
+                btnElement.classList.add("active");
+            } else {
+                const map = { "obsidian": 0, "swiss": 1, "matrix": 2, "sunset": 3 };
+                const idx = map[themeName] || 0;
+                const btns = document.querySelectorAll(".theme-btn");
+                if (btns[idx]) btns[idx].classList.add("active");
+            }
+        }
+
+        function init() {
+            const savedTheme = localStorage.getItem("wayfinder_theme") || "swiss";
+            setTheme(savedTheme, null);
+
+            document.getElementById("stat-total").innerText = SKILLS_DATA.length;
+            renderScopeButtons();
+            renderCategoryButtons();
+            renderSubModuleButtons();
+            renderSkills();
+
+            document.getElementById("search-input").addEventListener("input", (e) => {
+                currentSearch = e.target.value.trim().toLowerCase();
+                renderSkills();
+            });
+        }
+
+        function renderScopeButtons() {
+            const container = document.getElementById("scope-filters");
+            container.innerHTML = '<span class="filter-label">作用域空间</span>';
+            
+            const counts = {};
+            SKILLS_DATA.forEach(s => {
+                counts[s.scope] = (counts[s.scope] || 0) + 1;
+            });
+
+            const btnAll = createSegmentBtn(`全部来源`, SKILLS_DATA.length, currentScope === "all", () => selectScope("all"));
+            container.appendChild(btnAll);
+
+            const priority = {
+                "impeccable": 1,
+                "taste": 2,
+                "mattpocock": 3,
+                "全局技能 (Global)": 4,
+                "小红书": 5
+            };
+
+            const scopes = Object.keys(counts).sort((a, b) => {
+                const pa = priority[a] || 99;
+                const pb = priority[b] || 99;
+                if (pa !== pb) return pa - pb;
+                return a.localeCompare(b, "zh-CN");
+            });
+
+            scopes.forEach(scope => {
+                const btn = createSegmentBtn(scope, counts[scope], currentScope === scope, () => selectScope(scope));
+                container.appendChild(btn);
+            });
+        }
+
+        function selectScope(scope) {
+            currentScope = scope;
+            renderScopeButtons();
+            renderCategoryButtons();
+            renderSubModuleButtons();
+            renderSkills();
+        }
+
+        function renderCategoryButtons() {
+            const container = document.getElementById("category-filters");
+            container.innerHTML = '<span class="filter-label">能力领域</span>';
+
+            const activeSkills = SKILLS_DATA.filter(s => currentScope === "all" || s.scope === currentScope);
+            
+            const catCounts = {};
+            activeSkills.forEach(s => {
+                catCounts[s.category] = (catCounts[s.category] || 0) + 1;
+            });
+
+            if (currentCat !== "all" && !catCounts[currentCat]) {
+                currentCat = "all";
+            }
+
+            const btnAll = createSegmentBtn("所有分类", activeSkills.length, currentCat === "all", () => selectCat("all"));
+            container.appendChild(btnAll);
+
+            const order = [
+                "核心研发工作流 (Matt Flow)",
+                "运营创作与自媒体",
+                "视觉生成与办公文档",
+                "前端UI与现代美学",
+                "研发辅助与运维工具"
+            ];
+
+            order.forEach(cat => {
+                const count = catCounts[cat] || 0;
+                if (count > 0) {
+                    const btn = createSegmentBtn(cat, count, currentCat === cat, () => selectCat(cat));
+                    container.appendChild(btn);
+                }
+            });
+        }
+
+        function selectCat(cat) {
+            currentCat = cat;
+            currentSubMod = "all";
+            renderCategoryButtons();
+            renderSubModuleButtons();
+            renderSkills();
+        }
+
+        function renderSubModuleButtons() {
+            const container = document.getElementById("submodule-filters");
+            container.innerHTML = '<span class="filter-label">业务航线模块</span>';
+
+            const activeSkills = SKILLS_DATA.filter(s => {
+                if (currentScope !== "all" && s.scope !== currentScope) return false;
+                if (currentCat !== "all" && s.category !== currentCat) return false;
+                return true;
+            });
+            
+            const subCounts = {};
+            activeSkills.forEach(s => {
+                const sm = s.subModule || "通用";
+                subCounts[sm] = (subCounts[sm] || 0) + 1;
+            });
+
+            if (currentSubMod !== "all" && !subCounts[currentSubMod]) {
+                currentSubMod = "all";
+            }
+
+            const btnAll = createSegmentBtn("全流程综合视角", activeSkills.length, currentSubMod === "all", () => selectSubMod("all"), true);
+            container.appendChild(btnAll);
+
+            Object.keys(subCounts).sort().forEach(sm => {
+                const btn = createSegmentBtn(sm, subCounts[sm], currentSubMod === sm, () => selectSubMod(sm), true);
+                container.appendChild(btn);
+            });
+        }
+
+        function selectSubMod(sm) {
+            currentSubMod = sm;
+            renderSubModuleButtons();
+            renderSkills();
+        }
+
+        function createSegmentBtn(label, count, isActive, onClick, isSubMod = false) {
+            const btn = document.createElement("button");
+            btn.className = "segmented-btn" + (isActive ? " active" : "") + (isSubMod ? " submod-btn" : "");
+            btn.innerHTML = `${label} <span class="badge-count">${count}</span>`;
+            btn.onclick = onClick;
+            return btn;
+        }
+
+        function renderSkills() {
+            const grid = document.getElementById("skills-grid");
+            grid.innerHTML = "";
+
+            const filtered = SKILLS_DATA.filter(skill => {
+                if (currentScope !== "all" && skill.scope !== currentScope) return false;
+                if (currentCat !== "all" && skill.category !== currentCat) return false;
+                if (currentSubMod !== "all" && skill.subModule !== currentSubMod) return false;
+                if (currentSearch) {
+                    const matchName = skill.name.toLowerCase().includes(currentSearch);
+                    const matchDesc = (skill.description || "").toLowerCase().includes(currentSearch);
+                    const matchPath = skill.path.toLowerCase().includes(currentSearch);
+                    const matchScope = skill.scope.toLowerCase().includes(currentSearch);
+                    const matchSub = (skill.subModule || "").toLowerCase().includes(currentSearch);
+                    const matchCmds = (skill.commands || []).some(c => 
+                        c.cmd.toLowerCase().includes(currentSearch) || c.desc.toLowerCase().includes(currentSearch) || (c.wakeup || "").toLowerCase().includes(currentSearch) || (c.group || "").toLowerCase().includes(currentSearch)
+                    );
+                    if (!matchName && !matchDesc && !matchPath && !matchScope && !matchSub && !matchCmds) return false;
+                }
+                return true;
+            });
+
+            if (filtered.length === 0) {
+                grid.innerHTML = `
+                    <div class="empty-view">
+                        <h3>没有匹配到该坐标下的任务指令模块</h3>
+                        <p>请尝试重置上方的工作流航线过滤器，或调整查询关键词</p>
+                    </div>
+                `;
+                return;
+            }
+
+            filtered.forEach(skill => {
+                const card = document.createElement("div");
+                card.className = "skill-card";
+                card.style.setProperty("--accent-color", skill.categoryColor);
+                card.onclick = () => openModal(skill);
+
+                let cmdsHtml = "";
+                if (skill.commands && skill.commands.length > 1) {
+                    const previewCmds = skill.commands.slice(0, 4);
+                    const pills = previewCmds.map(c => {
+                        const shortCmd = c.cmd.replace("impeccable ", "");
+                        const pureCmd = c.cmd.split('[')[0].trim();
+                        const safeCmd = ('/' + pureCmd).replace(/'/g, "\\'");
+                        return `<span class="cmd-pill" onclick="event.stopPropagation(); copyText('${safeCmd}')" title="点击直接精准复制命令: /${pureCmd}">
+                            ⚡ ${shortCmd}
+                            <span class="cmd-pill-desc">· ${c.desc.split('：')[0].substring(0, 7)}</span>
+                        </span>`;
+                    }).join("");
+                    
+                    const moreBadge = skill.commands.length > 4 ? 
+                        `<span class="cmd-pill" style="background:transparent; border-color:transparent; color:var(--text-tertiary);">+${skill.commands.length - 4} 更多指令...</span>` : "";
+                        
+                    cmdsHtml = `<div class="card-commands-bar">${pills}${moreBadge}</div>`;
+                }
+
+                const cardWakeupSafe = (skill.wakeupPrompt || "").replace(/'/g, "\\'");
+
+                card.innerHTML = `
+                    <div>
+                        <div class="card-header">
+                            <div class="skill-name">
+                                <span class="skill-slash">/</span>${skill.name}
+                            </div>
+                            <span class="scope-tag">${skill.scope}</span>
+                        </div>
+                        <div style="margin-top: 10px;">
+                            <span class="submod-badge-card">${skill.subModule || "通用流程"}</span>
+                        </div>
+                        <p class="skill-body" style="margin-top: 12px;">${skill.description || "未设定详情文本"}</p>
+                        ${cmdsHtml}
+                    </div>
+                    <div class="card-footer">
+                        <span class="cat-indicator" style="--accent-color: ${skill.categoryColor}">
+                            <span class="cat-dot"></span>
+                            ${skill.category}
+                        </span>
+                        <div class="card-actions" onclick="event.stopPropagation()">
+                            <button class="btn-card highlight" onclick="copyText('${cardWakeupSafe}')" title="点击复制该技能专用调用唤醒句">
+                                ⚡ 立即执行指令
+                            </button>
+                            <button class="btn-card" onclick="copyText('${skill.path.replace(/\\\\/g, '\\\\\\\\')}')" title="复制物理路径">
+                                📁
+                            </button>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function copyText(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                showToast("⚡ 成功复制到剪贴板:\\n" + text);
+            }).catch(() => {
+                showToast("复制失败");
+            });
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById("toast");
+            toast.innerText = msg;
+            toast.classList.add("show");
+            setTimeout(() => {
+                toast.classList.remove("show");
+            }, 3000);
+        }
+
+        function openModal(skill) {
+            activeModalItem = skill;
+            const backdrop = document.getElementById("modal-backdrop");
+
+            document.getElementById("modal-title").innerHTML = `<span style="color: var(--text-accent)">/</span>${skill.name}`;
+            document.getElementById("modal-meta").innerHTML = `
+                <span class="scope-tag">${skill.scope}</span>
+                <span class="cat-indicator" style="--accent-color: ${skill.categoryColor}"><span class="cat-dot"></span>${skill.category}</span>
+                <span class="submod-badge-card" style="margin-bottom:0;">${skill.subModule}</span>
+            `;
+            document.getElementById("modal-desc").innerText = skill.description || "无详细描述。";
+            document.getElementById("modal-path").innerText = skill.path;
+
+            const cmdsContainer = document.getElementById("modal-commands");
+            if (skill.commands && skill.commands.length > 0) {
+                const groupMap = {};
+                skill.commands.forEach(c => {
+                    const g = c.group || "⚙️ 默认功能指令";
+                    if (!groupMap[g]) groupMap[g] = [];
+                    groupMap[g].push(c);
+                });
+
+                let allHtml = "";
+                Object.keys(groupMap).forEach(groupName => {
+                    allHtml += `<div class="cmd-group-header">${groupName}</div>`;
+                    groupMap[groupName].forEach(c => {
+                        const pureCmd = c.cmd.split('[')[0].trim();
+                        const safeCmd = ('/' + pureCmd).replace(/'/g, "\\'");
+                        allHtml += `
+                        <div class="cmd-row">
+                            <div class="cmd-left">
+                                <span class="cmd-syntax">/${c.cmd}</span>
+                                <span class="cmd-action-desc">${c.desc}</span>
+                            </div>
+                            <button class="cmd-btn-copy" onclick="copyText('${safeCmd}')" title="精准复制命令: /${pureCmd}">
+                                ⚡ 复制调用
+                            </button>
+                        </div>
+                        `;
+                    });
+                });
+                cmdsContainer.innerHTML = allHtml;
+            } else {
+                cmdsContainer.innerHTML = `<div style="padding: 18px; color: var(--text-tertiary); text-align: center;">该技能默认通过 /${skill.name} 触发。</div>`;
+            }
+
+            backdrop.classList.add("open");
+        }
+
+        function closeModal(event) {
+            if (!event || event.target.id === "modal-backdrop" || !event.target) {
+                document.getElementById("modal-backdrop").classList.remove("open");
+            }
+        }
+
+        function copyModalWakeup() {
+            if (activeModalItem) {
+                copyText(activeModalItem.wakeupPrompt);
+            }
+        }
+
+        function copyModalPath() {
+            if (activeModalItem) copyText(activeModalItem.path);
+        }
+
+        window.addEventListener("keydown", (e) => {
+            if (e.key === "Escape") closeModal();
+        });
+
+        window.addEventListener("DOMContentLoaded", init);
+    </script>
+</body>
+</html>
