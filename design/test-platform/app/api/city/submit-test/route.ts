@@ -79,7 +79,7 @@ export async function POST(req: Request) {
               desc: cityObj.desc,
               quote: cityObj.quote,
               theme: extraData.theme,
-              tags: extraData.tags,
+              tags: extraData.tags || ["特立独行", "探索者"],
               coords: extraData.coords
             };
           }

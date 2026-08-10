@@ -271,7 +271,7 @@ export default function ResultView({ forcedResultData }: ResultViewProps) {
           </div>
           
           <div className="flex flex-wrap gap-2 mt-3">
-            {city.tags.map((tag: string, i: number) => (
+            {(city.tags || []).map((tag: string, i: number) => (
               <span key={i} className={`${currentStyle.tagBg} text-xs px-2.5 py-1 font-bold rounded-sm transition-colors duration-300 shadow-sm`}>{tag}</span>
             ))}
           </div>
