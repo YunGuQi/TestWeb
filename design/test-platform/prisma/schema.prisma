@@ -58,6 +58,7 @@ model ActivationCode {
   code       String
   maxUses    Int      @default(3)
   isDisabled Boolean  @default(false)
+  isExported Boolean  @default(false)
   devices        String?  @db.Text // JSON string of device IDs
   boundResultKey String?  // To prevent VIP loophole (one code unlocking all results)
   createdAt      DateTime @default(now())

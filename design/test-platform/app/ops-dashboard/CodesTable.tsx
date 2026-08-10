@@ -14,13 +14,16 @@ export default function CodesTable({ initialCodes, testId }: { initialCodes: any
   const [editModal, setEditModal] = useState({ show: false, id: 0, code: '', maxUses: 3 });
   const [batchEditModal, setBatchEditModal] = useState({ show: false, maxUses: 3 });
 
-  // ✅ 性能优化：预处理 JSON.parse，避免每次 render 重复解析
-  // 原来：每次 render（包括 checkbox 变化、modal 弹出等）都会对 50 条数据重复 parse
-  // 现在：只有 codes 真正变化时才重新计算
+  // Filter & Sort States
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterUsage, setFilterUsage] = useState('all'); // all, used, unused
+  const [filterExported, setFilterExported] = useState('all'); // all, exported, unexported
+  const [sortBy, setSortBy] = useState('createdAt'); // createdAt, deviceCount, testCount
+  const [sortOrder, setSortOrder] = useState('desc'); // desc, asc
+
   const processedCodes = useMemo(() => {
-    return codes.map(code => ({
+    let result = codes.map(code => ({
       ...code,
-      // 预先解析设备数，避免 render 时重复 parse
       deviceCount: (() => {
         try {
           const devices = JSON.parse(code.devices || '[]');
@@ -28,25 +31,79 @@ export default function CodesTable({ initialCodes, testId }: { initialCodes: any
         } catch { return 0; }
       })()
     }));
-  }, [codes]);
+
+    // 1. 搜索卡密
+    if (searchTerm.trim()) {
+      const term = searchTerm.toLowerCase().trim();
+      result = result.filter(c => c.code.toLowerCase().includes(term));
+    }
+
+    // 2. 使用状态过滤
+    if (filterUsage === 'used') result = result.filter(c => c.deviceCount > 0);
+    if (filterUsage === 'unused') result = result.filter(c => c.deviceCount === 0);
+
+    // 3. 导出状态过滤
+    if (filterExported === 'exported') result = result.filter(c => c.isExported);
+    if (filterExported === 'unexported') result = result.filter(c => !c.isExported);
+
+    // 4. 排序
+    result.sort((a, b) => {
+      let valA, valB;
+      if (sortBy === 'createdAt') {
+        valA = new Date(a.createdAt).getTime();
+        valB = new Date(b.createdAt).getTime();
+      } else if (sortBy === 'deviceCount') {
+        valA = a.deviceCount;
+        valB = b.deviceCount;
+      } else if (sortBy === 'testCount') {
+        valA = a.testCount || 0;
+        valB = b.testCount || 0;
+      } else {
+        valA = 0; valB = 0;
+      }
+      return sortOrder === 'desc' ? valB - valA : valA - valB;
+    });
+
+    return result;
+  }, [codes, searchTerm, filterUsage, filterExported, sortBy, sortOrder]);
 
   useEffect(() => {
     setCodes(initialCodes);
   }, [initialCodes]);
 
-  const handleExportTXT = () => {
+  const handleExportTXT = async () => {
     if (selectedIds.length === 0) return alert('请先勾选需要导出的激活码');
     const codesToExport = codes.filter(c => selectedIds.includes(c.id));
     
-    // 阿奇索卡券仓库格式：纯文本，一行一个卡密
-    const txt = codesToExport.map(c => c.code).join('\n');
-    
-    const blob = new Blob([txt], { type: 'text/plain;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `agiso_codes_${Date.now()}.txt`;
-    link.click();
+    setLoading(true);
+    try {
+      // 1. 标记为已导出
+      const res = await fetch('/api/admin/code/export_mark', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ids: selectedIds })
+      });
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error || '标记导出失败');
+      }
+
+      // 2. 乐观更新UI状态
+      setCodes(codes.map(c => selectedIds.includes(c.id) ? { ...c, isExported: true } : c));
+      setSelectedIds([]);
+
+      // 3. 阿奇索卡券仓库格式：纯文本，一行一个卡密
+      const txt = codesToExport.map(c => c.code).join('\n');
+      const blob = new Blob([txt], { type: 'text/plain;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `agiso_codes_${Date.now()}.txt`;
+      link.click();
+    } catch(e: any) {
+      alert(e.message);
+    }
+    setLoading(false);
   };
 
   const handleBatchDelete = async () => {
@@ -61,7 +118,6 @@ export default function CodesTable({ initialCodes, testId }: { initialCodes: any
       });
       const data = await res.json();
       if (data.success) {
-        // ✅ 乐观 UI 更新，避免不必要的 router.refresh()
         setCodes(codes.filter(c => !selectedIds.includes(c.id)));
         setSelectedIds([]);
       } else {
@@ -90,11 +146,9 @@ export default function CodesTable({ initialCodes, testId }: { initialCodes: any
       const data = await res.json();
       if (data.success) {
         if (data.codes && Array.isArray(data.codes)) {
-          // ✅ 乐观更新，新卡密展示在列表顶部
           setCodes([...data.codes, ...codes]);
         }
         setGenerateModal({ show: false, count: 10 });
-        // 异步刷新服务器数据，不阻塞 UI
         router.refresh();
       } else {
         alert(data.error);
@@ -116,7 +170,6 @@ export default function CodesTable({ initialCodes, testId }: { initialCodes: any
       });
       const data = await res.json();
       if (data.success) {
-        // ✅ 乐观 UI 更新，避免不必要的 router.refresh() 导致整页重新连接数据库
         setCodes(codes.map(c => c.id === editModal.id 
           ? { ...c, code: editModal.code, maxUses: editModal.maxUses } 
           : c
@@ -157,6 +210,20 @@ export default function CodesTable({ initialCodes, testId }: { initialCodes: any
     setLoading(false);
   };
 
+  const toggleSort = (field: string) => {
+    if (sortBy === field) {
+      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortBy(field);
+      setSortOrder('desc');
+    }
+  };
+
+  const getSortIcon = (field: string) => {
+    if (sortBy !== field) return <span className="opacity-0 group-hover:opacity-30">↓</span>;
+    return sortOrder === 'desc' ? <span>↓</span> : <span>↑</span>;
+  };
+
   return (
     <div className="mt-8 text-[#37352F]">
       <div className="flex justify-between items-center mb-6">
@@ -186,20 +253,71 @@ export default function CodesTable({ initialCodes, testId }: { initialCodes: any
         )}
       </div>
 
+      {/* ============ Toolbar (Search, Filters, Mobile Sort) ============ */}
+      <div className="bg-[#F7F6F3] border border-[#EBEBEB] p-3.5 rounded-xl mb-4 shadow-sm flex flex-col md:flex-row gap-3">
+        <div className="flex-1 min-w-[200px]">
+          <input 
+            type="text" 
+            placeholder="搜索激活码..." 
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full border border-[#EBEBEB] px-3 py-1.5 rounded-md text-sm outline-none focus:border-blue-300 focus:ring-1 focus:ring-blue-100 transition-all text-[#37352F] font-mono"
+          />
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <select 
+            value={filterUsage} 
+            onChange={(e) => setFilterUsage(e.target.value)}
+            className="border border-[#EBEBEB] px-2 py-1.5 rounded-md text-sm outline-none focus:border-blue-300 bg-white text-[#37352F] cursor-pointer"
+          >
+            <option value="all">使用状态: 全部</option>
+            <option value="unused">未使用</option>
+            <option value="used">已使用</option>
+          </select>
+          <select 
+            value={filterExported} 
+            onChange={(e) => setFilterExported(e.target.value)}
+            className="border border-[#EBEBEB] px-2 py-1.5 rounded-md text-sm outline-none focus:border-blue-300 bg-white text-[#37352F] cursor-pointer"
+          >
+            <option value="all">导出状态: 全部</option>
+            <option value="unexported">未导出</option>
+            <option value="exported">已导出</option>
+          </select>
+          <div className="md:hidden flex items-center border border-[#EBEBEB] bg-white rounded-md pr-2">
+            <select 
+              value={`${sortBy}-${sortOrder}`} 
+              onChange={(e) => {
+                const [sb, so] = e.target.value.split('-');
+                setSortBy(sb);
+                setSortOrder(so);
+              }}
+              className="px-2 py-1.5 text-sm outline-none bg-transparent text-[#37352F] cursor-pointer"
+            >
+              <option value="createdAt-desc">创建时间: 新 → 旧</option>
+              <option value="createdAt-asc">创建时间: 旧 → 新</option>
+              <option value="deviceCount-desc">已绑设备: 多 → 少</option>
+              <option value="deviceCount-asc">已绑设备: 少 → 多</option>
+              <option value="testCount-desc">测算次数: 多 → 少</option>
+              <option value="testCount-asc">测算次数: 少 → 多</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
       {/* ============ Mobile Select All Bar (< md) ============ */}
       <div className="md:hidden bg-[#F7F6F3] border border-[#EBEBEB] p-3.5 rounded-xl mb-4 shadow-sm">
         <div className="flex items-center justify-between">
           <label className="flex items-center gap-2.5 text-sm font-bold text-[#37352F] cursor-pointer select-none">
             <input 
               type="checkbox" 
-              checked={codes.length > 0 && codes.every(c => selectedIds.includes(c.id))}
+              checked={processedCodes.length > 0 && processedCodes.every(c => selectedIds.includes(c.id))}
               onChange={(e) => {
-                if (e.target.checked) setSelectedIds(codes.map(c => c.id));
+                if (e.target.checked) setSelectedIds(processedCodes.map(c => c.id));
                 else setSelectedIds([]);
               }}
               className="w-4 h-4 rounded border-[#EBEBEB] text-blue-500 focus:ring-blue-500 cursor-pointer"
             />
-            <span>全选所有卡密 ({codes.length})</span>
+            <span>全选可视卡密 ({processedCodes.length})</span>
           </label>
           {selectedIds.length > 0 && (
             <span className="text-xs font-bold text-[#37352F] bg-white border border-[#EBEBEB] px-2.5 py-1 rounded-md shadow-sm">
@@ -236,6 +354,11 @@ export default function CodesTable({ initialCodes, testId }: { initialCodes: any
                   <span className="font-mono font-bold text-base text-[#37352F] tracking-wide">
                     {isUnlocked ? code.code : '****-****-****-****'}
                   </span>
+                  {code.isExported && (
+                    <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-green-50 text-green-700 border border-green-100">
+                      已导出
+                    </span>
+                  )}
                 </div>
                 {isUnlocked && (
                   <button 
@@ -255,7 +378,6 @@ export default function CodesTable({ initialCodes, testId }: { initialCodes: any
                 <div className="bg-[#FDFBF7] p-2 rounded-lg border border-[#EBEBEB]/50">
                   <div className="text-[10px] text-[#787774] font-medium mb-0.5">已用次数</div>
                   <div className="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold bg-blue-50 text-blue-700">
-                    {/* ✅ 使用预处理的 deviceCount，而非 render 时 JSON.parse */}
                     {code.deviceCount}
                   </div>
                 </div>
@@ -274,34 +396,44 @@ export default function CodesTable({ initialCodes, testId }: { initialCodes: any
             </div>
           );
         })}
+        {processedCodes.length === 0 && (
+          <div className="text-center py-8 text-[#9F9E9B] text-sm">
+            没有找到匹配的卡密
+          </div>
+        )}
       </div>
 
       {/* ============ Desktop Table View (>= md) ============ */}
       <div className="hidden md:block overflow-x-auto bg-white border border-[#EBEBEB] rounded-xl shadow-[0_4px_20px_rgb(0,0,0,0.02)]">
         <table className="w-full text-left text-sm whitespace-nowrap">
-          <thead className="bg-[#F7F6F3] border-b border-[#EBEBEB] text-[#787774] font-medium text-xs uppercase tracking-wider">
+          <thead className="bg-[#F7F6F3] border-b border-[#EBEBEB] text-[#787774] font-medium text-xs uppercase tracking-wider select-none">
             <tr>
               <th className="p-4 w-10">
                 <input 
                   type="checkbox" 
-                  checked={codes.length > 0 && codes.every(c => selectedIds.includes(c.id))}
+                  checked={processedCodes.length > 0 && processedCodes.every(c => selectedIds.includes(c.id))}
                   onChange={(e) => {
-                    if (e.target.checked) setSelectedIds(codes.map(c => c.id));
+                    if (e.target.checked) setSelectedIds(processedCodes.map(c => c.id));
                     else setSelectedIds([]);
                   }}
-                  className="rounded border-[#EBEBEB] text-blue-500 focus:ring-blue-500"
+                  className="rounded border-[#EBEBEB] text-blue-500 focus:ring-blue-500 cursor-pointer"
                 />
               </th>
               <th className="p-4">卡密</th>
               <th className="p-4">上限</th>
-              <th className="p-4">已绑设备数</th>
-              <th className="p-4">测算次数</th>
-              <th className="p-4">创建时间</th>
+              <th className="p-4 cursor-pointer hover:bg-[#EBEBEB]/50 transition-colors group" onClick={() => toggleSort('deviceCount')}>
+                <div className="flex items-center gap-1">已绑设备数 {getSortIcon('deviceCount')}</div>
+              </th>
+              <th className="p-4 cursor-pointer hover:bg-[#EBEBEB]/50 transition-colors group" onClick={() => toggleSort('testCount')}>
+                <div className="flex items-center gap-1">测算次数 {getSortIcon('testCount')}</div>
+              </th>
+              <th className="p-4 cursor-pointer hover:bg-[#EBEBEB]/50 transition-colors group" onClick={() => toggleSort('createdAt')}>
+                <div className="flex items-center gap-1">创建时间 {getSortIcon('createdAt')}</div>
+              </th>
               <th className="p-4">操作</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-[#EBEBEB]">
-            {/* ✅ 使用预处理的 processedCodes，避免每行 render 时重复 JSON.parse */}
             {processedCodes.map(code => (
               <tr key={code.id} className="hover:bg-[#FDFBF7] transition-colors">
                 <td className="p-4">
@@ -313,12 +445,17 @@ export default function CodesTable({ initialCodes, testId }: { initialCodes: any
                         if (e.target.checked) setSelectedIds([...selectedIds, code.id]);
                         else setSelectedIds(selectedIds.filter(id => id !== code.id));
                       }}
-                      className="rounded border-[#EBEBEB] text-blue-500 focus:ring-blue-500"
+                      className="rounded border-[#EBEBEB] text-blue-500 focus:ring-blue-500 cursor-pointer"
                     />
                   )}
                 </td>
-                <td className="p-4 font-mono font-medium text-[#37352F]">
+                <td className="p-4 font-mono font-medium text-[#37352F] flex items-center gap-2">
                   {isUnlocked ? code.code : '****-****-****-****'}
+                  {code.isExported && (
+                    <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-green-50 text-green-700 border border-green-100">
+                      已导出
+                    </span>
+                  )}
                 </td>
                 <td className="p-4 text-[#787774]">{code.maxUses}</td>
                 <td className="p-4">
@@ -344,6 +481,13 @@ export default function CodesTable({ initialCodes, testId }: { initialCodes: any
                 </td>
               </tr>
             ))}
+            {processedCodes.length === 0 && (
+              <tr>
+                <td colSpan={7} className="p-8 text-center text-[#9F9E9B] text-sm">
+                  没有找到匹配的卡密
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>
