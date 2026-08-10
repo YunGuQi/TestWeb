@@ -148,7 +148,7 @@ export default function DestinyBackground({ children }: DestinyBackgroundProps) 
       />
 
       {/* 5. 跨端契约点睛：仿古月老因缘小签章 (支持手机屏幕顶角展现) */}
-      <div className="absolute top-4 right-4 sm:top-6 sm:right-6 md:right-12 flex flex-col items-center pointer-events-none opacity-50 z-0 scale-90 sm:scale-100">
+      <div className="absolute top-[max(72px,env(safe-area-inset-top))] right-4 sm:top-6 sm:right-6 md:right-12 flex flex-col items-center pointer-events-none opacity-50 z-0 scale-90 sm:scale-100">
         <div className="w-9 h-9 border-2 border-[#B93A32] rounded-full flex items-center justify-center text-[#B93A32] font-black text-[11px] -rotate-12 bg-[#FAF7F0] shadow-sm">
           <span className="leading-tight text-center">月老<br />印鉴</span>
         </div>

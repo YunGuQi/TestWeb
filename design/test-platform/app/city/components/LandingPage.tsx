@@ -103,14 +103,14 @@ export default function LandingPage() {
           <span className="font-mono text-[9px] text-gray-400">SERIAL: CN-34-SOUL-EXPRESS</span>
         </div>
 
-        <div className="flex items-center justify-center gap-4 font-mono font-bold mt-4">
-          <button onClick={() => setShowHistory(true)} className="text-xs text-gray-500 hover:text-[#1a1a1a] transition-colors underline underline-offset-4 min-h-[44px] inline-flex items-center justify-center cursor-pointer touch-manipulation active:scale-95 px-3">[ 查看历史记录 ]</button>
+        <div className="flex items-center justify-center gap-2 font-mono font-bold mt-4 flex-wrap">
+          <button onClick={() => setShowHistory(true)} className="text-xs text-gray-500 hover:text-[#1a1a1a] transition-colors underline underline-offset-4 min-h-[44px] inline-flex items-center justify-center cursor-pointer touch-manipulation active:scale-95 px-2 whitespace-nowrap">[ 查看历史记录 ]</button>
           <button 
             type="button"
             onClick={() => window.location.href = 'https://xhslink.com/m/Atwtf3Cy6FR'} 
-            className="text-xs text-gray-500 hover:text-[#1a1a1a] transition-colors underline underline-offset-4 min-h-[44px] inline-flex items-center justify-center cursor-pointer touch-manipulation active:scale-95 px-3"
+            className="text-xs text-gray-500 hover:text-[#1a1a1a] transition-colors underline underline-offset-4 min-h-[44px] inline-flex items-center justify-center cursor-pointer touch-manipulation active:scale-95 px-2 whitespace-nowrap"
           >
-            [ 访问安安的黑市补给站 ]
+            [ 访问黑市补给站 ]
           </button>
         </div>
       </motion.div>

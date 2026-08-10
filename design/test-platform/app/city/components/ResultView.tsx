@@ -175,7 +175,12 @@ export default function ResultView({ forcedResultData }: ResultViewProps) {
           try {
             const history = JSON.parse(localStorage.getItem('quiz_history_city') || '[]');
             const newId = Date.now().toString().slice(-6);
-            history.push({ id: newId, answers, timestamp: Date.now() });
+            history.push({ 
+              id: newId, 
+              answers, 
+              timestamp: Date.now(),
+              result: { title: json.data.city?.name || '性格城市匹配测试' }
+            });
             localStorage.setItem('quiz_history_city', JSON.stringify(history));
           } catch (e) {}
         }

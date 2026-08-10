@@ -145,7 +145,7 @@ export default function TestEngine({ userInfo, onBack, onFinish }: TestEnginePro
   return (
     <main className="flex-1 flex flex-col mx-auto w-full relative z-10 min-h-[100dvh] transition-colors duration-700 ease-in-out overflow-hidden bg-transparent">
         {/* 顶部进度条区 */}
-        <div className="w-full max-w-md mx-auto p-6 flex flex-col relative z-20">
+        <div className="w-full max-w-md mx-auto pt-[max(32px,env(safe-area-inset-top))] px-6 pb-6 flex flex-col relative z-20">
             <div className="flex items-center justify-between mb-4">
 
                 <button onClick={() => setShowExitModal(true)} className="text-[#8C847A] hover:text-[#B93A32] transition-colors flex items-center gap-1 font-serif text-sm cursor-pointer tracking-wider">

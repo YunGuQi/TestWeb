@@ -42,7 +42,7 @@ export default function Home({ onStartTest, onRestoreHistory }: HomeProps) {
   }, []);
 
   return (
-    <main id="view-home" className="relative w-full max-w-lg mx-auto min-h-[100dvh] flex flex-col pt-[max(24px,env(safe-area-inset-top))] pb-[max(100px,env(safe-area-inset-bottom))] px-5 justify-center z-10">
+    <main id="view-home" className="relative w-full max-w-lg mx-auto min-h-[100dvh] flex flex-col pt-[max(24px,env(safe-area-inset-top))] pb-[max(24px,env(safe-area-inset-bottom))] px-5 justify-center z-10">
       <div id="home-content" className="w-full">
           <div className="text-center mb-10 brutalist-card p-6 sm:p-8 transform -rotate-1 border-4 border-black bg-[#fefdfb] shadow-[8px_8px_0px_#000] relative overflow-hidden">
               {/* 热敏纸小票顶部锯齿装饰 */}
@@ -143,7 +143,7 @@ export default function Home({ onStartTest, onRestoreHistory }: HomeProps) {
                   )}
               </button>
               
-              <div className="flex items-center justify-center gap-2 text-[10px] text-black/60 font-mono font-bold mb-8 mx-auto px-4 select-none">
+              <div className="flex items-center justify-center gap-2 text-[10px] text-black/60 font-mono font-bold mb-4 mt-4 mx-auto px-4 select-none">
                   <div className="w-1 h-1 bg-green-500 rounded-full animate-pulse"></div>
                   当前排队结账人数：<span>{queueCount}</span> 人
               </div>
