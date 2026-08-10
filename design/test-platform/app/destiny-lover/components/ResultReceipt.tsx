@@ -3,6 +3,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { toPng } from 'html-to-image';
+import { generateSignature } from '../../../lib/security';
 
 interface ResultReceiptProps {
   result: any;
@@ -44,14 +45,22 @@ export default function ResultReceipt({ result, userInfo, onRestart }: ResultRec
     
     setIsVerifying(true);
     try {
+      // 生成签名，防止直接请求绕过浏览器验证
+      const payload = JSON.stringify({
+        code: unlockCode.trim(),
+        deviceId: typeof window !== 'undefined' ? localStorage.getItem('deviceId') || 'unknown' : 'unknown',
+        recordId: 'destiny-lover'
+      });
+      const timestamp = Date.now();
+      const sign = await generateSignature(payload, timestamp);
       const res = await fetch('/api/verify', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          code: unlockCode.trim(),
-          deviceId: typeof window !== 'undefined' ? localStorage.getItem('deviceId') || 'unknown' : 'unknown',
-          recordId: 'destiny-lover'
-        })
+        headers: {
+          'Content-Type': 'application/json',
+          'x-timestamp': timestamp.toString(),
+          'x-sign': sign
+        },
+        body: payload
       });
       const data = await res.json();
       if (data.success) {

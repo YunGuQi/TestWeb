@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { generateSignature } from '../../../lib/security';
 
 interface TestEngineProps {
   userInfo: { nickname: string; status: 'single' | 'dating' };
@@ -89,15 +90,23 @@ export default function TestEngine({ userInfo, onBack, onFinish }: TestEnginePro
   const submitAnswers = async (finalAnswers: any) => {
     setIsLoading(true);
     try {
+      // 生成请求签名，防止直接 curl 攻击 API
+      const payload = JSON.stringify({
+        deviceId: localStorage.getItem('deviceId') || 'unknown',
+        answers: finalAnswers,
+        testId: 'destiny-lover',
+        metadata: userInfo
+      });
+      const timestamp = Date.now();
+      const sign = await generateSignature(payload, timestamp);
       const res = await fetch('/api/submit', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          deviceId: localStorage.getItem('deviceId') || 'unknown',
-          answers: finalAnswers,
-          testId: 'destiny-lover',
-          metadata: userInfo // 传递给后端
-        })
+        headers: {
+          'Content-Type': 'application/json',
+          'x-timestamp': timestamp.toString(),
+          'x-sign': sign
+        },
+        body: payload
       });
       const data = await res.json();
       if (data.success && data.result) {

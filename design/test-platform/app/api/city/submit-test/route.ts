@@ -73,7 +73,7 @@ export async function POST(req: Request) {
           if (distance < minDistance) {
             minDistance = distance;
             closestCity = {
-              id: extraData.id,
+              id: cityObj.id,
               name: extraData.name,
               title: cityObj.title, 
               desc: cityObj.desc,
@@ -92,7 +92,7 @@ export async function POST(req: Request) {
       const fbObj = CITY_RESULTS_FALLBACK[0];
       const extra = JSON.parse(fbObj.condition);
       closestCity = {
-        id: extra.id,
+        id: fbObj.id,
         name: extra.name,
         title: fbObj.title,
         desc: fbObj.desc,

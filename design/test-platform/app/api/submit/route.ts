@@ -12,10 +12,11 @@ export async function POST(request: Request) {
     const timestamp = request.headers.get('x-timestamp');
     const signature = request.headers.get('x-sign');
     
-    // const isValid = await verifySignature(timestamp, signature, rawBody, 120);
-    // if (!isValid) {
-    //   return NextResponse.json({ success: false, error: 'Unauthorized signature' }, { status: 403 });
-    // }
+    // 签名验证：防止直接 curl 绕过前端提交
+    const isValid = await verifySignature(timestamp, signature, rawBody, 120);
+    if (!isValid) {
+      return NextResponse.json({ success: false, error: 'Unauthorized signature' }, { status: 403 });
+    }
 
     const { deviceId, answers, testId = 'emotional-friction' } = body;
 

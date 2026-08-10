@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { results } from '../../../lib/data';
 import * as htmlToImage from 'html-to-image';
+import { generateSignature } from '../../../lib/security';
 
 const DanmakuOverlay = ({ danmakuList, isHidden, speedPct, opacityPct }: { danmakuList: string[], isHidden: boolean, speedPct: number, opacityPct: number }) => {
   if (isHidden || !danmakuList || danmakuList.length === 0) return null;
@@ -83,14 +84,22 @@ export default function ResultReceipt({ result, onRestart, forcedUnlock }: Resul
     
     setIsVerifying(true);
     try {
+      // 生成签名，防止直接请求绕过浏览器验证
+      const payload = JSON.stringify({
+        code: unlockCode.trim(),
+        deviceId: typeof window !== 'undefined' ? localStorage.getItem('deviceId') || 'unknown' : 'unknown',
+        recordId: 'emotional-friction'
+      });
+      const timestamp = Date.now();
+      const sign = await generateSignature(payload, timestamp);
       const res = await fetch('/api/verify', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          code: unlockCode.trim(),
-          deviceId: typeof window !== 'undefined' ? localStorage.getItem('deviceId') || 'unknown' : 'unknown',
-          recordId: 'emotional-friction'
-        })
+        headers: {
+          'Content-Type': 'application/json',
+          'x-timestamp': timestamp.toString(),
+          'x-sign': sign
+        },
+        body: payload
       });
       
       if (!res.ok) {
