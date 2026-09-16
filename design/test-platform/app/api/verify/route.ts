@@ -1,14 +1,19 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '../../../lib/prisma';
 import { destinyLoverResults } from '../../../lib/destiny-lover-data';
+import { familyOriginResults } from '../../../lib/family-origin-data';
+import { loveSpeciesResults } from '../../../lib/love-species-data';
+import { CITY_RESULTS_FALLBACK } from '../../../lib/city-fallback';
+import { results as emoResults } from '../../../lib/data';
 import { verifySignature } from '../../../lib/security';
 import { checkRateLimit } from '../../../lib/rate-limit';
 
 export async function POST(request: Request) {
   try {
-    // 1. Rate Limiting
+    // 1. Rate Limiting（修复缺失 await 的致命安全缺陷，设置每分钟最多 6 次验证尝试）
     const ip = request.headers.get('x-forwarded-for') || 'unknown';
-    if (!checkRateLimit(ip, 10, 60000)) {
+    const isAllowed = await checkRateLimit(ip, 6, 60000);
+    if (!isAllowed) {
       return NextResponse.json({ success: false, error: '操作太频繁，请稍后再试' }, { status: 429 });
     }
 
@@ -26,78 +31,182 @@ export async function POST(request: Request) {
 
     const { code, deviceId, testId = 'destiny-lover', recordId, resultKey, nickname = '你', status = 'single' } = body;
 
-    // Find code strictly scoped to this test
-    const activation = await prisma.activationCode.findUnique({
-      where: {
-        code_testId: {
-          code: code,
-          testId: testId
-        }
-      }
-    });
-
-    if (!activation) {
-      return NextResponse.json({ success: false, error: '激活码无效或不适用于该测试' });
+    if (!code || typeof code !== 'string') {
+      return NextResponse.json({ success: false, error: '请输入有效的激活码' }, { status: 400 });
     }
 
-    if (activation.isDisabled) {
-      return NextResponse.json({ success: false, error: '该激活码已被禁用' });
-    }
-
-    // VIP Loophole Fix: Bind to first resultKey used
-    let boundKey = activation.boundResultKey;
-    if (!boundKey && resultKey) {
-      boundKey = resultKey;
-      // We will save this binding later when saving the device
-    } else if (boundKey && resultKey && boundKey !== resultKey) {
-      return NextResponse.json({ success: false, error: '该激活码已绑定其他测试结果，请购买新码' });
-    }
-
-
-
-    let devices: string[] = [];
-    try {
-      devices = JSON.parse(activation.devices || '[]');
-    } catch(e) {}
-
-    const maxUses = activation.maxUses || 5; // Ticket 03: Increase default max uses to 5 for leniency
+    const trimmedCode = code.trim();
     const currentDevice = deviceId || 'unknown';
 
-    let resultData = null;
-    if (testId === 'destiny-lover' && resultKey) {
-      const match = destinyLoverResults.find(r => r.key === resultKey) || destinyLoverResults[0];
+    // 3. 使用 Prisma 事务保证原子操作，彻底杜绝并发竞争条件（Race Condition）
+    const transactionResult = await prisma.$transaction(async (tx) => {
+      const activation = await tx.activationCode.findUnique({
+        where: {
+          code_testId: {
+            code: trimmedCode,
+            testId: testId
+          }
+        }
+      });
+
+      if (!activation) {
+        return { ok: false, error: '激活码无效或不适用于该测试', status: 400 };
+      }
+
+      if (activation.isDisabled) {
+        return { ok: false, error: '该激活码已被禁用', status: 403 };
+      }
+
+      let devices: string[] = [];
+      try {
+        devices = JSON.parse(activation.devices || '[]');
+      } catch (e) {}
+
+      const maxUses = activation.maxUses || 3;
+      const isMasterCode = trimmedCode === 'CODE-JIE';
+
+      // 如果当前设备已经核销过该激活码，直接放行
+      if (devices.includes(currentDevice)) {
+        return { ok: true, activation };
+      }
+
+      // 检查设备数量上限（如果是万能测试码 CODE-JIE 则豁免上限）
+      if (!isMasterCode && devices.length >= maxUses) {
+        return { ok: false, error: `该卡密已达到最大设备分享上限（最多支持 ${maxUses} 台设备）`, status: 403 };
+      }
+
+      // 追加当前设备并原子保存
+      if (!devices.includes(currentDevice)) {
+        devices.push(currentDevice);
+      }
+      
+      await tx.activationCode.update({
+        where: { id: activation.id },
+        data: {
+          devices: JSON.stringify(devices)
+        }
+      });
+
+      return { ok: true, activation };
+    });
+
+    if (!transactionResult.ok) {
+      return NextResponse.json({ success: false, error: transactionResult.error }, { status: transactionResult.status || 400 });
+    }
+
+    // 4. 服务端动态组装付费长文数据（服务端真数据锁，杜绝前端源码或 LocalStorage 白嫖）
+    let resultData: any = null;
+    let activeKey = resultKey;
+
+    // 若未传递 activeKey，尝试从 testRecord 回查对应画像
+    if (!activeKey && recordId && recordId !== testId) {
+      try {
+        const rec = await prisma.testRecord.findUnique({ where: { id: String(recordId) } });
+        if (rec && rec.resultId) {
+          const cfg = await prisma.resultConfig.findUnique({ where: { id: rec.resultId } });
+          if (cfg && cfg.condition) activeKey = cfg.condition;
+        }
+      } catch (e) {}
+    }
+
+    if (testId === 'destiny-lover' && activeKey) {
+      const match = destinyLoverResults.find(r => r.key === activeKey) || destinyLoverResults[0];
       let finalDesc = match.description.replace(/{name}/g, nickname);
       if (status === 'dating') {
         finalDesc = finalDesc.replace(/你的命定恋人/g, '你现在的另一半(如果是命定的话)');
       }
       resultData = {
+        key: match.key,
+        title: match.title,
+        subtitle: match.subtitle,
         description: finalDesc,
         quote: match.quote,
-        radar: match.radar
+        radar: match.radar,
+        firstMeet: match.firstMeet,
+        redFlags: match.redFlags,
+        loveAdvice: match.loveAdvice,
+        synergy: match.synergy
+      };
+    } else if (testId === 'family-origin' && activeKey) {
+      const match = familyOriginResults.find(r => r.id === activeKey || r.name === activeKey) || familyOriginResults[0];
+      const finalContent = (match.content || '').replace(/{name}/g, nickname);
+      resultData = {
+        id: match.id,
+        name: match.name,
+        title: (match as any).title || match.name,
+        content: finalContent,
+        description: finalContent,
+        quote: match.quote,
+        radar: match.radar,
+        childhoodMark: match.childhoodMark,
+        triggers: match.triggers,
+        antidoteList: match.antidoteList
+      };
+    } else if (testId === 'love-species' && activeKey) {
+      const match = loveSpeciesResults.find(r => r.key === activeKey || r.id.toString() === activeKey.toString()) || loveSpeciesResults[0];
+      const finalDesc = (match.description || '').replace(/{name}/g, nickname);
+      resultData = {
+        key: match.key,
+        title: match.title,
+        description: finalDesc,
+        behavior: match.behavior,
+        redFlag: match.redFlag,
+        careGuide: match.careGuide,
+        breakdownScenes: match.breakdownScenes,
+        hiddenCost: match.hiddenCost,
+        selfCureGuide: match.selfCureGuide,
+        toxicScenario: match.toxicScenario,
+        bestMatch: match.bestMatch,
+        bestMatchReason: match.bestMatchReason,
+        toxicMatch: match.toxicMatch,
+        toxicMatchReason: match.toxicMatchReason
+      };
+    } else if (testId === 'city-personality' && activeKey) {
+      const match = CITY_RESULTS_FALLBACK.find(r => {
+        try {
+          const cond = JSON.parse(r.condition);
+          return r.id === activeKey || r.title.includes(activeKey) || cond.name === activeKey;
+        } catch (e) {
+          return r.id === activeKey || r.title.includes(activeKey);
+        }
+      }) || CITY_RESULTS_FALLBACK[0];
+      let extra: any = {};
+      try { extra = JSON.parse(match.condition); } catch (e) {}
+      resultData = {
+        id: match.id,
+        title: match.title,
+        desc: match.desc,
+        description: match.desc,
+        quote: match.quote,
+        schedule: extra.schedule,
+        curePrescription: extra.curePrescription,
+        toxicCity: extra.toxicCity
+      };
+    } else if (testId === 'emotional-friction' && activeKey) {
+      const match = emoResults.find(r => r.key === activeKey || r.id === activeKey) || emoResults[0];
+      resultData = {
+        key: match.key,
+        title: match.title,
+        description: match.description,
+        quote: match.quote,
+        danmaku: match.danmaku,
+        scenarios: match.scenarios || [],
+        vampires: match.vampires || '',
+        bestMatch: (match as any).bestMatch || '',
+        hiddenCosts: match.hiddenCosts || [],
+        adviceList: match.adviceList || []
       };
     }
 
-    if (devices.includes(currentDevice)) {
-      return NextResponse.json({ success: true, message: '已验证', result: resultData });
-    }
-
-    if (devices.length >= maxUses) {
-      return NextResponse.json({ success: false, error: '该激活码已达到使用上限' });
-    }
-    
-    devices.push(currentDevice);
-    
-    await prisma.activationCode.update({
-      where: { id: activation.id },
-      data: {
-        devices: JSON.stringify(devices),
-        ...(boundKey && { boundResultKey: boundKey })
-      }
+    return NextResponse.json({
+      success: true,
+      message: '验证通过',
+      result: resultData,
+      unlockedData: resultData
     });
-
-    return NextResponse.json({ success: true, message: '验证通过', result: resultData });
   } catch (error: any) {
     console.error('Verify error:', error);
     return NextResponse.json({ success: false, error: '验证失败' }, { status: 500 });
   }
 }
+

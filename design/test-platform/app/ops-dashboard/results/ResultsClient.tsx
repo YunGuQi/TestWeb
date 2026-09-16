@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useAdminStore } from '../../../lib/store/admin-store';
 
-export default function ResultsClient({ initialResults }: { initialResults: any[] }) {
+export default function ResultsClient({ initialResults, testId }: { initialResults: any[]; testId?: string }) {
   const { isUnlocked } = useAdminStore();
   const [results, setResults] = useState(initialResults);
   const [editRes, setEditRes] = useState<any>(null);

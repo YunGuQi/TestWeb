@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useAdminStore } from '../../../lib/store/admin-store';
 
-export default function QuestionsClient({ initialQuestions }: { initialQuestions: any[] }) {
+export default function QuestionsClient({ initialQuestions, testId }: { initialQuestions: any[]; testId?: string }) {
   const { isUnlocked } = useAdminStore();
   const [questions, setQuestions] = useState(initialQuestions);
   const [editQ, setEditQ] = useState<{ show: boolean, id: number, text: string }>({ show: false, id: 0, text: '' });

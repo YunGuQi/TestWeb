@@ -1,16 +1,66 @@
+# 编辑器与智能体配置
 .gemini
 .agent
 .agents
-# 本地运营物料与参考资料（不上传 Git）
-参考/
-对标账号/
-帖子物料/
-graphify-out/
-tmp_skill/
-# 本地工具临时文件
 .scratch/
 .codex/
 .mcp.json
 
-# 忽略打包生成的部署文件
+# 依赖与虚拟环境
+node_modules/
+.venv/
+__pycache__/
+*.pyc
+
+# 构建产物、临时缓存与测试输出
+.next/
+temp_edge
+temp_edge/
+scratch/
+*.tsbuildinfo
+test-results/
+screenshots/
+*.log
+
+# 环境变量与本地数据库
+.env
+.env.local
+.env.*.local
+dev.db
+dev.db-journal
+
+# 压缩包与二进制可执行文件
 *.zip
+*.7z
+*.rar
+*.tar.gz
+*.exe
+*.dll
+
+# 超大无损多媒体与视频媒体文件
+*.bmp
+*.mp4
+*.mov
+*.avi
+*.mkv
+*.jfif
+
+# 运营物料、参考资料与上课教程（不上传 Git）
+参考/
+对标账号/
+帖子物料/
+教程/
+graphify-out/
+tmp_skill/
+
+# 产品文档中的大图与原始素材资产（保留文案 md/txt/json，忽略本地大图与截图）
+design/product-docs/**/*.png
+design/product-docs/**/*.jpg
+design/product-docs/**/*.jpeg
+design/product-docs/**/*.bmp
+design/product-docs/**/*.jfif
+design/product-docs/**/*.gif
+design/product-docs/**/*.7z
+design/product-docs/**/*.zip
+design/product-docs/*.jpg
+design/product-docs/*.png

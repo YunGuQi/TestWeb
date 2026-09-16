@@ -14,7 +14,7 @@ export default function DestinyLoverApp() {
 
   const reduce = useReducedMotion();
 
-  const pageVariants = {
+  const pageVariants: any = {
     initial: { 
       opacity: 0, 
       transform: reduce ? "translateY(0px) scale(1)" : "translateY(16px) scale(0.98)" 

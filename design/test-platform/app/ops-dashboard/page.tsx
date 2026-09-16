@@ -2,6 +2,7 @@ import { Suspense } from 'react';
 import { prisma } from '../../lib/prisma';
 import CodesTable from './CodesTable';
 import PVCard from './PVCard';
+import CompletedCard from './CompletedCard';
 
 // 强制动态渲染（searchParams 依赖使然），但使用并发查询大幅提速
 export const dynamic = 'force-dynamic';
@@ -109,6 +110,13 @@ async function DashboardContent({ testId }: { testId: string }) {
   ]);
 
   let baseCount = config?.baseCount || 12544;
+  let completedBaseCount = 0;
+  try {
+    if (config?.danmakuContent) {
+      const dContent = JSON.parse(config.danmakuContent);
+      completedBaseCount = typeof dContent.completedBaseCount === 'number' ? dContent.completedBaseCount : 0;
+    }
+  } catch(e) {}
 
   // --- Analytics Calculation ---
   
@@ -205,27 +213,17 @@ async function DashboardContent({ testId }: { testId: string }) {
         <div className="bg-gradient-to-br from-white via-white/90 to-emerald-50/50 border-2 border-emerald-500/30 p-6 rounded-2xl shadow-[0_6px_30px_rgba(16,185,129,0.08)] hover:shadow-[0_10px_36px_rgba(16,185,129,0.12)] hover:-translate-y-0.5 transition-all relative overflow-hidden backdrop-blur-md">
           <div className="flex items-center justify-between mb-4">
             <div className="w-10 h-10 rounded-xl bg-emerald-100/80 flex items-center justify-center text-emerald-700 text-lg font-black shadow-sm border border-emerald-200">🎟️</div>
-            <span className="text-[10px] font-mono font-bold bg-emerald-500 text-white px-2 py-0.5 uppercase tracking-widest">ACTIVE CODES</span>
+            <span className="text-[10px] font-mono font-bold bg-emerald-500 text-white px-2 py-0.5 uppercase tracking-widest">激活码总库</span>
           </div>
-          <div className="text-gray-500 text-xs font-bold mb-1 uppercase tracking-wider font-mono">// TOTAL ACTIVATION CODES</div>
+          <div className="text-gray-500 text-xs font-bold mb-1 uppercase tracking-wider font-mono">总发行卡密数</div>
           <div className="text-4xl font-black text-black tracking-tight mb-3">{codeCount}</div>
           <div className="text-xs text-emerald-950 font-bold bg-emerald-100/70 inline-block px-2.5 py-1 rounded-md border border-emerald-300">
             已分配完成激活: <span className="font-mono font-black">{usedCodeCount}</span> 组
           </div>
         </div>
         
-        {/* 测算总数监控卡 - 紫罗兰 /impeccable colorize */}
-        <div className="bg-gradient-to-br from-white via-white/90 to-violet-50/50 border-2 border-violet-500/30 p-6 rounded-2xl shadow-[0_6px_30px_rgba(139,92,246,0.08)] hover:shadow-[0_10px_36px_rgba(139,92,246,0.12)] hover:-translate-y-0.5 transition-all relative overflow-hidden backdrop-blur-md">
-          <div className="flex items-center justify-between mb-4">
-            <div className="w-10 h-10 rounded-xl bg-violet-100/80 flex items-center justify-center text-violet-700 text-lg font-black shadow-sm border border-violet-200">⚡</div>
-            <span className="text-[10px] font-mono font-bold bg-violet-600 text-white px-2 py-0.5 uppercase tracking-widest">COMPLETED</span>
-          </div>
-          <div className="text-gray-500 text-xs font-bold mb-1 uppercase tracking-wider font-mono">// TOTAL COMPLETED TESTS</div>
-          <div className="text-4xl font-black text-black tracking-tight mb-3">{testRecordCount}</div>
-          <div className="text-xs text-violet-950 font-bold bg-violet-100/70 inline-block px-2.5 py-1 rounded-md border border-violet-300">
-            所有终端累记提交的完测答卷
-          </div>
-        </div>
+        {/* 测算总数监控卡 - 紫罗兰 */}
+        <CompletedCard initialBaseCount={completedBaseCount} testRecordCount={testRecordCount} testId={testId} />
 
         {/* 流量监控卡 - 琥珀黄 PVCard */}
         <PVCard initialBaseCount={baseCount} testRecordCount={testRecordCount} testId={testId} />

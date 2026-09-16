@@ -46,7 +46,7 @@ async function QuestionsContent({ testId }: { testId: string }) {
       options: q.options.map(o => ({
         id: o.id,
         text: o.text,
-        weight: o.weight
+        weight: (o as any).weight || 0
       }))
     }));
   }

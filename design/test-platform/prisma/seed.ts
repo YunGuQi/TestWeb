@@ -16,8 +16,8 @@ async function main() {
   // 1. 初始化 GlobalConfig
   await prisma.globalConfig.create({
     data: {
-      id: 1,
       baseCount: 1542,
+      danmakuContent: '[]',
     },
   })
   console.log('GlobalConfig seeded.')
@@ -69,6 +69,7 @@ async function main() {
     data: {
       testId: 'destiny-lover',
       baseCount: 88,
+      danmakuContent: '[]',
     },
   })
 

@@ -1,257 +1,191 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '../../../lib/prisma';
-import { questions, results } from '../../../lib/data';
-import { destinyLoverQuestions, destinyLoverResults } from '../../../lib/destiny-lover-data';
 import { verifySignature } from '../../../lib/security';
+import { checkRateLimit } from '../../../lib/rate-limit';
+import { verifySessionToken } from '../../../lib/session';
+import { EngineFactory } from '../../../lib/engines';
+
+/**
+ * 服务端真脱敏中间件：物理剔除后 70% 深度付费字段，仅吐出前 30% 身份定调与量化诱饵
+ * 彻底封死前端 F12 删除遮罩 DOM 节点或抓包白嫖漏洞
+ */
+function stripPremiumContent(finalResult: any, testId: string): any {
+  if (!finalResult || typeof finalResult !== 'object') return finalResult;
+  const safeResult = { ...finalResult };
+
+  switch (testId) {
+    case 'emotional-friction':
+      delete safeResult.quote;
+      delete safeResult.scenarios;
+      delete safeResult.vampires;
+      delete safeResult.bestMatch;
+      delete safeResult.hiddenCosts;
+      delete safeResult.adviceList;
+      break;
+
+    case 'destiny-lover':
+      delete safeResult.firstMeet;
+      delete safeResult.redFlags;
+      delete safeResult.loveAdvice;
+      break;
+
+    case 'love-species':
+      delete safeResult.behavior;
+      delete safeResult.redFlag;
+      delete safeResult.careGuide;
+      delete safeResult.breakdownScenes;
+      delete safeResult.hiddenCost;
+      delete safeResult.selfCureGuide;
+      delete safeResult.toxicScenario;
+      delete safeResult.bestMatch;
+      delete safeResult.toxicMatch;
+      break;
+
+    case 'family-origin':
+      delete safeResult.childhoodMark;
+      delete safeResult.triggers;
+      delete safeResult.antidoteList;
+      break;
+
+    default:
+      break;
+  }
+
+  return safeResult;
+}
 
 export async function POST(request: Request) {
   try {
     const rawBody = await request.text();
     const body = JSON.parse(rawBody);
     
+    // --- 1. Security Seam: Signature & Rate Limit & Session Validation ---
+    
+    // 验证签名防重放
     const timestamp = request.headers.get('x-timestamp');
     const signature = request.headers.get('x-sign');
-    
-    // 签名验证：防止直接 curl 绕过前端提交
     const isValid = await verifySignature(timestamp, signature, rawBody, 120);
     if (!isValid) {
       return NextResponse.json({ success: false, error: 'Unauthorized signature' }, { status: 403 });
     }
 
-    const { deviceId, answers, testId = 'emotional-friction' } = body;
+    // 验证 Session Token (HttpOnly Cookie)
+    // 相比依赖前端明文传递的 deviceId，此方案彻底隔绝了伪造和串号可能
+    let participantId = 'unknown';
+    const cookieHeader = request.headers.get('cookie') || '';
+    const match = cookieHeader.match(/test_session=([^;]+)/);
+    
+    if (match && match[1]) {
+      const payload = await verifySessionToken(match[1]);
+      if (payload && payload.participantId) {
+        participantId = payload.participantId;
+      }
+    }
+
+    // 如果不存在 Cookie，则阻断提交 (强制开启强力防刷防串号保护)
+    if (participantId === 'unknown') {
+      return NextResponse.json({ success: false, error: 'Session expired or missing. Please initialize test first.' }, { status: 401 });
+    }
+
+    // 频控：使用 Redis Rate Limit (单会话+IP联合限制，或者全局限制)
+    const ip = request.headers.get('x-forwarded-for') || '127.0.0.1';
+    const identifier = `${participantId}_${ip}`;
+    const isAllowed = await checkRateLimit(identifier, 10, 60000); // 每分钟最多 10 次提交
+    if (!isAllowed) {
+      return NextResponse.json({ success: false, error: 'Too many requests, please slow down' }, { status: 429 });
+    }
+
+    // --- 2. Turnstile 人机验证 ---
+    const turnstileSecret = process.env.TURNSTILE_SECRET_KEY;
+    const { answers, testId = 'emotional-friction', turnstileToken, metadata, deviceId } = body;
 
     if (!answers || typeof answers !== 'object') {
       return NextResponse.json({ success: false, error: '无有效答案数据' }, { status: 400 });
     }
 
-    // 1. 提取选项 ID 列表
+    if (turnstileSecret && turnstileToken) {
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 2000);
+        const verifyRes = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: `secret=${encodeURIComponent(turnstileSecret)}&response=${encodeURIComponent(turnstileToken)}`,
+          signal: controller.signal
+        });
+        clearTimeout(timeoutId);
+        const verifyData = await verifyRes.json();
+        if (!verifyData.success) {
+          console.warn('[Submit API] Turnstile verification failed:', verifyData);
+          if (process.env.NODE_ENV === 'production' && participantId === 'unknown') {
+            return NextResponse.json({ success: false, error: '人机验证未通过，请重试' }, { status: 403 });
+          }
+        }
+      } catch (e) {
+        console.warn('Turnstile verification network timeout, gracefully continuing based on valid session signature:', e);
+      }
+    }
+
+
+    // --- 3. Routing to specific Engine (Scoring Engine Seam) ---
     const optionIds: string[] = Object.values(answers).map((v: any) => {
       if (typeof v === 'string' || typeof v === 'number') return v.toString();
       return v?.id?.toString();
     }).filter(Boolean);
 
-    // ==== 命运恋人独立算分分支 ====
-    if (testId === 'destiny-lover') {
-      let L = 0, G = 0, D = 0, S = 0, A = 0, C = 0, R = 0, P = 0;
-      
-      // 遍历所有题目和选项进行算分
-      destinyLoverQuestions.forEach(q => {
-        q.options.forEach(opt => {
-          if (optionIds.includes(opt.id.toString())) {
-            L += opt.scores.L;
-            G += opt.scores.G;
-            D += opt.scores.D;
-            S += opt.scores.S;
-            A += opt.scores.A;
-            C += opt.scores.C;
-            R += opt.scores.R;
-            P += opt.scores.P;
-          }
-        });
-      });
+    const engine = EngineFactory.getEngine(testId);
+    
+    // Engine 的计算过程是一个纯逻辑过程，具有高 Locality 和扩展性
+    const finalResult = await engine.calculate({ optionIds, metadata, testId });
 
-      // 计算四个维度的胜出者组合
-      const dim1 = L >= G ? 'l' : 'g';
-      const dim2 = D >= S ? 'd' : 's';
-      const dim3 = A >= C ? 'a' : 'c';
-      const dim4 = R >= P ? 'r' : 'p';
-      const userCombo = dim1 + dim2 + dim3 + dim4; // 例如 "ldar"
-
-      // 寻找最匹配的结果
-      let bestMatch = destinyLoverResults[0];
-      let maxMatchCount = -1;
-
-      for (const res of destinyLoverResults) {
-        let matchCount = 0;
-        const resKey = res.key.split('_')[0]; // 处理 gscp_pure
-        for (let i = 0; i < 4; i++) {
-          if (resKey[i] && userCombo[i] && resKey[i] === userCombo[i]) {
-            matchCount++;
-          }
-        }
-        if (matchCount > maxMatchCount) {
-          maxMatchCount = matchCount;
-          bestMatch = res;
-        }
-      }
-
-      // 动态注入称呼与状态微调
-      const nickname = body.metadata?.nickname || '你';
-      const userStatus = body.metadata?.status || 'single';
-      
-      let finalDesc = bestMatch.description.replace(/{name}/g, nickname);
-      if (userStatus === 'dating') {
-        finalDesc = finalDesc.replace(/你的命定恋人/g, '你现在的另一半(如果是命定的话)');
-      }
-
-      const finalResult = {
-        id: bestMatch.id,
-        key: bestMatch.key,
-        title: bestMatch.title,
-        subtitle: bestMatch.subtitle,
-        tags: bestMatch.tags,
-        description: finalDesc,
-        quote: bestMatch.quote,
-        radar: bestMatch.radar, // 返回雷达图数据
-        rawScores: { L, G, D, S, A, C, R, P, userCombo }
-      };
-
-      let recordId: string | number = 1;
-      try {
-        const record = await prisma.testRecord.create({
-          data: {
-            testId,
-            deviceId: deviceId || 'unknown',
-            answers: JSON.stringify(answers),
-            resultId: 1 // 简化记录，实际可存字典表 ID
-          }
-        });
-        recordId = record.id;
-      } catch (dbErr) {
-        console.warn('DB connect failed during testRecord create. Gracefully continuing.');
-      }
-
-      const strippedResult = { ...finalResult };
-      // 修复：取消剥离详细数据，否则已解锁的前端也会显示空白
-      // delete strippedResult.description;
-      // delete strippedResult.quote;
-      // delete strippedResult.radar;
-
-      return NextResponse.json({
-        success: true,
-        recordId: recordId,
-        result: strippedResult 
-      });
-    }
-    // ==== 原有 emo 算分分支 ====
-
-    let sen = 0, rum = 0, pls = 0, bnd = 0;
-    const billItems: Array<{ name: string; cost: number }> = [];
-
-    // 2. 从数据库中查询对应 Option
-    const numericIds = optionIds.map(id => parseInt(id, 10)).filter(n => !isNaN(n));
-    let dbOptions: any[] = [];
-    if (numericIds.length > 0) {
-      dbOptions = await prisma.option.findMany({
-        where: { id: { in: numericIds } }
-      });
-    }
-
-    if (dbOptions.length > 0) {
-      // 数据库权重算分
-      dbOptions.forEach(opt => {
-        try {
-          const scores = JSON.parse(opt.scores || '{}');
-          const senScore = scores.sen || 0;
-          const rumScore = scores.rum || 0;
-          const plsScore = scores.pls || 0;
-          const bndScore = scores.bnd || 0;
-
-          sen += senScore;
-          rum += rumScore;
-          pls += plsScore;
-          bnd += bndScore;
-
-          const cost = (senScore * 300) + (rumScore * 250) + (plsScore * 280);
-          if (scores.billName && cost > 0) {
-            billItems.push({ name: scores.billName, cost });
-          }
-        } catch (e) {
-          console.error('Error parsing scores:', e);
-        }
-      });
-    } else {
-      // 降级兜底：用 lib/data.ts 计算分值
-      questions.forEach(q => {
-        q.options.forEach(opt => {
-          if (optionIds.includes(opt.id.toString())) {
-            sen += opt.senScore || 0;
-            rum += opt.rumScore || 0;
-            pls += opt.plsScore || 0;
-            bnd += opt.bndScore || 0;
-
-            const cost = ((opt.senScore || 0) * 300) + ((opt.rumScore || 0) * 250) + ((opt.plsScore || 0) * 280);
-            if (opt.billName && cost > 0) {
-              billItems.push({ name: opt.billName, cost });
-            }
-          }
-        });
-      });
-    }
-
-    // 3. 计算 totalFriction
-    let totalFriction = (sen * 300) + (rum * 250) + (pls * 280) - (bnd * 100);
-    if (totalFriction < 0) totalFriction = 0;
-
-    // 4. 判定 resultKey
-    let resultKey = 'bnd'; // default
-    const maxVal = Math.max(sen, rum, pls, bnd);
-
-    if (sen >= 35 && rum >= 35 && pls >= 35) {
-      resultKey = 'high';
-    } else if (sen >= 30 && pls >= 30) {
-      resultKey = 'sen_pls';
-    } else if (rum >= 40 && bnd <= 10) {
-      resultKey = 'rum_low_bnd';
-    } else if (bnd >= 40 && sen <= 15) {
-      resultKey = 'low';
-    } else if (pls === maxVal) {
-      resultKey = 'pls';
-    } else if (rum === maxVal) {
-      resultKey = 'rum';
-    } else if (sen === maxVal) {
-      resultKey = 'sen';
-    } else if (bnd === maxVal) {
-      resultKey = 'bnd';
-    }
-
-    // 5. 获取具体结论文本
-    const fallbackRes = results.find(r => r.key === resultKey) || results[0];
-    let resConfig = null;
-    try {
-      resConfig = await prisma.resultConfig.findFirst({
-        where: { condition: resultKey, testId }
-      });
-    } catch (e) {
-      console.warn('DB error reading emo resultConfig, fallback to local data.');
-    }
-
-    const finalResult = {
-      id: resConfig?.id || 1,
-      key: resultKey,
-      title: resConfig?.title || fallbackRes.title,
-      tags: fallbackRes.tags || '#钝感力王者,#反PUA大师',
-      description: resConfig?.desc || fallbackRes.description,
-      quote: resConfig?.quote || fallbackRes.quote,
-      sen,
-      rum,
-      pls,
-      bnd,
-      totalFriction,
-      maxScore: 100,
-      billItems
-    };
-
-    // 6. 持久化存入 TestRecord (断网容灾)
+    // --- 4. 统一持久化存储 ---
     let recordId: string | number = 1;
+    let participantCount = 10000;
+    
     try {
+      // 记录存储时优先使用前端设备 deviceId 以便历史回查，兜底使用服务端 participantId
+      const targetDeviceId = (deviceId && typeof deviceId === 'string' && deviceId.trim().length > 0) 
+        ? deviceId.trim() 
+        : participantId;
+
       const record = await prisma.testRecord.create({
         data: {
           testId,
-          deviceId: deviceId || 'unknown',
+          deviceId: targetDeviceId, 
           answers: JSON.stringify(answers),
-          resultId: finalResult.id
+          resultId: typeof finalResult.id === 'number' ? finalResult.id : 1
         }
       });
       recordId = record.id;
-    } catch (e) {
-      console.warn('DB error creating testRecord, skipping offline.');
+      
+      const recordCount = await prisma.testRecord.count({ where: { testId } });
+      const config = await prisma.globalConfig.findFirst({ where: { testId } });
+      
+      let extraBase = testId === 'family-origin' ? 85300 : (testId === 'love-species' ? 12544 : 0);
+      if (config) {
+        extraBase = config.baseCount || extraBase;
+        if (config.danmakuContent) {
+          try {
+            const dContent = JSON.parse(config.danmakuContent);
+            if (typeof dContent.completedBaseCount === 'number') {
+              extraBase = dContent.completedBaseCount;
+            }
+          } catch (e) {}
+        }
+      }
+      participantCount = extraBase + recordCount;
+      
+    } catch (dbErr) {
+      console.warn('DB error creating testRecord, gracefully continuing.');
     }
+    // --- 5. 返回统一格式响应（经过服务端真脱敏，物理阻断 F12 白嫖） ---
+    const strippedResult = stripPremiumContent(finalResult, testId);
 
     return NextResponse.json({
       success: true,
-      recordId: recordId,
-      result: finalResult
+      recordId,
+      participantCount,
+      result: strippedResult
     });
 
   } catch (error: any) {

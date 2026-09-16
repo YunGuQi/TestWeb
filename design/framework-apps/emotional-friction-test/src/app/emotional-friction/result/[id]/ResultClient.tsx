@@ -289,23 +289,23 @@ export default function ResultClient({ record, config, allConfigs, scores: propS
       </div>
 
       {/* 底部操作区 (Fixed, 不会被截图) */}
-      <div className="absolute bottom-0 left-0 right-0 p-4 bg-[#1c1c1e] border-t-2 border-white/10 flex flex-col gap-3 z-50">
+      <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-[#f4f4f4] via-[#f4f4f4] to-transparent pt-12 flex flex-col gap-3 z-50">
         
         <button 
           onClick={savePoster}
           disabled={isSaving}
-          className="brutalist-btn disabled:opacity-50 !py-3 w-full max-w-[340px] mx-auto"
+          className="brutalist-btn disabled:opacity-50 !py-3 w-full max-w-[340px] mx-auto bg-black text-white border-2 border-black font-black hover:bg-gray-800 transition-all shadow-[4px_4px_0px_#000] active:translate-y-1 active:shadow-none flex items-center justify-center"
         >
-          {isSaving ? <RefreshCw className="animate-spin mr-2" size={18} /> : <Download size={18} className="mr-2" />}
+          {isSaving ? <RefreshCw className="animate-spin mr-2" size={18} /> : <Download size={18} strokeWidth={2.5} className="mr-2" />}
           {isSaving ? 'GENERATING...' : '保存账单截图'}
         </button>
 
         <div className="flex justify-center gap-4 mt-1 mb-2 font-mono font-bold w-full max-w-[340px] mx-auto">
-          <Link href="/emotional-friction" className="text-xs text-gray-400 hover:text-white tracking-widest underline underline-offset-4 decoration-gray-700 transition-colors">
-            重新打印
+          <Link href="/emotional-friction" className="text-xs text-gray-500 hover:text-black tracking-widest underline underline-offset-4 decoration-gray-400 transition-colors">
+            [ 重新打印 ]
           </Link>
-          <Link href="/hub" className="text-xs text-gray-400 hover:text-white tracking-widest underline underline-offset-4 decoration-gray-700 transition-colors">
-            探索其他专柜
+          <Link href="/hub" className="text-xs text-gray-500 hover:text-black tracking-widest underline underline-offset-4 decoration-gray-400 transition-colors">
+            [ 探索其他专柜 ]
           </Link>
         </div>
       </div>

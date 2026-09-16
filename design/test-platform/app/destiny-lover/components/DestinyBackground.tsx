@@ -102,7 +102,7 @@ export default function DestinyBackground({ children }: DestinyBackgroundProps) 
         </svg>
       </div>
 
-      {/* 3. 宿命牵连 · 月老朱砂因缘红绳 (使用 preserveAspectRatio=none 自动延展覆盖宽屏/竖屏手机) */}
+      {/* 3. 心动羁绊 · 朱砂红绳 (使用 preserveAspectRatio=none 自动延展覆盖宽屏/竖屏手机) */}
       <div
         className="absolute inset-0 pointer-events-none opacity-85 z-0 flex items-center justify-center"
         style={{
@@ -110,7 +110,7 @@ export default function DestinyBackground({ children }: DestinyBackgroundProps) 
         }}
       >
         <svg className="w-full h-full" viewBox="0 0 1440 900" preserveAspectRatio="none" fill="none" xmlns="http://www.w3.org/2000/svg">
-          {/* 横竖兼顾的红色姻缘主线 */}
+          {/* 横竖兼顾的红色心动主线 */}
           <path
             d="M-100,180 C320,380 680,60 1560,580"
             stroke="#B93A32"
@@ -147,10 +147,10 @@ export default function DestinyBackground({ children }: DestinyBackgroundProps) 
         }}
       />
 
-      {/* 5. 跨端契约点睛：仿古月老因缘小签章 (支持手机屏幕顶角展现) */}
+      {/* 5. 跨端契约点睛：仿古心动小签章 (支持手机屏幕顶角展现) */}
       <div className="absolute top-[max(72px,env(safe-area-inset-top))] right-4 sm:top-6 sm:right-6 md:right-12 flex flex-col items-center pointer-events-none opacity-50 z-0 scale-90 sm:scale-100">
         <div className="w-9 h-9 border-2 border-[#B93A32] rounded-full flex items-center justify-center text-[#B93A32] font-black text-[11px] -rotate-12 bg-[#FAF7F0] shadow-sm">
-          <span className="leading-tight text-center">月老<br />印鉴</span>
+          <span className="leading-tight text-center">心动<br />印鉴</span>
         </div>
         <span className="text-[10px] font-mono text-[#8C8275] mt-1 tracking-widest">// NO.08492 //</span>
       </div>
@@ -160,7 +160,7 @@ export default function DestinyBackground({ children }: DestinyBackgroundProps) 
         className="absolute left-6 top-1/4 hidden lg:block text-[#8C8275] text-xs tracking-[0.7em] font-serif opacity-30 pointer-events-none select-none z-0"
         style={{ writingMode: 'vertical-rl' }}
       >
-        千里姻缘一线牵 · 红线结发注此生
+        心有灵犀一点通 · 岁暮天涯共此生
       </div>
 
       {/* 7. 前台组件安全容器 ( relative z-10 支持任何长表格页面自然滚动 ) */}

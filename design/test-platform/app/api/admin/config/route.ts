@@ -10,7 +10,7 @@ export async function GET(req: Request) {
     
     let config = await prisma.globalConfig.findFirst({ where: { testId } });
     if (!config) {
-      config = await prisma.globalConfig.create({ data: { testId } });
+      config = await prisma.globalConfig.create({ data: { testId, danmakuContent: '[]' } });
     }
     return NextResponse.json({ success: true, data: config });
   } catch (error) {
@@ -22,9 +22,21 @@ export async function GET(req: Request) {
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { danmakuSpeed, danmakuOpacity, danmakuContent, baseCount, testId = 'emotional-friction' } = body;
+    const { danmakuSpeed, danmakuOpacity, danmakuContent, baseCount, completedBaseCount, testId = 'emotional-friction' } = body;
     
     let config = await prisma.globalConfig.findFirst({ where: { testId } });
+    let existingDanmaku = {};
+    try {
+      if (config?.danmakuContent) existingDanmaku = JSON.parse(config.danmakuContent);
+    } catch(e) {}
+
+    const newDanmakuContent = {
+      ...existingDanmaku,
+      ...(typeof danmakuContent === 'object' ? danmakuContent : {}),
+    };
+    if (completedBaseCount !== undefined) {
+      newDanmakuContent.completedBaseCount = parseInt(completedBaseCount) || 0;
+    }
     if (config) {
       config = await prisma.globalConfig.update({
         where: { id: config.id },
@@ -32,7 +44,7 @@ export async function POST(req: Request) {
           danmakuSpeed: danmakuSpeed ?? config.danmakuSpeed,
           danmakuOpacity: danmakuOpacity ?? config.danmakuOpacity,
           baseCount: baseCount ?? config.baseCount,
-          danmakuContent: typeof danmakuContent === 'string' ? danmakuContent : JSON.stringify(danmakuContent || config.danmakuContent || {})
+          danmakuContent: JSON.stringify(newDanmakuContent)
         }
       });
     } else {
@@ -42,7 +54,7 @@ export async function POST(req: Request) {
           danmakuSpeed: danmakuSpeed ?? 50,
           danmakuOpacity: danmakuOpacity ?? 70,
           baseCount: baseCount ?? 0,
-          danmakuContent: typeof danmakuContent === 'string' ? danmakuContent : JSON.stringify(danmakuContent || {})
+          danmakuContent: JSON.stringify(newDanmakuContent)
         }
       });
     }

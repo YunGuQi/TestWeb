@@ -47,10 +47,10 @@ export default function PVCard({
     <div className="bg-gradient-to-br from-white via-white/90 to-amber-50/50 border-2 border-amber-500/30 p-6 rounded-2xl shadow-[0_6px_30px_rgba(245,158,11,0.08)] hover:shadow-[0_10px_36px_rgba(245,158,11,0.12)] hover:-translate-y-0.5 transition-all relative overflow-hidden backdrop-blur-md">
       <div className="flex items-center justify-between mb-4">
         <div className="w-10 h-10 rounded-xl bg-amber-100/80 flex items-center justify-center text-amber-700 text-lg font-black shadow-sm border border-amber-200">👁️</div>
-        <span className="text-[10px] font-mono font-bold bg-amber-500 text-white px-2 py-0.5 uppercase tracking-widest">TRAFFIC PV</span>
+        <span className="text-[10px] font-mono font-bold bg-amber-500 text-white px-2 py-0.5 uppercase tracking-widest">流量监控</span>
       </div>
-      <div className="text-gray-500 text-xs font-bold mb-1 flex items-center gap-1 cursor-help group font-mono uppercase tracking-wider" title="PV(Page View): 预估总页面访问量，基于基础基数和实际测算人数计算出的模拟热度指标。">
-        // ESTIMATED PAGE VIEWS
+      <div className="text-gray-500 text-xs font-bold mb-1 flex items-center gap-1 cursor-help group font-mono uppercase tracking-wider" title="预估总页面访问量，基于基础基数和实际测算人数计算出的模拟热度指标。">
+        预估浏览量 PV
         <span className="text-[10px] bg-amber-100 text-amber-800 rounded-full w-4 h-4 flex items-center justify-center font-bold">?</span>
       </div>
       <div className="text-4xl font-black text-black tracking-tight mb-3 flex items-center gap-2">

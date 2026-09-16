@@ -10,19 +10,25 @@ export async function GET(req: Request) {
 
     let config = await prisma.globalConfig.findFirst({ where: { testId } });
     if (!config) {
-      config = await prisma.globalConfig.create({ data: { testId } });
+      config = await prisma.globalConfig.create({ data: { testId, danmakuContent: '[]' } });
     }
     
     const testRecordCount = await prisma.testRecord.count({ where: { testId } });
     const baseCount = config.baseCount || 12544; // Default to 12544 if 0 for backward compatibility
     const pv = baseCount + testRecordCount * 3;
     
+    let dContent = {};
+    try {
+      if (config.danmakuContent) dContent = JSON.parse(config.danmakuContent);
+    } catch(e) {}
+
     return NextResponse.json({
       success: true,
       data: {
         danmakuSpeed: config.danmakuSpeed,
         danmakuOpacity: config.danmakuOpacity,
-        danmakuContent: JSON.parse(config.danmakuContent || '{}'),
+        danmakuContent: dContent,
+        completedBaseCount: (dContent as any).completedBaseCount || 0,
         pv
       }
     });

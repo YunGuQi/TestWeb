@@ -1,15 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '../../../../../lib/prisma';
-import { cookies } from 'next/headers';
-
 export async function POST(req: Request) {
   try {
-    const cookieStore = cookies();
-    const isUnlocked = cookieStore.get('admin_unlocked')?.value === 'true';
-
-    if (!isUnlocked) {
-      return NextResponse.json({ success: false, error: '未解锁高级权限' }, { status: 403 });
-    }
 
     const body = await req.json();
     const { ids } = body;

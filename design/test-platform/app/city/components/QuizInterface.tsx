@@ -29,8 +29,8 @@ export default function QuizInterface() {
     fetchQuestions();
   }, []);
 
-  if (isLoading) return <div className="min-h-screen flex items-center justify-center">加载安检设备中...</div>;
-  if (!questions.length) return <div className="min-h-screen flex items-center justify-center">暂无题库</div>;
+  if (isLoading) return <div className="min-h-screen flex items-center justify-center text-[#fdfbf7] font-bold tracking-widest text-lg">加载安检设备中...</div>;
+  if (!questions.length) return <div className="min-h-screen flex items-center justify-center text-[#fdfbf7] font-bold tracking-widest text-lg">暂无题库</div>;
 
   const currentQ = questions[currentStep];
   const isLast = currentStep === questions.length - 1;
@@ -99,13 +99,11 @@ export default function QuizInterface() {
             {currentQ.opts.map((opt, idx) => {
               const abcd = ['A', 'B', 'C', 'D'];
               const isSelected = answers[currentStep] === idx;
-              const isDisabled = answers.length === questions.length;
               return (
                 <button
                   key={idx}
-                  disabled={isDisabled}
                   onClick={() => handleOptionClick(idx)}
-                  className={`w-full text-left border-2 border-[#1a1a1a] px-4 py-3.5 min-h-[76px] flex items-center justify-between rounded shadow-[0_4px_12px_rgba(0,0,0,0.06)] font-medium leading-relaxed transition-all duration-200 relative overflow-hidden ${isSelected ? 'bg-black text-white translate-y-0.5 shadow-none' : 'bg-white text-[#1a1a1a] hover:bg-gray-50 active:scale-[0.98]'} ${isDisabled ? 'opacity-80 cursor-default' : ''}`}
+                  className={`w-full text-left border-2 border-[#1a1a1a] px-4 py-3.5 min-h-[76px] flex items-center justify-between rounded shadow-[0_4px_12px_rgba(0,0,0,0.06)] font-medium leading-relaxed transition-all duration-200 relative overflow-hidden ${isSelected ? 'bg-black text-white translate-y-0.5 shadow-none' : 'bg-white text-[#1a1a1a] hover:bg-gray-50 active:scale-[0.98]'}`}
                 >
                   <div className="relative z-10 flex gap-3 font-bold w-full items-center">
                     <span className="shrink-0 font-mono text-sm">{isSelected ? '[x]' : '[ ]'}</span>

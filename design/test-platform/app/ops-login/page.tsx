@@ -24,8 +24,7 @@ export default function AdminLogin() {
 
       const data = await res.json();
       if (data.success) {
-        // 双层 cookie 写入 + 硬导航以确保中间件鉴权生效
-        document.cookie = "admin_token=jiasite_Authorized; path=/; max-age=604800; SameSite=Lax";
+        // 后端已通过 HttpOnly Set-Cookie 写入真实的 JWT
         window.location.href = '/ops-dashboard';
       } else {
         setError(data.error || '访问凭证无效');

@@ -4,26 +4,37 @@ import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAdminStore } from '../../lib/store/admin-store';
 
+const TEST_NAMES: Record<string, string> = {
+  'emotional-friction': '深度情绪内耗测算',
+  'city-personality': '性格城市匹配测试',
+  'destiny-lover': '命定恋人红娘测试',
+  'love-species': '恋爱物种领养中心',
+  'family-origin': '原生家庭人生剧本测试'
+};
+
 export default function CodesTable({ initialCodes, testId }: { initialCodes: any[], testId: string }) {
   const router = useRouter();
   const { isUnlocked } = useAdminStore();
   const [codes, setCodes] = useState(initialCodes);
   const [loading, setLoading] = useState(false);
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
-  const [generateModal, setGenerateModal] = useState({ show: false, count: 10 });
+  const [generateModal, setGenerateModal] = useState({ show: false, count: 10, vendor: 'main' });
   const [editModal, setEditModal] = useState({ show: false, id: 0, code: '', maxUses: 3 });
   const [batchEditModal, setBatchEditModal] = useState({ show: false, maxUses: 3 });
+  const [deleteConfirmStage, setDeleteConfirmStage] = useState(0);
 
   // Filter & Sort States
   const [searchTerm, setSearchTerm] = useState('');
   const [filterUsage, setFilterUsage] = useState('all'); // all, used, unused
   const [filterExported, setFilterExported] = useState('all'); // all, exported, unexported
+  const [filterVendor, setFilterVendor] = useState('all');
   const [sortBy, setSortBy] = useState('createdAt'); // createdAt, deviceCount, testCount
   const [sortOrder, setSortOrder] = useState('desc'); // desc, asc
 
   const processedCodes = useMemo(() => {
     let result = codes.map(code => ({
       ...code,
+      vendor: code.vendor || 'main',
       deviceCount: (() => {
         try {
           const devices = JSON.parse(code.devices || '[]');
@@ -46,7 +57,10 @@ export default function CodesTable({ initialCodes, testId }: { initialCodes: any
     if (filterExported === 'exported') result = result.filter(c => c.isExported);
     if (filterExported === 'unexported') result = result.filter(c => !c.isExported);
 
-    // 4. 排序
+    // 4. 渠道过滤
+    if (filterVendor !== 'all') result = result.filter(c => c.vendor === filterVendor);
+
+    // 5. 排序
     result.sort((a, b) => {
       let valA, valB;
       if (sortBy === 'createdAt') {
@@ -65,7 +79,12 @@ export default function CodesTable({ initialCodes, testId }: { initialCodes: any
     });
 
     return result;
-  }, [codes, searchTerm, filterUsage, filterExported, sortBy, sortOrder]);
+  }, [codes, searchTerm, filterUsage, filterExported, filterVendor, sortBy, sortOrder]);
+
+  const uniqueVendors = useMemo(() => {
+    const vendors = new Set(codes.map(c => c.vendor || 'main'));
+    return Array.from(vendors);
+  }, [codes]);
 
   useEffect(() => {
     setCodes(initialCodes);
@@ -98,7 +117,11 @@ export default function CodesTable({ initialCodes, testId }: { initialCodes: any
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      link.download = `agiso_codes_${Date.now()}.txt`;
+      const now = new Date();
+      const pad = (n: number) => String(n).padStart(2, '0');
+      const timeStr = `${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}_${pad(now.getHours())}${pad(now.getMinutes())}`;
+      const testName = TEST_NAMES[testId] || testId;
+      link.download = `${testName}_${codesToExport.length}条_${timeStr}.txt`;
       link.click();
     } catch(e: any) {
       alert(e.message);
@@ -106,9 +129,18 @@ export default function CodesTable({ initialCodes, testId }: { initialCodes: any
     setLoading(false);
   };
 
-  const handleBatchDelete = async () => {
+  const handleBatchDeleteClick = () => {
     if (selectedIds.length === 0) return;
-    if (!confirm(`确定删除这 ${selectedIds.length} 个卡密吗？`)) return;
+    if (deleteConfirmStage === 0) {
+      setDeleteConfirmStage(1);
+      setTimeout(() => setDeleteConfirmStage(0), 3000); // 3秒不确认则恢复
+    } else {
+      executeBatchDelete();
+    }
+  };
+
+  const executeBatchDelete = async () => {
+    setDeleteConfirmStage(0);
     setLoading(true);
     try {
       const res = await fetch('/api/admin/code/delete', {
@@ -135,7 +167,7 @@ export default function CodesTable({ initialCodes, testId }: { initialCodes: any
       const res = await fetch('/api/admin/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ count: generateModal.count, maxUses: 3, testId })
+        body: JSON.stringify({ count: generateModal.count, maxUses: 3, testId, vendor: generateModal.vendor })
       });
       
       if (!res.ok) {
@@ -148,7 +180,7 @@ export default function CodesTable({ initialCodes, testId }: { initialCodes: any
         if (data.codes && Array.isArray(data.codes)) {
           setCodes([...data.codes, ...codes]);
         }
-        setGenerateModal({ show: false, count: 10 });
+        setGenerateModal({ show: false, count: 10, vendor: 'main' });
         router.refresh();
       } else {
         alert(data.error);
@@ -231,8 +263,16 @@ export default function CodesTable({ initialCodes, testId }: { initialCodes: any
           <span>卡密详细列表</span>
           {isUnlocked && selectedIds.length > 0 && (
             <div className="flex items-center gap-2">
-              <button onClick={handleBatchDelete} disabled={loading} className="text-xs font-semibold bg-red-50 text-red-600 border border-red-100 hover:bg-red-100 transition-colors px-3 py-1.5 rounded-md cursor-pointer">
-                批量删除 ({selectedIds.length})
+              <button 
+                onClick={handleBatchDeleteClick} 
+                disabled={loading} 
+                className={`text-xs font-semibold px-3 py-1.5 rounded-md cursor-pointer transition-colors ${
+                  deleteConfirmStage === 1 
+                    ? 'bg-red-500 text-white hover:bg-red-600' 
+                    : 'bg-red-50 text-red-600 border border-red-100 hover:bg-red-100'
+                }`}
+              >
+                {deleteConfirmStage === 1 ? `点击确认删除 (${selectedIds.length})` : `批量删除 (${selectedIds.length})`}
               </button>
               <button onClick={() => setBatchEditModal({ show: true, maxUses: 3 })} disabled={loading} className="text-xs font-semibold bg-blue-50 text-blue-600 border border-blue-100 hover:bg-blue-100 transition-colors px-3 py-1.5 rounded-md cursor-pointer">
                 批量修改 ({selectedIds.length})
@@ -245,7 +285,7 @@ export default function CodesTable({ initialCodes, testId }: { initialCodes: any
         </h2>
         {isUnlocked && (
           <button 
-            onClick={() => setGenerateModal({ show: true, count: 10 })}
+            onClick={() => setGenerateModal({ show: true, count: 10, vendor: 'main' })}
             className="bg-white border border-[#EBEBEB] hover:bg-[#F7F6F3] transition-colors text-[#37352F] px-4 py-2 rounded-md font-semibold text-sm shadow-sm flex items-center gap-2 shrink-0"
           >
             <span>✨</span> 一键生成
@@ -282,6 +322,16 @@ export default function CodesTable({ initialCodes, testId }: { initialCodes: any
             <option value="all">导出状态: 全部</option>
             <option value="unexported">未导出</option>
             <option value="exported">已导出</option>
+          </select>
+          <select 
+            value={filterVendor} 
+            onChange={(e) => setFilterVendor(e.target.value)}
+            className="border border-[#EBEBEB] px-2 py-1.5 rounded-md text-sm outline-none focus:border-blue-300 bg-white text-[#37352F] cursor-pointer"
+          >
+            <option value="all">渠道: 全部</option>
+            {uniqueVendors.map(v => (
+              <option key={v} value={v}>{v === 'main' ? '主账号 (main)' : v}</option>
+            ))}
           </select>
           <div className="md:hidden flex items-center border border-[#EBEBEB] bg-white rounded-md pr-2">
             <select 
@@ -359,6 +409,9 @@ export default function CodesTable({ initialCodes, testId }: { initialCodes: any
                       已导出
                     </span>
                   )}
+                  <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold ${code.vendor === 'main' ? 'bg-gray-100 text-gray-600' : 'bg-orange-50 text-orange-700 border border-orange-100'}`}>
+                    {code.vendor || 'main'}
+                  </span>
                 </div>
                 {isUnlocked && (
                   <button 
@@ -420,6 +473,7 @@ export default function CodesTable({ initialCodes, testId }: { initialCodes: any
                 />
               </th>
               <th className="p-4">卡密</th>
+              <th className="p-4">渠道 (Vendor)</th>
               <th className="p-4">上限</th>
               <th className="p-4 cursor-pointer hover:bg-[#EBEBEB]/50 transition-colors group" onClick={() => toggleSort('deviceCount')}>
                 <div className="flex items-center gap-1">已绑设备数 {getSortIcon('deviceCount')}</div>
@@ -457,6 +511,11 @@ export default function CodesTable({ initialCodes, testId }: { initialCodes: any
                     </span>
                   )}
                 </td>
+                <td className="p-4">
+                  <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${code.vendor === 'main' ? 'bg-gray-100 text-gray-600' : 'bg-orange-50 text-orange-700 border border-orange-100'}`}>
+                    {code.vendor || 'main'}
+                  </span>
+                </td>
                 <td className="p-4 text-[#787774]">{code.maxUses}</td>
                 <td className="p-4">
                   <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-50 text-blue-700">
@@ -483,7 +542,7 @@ export default function CodesTable({ initialCodes, testId }: { initialCodes: any
             ))}
             {processedCodes.length === 0 && (
               <tr>
-                <td colSpan={7} className="p-8 text-center text-[#9F9E9B] text-sm">
+                <td colSpan={8} className="p-8 text-center text-[#9F9E9B] text-sm">
                   没有找到匹配的卡密
                 </td>
               </tr>
@@ -502,8 +561,12 @@ export default function CodesTable({ initialCodes, testId }: { initialCodes: any
               生成数量:
               <input type="number" value={generateModal.count} onChange={e => setGenerateModal({ ...generateModal, count: parseInt(e.target.value) || 1 })} className="border border-[#EBEBEB] px-3 py-1.5 w-24 text-center rounded-lg outline-none focus:border-blue-300 focus:ring-2 focus:ring-blue-100 transition-all text-[#37352F] font-medium"/>
             </label>
+            <label className="flex items-center justify-between mb-6 text-[#787774] text-sm">
+              渠道账号:
+              <input type="text" value={generateModal.vendor} onChange={e => setGenerateModal({ ...generateModal, vendor: e.target.value })} placeholder="默认: main" className="border border-[#EBEBEB] px-3 py-1.5 w-32 text-center rounded-lg outline-none focus:border-blue-300 focus:ring-2 focus:ring-blue-100 transition-all text-[#37352F] font-medium"/>
+            </label>
             <div className="flex justify-end gap-2">
-              <button onClick={() => setGenerateModal({ show: false, count: 10 })} className="px-4 py-2 bg-white border border-[#EBEBEB] text-[#787774] hover:bg-[#F7F6F3] rounded-lg text-sm font-semibold transition-colors">取消</button>
+              <button onClick={() => setGenerateModal({ show: false, count: 10, vendor: 'main' })} className="px-4 py-2 bg-white border border-[#EBEBEB] text-[#787774] hover:bg-[#F7F6F3] rounded-lg text-sm font-semibold transition-colors">取消</button>
               <button onClick={handleGenerate} disabled={loading} className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-sm font-semibold transition-colors shadow-sm">{loading ? '生成中...' : '确认生成'}</button>
             </div>
           </div>
@@ -567,6 +630,7 @@ export default function CodesTable({ initialCodes, testId }: { initialCodes: any
           </div>
         </div>
       )}
+
     </div>
   );
 }

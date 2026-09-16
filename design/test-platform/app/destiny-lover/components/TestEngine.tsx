@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { generateSignature } from '../../../lib/security';
+import { Turnstile } from '@marsidev/react-turnstile';
 
 interface TestEngineProps {
   userInfo: { nickname: string; status: 'single' | 'dating' };
@@ -24,24 +25,39 @@ export default function TestEngine({ userInfo, onBack, onFinish }: TestEnginePro
   const [isLoading, setIsLoading] = useState(false);
   const [isFetching, setIsFetching] = useState(true);
   const [showExitModal, setShowExitModal] = useState(false);
-  const [isFinished, setIsFinished] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [turnstileToken, setTurnstileToken] = useState<string>('');
+  const [fetchError, setFetchError] = useState<string | null>(null);
   
   // 动效状态
   const [isSwiping, setIsSwiping] = useState(false);
 
   useEffect(() => {
-    fetch('/api/questions?testId=destiny-lover')
-      .then(res => res.json())
-      .then(data => {
+    const fetchQuestions = async () => {
+      try {
+        await fetch('/api/init-test?testId=destiny-lover');
+        const timestamp = Date.now();
+        const sign = await generateSignature("GET_QUESTIONS", timestamp);
+        const res = await fetch('/api/questions?testId=destiny-lover', {
+          headers: {
+            'x-timestamp': timestamp.toString(),
+            'x-sign': sign
+          }
+        });
+        const data = await res.json();
         if (data.success && data.questions) {
           setQuestions(data.questions);
+        } else {
+          setFetchError(data.error || '接口请求被拒绝，请同步您的设备时间后刷新重试');
         }
         setIsFetching(false);
-      })
-      .catch(err => {
+      } catch (err) {
         console.error(err);
+        setFetchError('红线断裂，网络连接失败，请刷新重试');
         setIsFetching(false);
-      });
+      }
+    };
+    fetchQuestions();
   }, []);
 
   const getDimensionIndex = (index: number) => {
@@ -54,13 +70,22 @@ export default function TestEngine({ userInfo, onBack, onFinish }: TestEnginePro
     return (
       <main className="flex-1 flex flex-col justify-center items-center h-full relative z-10 p-4 bg-transparent">
          <div className="w-12 h-12 border-4 border-[#B93A32] border-t-transparent rounded-full animate-spin mx-auto mb-6"></div>
-         <p className="text-[#5A524A] font-serif tracking-widest text-sm">翻开姻缘簿中...</p>
+         <p className="text-[#5A524A] font-serif tracking-widest text-sm">加载测评题库中...</p>
+      </main>
+    );
+  }
+
+  if (fetchError) {
+    return (
+      <main className="flex-1 flex flex-col justify-center items-center h-full relative z-10 p-4 bg-transparent">
+         <div className="text-center font-bold font-serif text-[#B93A32] mb-4 text-sm">{fetchError}</div>
+         <button onClick={() => window.location.reload()} className="border border-[#B93A32] text-[#B93A32] px-6 py-2 text-xs font-serif hover:bg-[#B93A32] hover:text-white transition-colors">重新加载题库</button>
       </main>
     );
   }
 
   if (questions.length === 0) {
-    return <div className="text-center mt-20 font-bold">暂无题目，请联系月老</div>;
+    return <div className="text-center mt-20 font-bold">暂无题目，请稍后重试</div>;
   }
 
   const currentQ = questions[currentIndex];
@@ -71,6 +96,7 @@ export default function TestEngine({ userInfo, onBack, onFinish }: TestEnginePro
     
     const newAnswers = { ...answers, [qId]: opt.id };
     setAnswers(newAnswers);
+    if (submitError) setSubmitError(null);
     
     // 延迟更新和滑动 (展示盖章动效)
     setTimeout(() => {
@@ -89,16 +115,20 @@ export default function TestEngine({ userInfo, onBack, onFinish }: TestEnginePro
 
   const submitAnswers = async (finalAnswers: any) => {
     setIsLoading(true);
+    setSubmitError(null);
     try {
       // 生成请求签名，防止直接 curl 攻击 API
       const payload = JSON.stringify({
         deviceId: localStorage.getItem('deviceId') || 'unknown',
         answers: finalAnswers,
         testId: 'destiny-lover',
-        metadata: userInfo
+        metadata: userInfo,
+        turnstileToken: turnstileToken
       });
       const timestamp = Date.now();
       const sign = await generateSignature(payload, timestamp);
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 8000);
       const res = await fetch('/api/submit', {
         method: 'POST',
         headers: {
@@ -106,16 +136,18 @@ export default function TestEngine({ userInfo, onBack, onFinish }: TestEnginePro
           'x-timestamp': timestamp.toString(),
           'x-sign': sign
         },
-        body: payload
+        body: payload,
+        signal: controller.signal
       });
+      clearTimeout(timeoutId);
       const data = await res.json();
       if (data.success && data.result) {
         onFinish({ ...data.result, recordId: data.recordId });
       } else {
-        alert('解析失败: ' + (data.error || '天机不可泄露'));
+        setSubmitError('解析失败：' + (data.error || '天机未定，请点击重试'));
       }
     } catch(e) {
-      alert('红线缠绕，网络错误');
+      setSubmitError('红线缠绕，网络连接稍有迟滞，请点击重试');
     } finally {
       setIsLoading(false);
     }
@@ -164,12 +196,12 @@ export default function TestEngine({ userInfo, onBack, onFinish }: TestEnginePro
         {/* 答题卡片区 */}
         <div className="flex-1 w-full max-w-md mx-auto flex flex-col justify-center px-6 pb-20 relative z-20 overflow-hidden">
             <div className={`transition-all duration-300 ease-in-out transform ${isSwiping ? '-translate-x-full opacity-0' : 'translate-x-0 opacity-100'}`}>
-                {/* 签号引语张力强化 */}
+                {/* 题目引语 */}
                 <div className="flex items-center gap-2 mb-4">
                   <span className="inline-block bg-[#B93A32] text-white text-[10px] font-mono px-2 py-0.5 tracking-widest uppercase">
-                    第 {currentIndex + 1} 签
+                    第 {currentIndex + 1} 问
                   </span>
-                  <span className="text-xs text-[#7A7065] tracking-[0.2em] font-serif">· 姻缘问簿 · 灵魂循迹</span>
+                  <span className="text-xs text-[#7A7065] tracking-[0.2em] font-serif">· 心动画卷 · 深度循迹</span>
                 </div>
 
                 <h2 className="text-2xl md:text-3xl font-black mb-10 leading-snug text-[#2C2825] font-serif text-justify tracking-wide">
@@ -192,34 +224,53 @@ export default function TestEngine({ userInfo, onBack, onFinish }: TestEnginePro
                           {/* 盖章动效 */}
                           {isStamped && (
                             <div className="absolute right-4 top-1/2 -translate-y-1/2 w-11 h-11 border-2 border-[#B93A32] text-[#B93A32] text-xs font-bold rounded-full flex items-center justify-center transform rotate-12 animate-stamp shadow-[0_2px_12px_rgba(185,58,50,0.3)] bg-white/90">
-                                缘
+                                选
                             </div>
                           )}
                         </button>
                       );
                     })}
                 </div>
+
+                {/* 最后一题提交按钮（采用文档流布局，防视口裁剪，支持弹性重试） */}
+                {currentIndex === questions.length - 1 && answers[currentQ.id] && (
+                  <div className="mt-8 flex flex-col items-center gap-3 w-full animate-fade-in-up">
+                      <button 
+                          onClick={() => submitAnswers(answers)}
+                          disabled={isLoading}
+                          className="w-full max-w-[220px] bg-[#B93A32] text-white py-3.5 rounded-sm font-medium tracking-widest shadow-lg hover:bg-[#A32626] active:scale-[0.99] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#B93A32]/40 transition-all cursor-pointer disabled:opacity-60 flex items-center justify-center gap-2"
+                      >
+                          {isLoading ? (
+                            <>
+                              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                              <span>生成画像中...</span>
+                            </>
+                          ) : (
+                            <span>查看心动画像</span>
+                          )}
+                      </button>
+
+                      {/* 优雅新中式异常提示条（若网络或解析波动时显现） */}
+                      {submitError && (
+                        <div className="mt-2 w-full max-w-xs p-3 bg-[#FAF8F5] border border-[#B93A32]/30 text-[#B93A32] text-xs font-serif rounded-sm flex items-center justify-between gap-2 shadow-sm animate-fade-in">
+                          <span>{submitError}</span>
+                          <button 
+                            type="button"
+                            onClick={() => submitAnswers(answers)} 
+                            className="underline font-bold hover:opacity-80 transition-opacity whitespace-nowrap cursor-pointer"
+                          >
+                            重试
+                          </button>
+                        </div>
+                      )}
+                  </div>
+                )}
             </div>
             
-            {currentIndex > 0 && !isFinished && (
-              <div className="absolute bottom-6 left-0 w-full text-center">
-                  <button onClick={handleUndo} className="text-xs text-[#8C847A] hover:text-[#B93A32] focus-visible:underline transition-colors tracking-widest font-serif border-b border-[#8C847A] hover:border-[#B93A32] pb-1">
+            {currentIndex > 0 && (
+              <div className="mt-6 w-full text-center pb-4">
+                  <button onClick={handleUndo} className="text-xs text-[#8C847A] hover:text-[#B93A32] focus-visible:underline transition-colors tracking-widest font-serif border-b border-[#8C847A] hover:border-[#B93A32] pb-1 cursor-pointer">
                       撤回上一步
-                  </button>
-              </div>
-            )}
-
-            {/* 最后一题提交按钮 */}
-            {currentIndex === questions.length - 1 && answers[currentQ.id] && !isFinished && (
-              <div className="absolute bottom-16 left-0 w-full flex justify-center px-6 animate-fade-in-up">
-                  <button 
-                      onClick={() => {
-                        setIsFinished(true);
-                        submitAnswers(answers);
-                      }}
-                      className="w-full max-w-[200px] bg-[#B93A32] text-white py-3.5 rounded-sm font-medium tracking-widest shadow-lg hover:bg-[#A32626] active:scale-[0.99] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#B93A32]/40 transition-all"
-                  >
-                      解签查看结果
                   </button>
               </div>
             )}
@@ -236,7 +287,7 @@ export default function TestEngine({ userInfo, onBack, onFinish }: TestEnginePro
                     <div className="absolute bottom-2 right-2 w-2 h-2 border-b border-r border-[#B93A32]"></div>
                     
                     <h3 className="text-xl font-bold text-[#2C2825] mb-3 font-serif">确认要离开吗？</h3>
-                    <p className="text-[#8C847A] text-sm mb-8 font-serif">姻缘簿合上后，缘分可能流失（进度不保存）。</p>
+                    <p className="text-[#8C847A] text-sm mb-8 font-serif">退出后当前答题进度将不会保存。</p>
                     <div className="flex gap-4">
                         <button onClick={() => setShowExitModal(false)} className="flex-1 py-3 border border-[#D9D0C1] text-[#5A524A] font-medium hover:bg-[#F4F1EA] active:scale-[0.99] transition-all tracking-widest">
                             继续解密
@@ -248,6 +299,14 @@ export default function TestEngine({ userInfo, onBack, onFinish }: TestEnginePro
                 </div>
             </div>
         )}
+
+        {/* 全局隐式人机验证组件 */}
+        <div className="h-0 overflow-hidden opacity-0 pointer-events-none">
+          <Turnstile 
+            siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || '1x00000000000000000000AA'}
+            onSuccess={(token) => setTurnstileToken(token)}
+          />
+        </div>
 
       <style dangerouslySetInnerHTML={{__html: `
         @keyframes stamp {

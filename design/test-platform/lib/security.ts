@@ -19,7 +19,7 @@ export async function verifySignature(
   timestamp: string | null,
   signature: string | null,
   payload: string,
-  maxAgeSeconds: number = 120 // Default 2 minutes
+  maxAgeSeconds: number = 600 // Default 10 minutes
 ): Promise<boolean> {
   if (!timestamp || !signature) return false;
   

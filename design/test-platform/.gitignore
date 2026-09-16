@@ -4,3 +4,7 @@ node_modules/
 dev.db
 dev.db-journal
 .scratch/
+deploy*.zip
+*.tsbuildinfo
+test-results/
+scratch*

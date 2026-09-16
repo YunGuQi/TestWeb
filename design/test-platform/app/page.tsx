@@ -154,7 +154,7 @@ export default function LobbyPage() {
               · SOULSCAPE · 探索中心 ·
             </span>
             <h1 className="hero-gradient text-4xl font-black tracking-tight leading-[1.1]">
-              心理<br/>深潜空间
+              心灵探索
             </h1>
           </div>
           {/* 副标题徽章行 */}
@@ -245,8 +245,7 @@ export default function LobbyPage() {
               {/* 图标 */}
               <div className="w-[80px] h-[80px] shrink-0 rounded-[18px] bg-gradient-to-br from-[#7f1d1d] to-[#5c1c1c] flex items-center justify-center relative overflow-hidden border border-red-500/25 float-icon"
                 style={{boxShadow: '0 8px 20px rgba(127,29,29,0.5)'}}>
-                {/* 角标 NEW */}
-                <div className="absolute top-0 right-0 bg-gradient-to-r from-yellow-400 to-amber-500 text-amber-900 text-[8px] font-black px-1.5 py-0.5 rounded-bl-lg shadow">NEW</div>
+                <div className="absolute top-0 right-0 bg-gradient-to-r from-rose-500 to-red-600 text-white text-[8px] font-black px-1.5 py-0.5 rounded-bl-lg shadow">HOT</div>
                 <div className="w-11 h-11 border border-[#E8E2D5]/40 flex items-center justify-center animate-pulse">
                   <span className="text-[#E8E2D5] font-serif text-2xl font-bold tracking-widest" style={{ writingMode: 'vertical-rl' }}>缘</span>
                 </div>
@@ -255,11 +254,11 @@ export default function LobbyPage() {
               {/* 文字 */}
               <div className="flex-1 min-w-0">
                 <h2 className="font-bold text-[16px] mb-1.5 text-white/95 tracking-wide leading-tight">
-                  月老办事处<br/>
-                  <span className="text-[13px] text-white/70 font-medium">解密命定恋人档案</span>
+                  命定恋人<br/>
+                  <span className="text-[13px] text-white/70 font-medium">解密专属恋人档案</span>
                 </h2>
                 <p className="text-[11px] text-white/55 leading-relaxed line-clamp-2 mb-3">
-                  你命中注定的那个人究竟是什么模样？花3分钟完成灵魂问卷，抽取你的专属红娘档案卡。
+                  你命中注定的那个人究竟是什么模样？花3分钟完成灵魂问卷，抽取你的专属恋人档案卡。
                 </p>
                 <div className="flex flex-wrap items-center gap-1.5 text-[10px]">
                   <span className="glowing-tag rounded-full px-2.5 py-1 text-rose-200/80">💖 情感解析</span>
@@ -291,7 +290,7 @@ export default function LobbyPage() {
               {/* 图标 */}
               <div className="w-[80px] h-[80px] shrink-0 rounded-[18px] bg-gradient-to-br from-[#064E3B] to-[#065F46] flex items-center justify-center relative overflow-hidden border border-teal-400/20 float-icon"
                 style={{boxShadow: '0 8px 20px rgba(6,78,59,0.6)'}}>
-                <div className="absolute top-0 right-0 bg-gradient-to-r from-teal-400 to-emerald-400 text-emerald-900 text-[8px] font-black px-1.5 py-0.5 rounded-bl-lg shadow">NEW</div>
+                <div className="absolute top-0 right-0 bg-gradient-to-r from-teal-500 to-emerald-600 text-white text-[8px] font-black px-1.5 py-0.5 rounded-bl-lg shadow">POP</div>
                 <svg className="w-12 h-12 text-teal-200" viewBox="0 0 100 100" fill="none">
                   <path d="M10 50 L90 50 M50 10 L50 90 M20 20 L80 80 M20 80 L80 20" stroke="currentColor" strokeWidth="0.5" className="opacity-25" />
                   <circle cx="50" cy="50" r="5" fill="currentColor" style={{filter:'drop-shadow(0 0 8px currentColor)'}} />
@@ -328,24 +327,99 @@ export default function LobbyPage() {
           </Link>
 
           {/* ======================= */}
-          {/* Card 4: 即将上线 (UPCOMING) */}
+          {/* Card 4: 大女主核心独立测试 (原生家庭) */}
           {/* ======================= */}
-          <div className="block overflow-hidden rounded-[20px] p-5 glass-card opacity-45 cursor-not-allowed relative">
-            <div className="absolute inset-0 rounded-[20px] bg-gradient-to-br from-[#082F49]/30 to-transparent pointer-events-none" />
+          <Link
+            href="/family-origin"
+            className="block group overflow-hidden rounded-[20px] p-5 glass-card transition-all duration-300 hover:scale-[1.015] active:scale-[0.99] relative"
+          >
+            {/* 渐变底色叠层 */}
+            <div className="absolute inset-0 rounded-[20px] bg-gradient-to-br from-[#451a03]/50 to-transparent pointer-events-none" />
+
             <div className="relative flex gap-4">
-              <div className="w-[80px] h-[80px] shrink-0 rounded-[18px] bg-gradient-to-br from-[#082F49] to-[#0C4A6E] flex items-center justify-center relative border border-sky-500/20">
-                <div className="absolute top-0 right-0 bg-gray-600/80 text-gray-300 text-[8px] font-bold px-1.5 py-0.5 rounded-bl-lg">即将上线</div>
-                <div className="w-8 h-8 border border-sky-400/20 rounded-full" />
+              {/* 图标 */}
+              <div className="w-[80px] h-[80px] shrink-0 rounded-[18px] bg-gradient-to-br from-[#78350f] to-[#92400e] flex items-center justify-center relative overflow-hidden border border-amber-500/20 float-icon"
+                style={{boxShadow: '0 8px 20px rgba(120,53,15,0.6)'}}>
+                <div className="absolute top-0 right-0 bg-gradient-to-r from-amber-400 to-yellow-400 text-yellow-900 text-[8px] font-black px-1.5 py-0.5 rounded-bl-lg shadow">NEW</div>
+                <svg className="w-12 h-12 text-amber-200" viewBox="0 0 100 100" fill="none">
+                  {/* 一棵树/王冠的抽象图形 */}
+                  <path d="M50 80 L50 40 M50 40 L30 20 M50 40 L70 20 M50 60 L25 45 M50 60 L75 45" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="opacity-80"/>
+                  <circle cx="50" cy="80" r="4" fill="currentColor" className="opacity-90"/>
+                  <circle cx="30" cy="20" r="3" fill="currentColor" className="opacity-70 animate-ping-soft"/>
+                  <circle cx="70" cy="20" r="3" fill="currentColor" className="opacity-70 animate-ping-soft" style={{animationDelay: '1s'}}/>
+                  <circle cx="25" cy="45" r="2" fill="currentColor" className="opacity-50"/>
+                  <circle cx="75" cy="45" r="2" fill="currentColor" className="opacity-50"/>
+                </svg>
               </div>
+
+              {/* 文字 */}
               <div className="flex-1 min-w-0">
-                <h2 className="font-bold text-[16px] mb-1.5 text-white/80 tracking-wide">MBTI 水晶人格</h2>
-                <p className="text-[11px] text-white/40 leading-relaxed line-clamp-2 mb-3">你是哪种稀缺的自然宝石？发掘你独一无二的性格能量场与共鸣原石。</p>
-                <div className="flex items-center gap-1.5 text-[10px]">
-                  <span className="glowing-tag rounded-full px-2.5 py-1 text-white/40">🚧 开发中</span>
+                <h2 className="font-bold text-[16px] mb-1.5 text-white/95 tracking-wide leading-tight">
+                  大女主核心独立测试
+                </h2>
+                <p className="text-[11px] text-white/55 leading-relaxed line-clamp-2 mb-3">
+                  告别原生家庭羁绊。测一测你的精神独立指数与大女主觉醒进度。
+                </p>
+                <div className="flex flex-wrap items-center gap-1.5 text-[10px]">
+                  <span className="glowing-tag rounded-full px-2.5 py-1 text-amber-200/80">👑 独立指数</span>
+                  <span className="glowing-tag rounded-full px-2.5 py-1 text-amber-200/80">🏡 原生家庭</span>
                 </div>
               </div>
             </div>
-          </div>
+
+            {/* 底部行 */}
+            <div className="mt-3.5 pt-3 border-t border-white/8 flex justify-between items-center">
+              <span className="text-[10px] text-white/30 font-mono tracking-wide">98K+ Users</span>
+              <span className="text-[11px] bg-amber-600/60 hover:bg-amber-600/80 text-amber-100 px-3.5 py-1.5 rounded-full font-bold group-hover:bg-amber-600/80 transition shadow-[0_2px_12px_rgba(217,119,6,0.3)]">
+                进入 →
+              </span>
+            </div>
+          </Link>
+
+          {/* ======================= */}
+          {/* Card 5: 恋爱物种分析 */}
+          {/* ======================= */}
+          <Link
+            href="/love-species"
+            className="block group overflow-hidden rounded-[20px] p-5 glass-card transition-all duration-300 hover:scale-[1.015] active:scale-[0.99] relative"
+          >
+            {/* 渐变底色叠层 */}
+            <div className="absolute inset-0 rounded-[20px] bg-gradient-to-br from-[#4c1d95]/40 to-transparent pointer-events-none" />
+
+            <div className="relative flex gap-4">
+              {/* 图标 */}
+              <div className="w-[80px] h-[80px] shrink-0 rounded-[18px] bg-gradient-to-br from-[#831843] to-[#be185d] flex items-center justify-center relative overflow-hidden border border-fuchsia-400/20 float-icon"
+                style={{boxShadow: '0 8px 20px rgba(131,24,67,0.5)'}}>
+                <div className="absolute top-0 right-0 bg-gradient-to-r from-fuchsia-500 to-pink-600 text-white text-[8px] font-black px-1.5 py-0.5 rounded-bl-lg shadow">FUN</div>
+                <div className="w-11 h-11 flex items-center justify-center animate-pulse">
+                  <span className="text-[#fdf2f8] font-sans text-3xl font-black">🐾</span>
+                </div>
+              </div>
+
+              {/* 文字 */}
+              <div className="flex-1 min-w-0">
+                <h2 className="font-bold text-[16px] mb-1.5 text-white/95 tracking-wide leading-tight">
+                  恋爱物种分析<br/>
+                  <span className="text-[13px] text-white/70 font-medium">鉴定你的恋爱人格</span>
+                </h2>
+                <p className="text-[11px] text-white/55 leading-relaxed line-clamp-2 mb-3">
+                  在恋爱中你究竟是哪种“奇葩”物种？基于 4D 坐标系统，深度测写你在亲密关系中的真实面貌。
+                </p>
+                <div className="flex flex-wrap items-center gap-1.5 text-[10px]">
+                  <span className="glowing-tag rounded-full px-2.5 py-1 text-fuchsia-200/80">🧬 AESI系统</span>
+                  <span className="glowing-tag rounded-full px-2.5 py-1 text-fuchsia-200/80">🐾 物种图鉴</span>
+                </div>
+              </div>
+            </div>
+
+            {/* 底部行 */}
+            <div className="mt-3.5 pt-3 border-t border-white/8 flex justify-between items-center">
+              <span className="text-[10px] text-white/30 font-mono tracking-wide">320K+ Users</span>
+              <span className="text-[11px] bg-fuchsia-600/60 hover:bg-fuchsia-600/80 text-fuchsia-100 px-3.5 py-1.5 rounded-full font-bold group-hover:bg-fuchsia-600/80 transition shadow-[0_2px_12px_rgba(192,38,211,0.3)]">
+                进入 →
+              </span>
+            </div>
+          </Link>
 
         </div>
 

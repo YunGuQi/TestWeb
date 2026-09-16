@@ -72,10 +72,10 @@ export default function Home({ onStartTest, onRestoreHistory }: HomeProps) {
 
 
       {!showForm ? (
-        <div className="max-w-md w-full bg-[#FAF8F5] p-8 md:p-10 shadow-[0_28px_70px_rgba(44,40,37,0.12),0_2px_6px_rgba(0,0,0,0.04)] border-2 border-[#D9D0C1] rounded-sm relative z-10 text-center animate-fade-in-up">
-          {/* 古典朱砂官印契约头部 */}
-          <div className="inline-block border-2 border-[#B93A32] px-4 py-1.5 mb-5 opacity-90 shadow-[0_4px_20px_rgba(185,58,50,0.2)]">
-            <span className="text-[#B93A32] text-xs font-bold tracking-[0.3em] font-serif uppercase">· 月老办事处 · 红娘档案簿 ·</span>
+        <div className="max-w-md w-full bg-[#FAF8F5] p-5 sm:p-8 md:p-10 shadow-[0_28px_70px_rgba(44,40,37,0.12),0_2px_6px_rgba(0,0,0,0.04)] border-2 border-[#D9D0C1] rounded-sm relative z-10 text-center animate-fade-in-up">
+          {/* 古典朱砂印契约头部 */}
+          <div className="inline-block border-2 border-[#B93A32] px-2.5 sm:px-4 py-1 sm:py-1.5 mb-5 opacity-90 shadow-[0_4px_20px_rgba(185,58,50,0.2)] max-w-full">
+            <span className="text-[#B93A32] text-[10.5px] sm:text-xs font-bold tracking-[0.08em] sm:tracking-[0.25em] font-serif uppercase whitespace-nowrap block">· 潜意识心智实验室 · 命定心动档案 ·</span>
           </div>
           
           <h1 className="text-3xl md:text-4xl font-black mb-3 tracking-widest text-[#2C2825] leading-tight">
@@ -84,34 +84,32 @@ export default function Home({ onStartTest, onRestoreHistory }: HomeProps) {
           
           <div className="w-12 h-0.5 bg-[#B93A32]/40 mx-auto my-4"></div>
           
-
-          
           <p className="text-sm md:text-base leading-relaxed text-[#4A423A] mb-8 text-justify font-normal">
             你是否曾在夜里幻想过那个“对的人”究竟是什么模样？TA 是像你一样喜欢安静，还是能带你探索世界？是你的避风港，还是并肩作战的战友？<br/><br/>
-            花 <span className="font-bold text-[#B93A32]">3 分钟</span>完成这份灵魂问卷，解锁月老姻缘簿上早已注定的一对一专属【红娘档案卡】。
+            花 <span className="font-bold text-[#B93A32]">3 分钟</span>完成这份灵魂问卷，解锁属于你的专属一对一【命定心动档案卡】。
           </p>
 
           <button 
             onClick={() => setShowForm(true)}
             className="w-full bg-[#B93A32] text-white text-lg font-bold py-4 px-6 rounded-sm tracking-[0.25em] hover:bg-[#A32626] active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#B93A32]/40 transition-all shadow-[0_8px_25px_rgba(185,58,50,0.3)] mb-4"
           >
-            翻开姻缘簿
+            开启心动测评
           </button>
           
           <div className="flex items-center justify-center gap-2 text-xs text-[#7A7065] font-sans mb-6">
             <div className="w-2 h-2 bg-[#B93A32] rounded-full animate-pulse"></div>
-            已有 <span className="font-mono font-bold text-[#2C2825]">{participantCount > 0 ? participantCount : '...'}</span> 人解密了红娘档案
+            已有 <span className="font-mono font-bold text-[#2C2825]">{participantCount > 0 ? participantCount : '...'}</span> 人解锁了心动档案
           </div>
 
-          <div className="flex flex-col items-center gap-3">
-              <div className="flex items-center justify-center gap-4 font-medium">
-                  <button onClick={() => setShowHistory(true)} className="text-xs text-[#5A524A] hover:text-[#B93A32] focus-visible:underline transition-colors underline underline-offset-4 tracking-widest min-h-[44px] inline-flex items-center justify-center cursor-pointer touch-manipulation active:scale-95 px-3">[ 查看历史档案 ]</button>
+          <div className="flex flex-col items-center gap-3 w-full">
+              <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-4 font-medium w-full">
+                  <button onClick={() => setShowHistory(true)} className="text-[11px] sm:text-xs text-[#5A524A] hover:text-[#B93A32] focus-visible:underline transition-colors underline underline-offset-4 tracking-wider min-h-[40px] inline-flex items-center justify-center cursor-pointer touch-manipulation active:scale-95 px-2 sm:px-3 whitespace-nowrap shrink-0">[ 查看历史档案 ]</button>
                   <button 
                     type="button"
                     onClick={() => window.location.href = 'https://xhslink.com/m/Atwtf3Cy6FR'} 
-                    className="text-xs text-[#5A524A] hover:text-[#B93A32] focus-visible:underline transition-colors underline underline-offset-4 tracking-widest min-h-[44px] inline-flex items-center justify-center cursor-pointer touch-manipulation active:scale-95 px-3"
+                    className="text-[11px] sm:text-xs text-[#5A524A] hover:text-[#B93A32] focus-visible:underline transition-colors underline underline-offset-4 tracking-wider min-h-[40px] inline-flex items-center justify-center cursor-pointer touch-manipulation active:scale-95 px-2 sm:px-3 whitespace-nowrap shrink-0"
                   >
-                    [ 拜访安安的结缘铺 ]
+                    [ 拜访安安心灵便利店 ]
                   </button>
               </div>
           </div>
@@ -177,10 +175,10 @@ export default function Home({ onStartTest, onRestoreHistory }: HomeProps) {
           <div className="fixed inset-0 z-50 bg-[#1F1B18]/80 backdrop-blur-sm flex flex-col justify-end">
               <div className="bg-[#FAF8F5] text-[#2C2825] border-t border-[#D9D0C1] p-6 pb-[max(32px,env(safe-area-inset-bottom))] w-full max-w-lg mx-auto h-[60vh] flex flex-col relative animate-fade-in-up">
                   <button onClick={() => setShowHistory(false)} className="absolute top-4 right-4 w-8 h-8 border border-[#D9D0C1] flex items-center justify-center font-bold text-[#8A8075] hover:text-[#B93A32] hover:border-[#B93A32] transition-colors">X</button>
-                  <h2 className="text-xl font-bold mb-6 tracking-widest border-b border-[#D9D0C1] pb-4">历史红娘档案</h2>
+                  <h2 className="text-xl font-bold mb-6 tracking-widest border-b border-[#D9D0C1] pb-4">历史心动档案</h2>
                   <div className="flex-1 overflow-y-auto pr-2 mb-6 hide-scrollbar space-y-3">
                       {historyRecords.length === 0 ? (
-                        <div className="text-[#8A8075] text-sm mt-4 text-center tracking-widest">姻缘簿上暂无您的记录哦~</div>
+                        <div className="text-[#8A8075] text-sm mt-4 text-center tracking-widest">档案库中暂无您的记录哦~</div>
                       ) : (
                         [...historyRecords].map((record, index) => {
                           const id = record.id;
@@ -188,7 +186,7 @@ export default function Home({ onStartTest, onRestoreHistory }: HomeProps) {
                           
                           return (
                             <button 
-                              key={id + index}
+                              key={`dl-history-${id ?? 'item'}-${index}`}
                               onClick={() => {
                                 if (!recordResult) {
                                   alert('无数据，请重新测算。');
@@ -208,7 +206,7 @@ export default function Home({ onStartTest, onRestoreHistory }: HomeProps) {
                         })
                       )}
                   </div>
-                  <button onClick={() => setShowHistory(false)} className="w-full py-3 border border-[#5A524A] text-[#5A524A] text-sm tracking-widest hover:bg-[#E8E2D5] transition-colors shrink-0">合上姻缘簿</button>
+                  <button onClick={() => setShowHistory(false)} className="w-full py-3 border border-[#5A524A] text-[#5A524A] text-sm tracking-widest hover:bg-[#E8E2D5] transition-colors shrink-0">关闭档案盒</button>
               </div>
           </div>
       )}
@@ -227,7 +225,7 @@ export default function Home({ onStartTest, onRestoreHistory }: HomeProps) {
           from { transform: rotate(0deg); }
           to { transform: rotate(360deg); }
         }
-        /* 红线从左到右流动，象征月老红线牵引 */
+        /* 红线从左到右流动，象征心动红线牵引 */
         @keyframes redlineFlow {
           0%   { transform: translateX(-100%); opacity: 0; }
           20%  { opacity: 1; }

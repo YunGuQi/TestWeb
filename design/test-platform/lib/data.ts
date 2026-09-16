@@ -1,3 +1,335 @@
-export const questions = [{"id":"q1","text":"深夜看到一条同事发来的仅你可见的吐槽朋友圈，你会？","options":[{"id":"o1_1","text":"反复揣摩她的用意，甚至整晚失眠","billName":"无意义失眠费","senScore":3,"rumScore":4,"plsScore":0,"bndScore":0},{"id":"o1_2","text":"假装没看见，直接划走","billName":"装瞎逃避税","senScore":0,"rumScore":0,"plsScore":0,"bndScore":4},{"id":"o1_3","text":"默默点个赞，表示已阅","billName":"廉价社交费","senScore":0,"rumScore":0,"plsScore":2,"bndScore":2},{"id":"o1_4","text":"心里咯噔一下：是不是在内涵我？","billName":"深夜对号入座费","senScore":3,"rumScore":1,"plsScore":0,"bndScore":0}]},{"id":"q2","text":"发在群里的消息，过了10分钟都没人回复，你的第一反应：","options":[{"id":"o2_1","text":"有点尴尬，我是不是冷场了","billName":"群聊冷场焦虑费","senScore":3,"rumScore":0,"plsScore":0,"bndScore":0},{"id":"o2_2","text":"立刻把消息撤回，当作没发生过","billName":"社交自毁保释金","senScore":3,"rumScore":0,"plsScore":3,"bndScore":0},{"id":"o2_3","text":"可能都在忙，先干别的","billName":"钝感力储蓄","senScore":0,"rumScore":0,"plsScore":0,"bndScore":4},{"id":"o2_4","text":"我是不是说错话了？开始焦虑","billName":"自省过度惩罚","senScore":3,"rumScore":3,"plsScore":0,"bndScore":0}]},{"id":"q3","text":"被领导单独叫进办公室，走在路上的你在想什么？","options":[{"id":"o3_1","text":"回忆最近工作有没有纰漏","billName":"职场危机预演","senScore":0,"rumScore":3,"plsScore":0,"bndScore":0},{"id":"o3_2","text":"完了，我是不是要挨骂了","billName":"灾难化想象费","senScore":3,"rumScore":1,"plsScore":0,"bndScore":0},{"id":"o3_3","text":"心跳加速，甚至想立刻辞职逃避","billName":"离职冲动挂号费","senScore":3,"rumScore":3,"plsScore":0,"bndScore":0},{"id":"o3_4","text":"估计是有新任务要交代，公事公办","billName":"公事公办通行费","senScore":0,"rumScore":0,"plsScore":0,"bndScore":4}]},{"id":"q4","text":"朋友聚会结束后，回到家里的状态是：","options":[{"id":"o4_1","text":"感觉社交耗尽了所有能量，需要自闭几天","billName":"灵魂透支抢救费","senScore":3,"rumScore":0,"plsScore":4,"bndScore":0},{"id":"o4_2","text":"复盘自己今晚有没有说错话","billName":"睡前社交复盘费","senScore":3,"rumScore":4,"plsScore":0,"bndScore":0},{"id":"o4_3","text":"有点累，洗洗就睡了","billName":"电量耗尽维修","senScore":0,"rumScore":0,"plsScore":0,"bndScore":3},{"id":"o4_4","text":"非常开心，意犹未尽","billName":"社交充能奖励","senScore":0,"rumScore":0,"plsScore":0,"bndScore":4}]},{"id":"q5","text":"看到别人在社交平台上炫耀完美生活，你的感受是：","options":[{"id":"o5_1","text":"觉得自己是个彻头彻尾的loser","billName":"自我贬低重税","senScore":3,"rumScore":4,"plsScore":0,"bndScore":0},{"id":"o5_2","text":"点个赞，然后继续过自己的日子","billName":"关我屁事豁免","senScore":0,"rumScore":0,"plsScore":0,"bndScore":4},{"id":"o5_3","text":"有点羡慕，但也仅此而已","billName":"轻度眼红治疗","senScore":2,"rumScore":0,"plsScore":0,"bndScore":0},{"id":"o5_4","text":"对比自己，感到一阵深深的失落","billName":"同侪压力折旧费","senScore":3,"rumScore":3,"plsScore":0,"bndScore":0}]},{"id":"q6","text":"面对一个艰难的决定（比如换工作或分手），你会：","options":[{"id":"o6_1","text":"纠结几天，然后咬牙决定","billName":"限时纠结费","senScore":0,"rumScore":2,"plsScore":0,"bndScore":0},{"id":"o6_2","text":"极度拖延，直到现实逼迫我做决定","billName":"命运托管手续费","senScore":0,"rumScore":4,"plsScore":3,"bndScore":0},{"id":"o6_3","text":"权衡利弊后，果断做出选择","billName":"快刀斩乱麻","senScore":0,"rumScore":0,"plsScore":0,"bndScore":4},{"id":"o6_4","text":"反复推翻自己，迟迟做不了决定","billName":"选择困难罚单","senScore":0,"rumScore":4,"plsScore":0,"bndScore":0}]},{"id":"q7","text":"当别人对你提出一个有些过分的请求时，你的反应：","options":[{"id":"o7_1","text":"勉强答应，然后自己默默受委屈","billName":"委曲求全过路费","senScore":0,"rumScore":3,"plsScore":4,"bndScore":0},{"id":"o7_2","text":"直接拒绝，说明原因","billName":"边界感维护费","senScore":0,"rumScore":0,"plsScore":0,"bndScore":4},{"id":"o7_3","text":"立刻答应，因为极度害怕破坏关系","billName":"烂好人高昂保费","senScore":3,"rumScore":0,"plsScore":4,"bndScore":0},{"id":"o7_4","text":"委婉拒绝，心里稍微有点过意不去","billName":"轻度讨好倾向","senScore":0,"rumScore":0,"plsScore":2,"bndScore":3}]},{"id":"q8","text":"一天结束，躺在床上的你在思考什么？","options":[{"id":"o8_1","text":"各种杂念交织，越想越焦虑无法入睡","billName":"午夜疯狂内耗税","senScore":3,"rumScore":4,"plsScore":0,"bndScore":0},{"id":"o8_2","text":"总结今天完成了哪些事","billName":"自我管理费","senScore":0,"rumScore":1,"plsScore":0,"bndScore":3},{"id":"o8_3","text":"明天吃什么/玩什么","billName":"没心没肺快乐税","senScore":0,"rumScore":0,"plsScore":0,"bndScore":4},{"id":"o8_4","text":"回放今天尴尬的瞬间，感到懊恼","billName":"精神黑历史拷问","senScore":3,"rumScore":4,"plsScore":0,"bndScore":0}]},{"id":"q9","text":"受到了一句不经意的批评，你会记得多久？","options":[{"id":"o9_1","text":"在意一小会儿，很快调整过来","billName":"玻璃心修复费","senScore":2,"rumScore":0,"plsScore":0,"bndScore":3},{"id":"o9_2","text":"记好几天，时不时想起来就会难受","billName":"负面评价存储费","senScore":3,"rumScore":4,"plsScore":0,"bndScore":0},{"id":"o9_3","text":"变成长期的心理阴影，甚至改变自我认知","billName":"PUA深度疗愈费","senScore":3,"rumScore":4,"plsScore":3,"bndScore":0},{"id":"o9_4","text":"听完就忘，或者马上怼回去","billName":"反弹装甲费","senScore":0,"rumScore":0,"plsScore":0,"bndScore":4}]},{"id":"q10","text":"如果能拥有一个超能力，你最想拥有哪个？","options":[{"id":"o10_1","text":"读心术，想知道别人到底怎么看我","billName":"偷窥心声流量费","senScore":3,"rumScore":0,"plsScore":4,"bndScore":0},{"id":"o10_2","text":"情绪开关，能随时关掉自己泛滥的感受","billName":"感官切断手术费","senScore":3,"rumScore":4,"plsScore":0,"bndScore":0},{"id":"o10_3","text":"瞬间移动，想去哪就去哪","billName":"逃避现实机票","senScore":0,"rumScore":0,"plsScore":0,"bndScore":4},{"id":"o10_4","text":"预知未来，掌控一切可能","billName":"控制欲年费","senScore":0,"rumScore":4,"plsScore":0,"bndScore":0}]},{"id":"q11","text":"周末本来想在家躺一天，但一个不是很熟的朋友突然约你喝咖啡：","options":[{"id":"o11_1","text":"找借口拒绝后，一整天都在担心对方会不会生气","billName":"拒绝后遗症治疗费","senScore":3,"rumScore":4,"plsScore":0,"bndScore":0},{"id":"o11_2","text":"直接找个理由婉拒，继续躺着","billName":"边界感护城河维护费","senScore":0,"rumScore":0,"plsScore":0,"bndScore":4},{"id":"o11_3","text":"立刻答应，哪怕自己很累也怕对方失望","billName":"老好人周末透支税","senScore":3,"rumScore":0,"plsScore":4,"bndScore":0},{"id":"o11_4","text":"纠结半天要不要去，最后还是去了","billName":"违背意愿出门费","senScore":0,"rumScore":3,"plsScore":2,"bndScore":0}]},{"id":"q12","text":"开会时，你提出了一个想法，结果被同事当众反驳，你会：","options":[{"id":"o12_1","text":"当场理性探讨，就事论事","billName":"情绪绝缘盾牌","senScore":0,"rumScore":0,"plsScore":0,"bndScore":4},{"id":"o12_2","text":"会后反复回放那个尴尬瞬间，恨自己当时没发挥好","billName":"职场马后炮反刍费","senScore":3,"rumScore":4,"plsScore":0,"bndScore":0},{"id":"o12_3","text":"表面笑笑，心里立刻开始自我怀疑","billName":"职场自信心崩塌","senScore":3,"rumScore":3,"plsScore":0,"bndScore":0},{"id":"o12_4","text":"觉得非常丢脸，接下来的会一句话都不敢说","billName":"社交恐惧急救金","senScore":3,"rumScore":1,"plsScore":0,"bndScore":0}]},{"id":"q13","text":"在街上远远看到一个认识但不熟的人，对方好像没看你，你会：","options":[{"id":"o13_1","text":"纠结要不要打招呼，直到擦肩而过还在想","billName":"擦肩而过内耗费","senScore":3,"rumScore":4,"plsScore":0,"bndScore":0},{"id":"o13_2","text":"赶紧低头假装玩手机，避免打招呼的尴尬","billName":"社恐紧急避险费","senScore":3,"rumScore":0,"plsScore":2,"bndScore":0},{"id":"o13_3","text":"主动大声打招呼，即使对方可能不记得我","billName":"社交牛逼症体验卡","senScore":0,"rumScore":0,"plsScore":0,"bndScore":3},{"id":"o13_4","text":"当作没看见，各走各的路","billName":"路人甲伪装税","senScore":0,"rumScore":0,"plsScore":0,"bndScore":4}]},{"id":"q14","text":"买了一杯奶茶，喝了一口发现做错了（比如做成了全糖），你会：","options":[{"id":"o14_1","text":"算了吧，将就喝，不想麻烦别人","billName":"讨好型妥协税","senScore":0,"rumScore":0,"plsScore":4,"bndScore":0},{"id":"o14_2","text":"告诉店员做错了，要求重做","billName":"消费者维权专车费","senScore":0,"rumScore":0,"plsScore":0,"bndScore":4},{"id":"o14_3","text":"扔掉不喝了，但心里一直觉得很亏","billName":"沉默成本沉没费","senScore":0,"rumScore":4,"plsScore":0,"bndScore":0},{"id":"o14_4","text":"犹豫了很久想去换，走到柜台前又退缩了","billName":"社交退缩违约金","senScore":3,"rumScore":3,"plsScore":0,"bndScore":0}]},{"id":"q15","text":"发在社交媒体上的一张自拍，几个小时了只有两个赞，你会：","options":[{"id":"o15_1","text":"觉得照片真的很丑，默默删掉","billName":"容貌焦虑充值","senScore":3,"rumScore":4,"plsScore":0,"bndScore":0},{"id":"o15_2","text":"不在意，我自己觉得好看就行","billName":"自我肯定奖金","senScore":0,"rumScore":0,"plsScore":0,"bndScore":4},{"id":"o15_3","text":"怀疑是不是被限流了或者大家都不喜欢我","billName":"存在感稀薄惩罚","senScore":3,"rumScore":1,"plsScore":0,"bndScore":0},{"id":"o15_4","text":"开始分析是不是发的时间不对，下次换个时间","billName":"流量玄学分析费","senScore":0,"rumScore":3,"plsScore":0,"bndScore":0}]},{"id":"q16","text":"别人不小心弄坏了你很喜欢的东西，对方一直在道歉，你的反应：","options":[{"id":"o16_1","text":"反过来安慰对方，生怕对方因为内疚而难过","billName":"圣母光环维护费","senScore":3,"rumScore":0,"plsScore":4,"bndScore":0},{"id":"o16_2","text":"接受道歉，但好几天都会为了这个东西心烦","billName":"余波震荡损耗","senScore":0,"rumScore":4,"plsScore":0,"bndScore":0},{"id":"o16_3","text":"表面说“没关系”，其实心里心疼得要死","billName":"强颜欢笑医疗费","senScore":0,"rumScore":3,"plsScore":4,"bndScore":0},{"id":"o16_4","text":"告诉对方这东西对我来说很重要，要求相应的赔偿","billName":"物品损失折旧费","senScore":0,"rumScore":0,"plsScore":0,"bndScore":4}]},{"id":"q17","text":"晚上睡觉前，脑子里突然想起五年前的一件丢人小事：","options":[{"id":"o17_1","text":"马上开始反思为什么自己从小就这么蠢","billName":"基因层面否定税","senScore":3,"rumScore":4,"plsScore":0,"bndScore":0},{"id":"o17_2","text":"笑笑自己当年真傻，翻个身睡觉","billName":"黑历史和解金","senScore":0,"rumScore":0,"plsScore":0,"bndScore":4},{"id":"o17_3","text":"试图强行把画面赶出大脑，结果越想越清晰","billName":"强制遗忘手续费","senScore":0,"rumScore":4,"plsScore":0,"bndScore":0},{"id":"o17_4","text":"尴尬得能在床上抠出三室一厅，疯狂捶枕头","billName":"黑历史高清重置费","senScore":3,"rumScore":4,"plsScore":0,"bndScore":0}]},{"id":"q18","text":"准备要下班了，老板突然走过来说：“这有个不急的活儿，你顺手看一下”，你会：","options":[{"id":"o18_1","text":"说“好的，我明天一早来看”，准点下班","billName":"下班打卡护卫费","senScore":0,"rumScore":0,"plsScore":0,"bndScore":4},{"id":"o18_2","text":"说“好的老板”，然后加班做完再走","billName":"职场老黄牛草料费","senScore":0,"rumScore":0,"plsScore":4,"bndScore":0},{"id":"o18_3","text":"虽然接了，但一边做一边在心里疯狂咒骂","billName":"职场暗黑情绪税","senScore":3,"rumScore":4,"plsScore":0,"bndScore":0},{"id":"o18_4","text":"勉强接下，心里害怕如果不做完会被老板认为态度不好","billName":"职场印象管理费","senScore":3,"rumScore":0,"plsScore":4,"bndScore":0}]},{"id":"q19","text":"你的好朋友最近心情不好，跟你抱怨了两个小时，你的感受：","options":[{"id":"o19_1","text":"尽力倾听，但感觉自己的能量也被抽干了","billName":"情绪垃圾桶清理费","senScore":3,"rumScore":0,"plsScore":3,"bndScore":0},{"id":"o19_2","text":"开始反思自己是不是也遇到了同样糟糕的情况","billName":"共情过度传染病","senScore":3,"rumScore":4,"plsScore":0,"bndScore":0},{"id":"o19_3","text":"跟着一起骂，结果自己也气得半死","billName":"情绪同频共振费","senScore":3,"rumScore":0,"plsScore":0,"bndScore":0},{"id":"o19_4","text":"听完就过，不会把对方的情绪带到自己身上","billName":"情绪隔离罩","senScore":0,"rumScore":0,"plsScore":0,"bndScore":4}]},{"id":"q20","text":"马上要做一个重要的当众汇报，你的状态是：","options":[{"id":"o20_1","text":"提前一周就开始睡不好觉，脑子里全是忘词的画面","billName":"灾难预演门票","senScore":3,"rumScore":4,"plsScore":0,"bndScore":0},{"id":"o20_2","text":"紧张到手心出汗，总觉得大家在等看我的笑话","billName":"舞台恐惧聚光灯","senScore":3,"rumScore":3,"plsScore":0,"bndScore":0},{"id":"o20_3","text":"有点紧张，但深呼吸几次就能调整好","billName":"临场微调费","senScore":2,"rumScore":0,"plsScore":0,"bndScore":4},{"id":"o20_4","text":"无所谓，大不了就是丢个人，爱咋咋地","billName":"死猪不怕开水烫费","senScore":0,"rumScore":0,"plsScore":0,"bndScore":4}]}];
+export const questions = [{"id": "q1", "text": "深夜看到一条同事发来的仅你可见的吐槽朋友圈，你会？", "options": [{"id": "o1_4", "text": "敏锐察觉话里有话，虽不挑明但暗中留心细节", "billName": "细节雷达扫描费", "senScore": 3, "rumScore": 1, "plsScore": 0, "bndScore": 0}, {"id": "o1_2", "text": "保持礼貌距离，多一事不如少一事划走不掺和", "billName": "静默划走免除费", "senScore": 0, "rumScore": 0, "plsScore": 0, "bndScore": 4}, {"id": "o1_1", "text": "习惯性想得较深，反复确认是不是自己没做妥帖", "billName": "深层原因排查费", "senScore": 3, "rumScore": 4, "plsScore": 0, "bndScore": 0}, {"id": "o1_3", "text": "顺其自然不做过多解读，若与自己有关对方自会直说", "billName": "人际缓冲公摊费", "senScore": 0, "rumScore": 0, "plsScore": 2, "bndScore": 2}]}, {"id": "q2", "text": "发在群里的消息，过了10分钟都没人回复，你的第一反应：", "options": [{"id": "o2_4", "text": "心里悄悄琢磨，是不是自己刚才措辞不够妥当", "billName": "句式推敲折旧费", "senScore": 3, "rumScore": 3, "plsScore": 0, "bndScore": 0}, {"id": "o2_3", "text": "大家都在各自忙碌，关掉界面安心去干手头的事", "billName": "注意力归位费", "senScore": 0, "rumScore": 0, "plsScore": 0, "bndScore": 4}, {"id": "o2_2", "text": "顺手悄悄撤回，免得消息孤零零挂着破坏界面", "billName": "对话框修容成本", "senScore": 3, "rumScore": 0, "plsScore": 3, "bndScore": 0}, {"id": "o2_1", "text": "暗中观察群动态，稍微有些在意外界的反馈节奏", "billName": "气氛感知流量费", "senScore": 3, "rumScore": 0, "plsScore": 0, "bndScore": 0}]}, {"id": "q3", "text": "被领导单独叫进办公室，走在路上的你在想什么？", "options": [{"id": "o3_2", "text": "敏锐感知领导神态，下意识想知道今天整体气氛如何", "billName": "神态气场测绘费", "senScore": 3, "rumScore": 1, "plsScore": 0, "bndScore": 0}, {"id": "o3_3", "text": "心跳骤然加快，本能先在脑海中做好最保守的准备", "billName": "风险应激储备金", "senScore": 3, "rumScore": 3, "plsScore": 0, "bndScore": 0}, {"id": "o3_4", "text": "公事公办平静对待，大概率是有新的项目需要交接", "billName": "业务交接通行费", "senScore": 0, "rumScore": 0, "plsScore": 0, "bndScore": 4}, {"id": "o3_1", "text": "把近期的工作细节理一遍，提前梳理汇报逻辑与数据", "billName": "工作进度自检费", "senScore": 0, "rumScore": 3, "plsScore": 0, "bndScore": 0}]}, {"id": "q4", "text": "朋友聚会结束后，回到家里的状态是：", "options": [{"id": "o4_2", "text": "一个人安静呆着，习惯把今天聊到的细节在心里过一遍", "billName": "静坐思绪整理费", "senScore": 3, "rumScore": 4, "plsScore": 0, "bndScore": 0}, {"id": "o4_3", "text": "关门那一刻长舒一口气，迅速切换回自己的节奏", "billName": "居家界限切换费", "senScore": 0, "rumScore": 0, "plsScore": 0, "bndScore": 3}, {"id": "o4_4", "text": "尽兴而归满载而归，沉浸在热闹的余温中期待下次", "billName": "社交愉悦增值税", "senScore": 0, "rumScore": 0, "plsScore": 0, "bndScore": 4}, {"id": "o4_1", "text": "感到精力差不多用尽，只想切断联络独自安静放松", "billName": "独处电量回充费", "senScore": 3, "rumScore": 0, "plsScore": 4, "bndScore": 0}]}, {"id": "q5", "text": "看到别人在社交平台上晒出完美生活，你的感受是：", "options": [{"id": "o5_3", "text": "由衷欣赏优质生活，但清楚明白每个人跑道不同", "billName": "赛道分流观光券", "senScore": 2, "rumScore": 0, "plsScore": 0, "bndScore": 0}, {"id": "o5_2", "text": "顺手点个赞表示看见，转头继续踏实过自己的日子", "billName": "人淡如水浏览费", "senScore": 0, "rumScore": 0, "plsScore": 0, "bndScore": 4}, {"id": "o5_4", "text": "暗自对照当下的处境，心底悄悄泛起一阵落差感", "billName": "同侪参照损耗金", "senScore": 3, "rumScore": 3, "plsScore": 0, "bndScore": 0}, {"id": "o5_1", "text": "习惯向内探寻，容易把生活差距归结为自己不够努力", "billName": "追求完美惩罚税", "senScore": 3, "rumScore": 4, "plsScore": 0, "bndScore": 0}]}, {"id": "q6", "text": "面对一个艰难的决定（比如换工作或重要抉择），你会：", "options": [{"id": "o6_3", "text": "客观权衡利弊得失，一旦想清楚就果断推进执行", "billName": "理性决策交割费", "senScore": 0, "rumScore": 0, "plsScore": 0, "bndScore": 4}, {"id": "o6_2", "text": "耐心等待时机成熟，直到现实条件给出更明确的信号", "billName": "顺势而为托管费", "senScore": 0, "rumScore": 4, "plsScore": 3, "bndScore": 0}, {"id": "o6_1", "text": "给自己设定思考期限，期满后咬咬牙迈出关键一步", "billName": "限时破局手续费", "senScore": 0, "rumScore": 2, "plsScore": 0, "bndScore": 0}, {"id": "o6_4", "text": "反复推演各种可能，力求把未知变量全部纳入掌控", "billName": "全局沙盘推演费", "senScore": 0, "rumScore": 4, "plsScore": 0, "bndScore": 0}]}, {"id": "q7", "text": "当别人对你提出一个有些过分的请求时，你的反应：", "options": [{"id": "o7_1", "text": "心软顾全大局勉强答应，自己把后续的繁琐消化掉", "billName": "顾全大局转运费", "senScore": 0, "rumScore": 3, "plsScore": 4, "bndScore": 0}, {"id": "o7_2", "text": "温和而坚定地谢绝，就事论事地讲明当前客观限制", "billName": "体面拒绝护城费", "senScore": 0, "rumScore": 0, "plsScore": 0, "bndScore": 4}, {"id": "o7_4", "text": "委婉找理由推托，虽然立场分明但心里依然顾及体面", "billName": "委婉周旋公关费", "senScore": 0, "rumScore": 0, "plsScore": 2, "bndScore": 3}, {"id": "o7_3", "text": "优先维护和睦气氛，宁可自己多担待也不愿让关系僵化", "billName": "和气至上协作金", "senScore": 3, "rumScore": 0, "plsScore": 4, "bndScore": 0}]}, {"id": "q8", "text": "一天结束，躺在床上的你在思考什么？", "options": [{"id": "o8_2", "text": "简要核对今天待办清单，确认进度后心满意足合眼", "billName": "日落结算盘点费", "senScore": 0, "rumScore": 1, "plsScore": 0, "bndScore": 3}, {"id": "o8_1", "text": "思绪纷呈活跃难平，总觉得还有未尽事项挂在心头", "billName": "延时待机服务费", "senScore": 3, "rumScore": 4, "plsScore": 0, "bndScore": 0}, {"id": "o8_3", "text": "想着明天的美食与娱乐，一身轻松自然酝酿睡意", "billName": "惬意入眠免单券", "senScore": 0, "rumScore": 0, "plsScore": 0, "bndScore": 4}, {"id": "o8_4", "text": "脑海中闪过今日不顺遂的插曲，躺着琢磨如何补救", "billName": "夜间剧场推演费", "senScore": 3, "rumScore": 4, "plsScore": 0, "bndScore": 0}]}, {"id": "q9", "text": "受到了一句不经意的批评，你会记得多久？", "options": [{"id": "o9_2", "text": "表面翻篇了，但这事总在心里挂着，时不时重新琢磨", "billName": "余音绕梁审读费", "senScore": 3, "rumScore": 4, "plsScore": 0, "bndScore": 0}, {"id": "o9_4", "text": "听完就过不往心里去，只要核心事实无误旁人评论无妨", "billName": "从容过滤通行卡", "senScore": 0, "rumScore": 0, "plsScore": 0, "bndScore": 4}, {"id": "o9_1", "text": "在意片刻很快释怀，理性筛选其中是否有实用价值", "billName": "理性提纯建议费", "senScore": 2, "rumScore": 0, "plsScore": 0, "bndScore": 3}, {"id": "o9_3", "text": "心里容易沉一下，本能先审视自己是否有欠妥的地方", "billName": "深层归因核对金", "senScore": 3, "rumScore": 4, "plsScore": 3, "bndScore": 0}]}, {"id": "q10", "text": "如果能拥有一个超能力，你最想拥有哪个？", "options": [{"id": "o10_3", "text": "自由空间移动，随时可以抽身去往任何向往的天地", "billName": "随性漫游通行票", "senScore": 0, "rumScore": 0, "plsScore": 0, "bndScore": 4}, {"id": "o10_4", "text": "洞见发展脉络，提前看清所有走向并做好万全统筹", "billName": "长远规划罗盘费", "senScore": 0, "rumScore": 4, "plsScore": 0, "bndScore": 0}, {"id": "o10_2", "text": "情绪自如切换，随时能让纷乱的思绪彻底平息下来", "billName": "思绪归零调频费", "senScore": 3, "rumScore": 4, "plsScore": 0, "bndScore": 0}, {"id": "o10_1", "text": "透视真实想法，清楚洞悉旁人字里行间的真实温度", "billName": "人际共感透镜费", "senScore": 3, "rumScore": 0, "plsScore": 4, "bndScore": 0}]}, {"id": "q11", "text": "周末本来想在家躺一天，但一个不是很熟的朋友突然约你喝咖啡：", "options": [{"id": "o11_1", "text": "婉拒后心里仍有顾虑，暗自琢磨对方是否会感到扫兴", "billName": "推辞善后关切费", "senScore": 3, "rumScore": 4, "plsScore": 0, "bndScore": 0}, {"id": "o11_4", "text": "再三权衡利弊关系，最终还是决定赴约结个善缘", "billName": "人情投资出场费", "senScore": 0, "rumScore": 3, "plsScore": 2, "bndScore": 0}, {"id": "o11_2", "text": "体面找个理由婉拒，继续享受难得清净的个人时光", "billName": "周末静休守护费", "senScore": 0, "rumScore": 0, "plsScore": 0, "bndScore": 4}, {"id": "o11_3", "text": "不忍拂了对方好意，虽然疲累但依然愿意前往作陪", "billName": "有求必应陪伴金", "senScore": 3, "rumScore": 0, "plsScore": 4, "bndScore": 0}]}, {"id": "q12", "text": "开会时，你提出了一个想法，结果被同事当众反驳，你会：", "options": [{"id": "o12_4", "text": "坦然视之，观点碰撞实属常态，散会翻篇不挂心上", "billName": "思维脱敏通关卡", "senScore": 3, "rumScore": 1, "plsScore": 0, "bndScore": 0}, {"id": "o12_1", "text": "当场平静应对，就事论事地补充依据展开专业探讨", "billName": "专业交锋护盾", "senScore": 0, "rumScore": 0, "plsScore": 0, "bndScore": 4}, {"id": "o12_2", "text": "会后在脑海里推演，如果换一种切入点是否更有说服力", "billName": "方案表述复现费", "senScore": 3, "rumScore": 4, "plsScore": 0, "bndScore": 0}, {"id": "o12_3", "text": "心里泛起一阵波澜，暗中留意其他同事对观点的态度", "billName": "立场探查观测仪", "senScore": 3, "rumScore": 3, "plsScore": 0, "bndScore": 0}]}, {"id": "q13", "text": "在街上远远看到一个认识但不熟的人，对方好像没看你，你会：", "options": [{"id": "o13_3", "text": "大方热情迎上去致意，主动打破沉默营造亲切感", "billName": "社交破冰打点费", "senScore": 0, "rumScore": 0, "plsScore": 0, "bndScore": 3}, {"id": "o13_1", "text": "犹豫要不要主动招手，直到擦肩而过仍在心里琢磨", "billName": "迎面相逢考量费", "senScore": 3, "rumScore": 4, "plsScore": 0, "bndScore": 0}, {"id": "o13_2", "text": "顺手低头看看手机，体面化解两人之间可能有的生疏", "billName": "免扰通道维护费", "senScore": 3, "rumScore": 0, "plsScore": 2, "bndScore": 0}, {"id": "o13_4", "text": "从容走自己的路，不刻意做任何多余动作自然走过", "billName": "行色匆匆步道费", "senScore": 0, "rumScore": 0, "plsScore": 0, "bndScore": 4}]}, {"id": "q14", "text": "买了一杯饮品，喝了一口发现甜度做错了，你会：", "options": [{"id": "o14_3", "text": "虽未当面提出重做，但整场体验多少留下了些许遗憾", "billName": "小事搁置遗憾税", "senScore": 0, "rumScore": 4, "plsScore": 0, "bndScore": 0}, {"id": "o14_2", "text": "平静向店员说明情况，就事论事地礼貌要求重新调配", "billName": "权益维护沟通费", "senScore": 0, "rumScore": 0, "plsScore": 0, "bndScore": 4}, {"id": "o14_4", "text": "在柜台前稍作踟蹰，反复考虑是否值得为了小事交涉", "billName": "诉求平衡推敲费", "senScore": 3, "rumScore": 3, "plsScore": 0, "bndScore": 0}, {"id": "o14_1", "text": "心想大家都不容易，顺其自然将就喝完免得麻烦别人", "billName": "体谅他人随缘费", "senScore": 0, "rumScore": 0, "plsScore": 4, "bndScore": 0}]}, {"id": "q15", "text": "发在社交媒体上的一张生活动态，过了几个小时互动寥寥，你会：", "options": [{"id": "o15_1", "text": "默默隐去该条动态，觉得当下时机未到重新调整", "billName": "内容归档修饰费", "senScore": 3, "rumScore": 4, "plsScore": 0, "bndScore": 0}, {"id": "o15_3", "text": "暗自留心关注列表，敏锐揣测大家近期的兴趣点迁移", "billName": "受众偏好调研费", "senScore": 3, "rumScore": 1, "plsScore": 0, "bndScore": 0}, {"id": "o15_2", "text": "全凭自己心情记录，别人的反应并不影响自己的喜好", "billName": "自我悦纳保险费", "senScore": 0, "rumScore": 0, "plsScore": 0, "bndScore": 4}, {"id": "o15_4", "text": "理性琢磨发布时段与文案节奏，把它当作一次数据观察", "billName": "发布节奏摸索费", "senScore": 0, "rumScore": 3, "plsScore": 0, "bndScore": 0}]}, {"id": "q16", "text": "别人不小心弄坏了你很心爱的小物件，对方不断道歉，你的反应：", "options": [{"id": "o16_2", "text": "当面体谅接受致歉，但心里长久盘桓着那份珍贵回忆", "billName": "旧物寄情珍藏费", "senScore": 0, "rumScore": 4, "plsScore": 0, "bndScore": 0}, {"id": "o16_4", "text": "坦诚说明这件物品的意义，理智商议合理的补偿方案", "billName": "物件价值厘定费", "senScore": 0, "rumScore": 0, "plsScore": 0, "bndScore": 4}, {"id": "o16_3", "text": "嘴上说着没关系，心底默默承受意外带来的惋惜", "billName": "包容隐忍保全费", "senScore": 0, "rumScore": 3, "plsScore": 4, "bndScore": 0}, {"id": "o16_1", "text": "温言宽慰对方不必挂怀，优先安抚对方内疚的情绪", "billName": "情绪舒缓安抚金", "senScore": 3, "rumScore": 0, "plsScore": 4, "bndScore": 0}]}, {"id": "q17", "text": "晚上入睡前，脑海中突然浮现出多年前的一桩尴尬往事：", "options": [{"id": "o17_2", "text": "莞尔一笑感叹当年青涩，翻个身把往事当作睡前谈资", "billName": "岁月和解通行票", "senScore": 0, "rumScore": 0, "plsScore": 0, "bndScore": 4}, {"id": "o17_3", "text": "努力把思绪拉回当下，反复推演如果当时换个做法会怎样", "billName": "平行时空设想费", "senScore": 0, "rumScore": 4, "plsScore": 0, "bndScore": 0}, {"id": "o17_4", "text": "画面历历在目，不由得抓起枕头感慨当初表现太稚嫩", "billName": "旧事重提回甘费", "senScore": 3, "rumScore": 4, "plsScore": 0, "bndScore": 0}, {"id": "o17_1", "text": "习惯性向内探寻，深入琢磨自己性格中一贯的行事短板", "billName": "行事逻辑溯源费", "senScore": 3, "rumScore": 4, "plsScore": 0, "bndScore": 0}]}, {"id": "q18", "text": "准备下班打卡时，主管突然过来交办一项非紧急工作：", "options": [{"id": "o18_2", "text": "痛快爽快答应下来，把事情稳妥收尾后再安心回家", "billName": "有条不紊收尾费", "senScore": 0, "rumScore": 0, "plsScore": 4, "bndScore": 0}, {"id": "o18_3", "text": "接下任务留在工位完成，心里悄然琢磨时间分配的合理性", "billName": "任务负荷测算费", "senScore": 3, "rumScore": 4, "plsScore": 0, "bndScore": 0}, {"id": "o18_1", "text": "礼貌告知明天一早优先推进，收拾物品准点打卡离开", "billName": "准点离岗护卫费", "senScore": 0, "rumScore": 0, "plsScore": 0, "bndScore": 4}, {"id": "o18_4", "text": "顾虑团队评价勉强接下，尽心尽力展现敬业与担当", "billName": "职场口碑积累金", "senScore": 3, "rumScore": 0, "plsScore": 4, "bndScore": 0}]}, {"id": "q19", "text": "好朋友心情欠佳向你倾诉了两个小时，你的真实感受是：", "options": [{"id": "o19_2", "text": "由人及己产生联想，深入审视自己生活中是否存在隐患", "billName": "警钟长鸣对照费", "senScore": 3, "rumScore": 4, "plsScore": 0, "bndScore": 0}, {"id": "o19_1", "text": "真诚倾听全程照应，深感友人不易也分担了沉沉心意", "billName": "知己共情储蓄金", "senScore": 3, "rumScore": 0, "plsScore": 3, "bndScore": 0}, {"id": "o19_4", "text": "全情陪伴后及时抽离，把情绪边界划分清晰不被卷入", "billName": "心境隔离保护费", "senScore": 0, "rumScore": 0, "plsScore": 0, "bndScore": 4}, {"id": "o19_3", "text": "同仇敌忾一同宣泄，感同身受地帮对方排解胸中郁闷", "billName": "意气相投声援费", "senScore": 3, "rumScore": 0, "plsScore": 0, "bndScore": 0}]}, {"id": "q20", "text": "马上要做一个关键的公开汇报，你的心理状态是：", "options": [{"id": "o20_3", "text": "深吸一口气调整心绪，以从容姿态迅速进入专业节奏", "billName": "定力凝神收摄费", "senScore": 2, "rumScore": 0, "plsScore": 0, "bndScore": 4}, {"id": "o20_4", "text": "坦然登台全情发挥，尽人事听天命把注意力放在当下", "billName": "登台亮相豁免权", "senScore": 0, "rumScore": 0, "plsScore": 0, "bndScore": 4}, {"id": "o20_1", "text": "提前数日持续演练，脑海中把各环节要点逐一梳理妥帖", "billName": "通盘梳理整备费", "senScore": 3, "rumScore": 4, "plsScore": 0, "bndScore": 0}, {"id": "o20_2", "text": "敏锐感知全场目光，心跳加剧暗自期盼一切顺遂无误", "billName": "全场聚光注视费", "senScore": 3, "rumScore": 3, "plsScore": 0, "bndScore": 0}]}];
 
-export const results = [{"id": "r_low", "key": "low", "title": "【人间铁壁】", "tags": "#钝感力王者,#反PUA大师,#关我屁事", "description": "你的情绪防火墙堪比银行金库。你几乎不为外界的评价买单，绝不为不值得的人花一分钱情绪。保持这种冷酷，干得漂亮！在这个大家都在疯狂内耗的时代，你活得像一个绝缘体。", "quote": "我的感受优先级最高。", "danmaku": ["这也太酷了吧！", "羡慕这种精神状态", "如何拥有这种顶级钝感力？", "本内耗王者实名羡慕了", "只要我没素质，素质就绑架不了我"]}, {"id": "r_bnd", "key": "bnd", "title": "【精神守财奴】", "tags": "#精打细算,#偶尔破防,#边界感强", "description": "你虽然偶尔会在意别人的看法，但只要一想到内耗太费精力，你就会立刻止损。你在“在意别人”和“保护自己”之间找到了完美的平衡，是一个情绪上的“守财奴”。", "quote": "不值得的人，不配占用我的脑容量。", "danmaku": ["确实，内耗太费精力了", "精准命中我的生活哲学", "只要我跑得快，内耗就追不上我", "这小票打印得没毛病", "真实，守住自己的能量才是王道"]}, {"id": "r_sen", "key": "sen", "title": "【薛定谔的敏感】", "tags": "#间歇性发作,#特定对象破防,#表面稳如老狗", "description": "你大部分时候情绪稳定，但遇到特定的敏感触发点（比如在乎的人的一句话，或是某个特定的职场场景）就会突然破防。你的雷达很敏锐，只是平时假装关机。", "quote": "我只是看破不说破，别真以为我傻。", "danmaku": ["是谁在监视我？", "特定触发破防太真实了", "平时稳如老狗，一触雷就炸", "装死第一名就是我", "薛定谔的敏感，简直为我量身定制"]}, {"id": "r_pls", "key": "pls", "title": "【老好人提款机】", "tags": "#委曲求全,#不会拒绝,#烂好人", "description": "你的情绪账单里，大部分支出都在为别人买单。你太害怕得罪人，太害怕破坏气氛，以至于经常勉强自己答应不合理的要求。事后虽然委屈，但下次还是张不开拒绝的嘴。", "quote": "成全了别人，委屈了自己。", "danmaku": ["啊啊啊这就是我！", "每次答应完就后悔，说的就是我", "讨好型人格破大防了", "看这个小票直接看哭了", "救命，怎么才能学会拒绝啊"]}, {"id": "r_rum", "key": "rum", "title": "【深夜复盘家】", "tags": "#睡前批斗会,#选择困难,#后悔药常客", "description": "白天你是个正常人，一到深夜，你的大脑就开始播放《今日尴尬集锦》。你会为了一句没回好的话纠结半宿，反复推演“如果当时我那么说就好了”。你的精力都消耗在了对过去的追悔中。", "quote": "人类的悲欢并不相通，我只觉得我今天好尴尬。", "danmaku": ["深夜批斗会VIP会员在此", "原来大家睡前都在复盘啊", "别骂了别骂了，已经在抠脚趾了", "白天笑嘻嘻，晚上全网黑历史首播", "过于真实，引起不适"]}, {"id": "r_sen_pls", "key": "sen_pls", "title": "【情绪海绵】", "tags": "#高敏感体质,#玻璃心,#共情泛滥", "description": "你就像一块海绵，无差别地吸收着周围人的情绪。别人的一皱眉、一叹气，都能在你心里引发海啸。你极度敏锐，但也极度疲惫。你总是试图照顾所有人的感受，却唯独忘了自己。", "quote": "能不能求求大家别再给我散发负能量了？", "danmaku": ["本海绵精快被吸干了", "极度共情真的好累", "别再给我倒苦水了啊啊啊", "看到这句话直接泪奔", "感觉每天都在为别人活着"]}, {"id": "r_high", "key": "high", "title": "【灵魂透支大户】", "tags": "#灾难化想象,#内耗王者,#精神衰弱", "description": "警告！您的心灵信用卡已被刷爆！你每天都在为他人的眼光和虚无的担忧支付巨额税款。一点风吹草动就能让你脑补出一场大戏，你被自己想象中的灾难压得喘不过气来。", "quote": "我每天什么都没干，但就是觉得好累。", "danmaku": ["脑补王者就是我", "这账单数字简直惊心动魄", "每天在心里演完了一整部甄嬛传", "救救孩子吧，太累了", "这就是我为什么周末只想躺着"]}, {"id": "r_rum_low_bnd", "key": "rum_low_bnd", "title": "【自我PUA带师】", "tags": "#习惯性自责,#完美主义,#精神内伤", "description": "你对自己有着超乎寻常的苛刻。无论发生什么不好的事，你的第一反应永远是“是不是我哪里做错了”。你不需要别人来PUA你，你自己就能把自己批判得体无完肤。你的内耗，是对自己最残忍的惩罚。", "quote": "放过自己吧，你已经做得很好了。", "danmaku": ["破防了，为什么要这么残忍地戳穿我", "对自己最狠的人原来是我自己", "不敢看第二遍的测试", "原来内伤都是我自己打的", "抱抱自己吧，真的太难了"]}];
+export const results = [
+  {
+    id: "r_low",
+    key: "low",
+    title: "【人间铁壁】",
+    tags: "#钝感力天花板,#反PUA终结者,#精神离职祖师爷",
+    description: "你的情绪防火墙堪比银行防爆金库。外界的负面评价与道德绑架落在你身上，犹如水滴落在荷叶上，滑得干干净净。你绝不为不值得的人多浪费一毫克多巴胺，在这个全民焦虑内耗的时代，你活成了人人羡慕的绝缘体。",
+    quote: "只要我没有道德，你就绑架不了我。",
+    scenarios: [
+      "同事在群里阴阳怪气，你直接回了个微笑表情包并顺手开启免打扰",
+      "领导下班前发“收到请回复”，你假装没看见直到第二天准点打卡",
+      "朋友找你倾倒两小时负能量，你一边吃薯片一边礼貌附和“确实确实”"
+    ],
+    vampires: "【表演型卖惨大师】与【道德绑架狂魔】（试图用苦情戏激发你的愧疚感，但在你的冷漠面前通通失效）",
+    bestMatch: "【直球型行动派】（有事说事、直来直往，绝不内耗猜心思，与你的高效钝感同频共振）",
+    hiddenCosts: [
+      "由于过于无所谓，年化错失职场无效八卦约 120 小时",
+      "因被误认为高冷，自动过滤低质社交骚扰省下 1,800 元咖啡费",
+      "情绪波动极小，每年节省眼霜与修护精华至少 3 支"
+    ],
+    adviceList: [
+      "继续保持最高级别的“关我屁事”护城河，切忌同情心泛滥被破防。",
+      "在极为在乎的亲密关系中，适度释放 5% 的脆弱感以增进情感连接。",
+      "给周围的内耗朋友传授“物理断联法”，但谨防被对方反向吸血。"
+    ],
+    danmaku: [
+      "这也太酷了吧！",
+      "羡慕这种顶级钝感力",
+      "求人间铁壁保佑我",
+      "本内耗王者实名羡慕了",
+      "只要我没素质，素质就绑架不了我",
+      "请收下我的膝盖！"
+    ]
+  },
+  {
+    id: "r_bnd",
+    key: "bnd",
+    title: "【精神守财奴】",
+    tags: "#情绪精算师,#精准止损,#边界感护城河",
+    description: "你对个人心理账户的支出有着极其严苛的把控。你虽然偶尔也会产生情绪波澜，但脑内的风控系统会在 3 秒内报警：“此人不配消耗我的脑容量”。你在“体面社交”与“自我防卫”之间维持着教科书级的动态平衡。",
+    quote: "内耗太贵，我的精力要留给搞钱和睡觉。",
+    scenarios: [
+      "刚准备为一句无心之言纠结，立刻计算出“纠结这事一小时亏损200块”随即倒头大睡",
+      "遇到不讲理的杠精，刚敲了三个字就删掉，心里默念“你对你对”",
+      "聚会进行到气氛变味前，借口“明天早起体检”丝滑买单离场"
+    ],
+    vampires: "【情绪黑洞型搭子】（习惯性把别人当免费心理咨询师，企图偷走你的精力）",
+    bestMatch: "【高情商边界守望者】（懂得互相尊重独立空间，不越界、不索取，相处时舒服自在零负担）",
+    hiddenCosts: [
+      "理性权衡压抑的即时快感：年化约 45 次想骂人但克制住的憋屈",
+      "维持人设买单的客套社交账单：年化约 800 元无意义随礼",
+      "深夜理智复盘止损带来的延迟入睡：年化损耗约 30 小时睡眠"
+    ],
+    adviceList: [
+      "建立“情绪免赔额”：小额度的冒犯直接划入坏账计提，不必每次都启动风控。",
+      "偶尔允许自己冲动或任性一次，严丝合缝的边界有时会阻碍真正的深度共鸣。",
+      "对消耗型关系坚决实行“清算注销”，不再追加任何沉没成本。"
+    ],
+    danmaku: [
+      "确实，内耗太费精力了",
+      "精准命中我的生活哲学",
+      "只要我跑得快，内耗就追不上我",
+      "这小票打印得没毛病",
+      "真实，守住自己的能量才是王道",
+      "情绪精算师本人了"
+    ]
+  },
+  {
+    id: "r_sen",
+    key: "sen",
+    title: "【薛定谔的敏感】",
+    tags: "#间歇性发作,#特定雷区破防,#表面稳如泰山",
+    description: "你是一个高精度的雷达探测器，日常看似云淡风轻、甚至有点大大咧咧，但大脑底层其实驻扎着几个极度精细的专属触发点。一旦特定的人说了一句特定语气的话，你内心的八级地震瞬间触发，而表面上你还在微笑着点头。",
+    quote: "表面稳如老狗，内心其实已经演完了八十集恩怨情仇。",
+    scenarios: [
+      "在群里发了精心挑选的表情包，如果 5 分钟没人接茬，立刻觉得“我是不是被孤立了”",
+      "对方平时发“哈哈哈哈”今天只发了“哈哈”，你反复推敲他是不是对你不满了",
+      "在电梯遇到熟人，为了避免“该不该打招呼”的尴尬，全程死盯楼层跳变"
+    ],
+    vampires: "【谜语人型伴侣/领导】（说话留半句、全靠人揣摩的沟通刺客）",
+    bestMatch: "【情绪极度稳定的大树型】（语气永远温和笃定、凡事有着落，能瞬间抚平你脑海里所有的敏感波澜）",
+    hiddenCosts: [
+      "为揣测标点符号与聊天语气：年化多耗费 180 小时脑力显卡算力",
+      "过度解读对方表情包背后的心理动机：年化损耗多巴胺超 50%",
+      "因尴尬而绕路躲避熟人：年化多走冤枉路步数折合马拉松半程"
+    ],
+    adviceList: [
+      "执行“事实-脑补隔离法”：发生的事情是 1，你的解读是 99，只为 1 买单。",
+      "将敏感转化为直觉创造力，用文字、艺术或创作导出你的高敏雷达天线。",
+      "遇到含糊信息直接直球提问：“你这句话的意思是...？”，把揣摩成本丢回给对方。"
+    ],
+    danmaku: [
+      "是谁在监视我？",
+      "特定触发破防太真实了",
+      "平时稳如老狗，一触雷就炸",
+      "装死第一名就是我",
+      "薛定谔的敏感，简直为我量身定制",
+      "救命连表情包数量都要算"
+    ]
+  },
+  {
+    id: "r_pls",
+    key: "pls",
+    title: "【心软神明降临】",
+    tags: "#讨好型人格,#拒绝困难终身患者,#嘴硬心软",
+    description: "你长了一颗比棉花还软的心脏。你总是条件反射般地把别人的感受置于自身之上，生怕别人感到一丝尴尬或冷落。你所有的“拒绝”都在脑海里彩排了千百遍，但一旦对方眼神闪过一丝失落，脱口而出的永远是那句令人心碎的“好的”。",
+    quote: "所有体贴的背后，都是对被讨厌的无尽恐惧。",
+    scenarios: [
+      "店员做错了全糖奶茶，明明甜到发齁，你还是说“没事没事不用换了”",
+      "同事甩锅请求帮忙，嘴上说着“手头活有点多”，手上却已经顺从地接过了文件",
+      "聚餐时问你吃什么，永远是“我都行”，其实极度讨厌那家餐厅的油腻"
+    ],
+    vampires: "【巨婴型伸手党】（嗅觉灵敏，专挑心软之人进行情绪寄生与精力剥削）",
+    bestMatch: "【霸气护短型实力靠山】（敏锐察觉你的委屈，敢于替你出头撑腰、坚定为你挡掉一切道德绑架）",
+    hiddenCosts: [
+      "替别人背锅揽活消耗的无偿工时：年化相当于义务加班 160 小时",
+      "为了满足他人期待委屈自己咽下的窝囊气：年化造成偏头痛 12 次",
+      "买回不喜欢的推销商品/不好意思退货：年化沉没资金约 2,400 元"
+    ],
+    adviceList: [
+      "刻意练习“拖延拒绝法”：当别人求助时，至少间隔 10 分钟再回复“我手头有紧急事，这次帮不上”。",
+      "重塑认知：体面的拒绝是给成熟成年人最起码的尊重，别人没你想象的那么脆弱。",
+      "设立“自我优先基金”：每次勇敢说一次“不行”，就给自己点一杯好喝的奖励。"
+    ],
+    danmaku: [
+      "啊啊啊这就是我！",
+      "每次答应完就后悔，说的就是我",
+      "讨好型人格破大防了",
+      "看这个小票直接看哭了",
+      "救命，怎么才能学会拒绝啊",
+      "求求自己别再心软了"
+    ]
+  },
+  {
+    id: "r_rum",
+    key: "rum",
+    title: "【深夜复盘家】",
+    tags: "#睡前批斗会VIP,#马后炮王者,#选择困难重症",
+    description: "白天你在人前体面理性，一到夜深人静，你的大脑就开始自动高清重置《人生尴尬与失误精选集》。你会为了三年前一句没发挥好的反驳捶胸顿足，反复演算“如果当时我那么怼回去该多爽”。你的人生带宽被源源不断地抵押给了过去。",
+    quote: "人类的悲欢并不相通，我只觉得我今天好尴尬。",
+    scenarios: [
+      "关灯躺在床上闭上眼睛，五年前当众摔跤/念错别字的画面突然 4K 蓝光级回放",
+      "下午被同事当众呛了一句，晚上洗澡时突然想出三句绝妙回怼，恨不得冲回去重来",
+      "发完一条朋友圈后，每隔三分钟刷新一次看谁点赞，没达到预期就立刻删掉"
+    ],
+    vampires: "【打一巴掌给甜枣型关系】（让你反复回味每一句话背后的深意，深陷反思旋涡）",
+    bestMatch: "【乐天派钝感小太阳】（带你大口吃肉大声欢笑，用纯粹的快乐强行打断你的睡前思想内耗）",
+    hiddenCosts: [
+      "午夜黄金深度睡眠被脑内剧场剥夺：年化睡眠折损约 240 小时",
+      "为过去无法改变的既成事实买单：精神电量日常处于 20% 低电量模式",
+      "次日早晨因深夜复盘萎靡不振造成的咖啡因依赖：年化咖啡开销超 3,000 元"
+    ],
+    adviceList: [
+      "床铺设立“免思区”禁令：只要躺下，大脑强制切换到白噪音或数呼吸，决不清算白天的恩怨。",
+      "给尴尬设定“保质期”：成年人的记忆只有 7 秒，除你自己以外，根本没人记得你说了什么。",
+      "实行“纸笔倾倒法”：把复盘内容在草稿纸上狂写 3 分钟后揉成一团扔进垃圾桶，物理完成结案。"
+    ],
+    danmaku: [
+      "深夜批斗会VIP会员在此",
+      "原来大家睡前都在复盘啊",
+      "别骂了别骂了，已经在抠脚趾了",
+      "白天笑嘻嘻，晚上全网黑历史首播",
+      "过于真实，引起不适",
+      "洗澡时战斗力爆表"
+    ]
+  },
+  {
+    id: "r_sen_pls",
+    key: "sen_pls",
+    title: "【情绪海绵】",
+    tags: "#高敏感人形雷达,#情绪吸尘器,#共情泛滥中毒",
+    description: "你宛如一块没有外壳的高敏海绵，无差别吸收着方圆五米内所有人的气压与情绪渣滓。旁人的一个皱眉、一声微叹，都会在你心里激起惊涛骇浪。你像个全天候待命的情绪急救员，拼命想让周围的人都感到舒适，却把自己拧出了苦水。",
+    quote: "别人叹了一口气，我就开始疯狂反思是不是自己连呼吸都错了。",
+    scenarios: [
+      "办公室气压稍微一沉闷，立刻觉得空气凝固，连呼吸都小心翼翼不敢发出声音",
+      "朋友找你吐槽伴侣，朋友倾诉完一身轻松去吃火锅，你气得一整晚胸闷胃痉挛",
+      "看到流浪动物或悲剧新闻，胸口像堵着一块大石头，能难受压抑好几天"
+    ],
+    vampires: "【负能量情绪垃圾桶倾倒者】（习惯性把所有负面垃圾倒给你，把你吸干后扬长而去）",
+    bestMatch: "【天然情绪净化器】（自带高纯度正能量场，能吸收你的疲惫并反向给你源源不断注入温暖）",
+    hiddenCosts: [
+      "无底线吸收他人负面情绪引发的躯体化不适：年化肠胃药/止痛药开销增加",
+      "为别人的痛苦感同身受支付的共情税：年化损耗心力折合少活半个月",
+      "社交后因严重脱力需要的“自闭充电日”：年化损耗周末假期超 20 天"
+    ],
+    adviceList: [
+      "观想“透明玻璃罩”：他人倒苦水时，在心中设下一道防弹玻璃，让负能量顺着玻璃滑落。",
+      "严格限定当“倾听者”的时长：超过 15 分钟直接借故离开，不做免费的情绪下水道。",
+      "多接触“情绪稳定的大树型”朋友，停止与同质化内耗者抱团取暖互相浸泡。"
+    ],
+    danmaku: [
+      "本海绵精快被吸干了",
+      "极度共情真的好累",
+      "别再给我倒苦水了啊啊啊",
+      "看到这句话直接泪奔",
+      "感觉每天都在为别人活着",
+      "什么时候能有人共情我"
+    ]
+  },
+  {
+    id: "r_high",
+    key: "high",
+    title: "【灵魂透支大户】",
+    tags: "#心灵信用卡刷爆,#全自动末日编剧,#电量常年负数",
+    description: "严重警告！你的情绪系统已处于严重超载熔断边缘。你常年处于四面楚歌的防御姿态，一点点日常微澜都能被你的潜意识翻译成系统性毁灭危机。你每天即使肉体躺在沙发上一动不动，精神显卡也在以 100% 满负荷发烫运转，灵魂早已透支成负数。",
+    quote: "我每天什么都没干，但就是觉得好累好累。",
+    scenarios: [
+      "周日晚上刚过 6 点，胃部开始隐隐作痛，一想到明天要面对人群就呼吸急促",
+      "微信突然收到“在吗/明天来我办公室一趟”，心跳瞬间飙到 130，手心全是冷汗",
+      "长期处于低电量待机，连洗头、下楼拿快递、回一条消息都需要攒半天的心理勇气"
+    ],
+    vampires: "【全方位控制狂与焦虑贩卖机】（无休止施压并不断暗示你不够好、随时会完蛋的环境）",
+    bestMatch: "【极简主义松弛生活家】（不催促、不施压，能陪你一起无罪恶感地静静瘫坐，为你重新蓄满电量）",
+    hiddenCosts: [
+      "精神高压导致的皮质醇飙升与脱发：年化购买防脱洗护/保健品超 2,000 元",
+      "极度空虚后带来的报复性熬夜与高糖饮食：年化外卖垃圾食品开销约 4,500 元",
+      "心灵蓄电池严重老化：日常专注力与精神创造力衰退折损超 40%"
+    ],
+    adviceList: [
+      "立刻启动“系统最低功耗模式”：除了生存和拿工资，把一切额外社交与责任全盘暂停。",
+      "允许自己全面“摆烂”48 小时：拉上遮光窗帘蒙头大睡，坚信地球没了你照样转得很好。",
+      "寻求专业的心理倾听支持或给自己安排一次独处短途放空，给情绪系统做硬件级重启。"
+    ],
+    danmaku: [
+      "脑补王者就是我",
+      "这账单数字简直惊心动魄",
+      "每天在心里演完了一整部甄嬛传",
+      "救救孩子吧，太累了",
+      "这就是我为什么周末只想躺着",
+      "真的快要碎掉了"
+    ]
+  },
+  {
+    id: "r_rum_low_bnd",
+    key: "rum_low_bnd",
+    title: "【自我PUA带师】",
+    tags: "#习惯性自责,#完美主义暴政,#对自己最残忍的人",
+    description: "在摧毁自己自信这件事上，你无需借助外界任何外力。哪怕事情办成了 99%，你眼里也只有那 1% 的瑕疵，并据此判定自己是个不可救药的失败者。你对待他人宽容博大，对待自己却拿着皮鞭日夜鞭挞，你的内耗是一场永无止境的自残。",
+    quote: "根本不需要别人骂我，我自己已经在心里把自己批判过一万遍了。",
+    scenarios: [
+      "项目汇报获得了大家一致好评，但因为讲漏了一张PPT，接下来三天都在骂自己是废物",
+      "只要人际交往中出现一丝冷淡，第一反应必然是“一定是我哪句话说错得罪了对方”",
+      "只要稍微休息放松超过半天，就会产生强烈的负罪感，觉得不拼命奔跑就是在自甘堕落"
+    ],
+    vampires: "【挑剔型权威与打压式伴侣】（他们的每一次微小否定，都会被你内化成审判自己的重磅炸弹）",
+    bestMatch: "【无条件正面反馈夸夸机】（能精准发现你身上闪闪发光的闪光点，用坚定不移的认可打破你的自我苛责）",
+    hiddenCosts: [
+      "为虚幻的完美主义付出的过剩时间成本：年化无端多加班超 200 小时",
+      "长期自我贬低攻击导致免疫力低下：换季必患顽固感冒与偏头痛",
+      "购买过量‘拯救自我’的知识付费课却从未看完：年化焦虑充值超 1,500 元"
+    ],
+    adviceList: [
+      "树立“60分及格万岁”新信条：交出及格的半成品，永远胜过因死磕而难产的完美垃圾。",
+      "将内心自我批判的声音具象化：给那个挑剔的内心法官起个蠢名字，它一开口就命令它“闭嘴”。",
+      "练习“最佳好友视角的慈悲”：当你又想苛责自己时，想想你绝不会用这么恶毒的话去攻击好朋友。"
+    ],
+    danmaku: [
+      "破防了，为什么要这么残忍地戳穿我",
+      "对自己最狠的人原来是我自己",
+      "不敢看第二遍的测试",
+      "原来内伤都是我自己打的",
+      "抱抱自己吧，真的太难了",
+      "今天开始不做自己的监工"
+    ]
+  },
+  {
+    id: "r_burnout",
+    key: "burnout",
+    title: "【工伤级脆皮打工人】",
+    tags: "#群消息PTSD,#灵魂已出走,#无意识机械上班",
+    description: "你的身体虽然端坐在打工工位上，灵魂其实早在上个月就已阵亡。工作通讯软件的提示音能瞬间激发你的躯体应激反射，领导的一句“在吗”能让你冷汗直流。你在“想裸辞”和“要交房租”之间反复撕扯，日复一日被无意义的流程和情绪劳动彻底榨干。",
+    quote: "我不是在上班，我是在用肉身给工位当耗材。",
+    scenarios: [
+      "周末在商场逛街，突然听到隔壁手机响起了工作软件默认提示音，心脏瞬间骤停漏跳一拍",
+      "周一早晨闹钟响起那一刻，盯着天花板真实地产生“要是今天突然发烧就不用去公司了”的念头",
+      "在工位上假装打字如飞，其实大脑一片空白，只是机械地在几个无聊网页间来回切换摸鱼"
+    ],
+    vampires: "【全天候派活型领导】与【甩锅推诿型平级同事】（在非工作时间无限侵蚀你的生活领地）",
+    bestMatch: "【下班失联型摸鱼搭子】（到点准时拽你打卡下班，带你解锁人间烟火美食，把班味狠狠甩在脑后）",
+    hiddenCosts: [
+      "因工伤级厌班导致的下班报复性饮食：年化高热量外卖开销超 3,600 元",
+      "缓解久坐与心力衰竭的肩颈推拿/正骨费用：年化医药理疗开支约 2,500 元",
+      "因精神恍惚错点、遗失物品带来的隐性财物损失：年化损耗约 800 元"
+    ],
+    adviceList: [
+      "坚决践行“精神离职法”：工位只是拿钱办事的交易所，绝不把任何职场评价带进真实人生。",
+      "备用机断电隔离：下班后准时将工作微信/钉钉切至免打扰，非天塌大事一律明早 9 点再看。",
+      "建立“工伤对冲补偿机制”：在工位上每熬过一段难熬的会议，就给自己喝杯好茶或摸鱼 10 分钟。"
+    ],
+    danmaku: [
+      "工位上的我眼泪掉下来",
+      "钉钉提示音 PTSD 本人",
+      "这不就是我周一到周五的精神状态吗",
+      "班味太重了，救救打工人",
+      "精准诊断！每一句都在说我",
+      "只想退休养老，不想再当脆皮鸡"
+    ]
+  },
+  {
+    id: "r_isolated",
+    key: "isolated",
+    title: "【情绪断电绝缘体】",
+    tags: "#社交断联王者,#已读不回学者,#孤岛自救指南",
+    description: "当大多数人还在内耗纠结时，你早就按下了情绪系统的总电闸。你对外界建立了一套铜墙铁壁般的隔离系统，不发朋友圈、不点赞、已读不回是你的家常便饭。你不是冷血无情，你只是看透了低质社交的虚妄，宁愿在属于自己的孤岛上安宁地看海。",
+    quote: "只要我不接招，这世上就没人能打断我的节奏。",
+    scenarios: [
+      "看到手机弹出社交红点，直接划掉通知假装没看见，三天后再慢悠悠回一句“刚在忙没看手机”",
+      "部门聚餐或团建活动，无论别人怎么软磨硬泡，你总能面不改色地找到借口直接消失",
+      "在路上远远看到认识的熟人，提前 50 米就拐弯拐进便利店假装挑选口香糖以避免寒暄"
+    ],
+    vampires: "【自来熟社交逼迫狂】（疯狂拉你融入圈子、质问你为什么总是不说话的热心狂人）",
+    bestMatch: "【懂留白的默契同行者】（两个人哪怕同坐一个房间几个小时各自看书不说话，也觉得无比安心合拍）",
+    hiddenCosts: [
+      "因极度拒绝沟通错失的潜在合作与信息差红利：年化潜在机会收益难以估量",
+      "为躲避他人而额外产生的“战术性消费”（如咖啡馆独处门票）：年化约 1,200 元",
+      "人际关系近乎冻结带来的情感支持系统缺失：在极度脆弱时无人可倾诉"
+    ],
+    adviceList: [
+      "保持边界的同时，为 1-2 位真正同频的知己留一扇虚掩的窗，避免孤岛彻底荒漠化。",
+      "在工作中采用“最小必要沟通法则”：用简洁清晰的邮件和要点同步，替代无谓的人际寒暄。",
+      "承认并接纳自己的冷感需求，你不需要成为社交蝴蝶，平静的冷漠同样是一种力量。"
+    ],
+    danmaku: [
+      "已读不回就是我的保护伞",
+      "这不就是我的自闭日常",
+      "别联系我，我在我的孤岛很安宁",
+      "被说冷血但真的很舒服",
+      "社交断联带来的快乐你们不懂",
+      "终于有人懂绝缘体的快乐了"
+    ]
+  }
+];
+

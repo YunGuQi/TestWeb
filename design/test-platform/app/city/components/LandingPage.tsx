@@ -110,7 +110,7 @@ export default function LandingPage() {
             onClick={() => window.location.href = 'https://xhslink.com/m/Atwtf3Cy6FR'} 
             className="text-xs text-gray-500 hover:text-[#1a1a1a] transition-colors underline underline-offset-4 min-h-[44px] inline-flex items-center justify-center cursor-pointer touch-manipulation active:scale-95 px-2 whitespace-nowrap"
           >
-            [ 访问黑市补给站 ]
+            [ 访问安安的补给站 ]
           </button>
         </div>
       </motion.div>
@@ -128,9 +128,12 @@ export default function LandingPage() {
                   <button 
                     key={record.id + index}
                     onClick={() => {
-                      setAnswers(record.answers);
-                      setCurrentStep(20);
-                      useQuizStore.getState().setHasGenerated(true);
+                      useQuizStore.setState({
+                        answers: record.answers || [],
+                        currentStep: 20,
+                        hasStarted: true,
+                        hasGenerated: true
+                      });
                       setShowHistory(false);
                     }}
                     className="w-full text-left p-4 bg-white border border-[#d1cdc1] shadow-sm hover:-translate-y-1 hover:shadow-md transition-all flex items-center justify-between mb-3 rounded"

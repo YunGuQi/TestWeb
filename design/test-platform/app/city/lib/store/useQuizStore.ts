@@ -30,7 +30,7 @@ export const useQuizStore = create<QuizState>()(
     (set) => ({
       hasStarted: false,
       currentStep: 0,
-      userCoords: [5, 5, 5, 5, 5],
+      userCoords: [0, 0, 0, 0, 0],
       answers: [],
       deviceId: null,
       historyStackCoords: [],
@@ -39,13 +39,27 @@ export const useQuizStore = create<QuizState>()(
       startQuiz: () => set({ 
         hasStarted: true, 
         currentStep: 0, 
-        userCoords: [5, 5, 5, 5, 5],
+        userCoords: [0, 0, 0, 0, 0],
         answers: [],
         historyStackCoords: [],
         hasGenerated: false 
       }),
       
       nextStep: (coordsDelta, selectedOptIndex, isLast = false) => set((state) => {
+        // 如果当前题已经作答（如在最后一题切换选项）
+        if (state.answers.length > state.currentStep) {
+          const updatedAnswers = [...state.answers];
+          updatedAnswers[state.currentStep] = selectedOptIndex;
+          const prevCoords = state.historyStackCoords[state.currentStep] || [0, 0, 0, 0, 0];
+          const newCoords = prevCoords.map((v, i) => v + coordsDelta[i]);
+          return {
+            currentStep: isLast ? state.currentStep : state.currentStep + 1,
+            userCoords: newCoords,
+            answers: updatedAnswers,
+            historyStackCoords: state.historyStackCoords
+          };
+        }
+
         const newCoords = state.userCoords.map((v, i) => v + coordsDelta[i]);
         return {
           currentStep: isLast ? state.currentStep : state.currentStep + 1,
@@ -57,7 +71,7 @@ export const useQuizStore = create<QuizState>()(
       
       prevStep: () => set((state) => {
         if (state.answers.length === 0) return state;
-        const prevCoords = state.historyStackCoords[state.historyStackCoords.length - 1] || [5, 5, 0, 5, 5];
+        const prevCoords = state.historyStackCoords[state.historyStackCoords.length - 1] || [0, 0, 0, 0, 0];
         const isFinished = state.answers.length > state.currentStep;
         return {
           currentStep: isFinished ? state.currentStep : Math.max(0, state.currentStep - 1),
@@ -73,7 +87,7 @@ export const useQuizStore = create<QuizState>()(
         set({ 
           hasStarted: false, 
           currentStep: 0, 
-          userCoords: [5, 5, 0, 5, 5], 
+          userCoords: [0, 0, 0, 0, 0], 
           answers: [], 
           historyStackCoords: [],
           hasGenerated: false

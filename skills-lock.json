@@ -151,6 +151,12 @@
       "skillPath": "SKILL.md",
       "computedHash": "bd97f272623269b35d50881c1a5b644f64dfb65572a3bb639b58657ad38c55e9"
     },
+    "dispute-issue-identification": {
+      "source": "thuyran/legal-skills-chinese",
+      "sourceType": "github",
+      "skillPath": "skills/dispute-issue-identification/SKILL.md",
+      "computedHash": "a091a4f19172cedf1ec98ed7baae1419a1b4abe2f66cb247e2ab43651a74db06"
+    },
     "emil-design-eng": {
       "source": "emilkowalski/skills",
       "sourceType": "github",
@@ -192,6 +198,18 @@
       "sourceType": "github",
       "skillPath": "SKILL.md",
       "computedHash": "ae44ce0f5746967a9cd92ffbeb2e4592a80ad8da28fd1ea764d2106e4720e399"
+    },
+    "legal-risk-assessment": {
+      "source": "anthropics/knowledge-work-plugins",
+      "sourceType": "github",
+      "skillPath": "legal/skills/legal-risk-assessment/SKILL.md",
+      "computedHash": "7305866282d5f10d4ca7acd1d8569b767f9f64a017016cb4da72c38e2d4ff2cc"
+    },
+    "marketing-psychology": {
+      "source": "coreyhaines31/marketingskills",
+      "sourceType": "github",
+      "skillPath": "skills/marketing-psychology/SKILL.md",
+      "computedHash": "d057044710ce7b7f9b90b84b3ab64e9359aaf47982b922ec10daca3822185ede"
     },
     "pick-ui-library": {
       "source": "emilkowalski/skills",

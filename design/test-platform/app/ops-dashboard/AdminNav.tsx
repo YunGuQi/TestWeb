@@ -7,7 +7,9 @@ import { useAdminStore } from '../../lib/store/admin-store';
 const TESTS = [
   { id: 'emotional-friction', name: '深度情绪内耗测算', icon: '🔥', tag: 'EMO' },
   { id: 'city-personality', name: '性格城市匹配测试', icon: '🏙️', tag: 'CITY' },
-  { id: 'destiny-lover', name: '命定恋人红娘测试', icon: '🧧', tag: 'DESTINY' }
+  { id: 'destiny-lover', name: '命定恋人红娘测试', icon: '🧧', tag: 'DESTINY' },
+  { id: 'love-species', name: '恋爱物种领养中心', icon: '🐾', tag: 'LOVE' },
+  { id: 'family-origin', name: '原生家庭人生剧本测试', icon: '📜', tag: 'FAMILY' }
 ];
 
 function WorkspaceDropdown({ 
@@ -148,16 +150,23 @@ export default function AdminNav() {
 
   const handleLogout = async () => {
     try {
+      document.cookie = "admin_unlocked=; path=/; max-age=0";
       await fetch('/api/admin/logout', { method: 'POST' });
-      window.location.href = '/ops-login';
+      window.location.href = '/';
     } catch (err) {
       console.error('Logout failed', err);
     }
   };
 
+  const handleLock = () => {
+    lock();
+    document.cookie = "admin_unlocked=; path=/; max-age=0";
+  };
+
   const handleUnlockSubmit = () => {
     if (unlockCode === process.env.NEXT_PUBLIC_ADMIN_PRIVACY_PASSWORD) {
       unlock();
+      document.cookie = "admin_unlocked=true; path=/; max-age=86400";
       setShowUnlockModal(false);
       setUnlockCode('');
     } else {
@@ -178,13 +187,6 @@ export default function AdminNav() {
       <div className="md:hidden flex flex-col w-full bg-white/80 backdrop-blur-md px-3 py-2 border-b border-black/10">
         <div className="flex items-center justify-between pb-2 border-b border-black/10">
           <div className="flex items-center gap-1.5">
-            <button 
-              type="button" 
-              onClick={() => router.push('/')}
-              className="flex items-center gap-1 text-[10px] text-gray-600 bg-white border border-gray-300 px-1.5 py-0.5 rounded shadow-sm hover:bg-gray-50"
-            >
-              <span>🏠</span>返回大厅
-            </button>
             <div className="w-6 h-6 rounded-md bg-emerald-100 text-emerald-700 flex items-center justify-center text-xs shadow-sm font-black ml-1">⚙️</div>
             <span className="font-black text-[13px] tracking-tight text-black truncate max-w-[100px] sm:max-w-none">ANAN OPS</span>
           </div>
@@ -288,7 +290,7 @@ export default function AdminNav() {
           <div className="flex items-center gap-2 mb-2">
             <button 
               type="button" 
-              onClick={() => isUnlocked ? lock() : setShowUnlockModal(true)}
+              onClick={() => isUnlocked ? handleLock() : setShowUnlockModal(true)}
               className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 text-sm rounded-md transition-colors touch-manipulation cursor-pointer ${
                 isUnlocked ? 'bg-amber-100 text-amber-700 hover:bg-amber-200' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
               }`}
@@ -305,15 +307,7 @@ export default function AdminNav() {
             </button>
           </div>
           
-          <button 
-            type="button" 
-            onClick={() => router.push('/')}
-            className="w-full flex items-center gap-3 px-3 py-2 text-sm text-[#787774] hover:bg-[#EBEBEB]/50 hover:text-[#37352F] rounded-md transition-colors mb-2 touch-manipulation cursor-pointer"
-          >
-            <span className="shrink-0 text-base">🏠</span>
-            <span className="font-bold tracking-wider">返回探索大厅</span>
-          </button>
-          <div className="flex items-center gap-3 px-3 py-2 hover:bg-[#EBEBEB]/50 rounded-md cursor-pointer transition-colors">
+          <div className="flex items-center gap-3 px-3 py-2 hover:bg-[#EBEBEB]/50 rounded-md cursor-pointer transition-colors mt-4">
             <div className="w-6 h-6 rounded-full bg-gray-200 border border-gray-300 shrink-0"></div>
             <span className="text-sm font-medium text-[#787774]">Admin</span>
           </div>

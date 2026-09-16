@@ -1,15 +1,4 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
 
 export const metadata: Metadata = {
   title: "心灵逃跑车票 - 寻找契合你灵魂的那座城 | 性格城市测试",
@@ -28,7 +17,7 @@ export default function RootLayout({
 }>) {
   return (
     <div
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased min-h-full flex flex-col`}
+      className={`h-full antialiased min-h-full flex flex-col`}
     >
       {children}
     </div>
