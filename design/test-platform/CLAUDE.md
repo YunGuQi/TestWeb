@@ -28,9 +28,9 @@
 
   - 打包发布统一执行一键命令：`npm run pack`（自动流水线调用 `node generate-inline-css.js` ➔ `npm run build` ➔ `node pack_dlp.js`，生成纯明文 `deploy.zip`）。
   - 遇到异常读取阻断或脱壳要求，查阅专有规范资产：
-    👉 [07_防泄密与安全脱壳规范.md](../../.agent/skills/xhs-auto-operator-v5/references/07_防泄密与安全脱壳规范.md)
+    👉 [07_防泄密与安全脱壳规范.md](../../.agent/skills/xhs-auto-operator-v7/references/07_防泄密与安全脱壳规范.md)
   - 跨平台构建与排坑查阅：
-    👉 [06_跨平台构建与部署避坑指南.md](../../.agent/skills/xhs-auto-operator-v5/references/06_跨平台构建与部署避坑指南.md)
+    👉 [06_跨平台构建与部署避坑指南.md](../../.agent/skills/xhs-auto-operator-v7/references/06_跨平台构建与部署避坑指南.md)
 
 ---
 

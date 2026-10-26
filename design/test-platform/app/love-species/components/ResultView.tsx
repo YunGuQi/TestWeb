@@ -240,9 +240,9 @@ export default function ResultView({ result: staleResult, userInfo, onRestart }:
   const result = {
     id: staleResult?.id || 1,
     key: staleResult?.key || 'AESI',
-    title: staleResult?.title || '噬元橘猫',
+    title: staleResult?.title || '直球粘人精 · 掉毛大胖橘',
     emoji: staleResult?.emoji || '🐱',
-    tags: staleResult?.tags || ['#极度粘人', '#直球选手'],
+    tags: staleResult?.tags || ['#大橘为重', '#消息秒回'],
     radar: staleResult?.radar,
     recordId: staleResult?.recordId,
     participantCount: staleResult?.participantCount,
@@ -600,10 +600,17 @@ export default function ResultView({ result: staleResult, userInfo, onRestart }:
           {/* Background Image & Gradient Mask strictly in the header */}
           <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
             <img 
-              src={`/images/love-species/${result.key}.bmp`} 
+              src={`/images/love-species/${result.key}.png`} 
               alt="background" 
               className="w-full h-full object-cover object-right transform scale-125 origin-right"
-              onError={(e) => { e.currentTarget.style.display = 'none'; }}
+              onError={(e) => {
+                const target = e.currentTarget;
+                if (!target.src.endsWith('.bmp')) {
+                  target.src = `/images/love-species/${result.key}.bmp`;
+                } else {
+                  target.style.display = 'none';
+                }
+              }}
             />
             {/* Dark gradient from left to right */}
             <div className="absolute inset-0 bg-gradient-to-r from-[#121212] via-[#121212]/90 to-transparent" />
@@ -668,7 +675,7 @@ export default function ResultView({ result: staleResult, userInfo, onRestart }:
           {/* Detailed Report Region */}
           <div className="relative flex flex-col w-full">
             {!isUnlocked && (
-              <div className="absolute inset-0 z-30 flex flex-col items-center justify-center bg-[#FDFBF7]/85 backdrop-blur-sm border-t-2 border-[#121212] pt-4 rounded-b-xl overflow-hidden mt-2 px-4">
+              <div className="absolute inset-0 z-30 flex flex-col items-center justify-center bg-[#FDFBF7]/85 backdrop-blur-[8px] border-t-2 border-[#121212] pt-4 rounded-b-xl overflow-hidden mt-2 px-4">
                 <div className="w-14 h-14 border-4 border-[#121212] rounded-full flex items-center justify-center text-2xl mb-3 text-[#121212] bg-white shadow-[4px_4px_0px_rgba(0,0,0,1)]">
                   🔒
                 </div>

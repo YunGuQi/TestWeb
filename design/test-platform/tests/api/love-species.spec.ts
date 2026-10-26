@@ -12,17 +12,22 @@ function generateSignature(payload: string, timestamp: number): string {
 
 test.describe('Love Species 3.0 API Tests (TDD)', () => {
 
-  test('GET /api/questions?testId=love-species should return 20 questions without score weights', async ({ request }) => {
-    // Note: GET /api/questions does not actually check the signature according to current route.ts,
-    // but we can pass it just in case.
-    const response = await request.get('/api/questions?testId=love-species');
+  test('GET /api/questions?testId=love-species should return 15 questions without score weights', async ({ request }) => {
+    const timestamp = Date.now();
+    const sign = generateSignature('GET_QUESTIONS', timestamp);
+    const response = await request.get('/api/questions?testId=love-species', {
+      headers: {
+        'x-timestamp': timestamp.toString(),
+        'x-sign': sign
+      }
+    });
     
     expect(response.ok()).toBeTruthy();
     const data = await response.json();
     
-    // Check if it returns exactly 20 questions
+    // Check if it returns exactly 15 questions
     expect(data.questions).toBeDefined();
-    expect(data.questions.length).toBe(20);
+    expect(data.questions.length).toBe(15);
     
     // Check for anti-scraping: NO SCORES LEAKED
     const firstQuestion = data.questions[0];
@@ -33,17 +38,19 @@ test.describe('Love Species 3.0 API Tests (TDD)', () => {
     }
   });
 
-  test('POST /api/submit should calculate AESI genome and return 赛博哈士奇', async ({ request }) => {
-    // Select answers that heavily favor Attached, Expressive, Sensitive, Idealistic
-    // Based on love-species-data.ts:
-    // q1-o4 (A,S), q2-o4 (A,E), q3-o1 (E,A), q4-o1 (E,A), q6-o1 (A,S)
-    // q8-o1 (I,S), q12-o4 (E,I), q18-o1 (A,I), q19-o1 (A,I)
-    // These options will definitely push the result towards AESI
+  test('POST /api/submit should calculate AESI genome and return 直球粘人精 · 掉毛大胖橘', async ({ request }) => {
+    // 1. 初始化并获取 HttpOnly Session Cookie (与服务端鉴权对齐)
+    const initRes = await request.get('/api/init-test?testId=love-species');
+    expect(initRes.ok()).toBeTruthy();
+    const cookies = initRes.headers()['set-cookie'];
+    expect(cookies).toBeDefined();
+    expect(cookies).toContain('test_session=');
+
+    // 2. 选择稳定偏向 Attached, Expressive, Sensitive, Idealistic 的 15 题黄金选项
     const optionIds = [
-      'ls-q1-o4', 'ls-q2-o4', 'ls-q3-o1', 'ls-q4-o1', 'ls-q5-o1',
-      'ls-q6-o1', 'ls-q7-o1', 'ls-q8-o1', 'ls-q9-o2', 'ls-q10-o1',
-      'ls-q11-o1', 'ls-q12-o4', 'ls-q13-o1', 'ls-q14-o2', 'ls-q15-o4',
-      'ls-q16-o1', 'ls-q17-o1', 'ls-q18-o1', 'ls-q19-o1', 'ls-q20-o1'
+      'ls-q1-o1', 'ls-q2-o4', 'ls-q3-o1', 'ls-q4-o1', 'ls-q5-o2',
+      'ls-q6-o1', 'ls-q7-o1', 'ls-q8-o1', 'ls-q9-o2', 'ls-q10-o2',
+      'ls-q11-o1', 'ls-q12-o1', 'ls-q13-o1', 'ls-q14-o2', 'ls-q15-o1'
     ];
 
     const payload = {
@@ -60,7 +67,8 @@ test.describe('Love Species 3.0 API Tests (TDD)', () => {
       headers: {
         'x-timestamp': timestamp.toString(),
         'x-sign': signature,
-        'content-type': 'application/json'
+        'content-type': 'application/json',
+        'cookie': cookies
       },
       data: payloadStr
     });
@@ -76,18 +84,22 @@ test.describe('Love Species 3.0 API Tests (TDD)', () => {
     
     // The genome key should be AESI
     expect(data.result.key).toBe('AESI');
-    expect(data.result.title).toBe('赛博哈士奇');
+    expect(data.result.title).toBe('直球粘人精 · 掉毛大胖橘');
   });
 
-  test('POST /api/submit should calculate DHCR genome and return 冰川雪豹', async ({ request }) => {
-    // Select answers that heavily favor Detached, Hidden, Calm, Realistic
-    // Based on love-species-data.ts:
-    // q1-o3 (D,C), q2-o2 (C,R), q3-o2 (C,D), q4-o3 (D,C)
+  test('POST /api/submit should calculate DHCR genome and return 寡王巅峰 · 零度高岭雪豹', async ({ request }) => {
+    // 1. 初始化并获取 HttpOnly Session Cookie (与服务端鉴权对齐)
+    const initRes = await request.get('/api/init-test?testId=love-species');
+    expect(initRes.ok()).toBeTruthy();
+    const cookies = initRes.headers()['set-cookie'];
+    expect(cookies).toBeDefined();
+    expect(cookies).toContain('test_session=');
+
+    // 2. 选择稳定偏向 Detached, Hidden, Calm, Realistic 的 15 题黄金选项
     const optionIds = [
-      'ls-q1-o3', 'ls-q2-o2', 'ls-q3-o2', 'ls-q4-o3', 'ls-q5-o2',
-      'ls-q6-o2', 'ls-q7-o4', 'ls-q8-o2', 'ls-q9-o3', 'ls-q10-o2',
-      'ls-q11-o2', 'ls-q12-o2', 'ls-q13-o4', 'ls-q14-o4', 'ls-q15-o2',
-      'ls-q16-o4', 'ls-q17-o4', 'ls-q18-o3', 'ls-q19-o2', 'ls-q20-o4'
+      'ls-q1-o3', 'ls-q2-o2', 'ls-q3-o2', 'ls-q4-o2', 'ls-q5-o4',
+      'ls-q6-o3', 'ls-q7-o4', 'ls-q8-o4', 'ls-q9-o4', 'ls-q10-o3',
+      'ls-q11-o2', 'ls-q12-o2', 'ls-q13-o4', 'ls-q14-o3', 'ls-q15-o4'
     ];
 
     const payload = {
@@ -104,7 +116,8 @@ test.describe('Love Species 3.0 API Tests (TDD)', () => {
       headers: {
         'x-timestamp': timestamp.toString(),
         'x-sign': signature,
-        'content-type': 'application/json'
+        'content-type': 'application/json',
+        'cookie': cookies
       },
       data: payloadStr
     });
@@ -117,7 +130,7 @@ test.describe('Love Species 3.0 API Tests (TDD)', () => {
     
     expect(data.success).toBeTruthy();
     expect(data.result.key).toBe('DHCR');
-    expect(data.result.title).toBe('冰川雪豹');
+    expect(data.result.title).toBe('寡王巅峰 · 零度高岭雪豹');
   });
 
 });

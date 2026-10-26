@@ -11,7 +11,7 @@ function generateSignature(payload: string, timestamp: number): string {
 
 test.describe('Destiny Lover API Submit & Anti-Block Regression Tests', () => {
 
-  test('GET /api/questions?testId=destiny-lover should return 20 questions', async ({ request }) => {
+  test('GET /api/questions?testId=destiny-lover should return 15 questions', async ({ request }) => {
     const timestamp = Date.now();
     const sign = generateSignature('GET_QUESTIONS', timestamp);
     const response = await request.get('/api/questions?testId=destiny-lover', {
@@ -25,7 +25,7 @@ test.describe('Destiny Lover API Submit & Anti-Block Regression Tests', () => {
     const data = await response.json();
     expect(data.success).toBe(true);
     expect(data.questions).toBeDefined();
-    expect(data.questions.length).toBe(20);
+    expect(data.questions.length).toBe(15);
   });
 
   test('POST /api/submit should succeed WITHOUT turnstileToken (graceful degradation for mainland China network)', async ({ request }) => {
@@ -36,7 +36,7 @@ test.describe('Destiny Lover API Submit & Anti-Block Regression Tests', () => {
     expect(cookies).toBeDefined();
     expect(cookies).toContain('test_session=');
 
-    // 2. 模拟真实用户的 20 题答案 (偏向 ldap 组合)
+    // 2. 模拟真实用户的 15 题答案 (偏向 ldap 组合)
     const answers: Record<string, string> = {
       q1: 'o1_1',  // L
       q2: 'o2_2',  // L
@@ -52,12 +52,7 @@ test.describe('Destiny Lover API Submit & Anti-Block Regression Tests', () => {
       q12: 'o12_2', // A
       q13: 'o13_1', // A
       q14: 'o14_2', // A
-      q15: 'o15_1', // A
-      q16: 'o16_2', // P
-      q17: 'o17_1', // P
-      q18: 'o18_2', // P
-      q19: 'o19_1', // P
-      q20: 'o20_2'  // P
+      q15: 'o15_1'  // A
     };
 
     const payload = {

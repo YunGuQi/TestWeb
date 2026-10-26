@@ -88,36 +88,6 @@ export const CITY_QUESTIONS_FALLBACK = [
     { text: "踩沙滩人字拖，在热带椰林下放空晒暖", scores: '{"rhythm":0,"env":0,"temp":2,"social":0,"taste":1,"billName":"海岛躺平"}' },
     { text: "投身喧嚣夜市，在滚烫镬气人声里回血", scores: '{"rhythm":0,"env":1,"temp":0,"social":2,"taste":1,"billName":"夜市回血"}' },
     { text: "闭门沉浸组装，拔掉网线挑战复杂手作", scores: '{"rhythm":2,"env":0,"temp":-2,"social":0,"taste":0,"billName":"闭门沉浸"}' }
-  ]},
-  { order: 16, text: "面对\"说走就走的旅行\"，你最真实的出行作风是：", options: [
-    { text: "列出精确时刻，行程与备选分秒都不差", scores: '{"rhythm":2,"env":1,"temp":0,"social":0,"taste":-1,"billName":"精密路书"}' },
-    { text: "揣着车票即走，沿途跟着香味凭直觉逛", scores: '{"rhythm":-2,"env":0,"temp":1,"social":1,"taste":2,"billName":"凭胃流浪"}' },
-    { text: "跟随热络好友，安心当个不操心的跟班", scores: '{"rhythm":0,"env":0,"temp":1,"social":1,"taste":0,"billName":"搭伴随行"}' },
-    { text: "独自涉足原野，探寻无信号的旷野密林", scores: '{"rhythm":0,"env":-1,"temp":-2,"social":-2,"taste":-1,"billName":"荒野涉足"}' }
-  ]},
-  { order: 17, text: "如果给自己的精神底色挑选一种天气，你觉得自己最像：", options: [
-    { text: "艳阳晴空万里，热烈坦荡从不藏着掖着", scores: '{"rhythm":1,"env":0,"temp":2,"social":2,"taste":0,"billName":"艳阳热烈"}' },
-    { text: "江南梅雨微濛，细腻委婉藏着万千诗意", scores: '{"rhythm":-1,"env":0,"temp":0,"social":0,"taste":-2,"billName":"烟雨温婉"}' },
-    { text: "深冬凛冽晴空，冷峻通透保持绝对理性", scores: '{"rhythm":0,"env":1,"temp":-2,"social":-2,"taste":1,"billName":"冷峻克制"}' },
-    { text: "海风轻拂晚霞，随性松弛自有一番温柔", scores: '{"rhythm":0,"env":-1,"temp":0,"social":0,"taste":1,"billName":"晚霞微醺"}' }
-  ]},
-  { order: 18, text: "如果天上掉下一笔无需偿还的闲钱，你第一反应是拿来：", options: [
-    { text: "投入资本增值，为未来版图积蓄弹药库", scores: '{"rhythm":2,"env":1,"temp":-1,"social":0,"taste":0,"billName":"复利增值"}' },
-    { text: "做东宴请好友，大家痛痛快快尽兴一晚", scores: '{"rhythm":0,"env":0,"temp":2,"social":2,"taste":2,"billName":"请客欢聚"}' },
-    { text: "购置设计好物，把居所装点成美学空间", scores: '{"rhythm":0,"env":1,"temp":0,"social":0,"taste":-2,"billName":"装点美舍"}' },
-    { text: "买张单程机票，立刻动身飞往雪原放空", scores: '{"rhythm":-2,"env":-2,"temp":-1,"social":-2,"taste":0,"billName":"放空逃跑"}' }
-  ]},
-  { order: 19, text: "在这个世界上，最能触动你神经末梢的声音是：", options: [
-    { text: "键盘敲击节律，伴随白噪音的高能产出", scores: '{"rhythm":2,"env":1,"temp":0,"social":0,"taste":0,"billName":"键盘律动"}' },
-    { text: "排档鼎沸人声，清脆碰杯与爽朗欢笑声", scores: '{"rhythm":0,"env":0,"temp":2,"social":2,"taste":2,"billName":"大排档欢笑"}' },
-    { text: "潮水拍岸低鸣，退潮时轻抚卵石沙沙声", scores: '{"rhythm":-2,"env":1,"temp":0,"social":0,"taste":0,"billName":"海浪沙沙"}' },
-    { text: "松林吹拂飞雪，广袤寂静中的纯粹呼吸", scores: '{"rhythm":0,"env":-2,"temp":-2,"social":-2,"taste":-2,"billName":"雪落松林"}' }
-  ]},
-  { order: 20, text: "如果给这一生最向往的生活写一句注脚，你希望是：", options: [
-    { text: "奔涌破浪向前，在时代浪潮留下我名字", scores: '{"rhythm":2,"env":1,"temp":0,"social":1,"taste":-1,"billName":"破浪争先"}' },
-    { text: "得闲安稳饮茶，市井饭香热气才是归宿", scores: '{"rhythm":-2,"env":0,"temp":2,"social":1,"taste":1,"billName":"知足常乐"}' },
-    { text: "守住内心洁白，于喧闹繁华里辟一处幽", scores: '{"rhythm":0,"env":0,"temp":-1,"social":-1,"taste":-1,"billName":"一隅清雅"}' },
-    { text: "浪迹广阔天地，做天地苍茫无拘束游民", scores: '{"rhythm":0,"env":-1,"temp":-1,"social":-1,"taste":1,"billName":"天地游民"}' }
   ]}
 ];
 

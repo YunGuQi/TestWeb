@@ -43,22 +43,22 @@ export interface SpeciesSynergyResult {
 
 // 16 大恋爱物种公开轻量元数据清单（绝不含 70% 深度分析与私密商业资产）
 export const SPECIES_SUMMARIES_DATA = [
-  { id: 1, key: "AESI", title: "噬元橘猫", emoji: "🐱", tags: ["#极度粘人", "#直球选手", "#易受惊吓"], bestMatch: "慢热冬眠熊 (AHCR)", toxicMatch: "傲娇曼岛猫 (DECI)" },
-  { id: 2, key: "AESR", title: "护食幼狼", emoji: "🐺", tags: ["#双标护短", "#现实主义", "#领地意识"], bestMatch: "筑巢小燕子 (AECR)", toxicMatch: "沙漠耳狐 (DHSI)" },
-  { id: 3, key: "AECI", title: "满电海獭", emoji: "🦦", tags: ["#顶级情绪价值", "#六边形战士", "#小太阳"], bestMatch: "噬元橘猫 (AESI)", toxicMatch: "暗夜猫头鹰 (DHSR)" },
-  { id: 4, key: "AECR", title: "筑巢小燕子", emoji: "🐦", tags: ["#爹系妈系", "#务实陪伴", "#靠谱担当"], bestMatch: "护食幼狼 (AESR)", toxicMatch: "刺客猞猁 (DESI)" },
-  { id: 5, key: "AHSI", title: "剧毒水母", emoji: "🪼", tags: ["#情绪黑洞", "#美丽且危险", "#高敏易碎"], bestMatch: "满电海獭 (AECI)", toxicMatch: "傲娇曼岛猫 (DECI)" },
-  { id: 6, key: "AHSR", title: "脆皮洋桔梗", emoji: "🥀", tags: ["#患得患失", "#现实考量", "#极度缺爱"], bestMatch: "慢热冬眠熊 (AHCR)", toxicMatch: "极地白狼 (DECR)" },
-  { id: 7, key: "AHCI", title: "幻影变色龙", emoji: "🦎", tags: ["#极致浪漫", "#阴晴不定", "#需要新鲜感"], bestMatch: "噬元橘猫 (AESI)", toxicMatch: "刺客猞猁 (DESI)" },
-  { id: 8, key: "AHCR", title: "慢热冬眠熊", emoji: "🐻", tags: ["#稳如泰山", "#默默守护", "#过日子第一名"], bestMatch: "脆皮洋桔梗 (AHSR)", toxicMatch: "沙漠耳狐 (DHSI)" },
-  { id: 9, key: "DESI", title: "刺客猞猁", emoji: "🐅", tags: ["#傲娇至死", "#嘴硬心软", "#极度缺爱"], bestMatch: "满电海獭 (AECI)", toxicMatch: "傲娇曼岛猫 (DECI)" },
-  { id: 10, key: "DESR", title: "装甲刺猬", emoji: "🦔", tags: ["#人间清醒", "#及时止损", "#防御点满"], bestMatch: "筑巢小燕子 (AECR)", toxicMatch: "剧毒水母 (AHSI)" },
-  { id: 11, key: "DECI", title: "傲娇曼岛猫", emoji: "🐈", tags: ["#绝对自我", "#理智得可怕", "#需要空间"], bestMatch: "噬元橘猫 (AESI)", toxicMatch: "刺客猞猁 (DESI)" },
-  { id: 12, key: "DECR", title: "极地白狼", emoji: "🐺", tags: ["#生人勿近", "#利益至上", "#慕强"], bestMatch: "装甲刺猬 (DESR)", toxicMatch: "脆皮洋桔梗 (AHSR)" },
-  { id: 13, key: "DHSI", title: "沙漠耳狐", emoji: "🦊", tags: ["#听觉雷达", "#细节狂魔", "#难以触及"], bestMatch: "幻影变色龙 (AHCI)", toxicMatch: "护食幼狼 (AESR)" },
-  { id: 14, key: "DHSR", title: "暗夜猫头鹰", emoji: "🦉", tags: ["#极致利己", "#暗中观察", "#不见兔子不撒鹰"], bestMatch: "慢热冬眠熊 (AHCR)", toxicMatch: "满电海獭 (AECI)" },
-  { id: 15, key: "DHCI", title: "待机水豚", emoji: "🦦", tags: ["#情绪绝缘体", "#万物皆可佛", "#顶级松弛感"], bestMatch: "噬元橘猫 (AESI)", toxicMatch: "沙漠耳狐 (DHSI)" },
-  { id: 16, key: "DHCR", title: "冰川雪豹", emoji: "🐆", tags: ["#高岭之花", "#孤独求败", "#极度独立"], bestMatch: "极地白狼 (DECR)", toxicMatch: "噬元橘猫 (AESI)" }
+  { id: 1, key: "AESI", title: "直球粘人精 · 掉毛大胖橘", emoji: "🐱", tags: ["#大橘为重", "#消息秒回", "#掉毛狂魔", "#直球大喇叭"], bestMatch: "纯爱战神 · 铁憨憨大金毛 (AHCR)", toxicMatch: "查岗黑洞 · 莫挨老子渣猫 (DECI)" },
+  { id: 2, key: "AESR", title: "双标战神 · 护食黑柴犬", emoji: "🐕", tags: ["#对内摇尾", "#对外龇牙", "#护食狂犬", "#记仇小本本"], bestMatch: "全自动保姆 · 操心边牧 (AECR)", toxicMatch: "风吹草动连夜跑 · 惊恐飞鼠 (DHSI)" },
+  { id: 3, key: "AECI", title: "狂暴小太阳 · 撒欢二哈", emoji: "🐺", tags: ["#精力过载", "#纯血乐天派", "#热血笨蛋", "#拆家式示爱"], bestMatch: "直球粘人精 · 掉毛大胖橘 (AESI)", toxicMatch: "八百个心眼 · 侦探猫头鹰 (DHSR)" },
+  { id: 4, key: "AECR", title: "全自动保姆 · 操心边牧", emoji: "🐶", tags: ["#爹妈系男友", "#自动放牧", "#全盘操心", "#高智商保姆"], bestMatch: "双标战神 · 护食黑柴犬 (AESR)", toxicMatch: "嘴硬心烂 · 傲娇暹罗猫 (DESI)" },
+  { id: 5, key: "AHSI", title: "阴阳大师 · 炸毛黑猫", emoji: "🐈‍⬛", tags: ["#冷脸洗内裤", "#口是心非", "#高敏炸毛", "#微表情福尔摩斯"], bestMatch: "狂暴小太阳 · 撒欢二哈 (AECI)", toxicMatch: "查岗黑洞 · 莫挨老子渣猫 (DECI)" },
+  { id: 6, key: "AHSR", title: "又怂又爱 · 脆皮垂耳兔", emoji: "🐰", tags: ["#胆小如鼠", "#暗戳戳试探", "#现实主义装傻", "#一碰就碎"], bestMatch: "纯爱战神 · 铁憨憨大金毛 (AHCR)", toxicMatch: "利益合伙人 · 搞钱杜宾犬 (DECR)" },
+  { id: 7, key: "AHCI", title: "就地装死 · 摆烂猫猫虫", emoji: "🐛", tags: ["#遇事装死", "#浪漫绝缘假动作", "#别逼我", "#躺平治百病"], bestMatch: "直球粘人精 · 掉毛大胖橘 (AESI)", toxicMatch: "嘴硬心烂 · 傲娇暹罗猫 (DESI)" },
+  { id: 8, key: "AHCR", title: "纯爱战神 · 铁憨憨大金毛", emoji: "🦮", tags: ["#纯爱无脑", "#笨拙真诚", "#顶级安全感", "#护短大暖男"], bestMatch: "又怂又爱 · 脆皮垂耳兔 (AHSR)", toxicMatch: "风吹草动连夜跑 · 惊恐飞鼠 (DHSI)" },
+  { id: 9, key: "DESI", title: "嘴硬心烂 · 傲娇暹罗猫", emoji: "🐱", tags: ["#全身上下嘴最硬", "#推开又偷看", "#午夜心碎小狗", "#死要面子"], bestMatch: "狂暴小太阳 · 撒欢二哈 (AECI)", toxicMatch: "查岗黑洞 · 莫挨老子渣猫 (DECI)" },
+  { id: 10, key: "DESR", title: "法官级算账 · 防盗铁刺猬", emoji: "🦔", tags: ["#感情合伙制", "#绝不倒贴", "#账本防盗门", "#秒速止损"], bestMatch: "全自动保姆 · 操心边牧 (AECR)", toxicMatch: "阴阳大师 · 炸毛黑猫 (AHSI)" },
+  { id: 11, key: "DECI", title: "查岗黑洞 · 莫挨老子渣猫", emoji: "🐈", tags: ["#已读乱回", "#自由第一", "#你谁啊别管我", "#反PUA大师"], bestMatch: "直球粘人精 · 掉毛大胖橘 (AESI)", toxicMatch: "嘴硬心烂 · 傲娇暹罗猫 (DESI)" },
+  { id: 12, key: "DECR", title: "利益合伙人 · 搞钱杜宾犬", emoji: "🐕‍🦺", tags: ["#顶级慕强", "#恋爱不如搞钱", "#并肩作战", "#冷血合伙人"], bestMatch: "法官级算账 · 防盗铁刺猬 (DESR)", toxicMatch: "又怂又爱 · 脆皮垂耳兔 (AHSR)" },
+  { id: 13, key: "DHSI", title: "风吹草动连夜跑 · 惊恐飞鼠", emoji: "🐿️", tags: ["#逃跑冠军", "#风吹草动连夜买站票", "#自闭树洞", "#怕被看穿"], bestMatch: "就地装死 · 摆烂猫猫虫 (AHCI)", toxicMatch: "双标战神 · 护食黑柴犬 (AESR)" },
+  { id: 14, key: "DHSR", title: "八百个心眼 · 侦探猫头鹰", emoji: "🦉", tags: ["#暗中调查", "#背景背调", "#不见兔子不撒鹰", "#利己精算师"], bestMatch: "纯爱战神 · 铁憨憨大金毛 (AHCR)", toxicMatch: "狂暴小太阳 · 撒欢二哈 (AECI)" },
+  { id: 15, key: "DHCI", title: "情绪已入土 · 佛系卡皮巴拉", emoji: "🦫", tags: ["#情绪入土", "#万物皆可OK", "#顶级松弛感", "#精神老干部"], bestMatch: "直球粘人精 · 掉毛大胖橘 (AESI)", toxicMatch: "风吹草动连夜跑 · 惊恐飞鼠 (DHSI)" },
+  { id: 16, key: "DHCR", title: "寡王巅峰 · 零度高岭雪豹", emoji: "🐆", tags: ["#雪山寡王", "#生人勿近", "#爱能当饭吃吗", "#终极独行侠"], bestMatch: "利益合伙人 · 搞钱杜宾犬 (DECR)", toxicMatch: "直球粘人精 · 掉毛大胖橘 (AESI)" }
 ];
 
 export const getAllSpecies = (): SpeciesSummary[] => {
@@ -90,73 +90,73 @@ interface CustomScenario {
 const SPECIAL_SYNERGY_MAP: Record<string, CustomScenario> = {
   "AESI_AHCR": {
     score: 98,
-    tierTitle: "灵魂共鸣 · 天生饲养员 (SSS级)",
-    synergyTone: "高浓度粘人精遇到无底线包容的治愈神仙CP",
+    tierTitle: "猫狗双全 · 灵魂共鸣天花板 (SSS级)",
+    synergyTone: "高浓度掉毛粘人精遇到无底线顺毛的大暖汪",
     relationType: "soulmate",
-    interactionScene: "冬眠熊在沙发上默默切水果，橘猫一屁股坐进怀里，把手机亮给熊看搞笑猫咪视频。熊一边宠溺地递过切好的苹果，一边温厚地揉揉猫脑袋，任由橘猫在自己手臂上蹭来蹭去。",
-    sweetMoment: "橘猫半夜做噩梦突然惊醒，还没开口，冬眠熊闭着眼睛就下意识把被子给它掖好，反手搂紧轻拍它的后背：“别怕，我一直都在。”",
-    dangerNotice: "橘猫闹脾气时千万别玩失联；冬眠熊需要偶尔有属于自己的洞穴安静时刻，不要把熊的片刻沉默当成感情降温。",
-    secretCode: "“冬眠熊提供情绪避风港，橘猫给平淡生活点燃烟花。”"
+    interactionScene: "大金毛在沙发上默默切水果，大胖橘一屁股坐进金毛怀里，把手机亮给金毛看搞笑萌宠视频。金毛一边宠溺地递过苹果，一边温厚地给大橘顺毛，任由大橘在自己身上蹭得全是猫毛。",
+    sweetMoment: "大胖橘半夜做噩梦突然惊醒，还没开口，大金毛闭着眼睛下意识把被子给它掖好，反手搂紧轻拍后背：“别怕，我在呢，大橘为重。”",
+    dangerNotice: "大胖橘闹小脾气时金毛切莫冷场；金毛也需要偶尔放空的充电时刻，大橘不要把片刻安静当成感情降温。",
+    secretCode: "“大金毛提供终身避风港，大胖橘给平淡岁月点燃烟花。”"
   },
   "AESI_DECR": {
     score: 92,
-    tierTitle: "极限反差 · 孤傲狼王专属偏爱 (SS级)",
-    synergyTone: "冰封雪山被一团热烈火焰彻底捂化的反差甜",
+    tierTitle: "极限反差 · 搞钱杜宾专属偏爱 (SS级)",
+    synergyTone: "冷血商业杜宾被一团热烈掉毛大胖橘彻底捂化的反差甜",
     relationType: "complement",
-    interactionScene: "白狼在电脑前雷厉风行地敲着商业方案，气场冻结两米八。橘猫不管不顾一头撞进白狼手边撒娇喵喵叫，白狼眉头微微一皱，手却诚实地停下键盘，一把将橘猫捞起放在大腿上抱紧。",
-    sweetMoment: "白狼在外人面前威严冷峻滴水不漏，一回到家脱下外套，第一句话就是哑着嗓子问：“今天在家有没有想我？”",
-    dangerNotice: "白狼专注搞钱与正事时，橘猫切莫夺命连环催；白狼再忙也要在微信置顶里留一句报备，这是橘猫的续命稻草。",
-    secretCode: "“你是狼王向世界展示獠牙后，唯一的软肋与退路。”"
+    interactionScene: "杜宾犬在电脑前雷厉风行地敲着商业并购案，西装革履气场两米八。大胖橘不管不顾一头撞进杜宾手臂里喵喵叫蹭一身毛，杜宾眉头微微一皱，手却诚实地停下键盘，一把将大胖橘捞起抱在大腿上。",
+    sweetMoment: "杜宾在外人面前冷峻威严滴水不漏，一回到家脱下大衣，第一句话就是哑着嗓子问：“今天在家有没有想我？”",
+    dangerNotice: "杜宾专注搞钱与核心事业时，大胖橘切莫夺命连环催；杜宾再忙也要在微信置顶留句报备，这是大胖橘的安全感底线。",
+    secretCode: "“你是杜宾向世界展现利齿后，唯一的软肋与专属退路。”"
   },
   "AESI_DHSI": {
     score: 69,
-    tierTitle: "猫狐拉扯 · 猜忌迷宫修罗场 (B级)",
-    synergyTone: "夺命连环追击遇到敏锐捉迷藏大师的推拉虐恋",
+    tierTitle: "猫鼠拉扯 · 猜忌迷宫修罗场 (B级)",
+    synergyTone: "夺命连环追击遇到敏感逃跑冠军的推拉虐恋",
     relationType: "toxic",
-    interactionScene: "耳狐因为察觉到橘猫某句话的异样，突然躲进房间关紧房门不作声；橘猫在门外疯狂敲门敲到手红，眼泪打转：“你到底怎么了！说清楚好不好！”两人的安全感频段完全错位。",
-    sweetMoment: "两只小动物终于坦白脆弱的那一晚，在雨夜车里哭着抱头倾诉，发现原来彼此都在拼命害怕失去对方。",
-    dangerNotice: "一个想用直球逼问安全感，一个用后退筑起高墙；越逼退得越快，越躲追得越凶，极易两败俱伤。",
-    secretCode: "“耳狐需要学着放下试探直接说‘抱抱我’；橘猫需要给耳狐留出10分钟喘息的真空圈。”"
+    interactionScene: "惊恐飞鼠因为察觉到大胖橘某句话的语气异样，突然钻回树洞关紧房门；大胖橘在门外急得疯狂敲门手都红了：“你到底怎么了！说清楚好不好！”两人的安全感频段完全错位。",
+    sweetMoment: "两只小动物终于坦白脆弱的那一晚，在车里抱头哭着倾诉，发现原来彼此都在拼命害怕被对方抛弃。",
+    dangerNotice: "一个想用直球逼问安全感，一个用逃避筑起高墙；越逼退得越快，越躲追得越凶，极易两败俱伤。",
+    secretCode: "“惊恐飞鼠需要学会直接说‘抱抱我’；大胖橘需要留出10分钟让飞鼠回血的缓冲期。”"
   },
   "DESR_DHCI": {
     score: 95,
     tierTitle: "脱刺疗愈 · 专属松弛感绿洲 (SSS级)",
-    synergyTone: "浑身带刺的小防备遇到大地般温和的大水豚",
+    synergyTone: "浑身竖刺的清醒小算盘遇到大地般温和的大水豚",
     relationType: "soulmate",
-    interactionScene: "刺猬在外受了委屈，一身刺竖得像刺刀一样进门冷着脸。水豚什么也不追问，默默泡了一杯热可可推到它面前，旁边放上一块刚烤热的华夫饼，水豚慢吞吞躺在一旁看书，用行动告诉它：这里没有考核。",
-    sweetMoment: "刺猬终于敢在水豚怀里收起所有硬刺，露出了最柔软的粉色小肚皮，安心地睡起了长达两小时的午觉。",
-    dangerNotice: "水豚的极致松弛有时会被误解为‘不在乎’，水豚需多用切实的肢体拥抱让刺猬明确感知在场。",
-    secretCode: "“世间所有的刀枪不入，都在水豚的温水中化为一池春水。”"
+    interactionScene: "防盗铁刺猬在外受了委屈，一身刺竖得像刺刀一样进门冷着脸。卡皮巴拉什么也不追问，默默泡了一杯热可可推到面前，头顶橘子慢吞吞躺在一旁看书，用行动告诉它：这里没有考核与算计。",
+    sweetMoment: "铁刺猬终于敢在卡皮巴拉怀里收起所有硬刺，露出了最柔软的粉色小肚皮，安心睡了两个小时的香甜午觉。",
+    dangerNotice: "卡皮巴拉的极致佛系有时会被刺猬误解为‘不在乎’，卡皮巴拉需多用切实的拥抱让刺猬明确感知在场。",
+    secretCode: "“世间所有的刀枪不入，都在卡皮巴拉的温泉中化为一池春水。”"
   },
   "DHCR_DECR": {
     score: 94,
     tierTitle: "巅峰同盟 · 永不背叛的雪山双王 (SS级)",
-    synergyTone: "极度独立理智、顶峰相见的成年人高级爱情",
+    synergyTone: "极度独立理智、顶峰相见的搞钱天花板组合",
     relationType: "soulmate",
-    interactionScene: "两个人各自坐在咖啡馆两侧办公，两台笔记本电脑键盘声清脆连成一片，四小时互不打扰。合上电脑那一刻，雪豹递过车钥匙，白狼接过顺手拉开车门，相视一笑：“走，去吃那家必须排队的黑珍珠。”",
-    sweetMoment: "遭遇生活或职场的重大惊涛骇浪时，不需要言语煽情，两只猛兽并肩站立，彼此是最坚不可摧的后背。",
+    interactionScene: "两个人各自坐在咖啡馆两侧办公，两台笔记本电脑键盘声清脆连成一片，四小时互不打扰。合上电脑那一刻，雪豹递过车钥匙，杜宾接过顺手拉开车门，相视一笑：“走，去吃那家必须排队的黑珍珠。”",
+    sweetMoment: "遭遇职场或现实的重大惊涛浪浪时，不需要多余言语，两只强者并肩站立，彼此是最坚不可摧的后背。",
     dangerNotice: "双王都不肯先低头，出现原则分歧时切忌用商业并购般的冷血逻辑复盘对方，爱需要偶尔示弱。",
     secretCode: "“并肩作战而非相互依附，各自闪光却又唯一归巢。”"
   },
   "AECI_DHCI": {
     score: 91,
-    tierTitle: "水系欢喜 · 活力电量与无尽水库 (SS级)",
-    synergyTone: "一个上蹿下跳造梦狂欢，一个仰泳兜底提供充电桩",
+    tierTitle: "水火欢喜 · 狂暴拆家与无尽温泉 (SS级)",
+    synergyTone: "一个精力过载上蹿下跳，一个情绪入土仰泳兜底",
     relationType: "complement",
-    interactionScene: "海獭在客厅蹦蹦跳跳展示自己刚淘到的小贝壳和手办，说得口沫横飞眼睛放光；水豚顶着橘子漂在沙发一角，安详地微笑着，时不时配合地拍拍两下爪子给予最认真的掌声。",
-    sweetMoment: "海獭电量耗尽瘫倒在地毯上的瞬间，水豚默默把自己的毛绒肚子挪过去给它当枕头，一人一水獭静止在黄昏里。",
-    dangerNotice: "海獭别嫌弃水豚的反应慢半拍，水豚的平静就是你永不沉没的浮标。",
-    secretCode: "“你在水面掀起所有浪花，我沉入湖底为你稳固风浪。”"
+    interactionScene: "二哈在客厅上蹿下跳展示自己淘到的新玩具，说得口沫横飞眼睛放光；卡皮巴拉头顶橘子泡在沙发一角，安详地微笑着，时不时配合地拍拍两下爪子给予最认真的掌声。",
+    sweetMoment: "二哈电量耗尽瘫倒在地毯上的瞬间，卡皮巴拉默默把自己的毛绒肚皮挪过去给它当枕头，一哈一豚静止在黄昏里。",
+    dangerNotice: "二哈别嫌弃卡皮巴拉反应慢半拍，卡皮巴拉的平静就是你永不翻船的浮标。",
+    secretCode: "“你在地上掀起所有风暴，我卧在水底为你兜住人间。”"
   },
   "DECI_AESR": {
     score: 89,
-    tierTitle: "猫狗双全 · 嘴硬女王与忠犬骑士 (S级)",
-    synergyTone: "嘴上说着离我远点，身体却悄悄靠近的甜蜜拉扯",
+    tierTitle: "猫狗拉扯 · 高岭渣猫与护食忠犬 (S级)",
+    synergyTone: "嘴上说着离我远点，身体却悄悄靠近的傲娇反差",
     relationType: "complement",
-    interactionScene: "曼岛猫踩着高傲的步子走过，冷淡地说：“今天降温，我可不是特意给你拿外套的，顺手而已。”幼狼一把抓过外套搂住曼岛猫，尾巴摇得像螺旋桨：“只要是你给的我都穿！”",
-    sweetMoment: "当有外人质疑曼岛猫时，平时温驯的幼狼立刻龇牙护短冲在最前面，曼岛猫嘴角微微勾起，悄悄勾住幼狼的小指。",
-    dangerNotice: "曼岛猫不要频繁把分手或狠话挂在嘴边测试忠诚，幼狼也是会心碎的忠犬。",
-    secretCode: "“高岭之猫的骄傲，终究被幼狼毫无保留的赤诚所降服。”"
+    interactionScene: "渣猫踩着高傲的步子走过，冷淡地说：“今天降温，我可不是特意给你拿外套的，顺手而已。”黑柴一把抓过外套搂住渣猫，尾巴摇得像螺旋桨：“只要是你给的我都穿！”",
+    sweetMoment: "当有外人试图欺负渣猫时，平时温顺的黑柴立刻龇牙护食冲在最前面，渣猫嘴角微微勾起，悄悄勾住黑柴的爪子。",
+    dangerNotice: "渣猫不要频繁把分手或狠话挂在嘴边测试忠诚，黑柴的心也是肉长的。",
+    secretCode: "“莫挨老子渣猫的高冷，终究被黑柴犬毫无保留的赤诚所融化。”"
   }
 };
 

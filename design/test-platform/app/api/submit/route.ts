@@ -47,6 +47,13 @@ function stripPremiumContent(finalResult: any, testId: string): any {
       delete safeResult.antidoteList;
       break;
 
+    case 'city':
+    case 'city-personality':
+      delete safeResult.schedule;
+      delete safeResult.curePrescription;
+      delete safeResult.toxicCity;
+      break;
+
     default:
       break;
   }

@@ -1,10 +1,12 @@
 import { prisma } from '../prisma';
 import { destinyLoverQuestions, destinyLoverResults, DestinyLoverProfile } from '../destiny-lover-data';
-import { IScoringEngine, CalculateParams, FinalResult } from './engine.interface';
+import { CalculateParams, FinalResult } from './engine.interface';
+import { DualTagScoringEngine, AnswerItem } from './dual-tag.engine';
 
-export class DestinyLoverEngine implements IScoringEngine {
+export class DestinyLoverEngine extends DualTagScoringEngine {
   async calculate({ optionIds, metadata }: CalculateParams): Promise<FinalResult> {
     let L = 0, G = 0, D = 0, S = 0, A = 0, C = 0, R = 0, P = 0;
+    const answerSequence: AnswerItem[] = [];
     
     // 1. 优先从数据库根据 numericIds 读取已存入的 options.scores
     const numericIds = optionIds.map(id => parseInt(id, 10)).filter(n => !isNaN(n));
@@ -18,41 +20,68 @@ export class DestinyLoverEngine implements IScoringEngine {
     }
 
     if (dbOptions.length > 0) {
-      dbOptions.forEach(opt => {
+      dbOptions.forEach((opt, idx) => {
         try {
           const scores: any = opt.scores ? (typeof opt.scores === 'string' ? JSON.parse(opt.scores) : opt.scores) : {};
-          L += Number(scores.L) || 0;
-          G += Number(scores.G) || 0;
-          D += Number(scores.D) || 0;
-          S += Number(scores.S) || 0;
-          A += Number(scores.A) || 0;
-          C += Number(scores.C) || 0;
-          R += Number(scores.R) || 0;
-          P += Number(scores.P) || 0;
+          const optL = Number(scores.L) || 0;
+          const optG = Number(scores.G) || 0;
+          const optD = Number(scores.D) || 0;
+          const optS = Number(scores.S) || 0;
+          const optA = Number(scores.A) || 0;
+          const optC = Number(scores.C) || 0;
+          const optR = Number(scores.R) || 0;
+          const optP = Number(scores.P) || 0;
+
+          L += optL; G += optG; D += optD; S += optS;
+          A += optA; C += optC; R += optR; P += optP;
+
+          answerSequence.push({
+            questionOrder: idx + 1,
+            questionId: opt.questionId || `q${idx + 1}`,
+            optionId: opt.id,
+            scores: { L: optL, G: optG, D: optD, S: optS, A: optA, C: optC, R: optR, P: optP }
+          });
         } catch (e) {}
       });
     }
 
     // 2. 回退兜底：如果数据库未命中（如本地离线仿真传入 "o1_1" 等本地常数ID）
     if (L === 0 && G === 0 && D === 0 && S === 0 && A === 0 && C === 0 && R === 0 && P === 0) {
-      destinyLoverQuestions.forEach(q => {
+      destinyLoverQuestions.forEach((q, qIdx) => {
         q.options.forEach(opt => {
           if (optionIds.includes(opt.id.toString())) {
             L += opt.scores.L; G += opt.scores.G; D += opt.scores.D; S += opt.scores.S;
             A += opt.scores.A; C += opt.scores.C; R += opt.scores.R; P += opt.scores.P;
+
+            answerSequence.push({
+              questionOrder: qIdx + 1,
+              questionId: q.id,
+              optionId: opt.id,
+              primaryTag: (opt as any).primaryTag,
+              secondaryTag: (opt as any).secondaryTag,
+              scores: opt.scores
+            });
           }
         });
       });
     }
 
-    // 计算 4 维二分极性：引领/守护(L/G)、直球/细节(D/S)、冒险/居家(A/C)、浪漫/务实(R/P)
-    const dim1 = L >= G ? 'l' : 'g';
-    const dim2 = D >= S ? 'd' : 's';
-    const dim3 = A >= C ? 'a' : 'c';
-    const dim4 = R >= P ? 'r' : 'p';
+    // 计算 4 维二分极性，并采用压轴逆序 Tie-Breaker 处理两极并列平局
+    const resolvePolarity = (tag1: string, val1: number, tag2: string, val2: number): string => {
+      if (val1 > val2) return tag1.toLowerCase();
+      if (val2 > val1) return tag2.toLowerCase();
+      // 并列时由压轴题 Q15 -> Q14 -> Q13... 仲裁
+      const winner = this.resolveTieBreaker([tag1, tag2], answerSequence);
+      return (winner || tag1).toLowerCase();
+    };
+
+    const dim1 = resolvePolarity('L', L, 'G', G);
+    const dim2 = resolvePolarity('D', D, 'S', S);
+    const dim3 = resolvePolarity('A', A, 'C', C);
+    const dim4 = resolvePolarity('R', R, 'P', P);
     const userCombo = dim1 + dim2 + dim3 + dim4; 
 
-    // 基于 4 维特征进行无死锁的最短汉明距离（Hamming Distance）匹配
+    // 基于 4 维特征进行匹配
     let bestMatch: DestinyLoverProfile = destinyLoverResults[0];
     let minDistance = 999;
 

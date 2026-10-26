@@ -470,7 +470,7 @@ export default function ResultReceipt({ result: staleResult, userInfo, onRestart
               {/* 核心深度档案区域 */}
               <div className="mt-auto relative">
                   {!isUnlocked && (
-                      <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-[#FDFBF7]/85 backdrop-blur-sm p-4 text-center">
+                      <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-[#FDFBF7]/85 backdrop-blur-[8px] p-4 text-center">
                           <div 
                             className="border-4 border-[#121212] bg-white p-6 max-w-xs flex flex-col items-center transition-all"
                             style={{ boxShadow: theme.cardShadow }}
