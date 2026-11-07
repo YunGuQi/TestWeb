@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>开发者手记 - 牧童</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📓</text></svg>">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Serif+SC:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            /* Warm Earth / 原木暖灰 Palette */
+            --bg-body: #fdfcf9;
+            --bg-sidebar: #f4efe6;
+            --border-color: #e8e2d5;
+            --text-primary: #1a1a1a;
+            --text-secondary: #6b6357;
+            --text-muted: #8a7a63;
+            --accent-color: #c2410c; /* Terracotta */
+            --accent-bg: #e8e2d5;
+            
+            --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            --font-serif: 'Noto Serif SC', serif;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: var(--font-sans); background-color: var(--bg-body); color: var(--text-primary); line-height: 1.6; overflow-x: hidden; position: relative; }
+        
+        .layout { display: flex; min-height: 100vh; animation: fade-in 0.6s ease-out; }
+        
+        /* Sidebar */
+        .sidebar { width: 300px; background: var(--bg-sidebar); border-right: 1px solid var(--border-color); padding: 60px 40px; position: sticky; top: 0; height: 100vh; display: flex; flex-direction: column; }
+        .avatar { width: 88px; height: 88px; border-radius: 50%; margin-bottom: 24px; background: var(--accent-bg); color: var(--text-muted); display: flex; align-items: center; justify-content: center; font-size: 36px; transition: transform 0.3s; }
+        .avatar:hover { transform: scale(1.05); }
+        .sidebar h1 { font-family: var(--font-serif); font-size: 1.75rem; margin-bottom: 12px; font-weight: 700; color: var(--text-primary); }
+        .bio { color: var(--text-secondary); font-size: 0.95rem; margin-bottom: 40px; line-height: 1.7; }
+        
+        .nav { list-style: none; padding: 0; flex: 1; }
+        .nav li { margin-bottom: 16px; }
+        .nav a { color: var(--text-secondary); text-decoration: none; font-weight: 500; font-size: 1.05rem; transition: color 0.2s; display: flex; align-items: center; gap: 8px; }
+        .nav a:hover, .nav a.active { color: var(--accent-color); font-weight: 600; }
+        
+        /* Main Content */
+        .main { flex: 1; max-width: 800px; padding: 80px 60px 120px; }
+        .section-title { font-size: 0.95rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; padding-bottom: 16px; border-bottom: 1px solid var(--border-color); margin-bottom: 40px; }
+        
+        .post { margin-bottom: 60px; cursor: pointer; }
+        .post-title { font-family: var(--font-serif); font-size: 1.75rem; color: var(--text-primary); margin-bottom: 12px; font-weight: 700; transition: color 0.2s; line-height: 1.3; }
+        .post:hover .post-title { color: var(--accent-color); }
+        .post-meta { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 16px; display: flex; gap: 16px; align-items: center; }
+        .post-tag { border: 1px solid var(--border-color); color: var(--text-secondary); padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+        .post-excerpt { color: #4a453d; font-size: 1.05rem; line-height: 1.7; }
+
+        /* Modal / Article Drawer */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(44, 51, 45, 0.4); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 100; opacity: 0; pointer-events: none; transition: opacity 0.4s ease; display: flex; justify-content: flex-end; }
+        .modal-overlay.active { opacity: 1; pointer-events: auto; }
+        .modal-content { background: var(--bg-body); width: 100%; max-width: 760px; height: 100%; border-left: 1px solid var(--border-color); transform: translateX(100%); transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1); overflow-y: auto; position: relative; box-shadow: -10px 0 30px rgba(0,0,0,0.05); }
+        .modal-overlay.active .modal-content { transform: translateX(0); }
+        
+        .close-btn { position: sticky; top: 32px; left: 32px; float: left; width: 44px; height: 44px; border-radius: 50%; background: var(--bg-sidebar); border: 1px solid var(--border-color); color: var(--text-secondary); cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 10; transition: all 0.2s; }
+        .close-btn:hover { color: var(--accent-color); border-color: var(--accent-color); background: #fdfcf9; }
+        .close-btn svg { width: 22px; height: 22px; fill: currentColor; }
+
+        .article-body { padding: 100px 80px 80px; clear: both; }
+        .article-body h1 { font-family: var(--font-serif); font-size: 2.25rem; margin-bottom: 24px; line-height: 1.4; color: var(--text-primary); }
+        .article-body .meta { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 48px; padding-bottom: 32px; border-bottom: 1px solid var(--border-color); }
+        .article-body .content { color: #3d3932; font-size: 1.15rem; line-height: 1.8; }
+        .article-body .content h3 { font-size: 1.35rem; color: var(--text-primary); margin: 48px 0 16px 0; font-weight: 600; border-left: 4px solid var(--accent-color); padding-left: 12px; }
+        .article-body .content p { margin-bottom: 24px; }
+
+        /* Footer */
+        footer { margin-top: 100px; padding-top: 32px; border-top: 1px solid var(--border-color); color: var(--text-muted); font-size: 0.85rem; display: flex; flex-direction: column; gap: 12px; }
+        .beian-info { display: flex; gap: 24px; }
+        footer a { color: var(--text-muted); text-decoration: none; transition: color 0.2s; }
+        footer a:hover { color: var(--accent-color); }
+
+        @keyframes fade-in { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+
+        @media (max-width: 800px) {
+            .layout { flex-direction: column; }
+            .sidebar { width: 100%; height: auto; position: relative; padding: 40px 24px; border-right: none; border-bottom: 1px solid var(--border-color); }
+            .nav { display: flex; gap: 16px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 0; }
+            .nav li { margin-bottom: 0; white-space: nowrap; }
+            .main { padding: 40px 24px; }
+            .article-body { padding: 80px 24px; }
+            .beian-info { flex-direction: column; gap: 8px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="avatar">👨🏻‍💻</div>
+            <h1>牧童</h1>
+            <p class="bio">记录在业务洪流中沉淀的架构思考与底层逻辑。不追逐风口，只探究本质。</p>
+            
+            <ul class="nav">
+                <li><a href="#" class="active">最新手记</a></li>
+                <li><a href="#">技术专栏</a></li>
+                <li><a href="#">关于我</a></li>
+            </ul>
+            
+            <footer>
+                <div>&copy; 2026 牧童的手记. All rights reserved.</div>
+                <div class="beian-info">
+                    <a href="https://beian.miit.gov.cn/" target="_blank">闽ICP备2026031285号-1</a>
+                    <a href="https://beian.mps.gov.cn/#/query/webSearch" target="_blank">闽公网安备35030402009389号</a>
+                </div>
+            </footer>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main">
+            <div class="section-title">Latest Notes</div>
+            
+            <!-- 卡片 1 -->
+            <article class="post" onclick="openModal('React Hooks 深度剖析：从原理到最佳实践', '2026-08-14', '在现代前端开发中，React Hooks 已经成为函数式组件的标准配置。本文将带您深入探讨 useState、useEffect 等核心 Hooks 的底层闭包原理，以及如何通过自定义 Hooks 抽离状态逻辑，提升团队的协作效率。<br><br><h3>1. 闭包与过时状态 (Stale Closures)</h3><p>很多新手在使用 useEffect 时经常会遇到状态没有按预期更新的问题，这本质上是因为 JavaScript 闭包的特性导致的。当我们在 Hook 中引用外部变量时，实际上捕获的是渲染那一帧的快照。解决这个问题的最佳实践是合理配置依赖数组，或者使用 useRef 来保存可变的最新引用。</p><h3>2. 性能优化的误区</h3><p>并不是所有的函数都需要用 useCallback 包裹，过度优化反而会增加内存开销。只有当回调函数作为 props 传递给经过 React.memo 包装的子组件，或者作为其他 Hook 的依赖项时，使用 useCallback 才具有实际的性能收益。日常开发中，我们应该优先保证代码的可读性，避免过早优化。</p>')">
+                <h2 class="post-title">React Hooks 深度剖析：从原理到最佳实践</h2>
+                <div class="post-meta">
+                    <span class="post-tag">技术思考</span>
+                    <span>2026-08-14</span>
+                </div>
+                <p class="post-excerpt">为什么你写的 useEffect 总是拿不到最新的状态？不要盲目添加依赖项。今天我们翻开底层闭包逻辑，彻底终结 Stale Closures 的噩梦。</p>
+            </article>
+
+            <!-- 卡片 2 -->
+            <article class="post" onclick="openModal('CSS Grid 高级实战：打造丝滑响应式布局', '2026-08-10', '彻底告别繁琐的浮动布局与媒体查询噩梦。在这篇文章中，我们将通过几个实际的电商前端案例，手把手教你掌握 CSS Grid 的强大之处。<br><br><h3>1. 圣杯布局的现代写法</h3><p>以前我们需要用各种 float 和 clear hack 才能实现的布局，现在只需几行 grid-template-areas 即可优雅完成。通过定义 header、sidebar、main 和 footer 区域，我们可以直观地看到页面的结构骨架，维护成本极低，代码可读性更是碾压传统的布局方案。</p><h3>2. 自动响应式网格 (Auto-fit vs Auto-fill)</h3><p>利用 minmax() 函数配合 auto-fit，无需编写任何媒体查询，即可让卡片列表在移动端和 PC 端完美自适应展示。当容器宽度缩小时，卡片会自动折行；当容器宽度变大时，卡片会自动撑满可用空间。这不仅大大减少了 CSS 代码量，还能带来极其丝滑的响应式体验，绝对是现代前端布局的首选方案。</p>')">
+                <h2 class="post-title">CSS Grid 高级实战：零媒体查询的丝滑响应式</h2>
+                <div class="post-meta">
+                    <span class="post-tag">前端工程</span>
+                    <span>2026-08-10</span>
+                </div>
+                <p class="post-excerpt">浮动布局和满屏幕的 @media 查询早就该被淘汰了。只需要用到 auto-fit 和 minmax() 两个函数，一行代码即可实现工业级的自适应流式网格。</p>
+            </article>
+
+            <!-- 卡片 3 -->
+            <article class="post" onclick="openModal('理解微前端架构：Qiankun 与 Module Federation 选型指南', '2026-08-05', '随着业务系统的日益庞大，巨石应用 (Monolith) 的维护成本越来越高，微前端 (Micro-Frontends) 成为了大型 B 端项目的必选项。本文将带你横向剖析目前主流的微前端技术路径。<br><br><h3>1. iframe 的原罪</h3><p>虽然 iframe 是最完美的沙箱隔离方案，但在路由同步、全局弹窗、加载性能等体验上却有着难以逾越的鸿沟。现代微前端框架致力于在不牺牲用户体验的前提下，实现应用级别的隔离与解耦，从而打破传统架构的僵局。</p><h3>2. Qiankun 的工程化实践</h3><p>基于 single-spa 的 qiankun 提供了开箱即用的沙箱隔离机制。通过 Proxy 拦截全局变量污染，结合样式沙箱机制，极大降低了旧项目接入微前端的成本。然而，在实际落地中，我们还需要考虑公共依赖抽离、多应用通信机制等工程化细节。合理的架构拆分才是微前端落地的核心竞争力。</p>')">
+                <h2 class="post-title">巨石应用拆分：微前端架构的踩坑与选型指南</h2>
+                <div class="post-meta">
+                    <span class="post-tag">架构设计</span>
+                    <span>2026-08-05</span>
+                </div>
+                <p class="post-excerpt">当你的项目编译需要耗时 3 分钟以上，是时候考虑微前端了。但在 qiankun 和 Module Federation 之间，许多团队都选错了方向。</p>
+            </article>
+        </main>
+    </div>
+
+    <!-- 侧边抽屉：文章阅读器 -->
+    <div class="modal-overlay" id="articleModal" onclick="closeModal(event)">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <button class="close-btn" onclick="closeModal()">
+                <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+            </button>
+            
+            <div class="article-body">
+                <h1 id="modalTitle">标题</h1>
+                <div class="meta" id="modalDate">日期</div>
+                <div class="content" id="modalBody">内容...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const modal = document.getElementById('articleModal');
+        const titleEl = document.getElementById('modalTitle');
+        const dateEl = document.getElementById('modalDate');
+        const bodyEl = document.getElementById('modalBody');
+
+        function openModal(title, date, content) {
+            titleEl.textContent = title;
+            dateEl.textContent = date;
+            bodyEl.innerHTML = content;
+            
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden'; 
+        }
+
+        function closeModal(e) {
+            if (e && e.target !== modal) return;
+            modal.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+        
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeModal();
+        });
+
+        // ==========================================
+        // 🛡️ 安全与防扒机制 (Security & Anti-Scraping)
+        // ==========================================
+        (function() {
+            if (window.top !== window.self) {
+                window.top.location = window.self.location;
+            }
+
+            document.addEventListener('contextmenu', e => e.preventDefault());
+            document.addEventListener('selectstart', e => e.preventDefault());
+            document.addEventListener('copy', e => {
+                e.preventDefault();
+            });
+            document.addEventListener('dragstart', e => e.preventDefault());
+
+            document.addEventListener('keydown', e => {
+                if (e.key === 'F12' || e.keyCode === 123) {
+                    e.preventDefault();
+                }
+                if (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C')) {
+                    e.preventDefault();
+                }
+                if (e.ctrlKey && (e.key === 'U' || e.key === 'u')) {
+                    e.preventDefault();
+                }
+            });
+
+            setInterval(function() {
+                try {
+                    (function doDebug() { return false; })['constructor']('debugger')['call']();
+                } catch (err) {}
+            }, 1000);
+        })();
+    </script>
+</body>
+</html>

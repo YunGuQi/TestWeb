@@ -42,6 +42,12 @@ dev.db-journal
 *.exe
 *.dll
 
+# 证书私钥与公钥（绝对禁止上传 Git）
+*.pem
+*.key
+*.crt
+certs/
+
 # 超大无损多媒体与视频媒体文件
 *.bmp
 *.mp4

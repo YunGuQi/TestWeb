@@ -8,3 +8,10 @@ deploy*.zip
 *.tsbuildinfo
 test-results/
 scratch*
+
+# 证书文件（绝对禁止上传）
+*.pem
+*.key
+*.crt
+certs/
+

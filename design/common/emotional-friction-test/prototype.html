@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>背景风格探索原型 - 心灵便利店</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Base / Transitions */
+        body {
+            transition: all 0.5s ease;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow-x: hidden;
+            font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            margin: 0;
+            background-color: #f4f4f5;
+        }
+
+        .receipt {
+            transition: all 0.5s ease;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* receipt paper edge */
+        .receipt-paper {
+            background-color: #fdfdfd; 
+            color: #000; 
+            position: relative;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.03'/%3E%3C/svg%3E");
+        }
+        .receipt-top { height: 10px; background: radial-gradient(circle at 50% 0%, transparent 5px, #fdfdfd 6px); background-size: 12px 10px; width: 100%; transition: all 0.5s ease; }
+        .receipt-bottom { height: 10px; background: radial-gradient(circle at 50% 100%, transparent 5px, #fdfdfd 6px); background-size: 12px 10px; width: 100%; transition: all 0.5s ease; }
+
+        /* Background Layers */
+        .bg-layer {
+            position: fixed;
+            inset: -10vw;
+            z-index: 0;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s ease;
+        }
+
+        /* --- THEME 1: 情绪具象化 (Tangled Thoughts / Yarn) --- */
+        body.theme-tangled { background-color: #0a0a0c; color: #fff; }
+        body.theme-tangled .bg-tangled { opacity: 1; }
+        .bg-tangled {
+            background-image: url("data:image/svg+xml,%3Csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3E%3Cg stroke='rgba(255,255,255,0.05)' stroke-width='1.5' fill='none'%3E%3Cpath d='M-100,100 C200,-50 300,500 800,200 C1200,0 1500,400 2000,100'/%3E%3Cpath d='M-50,300 C150,150 450,700 900,400 C1100,200 1300,600 2100,200'/%3E%3Cpath d='M-100,500 C250,750 350,-100 850,600 C1150,1100 1450,0 2050,500'/%3E%3Cpath d='M-200,700 C300,900 400,200 900,800 C1300,1400 1500,100 2100,700'/%3E%3Cpath d='M100,-100 C-50,200 500,300 200,800 C0,1200 400,1500 100,2000'/%3E%3Cpath d='M300,-50 C150,150 700,450 400,900 C200,1100 600,1300 200,2100'/%3E%3Cpath d='M500,-100 C750,250 -100,350 600,850 C1100,1150 0,1450 500,2050'/%3E%3Cpath d='M700,-200 C900,300 200,400 800,900 C1400,1300 100,1500 700,2100'/%3E%3Cpath d='M-100,200 C150,50 250,400 750,100 C1150,-100 1450,300 1950,0'/%3E%3Cpath d='M-50,400 C100,250 400,600 850,300 C1050,100 1250,500 2050,100'/%3E%3Cpath d='M-100,600 C200,850 300,0 800,700 C1100,1200 1400,100 2000,600'/%3E%3Cpath d='M-200,800 C250,1000 350,300 850,900 C1250,1500 1450,200 2050,800'/%3E%3C/g%3E%3C/svg%3E");
+            background-size: 150% 150%;
+            animation: drift 20s linear infinite alternate;
+        }
+        @keyframes drift { 0% { transform: scale(1) translate(0,0); } 100% { transform: scale(1.1) translate(-2%, -2%); } }
+        body.theme-tangled .receipt { filter: drop-shadow(0 20px 50px rgba(200,180,255,0.1)); }
+
+        /* --- THEME 2: 便利店/消费元素 (Barcode / Store) --- */
+        body.theme-barcode { background-color: #fdfdfd; color: #000; }
+        body.theme-barcode .bg-barcode { opacity: 1; }
+        .bg-barcode {
+            background-image: repeating-linear-gradient(90deg, 
+                #000 0px, #000 2px, 
+                transparent 2px, transparent 8px,
+                #000 8px, #000 14px,
+                transparent 14px, transparent 16px,
+                #000 16px, #000 20px,
+                transparent 20px, transparent 32px,
+                #000 32px, #000 34px,
+                transparent 34px, transparent 40px
+            );
+            background-size: 200px 100%;
+            opacity: 0.04 !important;
+            mask-image: radial-gradient(circle, #000 20%, transparent 80%);
+            -webkit-mask-image: radial-gradient(circle, #000 20%, transparent 80%);
+        }
+        .laser-line {
+            position: fixed; top: 0; left: 0; right: 0; height: 2px;
+            background: #ff0000; box-shadow: 0 0 10px 2px rgba(255,0,0,0.5);
+            opacity: 0; z-index: 1; pointer-events: none;
+        }
+        body.theme-barcode .laser-line {
+            opacity: 0.3; animation: scan 3s ease-in-out infinite;
+        }
+        @keyframes scan { 0% { top: -10%; } 100% { top: 110%; } }
+        body.theme-barcode .receipt { filter: drop-shadow(8px 8px 0px #000); border: 2px solid #000; }
+        body.theme-barcode .receipt-paper { background-color: #fff; }
+        body.theme-barcode .receipt-top { background: radial-gradient(circle at 50% 0%, transparent 5px, #fff 6px); }
+        body.theme-barcode .receipt-bottom { background: radial-gradient(circle at 50% 100%, transparent 5px, #fff 6px); }
+
+        /* --- THEME 3: 废弃小票拼接 (Crumpled Receipts Stack) --- */
+        body.theme-receipt-stack { background-color: #e5e5e5; color: #333; }
+        body.theme-receipt-stack .bg-receipt-stack { opacity: 1; }
+        .bg-receipt-stack {
+            display: flex; justify-content: center; align-items: center;
+        }
+        .fake-receipt {
+            position: absolute;
+            width: 300px; height: 500px;
+            background-color: #f0f0f0;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
+            display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
+            padding: 2rem; box-sizing: border-box;
+            border-top: 2px dashed rgba(0,0,0,0.1); border-bottom: 2px dashed rgba(0,0,0,0.1);
+        }
+        .fake-receipt::before {
+            content: "TOTAL $ 920.00 \A TAX $ 0.00 \A \A THANK YOU";
+            white-space: pre-wrap; font-family: monospace; font-size: 14px;
+            color: rgba(0,0,0,0.1); font-weight: bold; text-align: center; margin-top: 100px;
+        }
+        body.theme-receipt-stack .receipt { filter: drop-shadow(0 20px 40px rgba(0,0,0,0.15)); }
+
+
+        /* Switcher Bar */
+        .switcher {
+            position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(12px);
+            padding: 8px; border-radius: 99px; display: flex; gap: 6px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15); border: 1px solid rgba(0,0,0,0.08);
+            z-index: 100; flex-wrap: wrap; justify-content: center; max-width: 90vw;
+        }
+        .switcher button {
+            padding: 6px 14px; border-radius: 99px; font-size: 13px; font-weight: 600;
+            color: #666; transition: all 0.2s; white-space: nowrap;
+        }
+        .switcher button:hover { color: #000; background: rgba(0,0,0,0.05); }
+        .switcher button.active { background: #000; color: #fff; }
+    </style>
+</head>
+<body class="theme-tangled">
+
+    <!-- Backgrounds -->
+    <div class="bg-layer bg-tangled"></div>
+    <div class="bg-layer bg-barcode"></div>
+    <div class="laser-line"></div>
+    <div class="bg-layer bg-receipt-stack">
+        <!-- Rotated fake receipts -->
+        <div class="fake-receipt" style="transform: rotate(-15deg) translate(-40vw, -10vh); opacity: 0.6;"></div>
+        <div class="fake-receipt" style="transform: rotate(25deg) translate(35vw, 15vh); opacity: 0.4;"></div>
+        <div class="fake-receipt" style="transform: rotate(-5deg) translate(20vw, -30vh); opacity: 0.5;"></div>
+        <div class="fake-receipt" style="transform: rotate(10deg) translate(-30vw, 30vh); opacity: 0.7;"></div>
+    </div>
+
+    <!-- Mockup Receipt -->
+    <div class="receipt w-[320px] flex flex-col pt-8">
+        <div class="receipt-top shrink-0"></div>
+        <div class="receipt-paper px-6 py-8 flex flex-col font-mono text-center">
+            <h2 class="text-2xl font-black mb-1 tracking-widest text-black">消费结账单</h2>
+            <p class="text-[10px] uppercase font-bold text-gray-500">--- EMOTIONAL RECEIPT ---</p>
+            <div class="border-b-2 border-black border-dashed my-6"></div>
+            
+            <div class="space-y-4 text-left">
+                <div class="flex justify-between items-center text-sm font-bold">
+                    <span>Sen 敏感税</span>
+                    <span class="accent-klein">$ 45.00</span>
+                </div>
+                <div class="flex justify-between items-center text-sm font-bold">
+                    <span>Rum 反刍税</span>
+                    <span class="accent-klein">$ 120.50</span>
+                </div>
+                <div class="flex justify-between items-center text-sm font-bold">
+                    <span>Pls 讨好税</span>
+                    <span class="accent-klein">$ 8.90</span>
+                </div>
+            </div>
+            
+            <div class="border-b-2 border-black border-dashed my-6"></div>
+            
+            <div class="flex justify-between items-center text-xl font-black">
+                <span>TOTAL</span>
+                <span class="accent-klein">$ 174.40</span>
+            </div>
+            <div class="mt-8 text-center text-xs font-bold text-gray-400">
+                [ 感谢光临 安安心灵便利店 ]
+            </div>
+        </div>
+        <div class="receipt-bottom shrink-0"></div>
+    </div>
+
+    <!-- UI Switcher -->
+    <div class="switcher">
+        <button onclick="setTheme('theme-tangled')" class="active" id="btn-tangled">情绪具象化 (缠绕乱麻)</button>
+        <button onclick="setTheme('theme-barcode')" id="btn-barcode">便利店元素 (巨型条形码)</button>
+        <button onclick="setTheme('theme-receipt-stack')" id="btn-receipt-stack">废弃小票拼接 (账单堆叠)</button>
+    </div>
+
+    <script>
+        function setTheme(themeName) {
+            document.body.className = themeName;
+            
+            // Update URL params
+            const url = new URL(window.location);
+            url.searchParams.set('theme', themeName);
+            window.history.pushState({}, '', url);
+
+            // Update active button
+            document.querySelectorAll('.switcher button').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('btn-' + themeName.replace('theme-', '')).classList.add('active');
+        }
+
+        // Initialize from URL
+        const params = new URLSearchParams(window.location.search);
+        const initialTheme = params.get('theme') || 'theme-tangled';
+        setTheme(initialTheme);
+    </script>
+</body>
+</html>

@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>探索大厅 - UI Prototype</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+    .font-serif { font-family: 'Noto Serif SC', serif; }
+    .font-mono { font-family: 'Space Mono', monospace; }
+  </style>
+</head>
+<body class="antialiased min-h-screen">
+  <div id="app"></div>
+
+  <script>
+    const tests = [
+      { id: 'emotional', title: '深度情绪内耗测试', desc: '定位你的情绪黑洞。基于认知行为学，深度拆解你的防御机制。', tags: ['钝感力', '反刍指数'], users: '120K+', hot: true, color: 'indigo' },
+      { id: 'love', title: '恋爱物种测试', desc: '揭秘你的亲密关系底色，看看你在爱情里到底是什么动物。', tags: ['依赖感', '边界'], users: '89K+', hot: false, color: 'fuchsia' },
+      { id: 'attachment', title: '依恋类型使用说明书', desc: '深度剖析你的安全感来源。你是焦虑型还是回避型？', tags: ['安全感', '亲密度'], users: '152K+', hot: false, color: 'pink' },
+      { id: 'desires', title: '隐藏欲望潜意识测算', desc: '直面潜意识深处的贪婪与恐惧。你真正渴望的到底是什么？', tags: ['潜意识', '掌控欲'], users: '203K+', hot: true, color: 'zinc' },
+      { id: 'city', title: '性格城市匹配测试', desc: '测试你的精神老家在哪里。你的生活节奏最契合世界上哪一座城市？', tags: ['节奏感', '社交度'], users: '214K+', hot: false, color: 'teal' },
+      { id: 'five', title: '五行命理城市风水局', desc: '金木水火土，测算你命格最旺盛的方向。用东方玄学找到风水宝地。', tags: ['五行', '方位'], users: '98K+', hot: false, color: 'amber' }
+    ];
+
+    const variants = {
+      'A': {
+        name: '高级神秘感 (Premium & Mysterious)',
+        render: () => `
+          <div class="min-h-screen bg-[#050505] text-gray-200 pb-32">
+            <div class="fixed top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-gradient-to-b from-indigo-900/20 to-transparent rounded-full blur-[100px] pointer-events-none"></div>
+            <div class="relative z-10 max-w-md mx-auto px-6 pt-16">
+              <header class="mb-12">
+                <h1 class="text-3xl font-serif font-black text-white mb-2">PSYCHE.</h1>
+                <p class="text-xs tracking-[0.3em] text-gray-500 uppercase">Explore the unseen</p>
+              </header>
+              <div class="space-y-4">
+                ${tests.map((t) => `
+                  <a href="#" class="block group relative bg-white/[0.02] border border-white/[0.05] rounded-2xl p-6 overflow-hidden transition-all duration-500 hover:bg-white/[0.05] hover:border-white/[0.1] hover:-translate-y-1">
+                    <div class="absolute inset-0 bg-gradient-to-br from-${t.color}-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                    <div class="relative z-10 flex flex-col gap-4">
+                      <div class="flex justify-between items-start">
+                        <div class="w-12 h-12 rounded-full bg-gradient-to-br from-gray-800 to-gray-900 border border-gray-700 shadow-inner flex items-center justify-center">
+                          <div class="w-4 h-4 rounded-full bg-${t.color}-400/50 blur-[2px]"></div>
+                        </div>
+                        ${t.hot ? '<span class="text-[10px] text-amber-500 tracking-wider">HOT</span>' : ''}
+                      </div>
+                      <div>
+                        <h3 class="font-serif text-lg text-white mb-2">${t.title}</h3>
+                        <p class="text-xs text-gray-400 leading-relaxed mb-4">${t.desc}</p>
+                        <div class="flex items-center gap-3">
+                          ${t.tags.map(tag => `<span class="text-[10px] text-gray-500 tracking-wider uppercase border-b border-gray-800 pb-0.5">${tag}</span>`).join('')}
+                        </div>
+                      </div>
+                    </div>
+                  </a>
+                `).join('')}
+              </div>
+            </div>
+          </div>
+        `
+      },
+      'B': {
+        name: '极简高级 (Editorial/Minimalist)',
+        render: () => `
+          <div class="min-h-screen bg-white text-black pb-32">
+            <div class="max-w-md mx-auto px-4 pt-12">
+              <header class="mb-16 border-b-2 border-black pb-6">
+                <h1 class="text-5xl font-black tracking-tighter mb-1">TESTS</h1>
+                <p class="text-sm font-bold text-gray-500 uppercase tracking-widest">Archive of Mind</p>
+              </header>
+              <div class="grid grid-cols-2 gap-4">
+                ${tests.map((t, i) => `
+                  <a href="#" class="block group relative border border-gray-200 hover:border-black transition-colors p-4 ${i === 0 ? 'col-span-2' : ''}">
+                    <div class="flex flex-col h-full justify-between gap-6">
+                      <div>
+                        ${t.hot ? '<div class="text-[10px] font-bold bg-black text-white inline-block px-1.5 py-0.5 mb-3">HOT</div>' : ''}
+                        <h3 class="font-black text-lg leading-tight mb-2 group-hover:underline underline-offset-4 decoration-2">${t.title}</h3>
+                        <p class="text-[11px] text-gray-600 leading-normal">${t.desc}</p>
+                      </div>
+                      <div class="flex flex-wrap gap-1">
+                        ${t.tags.map(tag => `<span class="text-[9px] font-bold uppercase bg-gray-100 px-1.5 py-0.5">${tag}</span>`).join('')}
+                      </div>
+                    </div>
+                  </a>
+                `).join('')}
+              </div>
+            </div>
+          </div>
+        `
+      },
+      'C': {
+        name: '治愈/亲和力 (Warm/Soft)',
+        render: () => `
+          <div class="min-h-screen bg-[#FFFBF5] text-[#4A4238] pb-32 font-sans">
+            <div class="max-w-md mx-auto px-5 pt-12">
+              <header class="mb-10 text-center">
+                <h1 class="text-2xl font-bold mb-2 text-[#2D2822]">探索内心宇宙 ✨</h1>
+                <p class="text-sm text-[#8C7E6C]">放松一下，来做个心理小测试吧</p>
+              </header>
+              <div class="space-y-4">
+                ${tests.map((t, i) => `
+                  <a href="#" class="block bg-white rounded-3xl p-5 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] border border-[#F3EFE8] hover:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.1)] hover:-translate-y-1 transition-all">
+                    <div class="flex gap-4">
+                      <div class="w-20 h-20 shrink-0 rounded-2xl bg-${t.color}-50 flex items-center justify-center text-3xl">
+                        ${['🎈','🦊','🫂','🔮','☕','🌲'][i]}
+                      </div>
+                      <div class="flex-1">
+                        <div class="flex justify-between items-center mb-1">
+                          <h3 class="font-bold text-[15px]">${t.title}</h3>
+                          ${t.hot ? '<span class="text-[10px] bg-red-100 text-red-600 px-2 py-0.5 rounded-full font-bold">HOT</span>' : ''}
+                        </div>
+                        <p class="text-xs text-[#8C7E6C] line-clamp-2 mb-3 leading-relaxed">${t.desc}</p>
+                        <div class="flex gap-2">
+                          ${t.tags.map(tag => `<span class="text-[10px] bg-[#F8F6F2] text-[#6B6054] px-2 py-1 rounded-lg">${tag}</span>`).join('')}
+                        </div>
+                      </div>
+                    </div>
+                  </a>
+                `).join('')}
+              </div>
+            </div>
+          </div>
+        `
+      },
+      'D': {
+        name: '潮酷工业风 (Brutalist)',
+        render: () => `
+          <div class="min-h-screen bg-black text-[#ccff00] pb-32 font-mono selection:bg-[#ccff00] selection:text-black">
+            <div class="max-w-md mx-auto px-4 pt-8">
+              <header class="mb-8 border-4 border-[#ccff00] p-4 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMSIgY3k9IjEiIHI9IjEiIGZpbGw9IiMzMzMzMzMiLz48L3N2Zz4=')]">
+                <h1 class="text-3xl font-black uppercase tracking-tighter mb-2">SYSTEM//LOBBY</h1>
+                <div class="text-[10px] bg-[#ccff00] text-black inline-block px-1 font-bold">STATUS: ACTIVE</div>
+              </header>
+              <div class="flex flex-col gap-4">
+                ${tests.map((t, i) => `
+                  <a href="#" class="block group relative border-2 border-gray-800 hover:border-[#ccff00] p-4 transition-all duration-75">
+                    <div class="absolute inset-0 bg-[#ccff00] scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-150 ease-out z-0"></div>
+                    <div class="relative z-10 flex flex-col gap-3 group-hover:text-black">
+                      <div class="flex justify-between items-end border-b border-gray-800 group-hover:border-black/20 pb-2">
+                        <div class="text-xs opacity-50 font-bold">0${i+1}</div>
+                        ${t.hot ? '<div class="text-[10px] animate-pulse">!! HIGH PRIORITY !!</div>' : ''}
+                      </div>
+                      <h3 class="font-bold text-lg uppercase">${t.title}</h3>
+                      <p class="text-[11px] opacity-70 line-clamp-2">${t.desc}</p>
+                      <div class="flex gap-2 mt-2">
+                        ${t.tags.map(tag => `<span class="text-[9px] border border-current px-1 py-0.5 uppercase">${tag}</span>`).join('')}
+                      </div>
+                    </div>
+                  </a>
+                `).join('')}
+              </div>
+            </div>
+          </div>
+        `
+      }
+    };
+
+    function renderApp() {
+      const urlParams = new URLSearchParams(window.location.search);
+      let currentVariantKey = urlParams.get('variant') || 'A';
+      if (!variants[currentVariantKey]) currentVariantKey = 'A';
+      
+      const app = document.getElementById('app');
+      app.innerHTML = variants[currentVariantKey].render();
+
+      const keys = Object.keys(variants);
+      const currentIndex = keys.indexOf(currentVariantKey);
+      const prevKey = keys[(currentIndex - 1 + keys.length) % keys.length];
+      const nextKey = keys[(currentIndex + 1) % keys.length];
+
+      const switcherHTML = `
+        <div class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center bg-zinc-900/90 backdrop-blur-md border border-zinc-700 p-1.5 rounded-full shadow-2xl text-white font-sans text-sm">
+          <a href="?variant=${prevKey}" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-zinc-700 transition">←</a>
+          <div class="px-4 font-medium min-w-[240px] text-center">
+            <span class="text-zinc-400 mr-1">${currentVariantKey} —</span> ${variants[currentVariantKey].name}
+          </div>
+          <a href="?variant=${nextKey}" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-zinc-700 transition">→</a>
+        </div>
+      `;
+      app.innerHTML += switcherHTML;
+    }
+
+    document.body.addEventListener('click', e => {
+      const link = e.target.closest('a[href^="?variant="]');
+      if (link) {
+        e.preventDefault();
+        window.history.pushState({}, '', link.href);
+        renderApp();
+      }
+    });
+
+    window.addEventListener('popstate', renderApp);
+    renderApp();
+
+    document.addEventListener('keydown', (e) => {
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+      const urlParams = new URLSearchParams(window.location.search);
+      let current = urlParams.get('variant') || 'A';
+      const keys = Object.keys(variants);
+      let idx = keys.indexOf(current);
+      if (e.key === 'ArrowLeft') {
+        window.history.pushState({}, '', '?variant=' + keys[(idx - 1 + keys.length) % keys.length]);
+        renderApp();
+      } else if (e.key === 'ArrowRight') {
+        window.history.pushState({}, '', '?variant=' + keys[(idx + 1) % keys.length]);
+        renderApp();
+      }
+    });
+  </script>
+</body>
+</html>

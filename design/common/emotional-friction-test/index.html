@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>深度情绪内耗测算</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: { brand: '#000000', 'brand-dark': '#333333' },
+                    fontFamily: { mono: ['JetBrains Mono', 'Courier New', 'Courier', 'monospace'] }
+                }
+            }
+        }
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <style>
+        body {
+            background-color: #fdfdfd;
+            color: #000;
+            overflow-x: hidden;
+            -webkit-tap-highlight-color: transparent;
+        }
+        /* Background Layers */
+        .bg-layer {
+            position: fixed; inset: 0; z-index: -1; pointer-events: none;
+        }
+        .bg-barcode {
+            background-image: repeating-linear-gradient(90deg, 
+                #000 0px, #000 2px, transparent 2px, transparent 8px,
+                #000 8px, #000 14px, transparent 14px, transparent 16px,
+                #000 16px, #000 20px, transparent 20px, transparent 32px,
+                #000 32px, #000 34px, transparent 34px, transparent 40px
+            );
+            background-size: 200px 100%; opacity: 0.04;
+            mask-image: radial-gradient(circle, #000 20%, transparent 80%);
+            -webkit-mask-image: radial-gradient(circle, #000 20%, transparent 80%);
+        }
+        .laser-line {
+            position: fixed; top: 0; left: 0; right: 0; height: 2px;
+            background: #ff0000; box-shadow: 0 0 10px 2px rgba(255,0,0,0.5);
+            opacity: 0.3; z-index: -1; pointer-events: none;
+            animation: scan 4s ease-in-out infinite;
+        }
+        @keyframes scan { 0% { top: -10%; } 100% { top: 110%; } }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .brutalist-btn {
+            position: relative; display: flex; align-items: center; justify-content: center;
+            width: 100%; padding: 1rem 1.5rem; background-color: white; color: black;
+            font-weight: bold; font-size: 1.125rem; border: 2px solid black;
+            transition: all 0.1s; box-shadow: 4px 4px 0px #000; cursor: pointer;
+        }
+        .brutalist-btn:active { box-shadow: 0px 0px 0px #000; transform: translate(4px, 4px); }
+        .brutalist-card { border: 2px solid black; background-color: white; color: black; box-shadow: 8px 8px 0px #000; }
+        
+        .option-btn {
+            width: 100%; text-align: left; cursor: pointer; transition: all 0.1s;
+            background-color: white; color: black; border: 2px solid black;
+            padding: 1rem; box-shadow: 4px 4px 0px #000;
+        }
+        .option-btn:active { box-shadow: 0px 0px 0px #000; transform: translate(4px, 4px); }
+        .option-btn.selected { background-color: black; color: white; }
+        
+        .receipt-container { filter: drop-shadow(-2px 0 0 #000) drop-shadow(2px 0 0 #000) drop-shadow(0 -2px 0 #000) drop-shadow(0 2px 0 #000) drop-shadow(8px 8px 0 #000); }
+        .receipt-paper {
+            background-color: #fdfdfd; color: #000; position: relative;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.03'/%3E%3C/svg%3E");
+        }
+        .receipt-top { height: 10px; background: radial-gradient(circle at 50% 0%, transparent 5px, #fdfdfd 6px); background-size: 12px 10px; width: 100%; }
+        .receipt-bottom { height: 10px; background: radial-gradient(circle at 50% 100%, transparent 5px, #fdfdfd 6px); background-size: 12px 10px; width: 100%; }
+        
+        @keyframes scan-progress {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(500%); }
+        }
+        .animate-scan { animation: scan-progress 2s ease-in-out infinite; }
+    </style>
+</head>
+<body class="font-mono flex flex-col min-h-[100dvh]">
+    <!-- Backgrounds -->
+    <div class="bg-layer bg-barcode"></div>
+    <div class="laser-line"></div>
+
+    <!-- ================= HOME VIEW ================= -->
+    <main id="view-home" class="relative w-full max-w-lg mx-auto min-h-[100dvh] flex flex-col pt-[max(24px,env(safe-area-inset-top))] pb-[max(100px,env(safe-area-inset-bottom))] px-5 justify-center">
+        <div id="home-content" class="w-full">
+            <div class="text-center mb-12 brutalist-card p-8 transform -rotate-2">
+                <div class="inline-flex items-center gap-2 px-3 py-1 border-2 border-black font-mono text-xs uppercase tracking-widest font-bold mb-6">
+                    <span class="w-2 h-2 bg-black animate-pulse"></span>
+                    安安心灵便利店
+                </div>
+                <h1 class="text-4xl font-black tracking-tighter leading-tight mb-4">深度情绪内耗<br/>消费账单</h1>
+                <div class="w-full h-px bg-black my-4"></div>
+                <p class="font-mono text-xs text-gray-700 leading-relaxed font-bold">
+                    [系统警告]<br/>你的每一次纠结<br/>都在暗中标好了价格
+                </p>
+                
+                <div class="mt-6 text-left border-t border-b border-black py-4 bg-[#f4f4f4] px-4 shadow-[4px_4px_0px_#000] border-2">
+                    <p class="text-xs font-bold mb-3 text-black">本次测算将精准扫描你的：</p>
+                    <ul class="text-[11px] space-y-2 font-mono list-none text-black font-bold">
+                        <li class="flex gap-2"><span class="shrink-0 bg-black text-white px-1">Sen</span> 敏感税：替人承担了多少额外情绪</li>
+                        <li class="flex gap-2"><span class="shrink-0 bg-black text-white px-1">Rum</span> 反刍税：深夜你结算了多少后悔账</li>
+                        <li class="flex gap-2"><span class="shrink-0 bg-black text-white px-1">Pls</span> 讨好税：花多少精力购买别人满意</li>
+                        <li class="flex gap-2"><span class="shrink-0 bg-black text-white px-1">Bnd</span> 边界税：你的原则底线折旧率多高</li>
+                    </ul>
+                    <p class="text-[10px] font-bold mt-4 pt-2 border-t border-black border-dashed text-gray-600">
+                        结账后将为您生成专属【内耗明细小票】，请注意查收。
+                    </p>
+                </div>
+
+                <div class="mt-4 flex justify-center" id="barcode-container">
+                    <!-- Barcode injected via JS -->
+                </div>
+            </div>
+
+            <div class="mt-auto w-full mb-8">
+                <button id="btn-start" class="brutalist-btn text-xl mb-3">
+                    <span>拉出结账单开始测算</span>
+                </button>
+                
+                <div class="flex items-center justify-center gap-2 text-[10px] text-black/60 font-mono font-bold mb-8 mx-auto px-4 cursor-pointer select-none">
+                    <div class="w-1 h-1 bg-green-500 rounded-full animate-pulse"></div>
+                    当前排队结账人数：<span id="queue-count">12,543</span> 人
+                </div>
+                
+                <div class="flex flex-col items-center gap-2">
+                    <div class="flex items-center justify-center gap-8 font-mono font-bold">
+                        <button id="btn-history" class="text-xs text-gray-600 hover:text-black transition-colors underline underline-offset-4">[ 查看历史消费单 ]</button>
+                        <a href="#" class="text-xs text-gray-600 hover:text-black transition-colors underline underline-offset-4">[ 探索其他专柜 ]</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- History Modal -->
+        <div id="modal-history" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex flex-col justify-end hidden">
+            <div id="modal-history-content" class="bg-[#f4f4f5] text-black border-t-4 border-black p-6 pb-[max(32px,env(safe-area-inset-bottom))] w-full max-w-lg mx-auto h-[60vh] flex flex-col relative translate-y-full">
+                <button id="btn-close-history" class="absolute top-4 right-4 w-10 h-10 border-2 border-black flex items-center justify-center font-bold active:translate-y-1 bg-white shadow-[2px_2px_0px_#000] active:shadow-none transition-all">X</button>
+                <h2 class="text-2xl font-black mb-6">历史消费单</h2>
+                <div id="history-list-container" class="flex-1 overflow-y-auto pr-2 mb-6 hide-scrollbar">
+                    <div class="text-gray-500 text-sm mt-4 italic font-bold">暂无消费记录。</div>
+                </div>
+                <button id="btn-close-history-bottom" class="brutalist-btn !py-3 shrink-0">关闭抽屉</button>
+            </div>
+        </div>
+    </main>
+
+    <!-- ================= TEST VIEW ================= -->
+    <main id="view-test" class="flex-1 flex flex-col max-w-md mx-auto w-full p-4 relative text-sm sm:text-base hidden">
+        <div class="flex items-center justify-between mb-8 py-4 border-b border-gray-300">
+            <button id="btn-exit-test" class="p-2 -ml-2 text-gray-600 hover:text-black transition-colors flex items-center gap-1 font-bold text-xs cursor-pointer relative z-50">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+                返回首页
+            </button>
+            <div class="text-gray-500 tracking-widest text-xs" id="progress-text">PROCESS: 1 / 20</div>
+        </div>
+
+        <div class="w-full h-1 bg-gray-200 mb-8 overflow-hidden relative">
+            <div id="progress-bar" class="h-full bg-brand w-0 transition-all duration-300"></div>
+            <div class="absolute top-0 bottom-0 left-0 w-12 bg-black/10 animate-scan" style="filter: blur(4px);"></div>
+        </div>
+
+        <div id="question-container" class="flex-1 flex flex-col">
+            <h2 class="text-xl md:text-2xl font-bold mb-8 leading-relaxed">
+                <span class="text-brand mr-2" id="q-num">Q1.</span>
+                <span id="q-title">题目加载中...</span>
+            </h2>
+            <div id="options-container" class="space-y-4"></div>
+            <div class="mt-8 text-center" id="undo-container" style="display:none;">
+                <button id="btn-undo" class="text-xs text-gray-500 hover:text-black underline underline-offset-4 decoration-gray-400 transition-colors">[ 撤回上一条计费 ]</button>
+            </div>
+        </div>
+        
+        <div id="submit-container" class="mt-8 hidden">
+             <button id="btn-submit" class="brutalist-btn mt-8">
+                <span class="flex justify-center items-center" id="submit-text">[ 打印账单 ]</span>
+            </button>
+        </div>
+
+        <!-- Exit Modal -->
+        <div id="modal-exit" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 hidden opacity-0">
+            <div id="modal-exit-content" class="bg-white border-4 border-black p-6 max-w-sm w-full text-center scale-95 shadow-[8px_8px_0px_#000]">
+                <h3 class="text-lg font-bold text-black mb-2">确定要离开吗？</h3>
+                <p class="text-gray-500 text-sm mb-6">当前答题进度将不会被保存。</p>
+                <div class="flex gap-4">
+                    <button id="btn-cancel-exit" class="flex-1 py-3 bg-gray-800 text-white font-bold hover:bg-gray-700 transition-colors">继续答题</button>
+                    <button id="btn-confirm-exit" class="flex-1 py-3 bg-red-600 text-white font-bold hover:bg-red-700 transition-colors">确认离开</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- ================= RESULT VIEW ================= -->
+    <main id="view-result" class="flex-1 flex flex-col w-full max-w-md mx-auto relative h-[100dvh] pt-[max(12px,env(safe-area-inset-top))] pb-[max(130px,env(safe-area-inset-bottom))] hidden">
+        <div class="flex-1 overflow-y-auto px-4 hide-scrollbar flex flex-col items-center pb-8">
+
+
+            <div id="poster-container" class="w-full max-w-[340px] flex flex-col bg-[#fdfdfd] receipt-container relative z-0 mb-8 pt-4">
+                <div class="receipt-top shrink-0"></div>
+                <div class="receipt-paper px-6 py-4 flex-1 flex flex-col relative overflow-hidden">
+                    <div class="text-center font-mono mb-4 shrink-0">
+                        <h2 class="text-2xl font-black mb-1 tracking-widest text-black">消费结账单</h2>
+                        <p class="text-xs uppercase font-bold text-gray-600">--- EMOTIONAL RECEIPT ---</p>
+                        <div class="text-xs text-black mt-2 font-bold bg-gray-100 py-1 inline-block px-3 border border-dashed border-gray-400" id="rank-text">
+                           你是第 12544 个结账完成的顾客
+                        </div>
+                        <p class="text-[10px] text-gray-500 mt-2" id="receipt-date">NO. 12544 // 2026/07/22</p>
+                    </div>
+                    <div class="border-b-4 border-black my-2"></div>
+                    
+                    <div class="text-center mb-6 mt-4">
+                        <div class="text-sm font-bold text-gray-600 mb-1">鉴定结果</div>
+                        <div class="text-2xl font-black bg-black text-white py-2 px-4 inline-block transform -rotate-1" id="res-title">
+                            结果计算中...
+                        </div>
+                    </div>
+                    <div class="flex flex-wrap justify-center gap-2 mb-6" id="res-tags"></div>
+                    <div class="border-b-2 border-dashed border-gray-400 mb-6"></div>
+                    
+                    <div class="mb-6 font-mono text-xs text-black border-t-2 border-b-2 border-black py-4">
+                        <div class="flex justify-between items-end pb-2 border-b-2 border-black font-bold">
+                            <span class="text-sm">TOTAL FRICTION (总内耗)</span>
+                            <span class="text-lg" id="res-total">0</span>
+                        </div>
+                        <button id="btn-toggle-details" class="w-full text-center py-2 text-[10px] text-gray-500 hover:bg-gray-100 transition-colors mt-2 border border-dashed border-gray-300">
+                            [+ 展开消费明细]
+                        </button>
+                        <div id="details-container" class="space-y-3 mt-4 pt-2 hidden">
+                            <div class="text-[10px] text-gray-500 mb-2">ITEM ................................. AMOUNT</div>
+                            <div id="details-list"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4 pt-4 text-center">
+                        <div id="barcode-bottom"></div>
+                        <p class="text-[10px] text-gray-500 font-bold tracking-tighter" id="beat-text">击败了 99% 的测试者</p>
+                    </div>
+                    
+                    <div class="border-b-4 border-black my-8"></div>
+                    
+                    <div class="text-center font-mono mb-4 shrink-0">
+                        <h2 class="text-xl font-black mb-1 tracking-widest text-black">深度评估报告</h2>
+                        <p class="text-xs uppercase font-bold text-gray-600">--- ANALYSIS ---</p>
+                    </div>
+                    
+                    <div class="space-y-3 mb-6 font-bold text-black border-2 border-black p-4 bg-[#f4f4f4] shadow-[4px_4px_0px_#000]">
+                        <p class="text-[10px] font-mono text-gray-500 mb-1">DIMENSION SCORES</p>
+                        <div class="flex flex-col gap-1">
+                            <div class="flex justify-between text-[10px] uppercase"><span>敏感 (Sen)</span><span id="score-sen">0</span></div>
+                            <div class="w-full h-2 border-2 border-black bg-white"><div id="bar-sen" class="h-full bg-black w-0"></div></div>
+                        </div>
+                        <div class="flex flex-col gap-1">
+                            <div class="flex justify-between text-[10px] uppercase"><span>反刍 (Rum)</span><span id="score-rum">0</span></div>
+                            <div class="w-full h-2 border-2 border-black bg-white"><div id="bar-rum" class="h-full bg-black w-0"></div></div>
+                        </div>
+                        <div class="flex flex-col gap-1">
+                            <div class="flex justify-between text-[10px] uppercase"><span>讨好 (Pls)</span><span id="score-pls">0</span></div>
+                            <div class="w-full h-2 border-2 border-black bg-white"><div id="bar-pls" class="h-full bg-black w-0"></div></div>
+                        </div>
+                        <div class="flex flex-col gap-1">
+                            <div class="flex justify-between text-[10px] uppercase"><span>边界 (Bnd)</span><span id="score-bnd">0</span></div>
+                            <div class="w-full h-2 border-2 border-black bg-white"><div id="bar-bnd" class="h-full bg-black w-0"></div></div>
+                        </div>
+                    </div>
+                    
+                    <div class="relative">
+                        <div id="unlock-overlay" class="absolute inset-0 z-10 flex flex-col items-center justify-center bg-white/40 backdrop-blur-sm">
+                            <button id="btn-show-unlock" class="bg-black text-white px-6 py-3 font-bold border-2 border-black shadow-[4px_4px_0px_#fff] hover:translate-y-1 hover:shadow-none transition-all">
+                                解锁后查看完整内容
+                            </button>
+                        </div>
+                        <div id="res-desc" class="text-[13px] text-left leading-relaxed font-bold border-2 border-black p-4 bg-white mb-4 shadow-[4px_4px_0px_#000]"></div>
+                        <div class="text-left font-mono mb-4">
+                            <div class="text-[10px] bg-black text-white px-2 py-0.5 inline-block mb-1">▶ 核心金句 QUOTE</div>
+                            <div id="res-quote" class="text-xs leading-relaxed font-bold border-l-2 border-black pl-2 italic"></div>
+                        </div>
+                        <div class="text-left font-mono mb-8">
+                            <div class="text-[10px] bg-black text-white px-2 py-0.5 inline-block mb-1">▶ 破局建议 ADVICE</div>
+                            <div class="text-xs leading-relaxed font-bold border-l-2 border-black pl-2">
+                                <ul class="list-disc pl-4 space-y-1">
+                                    <li>尝试在小事上直接拒绝别人。</li>
+                                    <li>设立睡前“断电时间”，禁止复盘当天。</li>
+                                    <li>把关注点转移到“我现在舒不舒服”。</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-8 pt-8 border-t-2 border-black border-dashed">
+                        <div class="text-center text-[10px] text-gray-500 font-mono mb-4">--- ANALYSIS END ---</div>
+                        <p class="text-[10px] text-gray-500 font-bold tracking-tighter text-center">*本报告最终解释权归本人的小世界所有</p>
+                    </div>
+                    
+                    <div class="absolute top-64 right-[-10px] rotate-[15deg] text-4xl font-black text-black/10 border-4 border-black/10 p-2 uppercase pointer-events-none">VERIFIED</div>
+                </div>
+                <div class="receipt-bottom shrink-0"></div>
+            </div>
+        </div>
+        
+        <div class="absolute bottom-0 left-0 right-0 p-4 bg-[#1c1c1e] border-t-2 border-white/10 flex flex-col gap-3 z-50">
+            <button id="btn-save" class="brutalist-btn !py-3 w-full max-w-[340px] mx-auto">
+                <span id="save-icon" class="mr-2"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg></span>
+                <span id="save-text">保存账单截图</span>
+            </button>
+            <div class="flex justify-center gap-6 mt-1 mb-2 font-mono font-bold w-full max-w-[340px] mx-auto">
+                <button id="btn-restart" class="text-xs text-gray-400 hover:text-white underline underline-offset-4 decoration-gray-700 transition-colors">[ 重新打印 ]</button>
+                <a href="https://xiaohongshu.com/user/profile/600000000000000000000000" class="text-xs text-gray-400 hover:text-white underline underline-offset-4 decoration-gray-700 transition-colors">[ 查看更多专柜 ]</a>
+            </div>
+        </div>
+        
+        <!-- Unlock Modal -->
+        <div id="modal-unlock" class="fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 font-sans hidden opacity-0">
+            <div id="modal-unlock-content" class="bg-white border-4 border-black w-full max-w-sm p-6 relative shadow-[8px_8px_0px_#000] scale-95">
+                <button id="btn-close-unlock" class="absolute top-4 right-4 text-black hover:scale-110 transition-transform font-bold border-2 border-black w-8 h-8 flex items-center justify-center bg-[#f4f4f4]">X</button>
+                <h3 class="text-xl font-bold mb-4 tracking-wider text-black">验证激活码</h3>
+                <p class="text-sm text-gray-600 mb-6 leading-relaxed">感谢对原创心血的认可。为了维持优质的内容产出与服务器运作，本次测算结果请认准小红书唯一官方发布账号：<strong>安安</strong>。</p>
+                <input id="input-verify" type="text" placeholder="请输入你在小红书收到的激活码" class="w-full border-2 border-black p-3 mb-4 outline-none focus:bg-yellow-50 font-bold bg-white text-black placeholder-gray-400" />
+                <button id="btn-verify" class="w-full bg-black text-white font-bold p-3 border-2 border-black active:translate-y-1 transition-transform">提交验证</button>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html-to-image/1.11.11/html-to-image.min.js"></script>
+    <script>
+        // DATA
+        const questions = [{"id": "q1", "text": "深夜看到一条同事发来的仅你可见的吐槽朋友圈，你会？", "options": [{"id": "o1_1", "text": "反复揣摩她的用意，甚至整晚失眠", "billName": "无意义失眠费", "senScore": 5, "rumScore": 5, "plsScore": 0, "bndScore": 0}, {"id": "o1_2", "text": "假装没看见，直接划走", "billName": "装瞎逃避税", "senScore": 0, "rumScore": 0, "plsScore": 0, "bndScore": 5}, {"id": "o1_3", "text": "默默点个赞，表示已阅", "billName": "廉价社交费", "senScore": 0, "rumScore": 0, "plsScore": 2, "bndScore": 2}, {"id": "o1_4", "text": "心里咯噔一下：是不是在内涵我？", "billName": "深夜对号入座费", "senScore": 5, "rumScore": 0, "plsScore": 0, "bndScore": 0}]}, {"id": "q2", "text": "发在群里的消息，过了10分钟都没人回复，你的第一反应：", "options": [{"id": "o2_1", "text": "有点尴尬，我是不是冷场了", "billName": "群聊冷场焦虑费", "senScore": 3, "rumScore": 0, "plsScore": 0, "bndScore": 0}, {"id": "o2_2", "text": "立刻把消息撤回，当作没发生过", "billName": "社交自毁保释金", "senScore": 5, "rumScore": 0, "plsScore": 3, "bndScore": 0}, {"id": "o2_3", "text": "可能都在忙，先干别的", "billName": "钝感力储蓄", "senScore": 0, "rumScore": 0, "plsScore": 0, "bndScore": 5}, {"id": "o2_4", "text": "我是不是说错话了？开始焦虑", "billName": "自省过度惩罚", "senScore": 4, "rumScore": 3, "plsScore": 0, "bndScore": 0}]}, {"id": "q3", "text": "被领导单独叫进办公室，走在路上的你在想什么？", "options": [{"id": "o3_1", "text": "回忆最近工作有没有纰漏", "billName": "职场危机预演", "senScore": 0, "rumScore": 3, "plsScore": 0, "bndScore": 0}, {"id": "o3_2", "text": "完了，我是不是要挨骂了", "billName": "灾难化想象费", "senScore": 5, "rumScore": 0, "plsScore": 0, "bndScore": 0}, {"id": "o3_3", "text": "心跳加速，甚至想立刻辞职逃避", "billName": "离职冲动挂号费", "senScore": 5, "rumScore": 3, "plsScore": 0, "bndScore": 0}, {"id": "o3_4", "text": "估计是有新任务要交代，公事公办", "billName": "公事公办通行费", "senScore": 0, "rumScore": 0, "plsScore": 0, "bndScore": 5}]}, {"id": "q4", "text": "朋友聚会结束后，回到家里的状态是：", "options": [{"id": "o4_1", "text": "感觉社交耗尽了所有能量，需要自闭几天", "billName": "灵魂透支抢救费", "senScore": 5, "rumScore": 0, "plsScore": 5, "bndScore": 0}, {"id": "o4_2", "text": "复盘自己今晚有没有说错话", "billName": "睡前社交复盘费", "senScore": 3, "rumScore": 5, "plsScore": 0, "bndScore": 0}, {"id": "o4_3", "text": "有点累，洗洗就睡了", "billName": "电量耗尽维修", "senScore": 0, "rumScore": 0, "plsScore": 0, "bndScore": 3}, {"id": "o4_4", "text": "非常开心，意犹未尽", "billName": "社交充能奖励", "senScore": 0, "rumScore": 0, "plsScore": 0, "bndScore": 5}]}, {"id": "q5", "text": "看到别人在社交平台上炫耀完美生活，你的感受是：", "options": [{"id": "o5_1", "text": "觉得自己是个彻头彻尾的loser", "billName": "自我贬低重税", "senScore": 5, "rumScore": 5, "plsScore": 0, "bndScore": 0}, {"id": "o5_2", "text": "点个赞，然后继续过自己的日子", "billName": "关我屁事豁免", "senScore": 0, "rumScore": 0, "plsScore": 0, "bndScore": 5}, {"id": "o5_3", "text": "有点羡慕，但也仅此而已", "billName": "轻度眼红治疗", "senScore": 2, "rumScore": 0, "plsScore": 0, "bndScore": 0}, {"id": "o5_4", "text": "对比自己，感到一阵深深的失落", "billName": "同侪压力折旧费", "senScore": 5, "rumScore": 3, "plsScore": 0, "bndScore": 0}]}, {"id": "q6", "text": "面对一个艰难的决定（比如换工作或分手），你会：", "options": [{"id": "o6_1", "text": "纠结几天，然后咬牙决定", "billName": "限时纠结费", "senScore": 0, "rumScore": 2, "plsScore": 0, "bndScore": 0}, {"id": "o6_2", "text": "极度拖延，直到现实逼迫我做决定", "billName": "命运托管手续费", "senScore": 0, "rumScore": 5, "plsScore": 3, "bndScore": 0}, {"id": "o6_3", "text": "权衡利弊后，果断做出选择", "billName": "快刀斩乱麻", "senScore": 0, "rumScore": 0, "plsScore": 0, "bndScore": 5}, {"id": "o6_4", "text": "反复推翻自己，迟迟做不了决定", "billName": "选择困难罚单", "senScore": 0, "rumScore": 5, "plsScore": 0, "bndScore": 0}]}, {"id": "q7", "text": "当别人对你提出一个有些过分的请求时，你的反应：", "options": [{"id": "o7_1", "text": "勉强答应，然后自己默默受委屈", "billName": "委曲求全过路费", "senScore": 0, "rumScore": 3, "plsScore": 5, "bndScore": 0}, {"id": "o7_2", "text": "直接拒绝，说明原因", "billName": "边界感维护费", "senScore": 0, "rumScore": 0, "plsScore": 0, "bndScore": 5}, {"id": "o7_3", "text": "立刻答应，因为极度害怕破坏关系", "billName": "烂好人高昂保费", "senScore": 5, "rumScore": 0, "plsScore": 5, "bndScore": 0}, {"id": "o7_4", "text": "委婉拒绝，心里稍微有点过意不去", "billName": "轻度讨好倾向", "senScore": 0, "rumScore": 0, "plsScore": 2, "bndScore": 3}]}, {"id": "q8", "text": "一天结束，躺在床上的你在思考什么？", "options": [{"id": "o8_1", "text": "各种杂念交织，越想越焦虑无法入睡", "billName": "午夜疯狂内耗税", "senScore": 5, "rumScore": 5, "plsScore": 0, "bndScore": 0}, {"id": "o8_2", "text": "总结今天完成了哪些事", "billName": "自我管理费", "senScore": 0, "rumScore": 1, "plsScore": 0, "bndScore": 3}, {"id": "o8_3", "text": "明天吃什么/玩什么", "billName": "没心没肺快乐税", "senScore": 0, "rumScore": 0, "plsScore": 0, "bndScore": 5}, {"id": "o8_4", "text": "回放今天尴尬的瞬间，感到懊恼", "billName": "精神黑历史拷问", "senScore": 3, "rumScore": 5, "plsScore": 0, "bndScore": 0}]}, {"id": "q9", "text": "受到了一句不经意的批评，你会记得多久？", "options": [{"id": "o9_1", "text": "在意一小会儿，很快调整过来", "billName": "玻璃心修复费", "senScore": 2, "rumScore": 0, "plsScore": 0, "bndScore": 3}, {"id": "o9_2", "text": "记好几天，时不时想起来就会难受", "billName": "负面评价存储费", "senScore": 5, "rumScore": 4, "plsScore": 0, "bndScore": 0}, {"id": "o9_3", "text": "变成长期的心理阴影，甚至改变自我认知", "billName": "PUA深度疗愈费", "senScore": 5, "rumScore": 5, "plsScore": 3, "bndScore": 0}, {"id": "o9_4", "text": "听完就忘，或者马上怼回去", "billName": "反弹装甲费", "senScore": 0, "rumScore": 0, "plsScore": 0, "bndScore": 5}]}, {"id": "q10", "text": "如果能拥有一个超能力，你最想拥有哪个？", "options": [{"id": "o10_1", "text": "读心术，想知道别人到底怎么看我", "billName": "偷窥心声流量费", "senScore": 5, "rumScore": 0, "plsScore": 4, "bndScore": 0}, {"id": "o10_2", "text": "情绪开关，能随时关掉自己泛滥的感受", "billName": "感官切断手术费", "senScore": 5, "rumScore": 5, "plsScore": 0, "bndScore": 0}, {"id": "o10_3", "text": "瞬间移动，想去哪就去哪", "billName": "逃避现实机票", "senScore": 0, "rumScore": 0, "plsScore": 0, "bndScore": 5}, {"id": "o10_4", "text": "预知未来，掌控一切可能", "billName": "控制欲年费", "senScore": 0, "rumScore": 4, "plsScore": 0, "bndScore": 0}]}, {"id": "q11", "text": "周末本来想在家躺一天，但一个不是很熟的朋友突然约你喝咖啡：", "options": [{"id": "o11_1", "text": "找借口拒绝后，一整天都在担心对方会不会生气", "billName": "拒绝后遗症治疗费", "senScore": 5, "rumScore": 4, "plsScore": 0, "bndScore": 0}, {"id": "o11_2", "text": "直接找个理由婉拒，继续躺着", "billName": "边界感护城河维护费", "senScore": 0, "rumScore": 0, "plsScore": 0, "bndScore": 5}, {"id": "o11_3", "text": "立刻答应，哪怕自己很累也怕对方失望", "billName": "老好人周末透支税", "senScore": 4, "rumScore": 0, "plsScore": 5, "bndScore": 0}, {"id": "o11_4", "text": "纠结半天要不要去，最后还是去了", "billName": "违背意愿出门费", "senScore": 0, "rumScore": 3, "plsScore": 2, "bndScore": 0}]}, {"id": "q12", "text": "开会时，你提出了一个想法，结果被同事当众反驳，你会：", "options": [{"id": "o12_1", "text": "当场理性探讨，就事论事", "billName": "情绪绝缘盾牌", "senScore": 0, "rumScore": 0, "plsScore": 0, "bndScore": 5}, {"id": "o12_2", "text": "会后反复回放那个尴尬瞬间，恨自己当时没发挥好", "billName": "职场马后炮反刍费", "senScore": 3, "rumScore": 5, "plsScore": 0, "bndScore": 0}, {"id": "o12_3", "text": "表面笑笑，心里立刻开始自我怀疑", "billName": "职场自信心崩塌", "senScore": 5, "rumScore": 3, "plsScore": 0, "bndScore": 0}, {"id": "o12_4", "text": "觉得非常丢脸，接下来的会一句话都不敢说", "billName": "社交恐惧急救金", "senScore": 5, "rumScore": 0, "plsScore": 0, "bndScore": 0}]}, {"id": "q13", "text": "在街上远远看到一个认识但不熟的人，对方好像没看你，你会：", "options": [{"id": "o13_1", "text": "纠结要不要打招呼，直到擦肩而过还在想", "billName": "擦肩而过内耗费", "senScore": 3, "rumScore": 4, "plsScore": 0, "bndScore": 0}, {"id": "o13_2", "text": "赶紧低头假装玩手机，避免打招呼的尴尬", "billName": "社恐紧急避险费", "senScore": 4, "rumScore": 0, "plsScore": 2, "bndScore": 0}, {"id": "o13_3", "text": "主动大声打招呼，即使对方可能不记得我", "billName": "社交牛逼症体验卡", "senScore": 0, "rumScore": 0, "plsScore": 0, "bndScore": 3}, {"id": "o13_4", "text": "当作没看见，各走各的路", "billName": "路人甲伪装税", "senScore": 0, "rumScore": 0, "plsScore": 0, "bndScore": 5}]}, {"id": "q14", "text": "买了一杯奶茶，喝了一口发现做错了（比如做成了全糖），你会：", "options": [{"id": "o14_1", "text": "算了吧，将就喝，不想麻烦别人", "billName": "讨好型妥协税", "senScore": 0, "rumScore": 0, "plsScore": 4, "bndScore": 0}, {"id": "o14_2", "text": "告诉店员做错了，要求重做", "billName": "消费者维权专车费", "senScore": 0, "rumScore": 0, "plsScore": 0, "bndScore": 5}, {"id": "o14_3", "text": "扔掉不喝了，但心里一直觉得很亏", "billName": "沉默成本沉没费", "senScore": 0, "rumScore": 4, "plsScore": 0, "bndScore": 0}, {"id": "o14_4", "text": "犹豫了很久想去换，走到柜台前又退缩了", "billName": "社交退缩违约金", "senScore": 4, "rumScore": 3, "plsScore": 0, "bndScore": 0}]}, {"id": "q15", "text": "发在社交媒体上的一张自拍，几个小时了只有两个赞，你会：", "options": [{"id": "o15_1", "text": "觉得照片真的很丑，默默删掉", "billName": "容貌焦虑充值", "senScore": 5, "rumScore": 4, "plsScore": 0, "bndScore": 0}, {"id": "o15_2", "text": "不在意，我自己觉得好看就行", "billName": "自我肯定奖金", "senScore": 0, "rumScore": 0, "plsScore": 0, "bndScore": 5}, {"id": "o15_3", "text": "怀疑是不是被限流了或者大家都不喜欢我", "billName": "存在感稀薄惩罚", "senScore": 5, "rumScore": 0, "plsScore": 0, "bndScore": 0}, {"id": "o15_4", "text": "开始分析是不是发的时间不对，下次换个时间", "billName": "流量玄学分析费", "senScore": 0, "rumScore": 3, "plsScore": 0, "bndScore": 0}]}, {"id": "q16", "text": "别人不小心弄坏了你很喜欢的东西，对方一直在道歉，你的反应：", "options": [{"id": "o16_1", "text": "反过来安慰对方，生怕对方因为内疚而难过", "billName": "圣母光环维护费", "senScore": 4, "rumScore": 0, "plsScore": 5, "bndScore": 0}, {"id": "o16_2", "text": "接受道歉，但好几天都会为了这个东西心烦", "billName": "余波震荡损耗", "senScore": 0, "rumScore": 4, "plsScore": 0, "bndScore": 0}, {"id": "o16_3", "text": "表面说“没关系”，其实心里心疼得要死", "billName": "强颜欢笑医疗费", "senScore": 0, "rumScore": 3, "plsScore": 5, "bndScore": 0}, {"id": "o16_4", "text": "告诉对方这东西对我来说很重要，要求相应的赔偿", "billName": "物品损失折旧费", "senScore": 0, "rumScore": 0, "plsScore": 0, "bndScore": 5}]}, {"id": "q17", "text": "晚上睡觉前，脑子里突然想起五年前的一件丢人小事：", "options": [{"id": "o17_1", "text": "马上开始反思为什么自己从小就这么蠢", "billName": "基因层面否定税", "senScore": 5, "rumScore": 5, "plsScore": 0, "bndScore": 0}, {"id": "o17_2", "text": "笑笑自己当年真傻，翻个身睡觉", "billName": "黑历史和解金", "senScore": 0, "rumScore": 0, "plsScore": 0, "bndScore": 4}, {"id": "o17_3", "text": "试图强行把画面赶出大脑，结果越想越清晰", "billName": "强制遗忘手续费", "senScore": 0, "rumScore": 4, "plsScore": 0, "bndScore": 0}, {"id": "o17_4", "text": "尴尬得能在床上抠出三室一厅，疯狂捶枕头", "billName": "黑历史高清重置费", "senScore": 4, "rumScore": 5, "plsScore": 0, "bndScore": 0}]}, {"id": "q18", "text": "准备要下班了，老板突然走过来说：“这有个不急的活儿，你顺手看一下”，你会：", "options": [{"id": "o18_1", "text": "说“好的，我明天一早来看”，准点下班", "billName": "下班打卡护卫费", "senScore": 0, "rumScore": 0, "plsScore": 0, "bndScore": 5}, {"id": "o18_2", "text": "说“好的老板”，然后加班做完再走", "billName": "职场老黄牛草料费", "senScore": 0, "rumScore": 0, "plsScore": 5, "bndScore": 0}, {"id": "o18_3", "text": "虽然接了，但一边做一边在心里疯狂咒骂", "billName": "职场暗黑情绪税", "senScore": 3, "rumScore": 4, "plsScore": 0, "bndScore": 0}, {"id": "o18_4", "text": "勉强接下，心里害怕如果不做完会被老板认为态度不好", "billName": "职场印象管理费", "senScore": 5, "rumScore": 0, "plsScore": 4, "bndScore": 0}]}, {"id": "q19", "text": "你的好朋友最近心情不好，跟你抱怨了两个小时，你的感受：", "options": [{"id": "o19_1", "text": "尽力倾听，但感觉自己的能量也被抽干了", "billName": "情绪垃圾桶清理费", "senScore": 5, "rumScore": 0, "plsScore": 3, "bndScore": 0}, {"id": "o19_2", "text": "开始反思自己是不是也遇到了同样糟糕的情况", "billName": "共情过度传染病", "senScore": 4, "rumScore": 4, "plsScore": 0, "bndScore": 0}, {"id": "o19_3", "text": "跟着一起骂，结果自己也气得半死", "billName": "情绪同频共振费", "senScore": 4, "rumScore": 0, "plsScore": 0, "bndScore": 0}, {"id": "o19_4", "text": "听完就过，不会把对方的情绪带到自己身上", "billName": "情绪隔离罩", "senScore": 0, "rumScore": 0, "plsScore": 0, "bndScore": 5}]}, {"id": "q20", "text": "马上要做一个重要的当众汇报，你的状态是：", "options": [{"id": "o20_1", "text": "提前一周就开始睡不好觉，脑子里全是忘词的画面", "billName": "灾难预演门票", "senScore": 5, "rumScore": 5, "plsScore": 0, "bndScore": 0}, {"id": "o20_2", "text": "紧张到手心出汗，总觉得大家在等看我的笑话", "billName": "舞台恐惧聚光灯", "senScore": 5, "rumScore": 3, "plsScore": 0, "bndScore": 0}, {"id": "o20_3", "text": "有点紧张，但深呼吸几次就能调整好", "billName": "临场微调费", "senScore": 2, "rumScore": 0, "plsScore": 0, "bndScore": 4}, {"id": "o20_4", "text": "无所谓，大不了就是丢个人，爱咋咋地", "billName": "死猪不怕开水烫费", "senScore": 0, "rumScore": 0, "plsScore": 0, "bndScore": 5}]}];
+        const results = [{"id": "r_low", "key": "low", "title": "【人间铁壁】", "tags": "#钝感力王者,#反PUA大师,#关我屁事", "description": "你的情绪防火墙堪比银行金库。你几乎不为外界的评价买单，绝不为不值得的人花一分钱情绪。保持这种冷酷，干得漂亮！在这个大家都在疯狂内耗的时代，你活得像一个绝缘体。", "quote": "我的感受优先级最高。"}, {"id": "r_bnd", "key": "bnd", "title": "【精神守财奴】", "tags": "#精打细算,#偶尔破防,#边界感强", "description": "你虽然偶尔会在意别人的看法，但只要一想到内耗太费精力，你就会立刻止损。你在“在意别人”和“保护自己”之间找到了完美的平衡，是一个情绪上的“守财奴”。", "quote": "不值得的人，不配占用我的脑容量。"}, {"id": "r_sen", "key": "sen", "title": "【薛定谔的敏感】", "tags": "#间歇性发作,#特定对象破防,#表面稳如老狗", "description": "你大部分时候情绪稳定，但遇到特定的敏感触发点（比如在乎的人的一句话，或是某个特定的职场场景）就会突然破防。你的雷达很敏锐，只是平时假装关机。", "quote": "我只是看破不说破，别真以为我傻。"}, {"id": "r_pls", "key": "pls", "title": "【老好人提款机】", "tags": "#委曲求全,#不会拒绝,#烂好人", "description": "你的情绪账单里，大部分支出都在为别人买单。你太害怕得罪人，太害怕破坏气氛，以至于经常勉强自己答应不合理的要求。事后虽然委屈，但下次还是张不开拒绝的嘴。", "quote": "成全了别人，委屈了自己。"}, {"id": "r_rum", "key": "rum", "title": "【深夜复盘家】", "tags": "#睡前批斗会,#选择困难,#后悔药常客", "description": "白天你是个正常人，一到深夜，你的大脑就开始播放《今日尴尬集锦》。你会为了一句没回好的话纠结半宿，反复推演“如果当时我那么说就好了”。你的精力都消耗在了对过去的追悔中。", "quote": "人类的悲欢并不相通，我只觉得我今天好尴尬。"}, {"id": "r_sen_pls", "key": "sen_pls", "title": "【情绪海绵】", "tags": "#高敏感体质,#玻璃心,#共情泛滥", "description": "你就像一块海绵，无差别地吸收着周围人的情绪。别人的一皱眉、一叹气，都能在你心里引发海啸。你极度敏锐，但也极度疲惫。你总是试图照顾所有人的感受，却唯独忘了自己。", "quote": "能不能求求大家别再给我散发负能量了？"}, {"id": "r_high", "key": "high", "title": "【灵魂透支大户】", "tags": "#灾难化想象,#内耗王者,#精神衰弱", "description": "警告！您的心灵信用卡已被刷爆！你每天都在为他人的眼光和虚无的担忧支付巨额税款。一点风吹草动就能让你脑补出一场大戏，你被自己想象中的灾难压得喘不过气来。", "quote": "我每天什么都没干，但就是觉得好累。"}, {"id": "r_rum_low_bnd", "key": "rum_low_bnd", "title": "【自我PUA带师】", "tags": "#习惯性自责,#完美主义,#精神内伤", "description": "你对自己有着超乎寻常的苛刻。无论发生什么不好的事，你的第一反应永远是“是不是我哪里做错了”。你不需要别人来PUA你，你自己就能把自己批判得体无完肤。你的内耗，是对自己最残忍的惩罚。", "quote": "放过自己吧，你已经做得很好了。"}];
+        
+        // STATE
+        let currentIndex = 0;
+        let answers = {};
+        let historyList = []; 
+        let isUnlocked = localStorage.getItem('emotional-friction_unlocked') === 'true';
+
+        // DOM Elements
+        const viewHome = document.getElementById('view-home');
+        const viewTest = document.getElementById('view-test');
+        const viewResult = document.getElementById('view-result');
+        
+        // UTILS: GSAP Transitions
+        function switchView(hideEl, showEl) {
+            gsap.to(hideEl, { opacity: 0, duration: 0.3, onComplete: () => {
+                hideEl.classList.add('hidden');
+                showEl.classList.remove('hidden');
+                gsap.fromTo(showEl, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.4 });
+            }});
+        }
+
+        // Render Fake Barcode
+        function renderBarcode(containerId) {
+            const el = document.getElementById(containerId);
+            if(!el) return;
+            const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+            svg.setAttribute("class", "w-full h-8");
+            svg.setAttribute("preserveAspectRatio", "none");
+            svg.setAttribute("viewBox", "0 0 100 10");
+            for (let i = 0; i < 40; i++) {
+                const r1 = Math.abs((Math.sin(i * 12.9898) * 43758.5453) % 1);
+                const r2 = Math.abs((Math.sin(i * 78.233) * 43758.5453) % 1);
+                if (r2 > 0.2) {
+                    const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+                    const w = r1 > 0.5 ? 2 : (r1 > 0.2 ? 4 : 1);
+                    rect.setAttribute("x", `${i * 2.5}%`);
+                    rect.setAttribute("y", "0");
+                    rect.setAttribute("width", `${w}%`);
+                    rect.setAttribute("height", "100%");
+                    rect.setAttribute("fill", "currentColor");
+                    svg.appendChild(rect);
+                }
+            }
+            el.appendChild(svg);
+        }
+        renderBarcode("barcode-container");
+        renderBarcode("barcode-bottom");
+
+        // 5-click easter egg on queue count
+        let clickCount = 0;
+        document.getElementById('queue-count').parentElement.onclick = () => {
+            clickCount++;
+            if (clickCount >= 5) {
+                localStorage.clear();
+                alert('[ 系统调试 ] 缓存已清除，应用已重启');
+                window.location.reload();
+            }
+        };
+
+        document.getElementById('btn-start').onclick = () => {
+            switchView(viewHome, viewTest);
+            renderQuestion();
+        };
+
+        // History Drawer
+        const modalHistory = document.getElementById('modal-history');
+        const modalHistoryContent = document.getElementById('modal-history-content');
+        function openHistory() {
+            modalHistory.classList.remove('hidden');
+            gsap.to(modalHistoryContent, { y: 0, duration: 0.4, ease: "power3.out" });
+            const listContainer = document.getElementById('history-list-container');
+            let historyIds = [];
+            try {
+                historyIds = JSON.parse(localStorage.getItem('quiz_history_emotional') || '[]');
+            } catch(e) {}
+            if(historyIds.length === 0) {
+                listContainer.innerHTML = '<div class="text-gray-500 text-sm mt-4 italic font-bold">暂无消费记录。</div>';
+            } else {
+                listContainer.innerHTML = historyIds.reverse().map(id => `
+                    <button class="w-full text-left p-4 bg-white border-2 border-black shadow-[4px_4px_0px_#000] hover:-translate-y-1 hover:shadow-[6px_6px_0px_#000] transition-all flex items-center justify-between mb-3" onclick="alert('纯前端测试版本无法还原往期账单明细，请以最新测试结果为准。')">
+                        <div>
+                            <div class="text-xs font-bold text-gray-500 mb-1">NO. ${id}</div>
+                            <div class="font-bold">情绪账单报告</div>
+                        </div>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                    </button>
+                `).join('');
+            }
+        }
+        function closeHistory() {
+            gsap.to(modalHistoryContent, { y: "100%", duration: 0.3, onComplete: () => modalHistory.classList.add('hidden') });
+        }
+        document.getElementById('btn-history').onclick = openHistory;
+        document.getElementById('btn-close-history').onclick = closeHistory;
+        document.getElementById('btn-close-history-bottom').onclick = closeHistory;
+
+        // TEST LOGIC
+        function renderQuestion() {
+            const q = questions[currentIndex];
+            document.getElementById('q-num').innerText = `Q${currentIndex + 1}.`;
+            document.getElementById('q-title').innerText = q.text;
+            document.getElementById('progress-text').innerText = `PROCESS: ${currentIndex + 1} / ${questions.length}`;
+            document.getElementById('progress-bar').style.width = `${((currentIndex + 1) / questions.length) * 100}%`;
+            
+            const optsContainer = document.getElementById('options-container');
+            optsContainer.innerHTML = '';
+            
+            gsap.fromTo('#question-container', { opacity: 0, x: 20 }, { opacity: 1, x: 0, duration: 0.2 });
+
+            q.options.forEach(opt => {
+                const btn = document.createElement('button');
+                const isSelected = answers[q.id] === opt.id;
+                btn.className = `option-btn ${isSelected ? 'selected' : ''}`;
+                btn.innerHTML = `<div class="relative z-10 flex gap-3 font-bold"><span class="shrink-0">${isSelected ? '[x]' : '[ ]'}</span><span>${opt.text}</span></div>`;
+                btn.onclick = () => handleSelect(q.id, opt);
+                optsContainer.appendChild(btn);
+            });
+
+            document.getElementById('undo-container').style.display = currentIndex > 0 ? 'block' : 'none';
+            
+            if (currentIndex === questions.length - 1 && Object.keys(answers).length === questions.length) {
+                document.getElementById('submit-container').classList.remove('hidden');
+            } else {
+                document.getElementById('submit-container').classList.add('hidden');
+            }
+        }
+
+        function handleSelect(qId, opt) {
+            answers[qId] = opt.id;
+            historyList[currentIndex] = { qId, text: opt.text, billName: opt.billName, senScore: opt.senScore, rumScore: opt.rumScore, plsScore: opt.plsScore, bndScore: opt.bndScore };
+            if (currentIndex < questions.length - 1) {
+                gsap.to('#question-container', { opacity: 0, x: -20, duration: 0.2, onComplete: () => {
+                    currentIndex++;
+                    renderQuestion();
+                }});
+            } else {
+                renderQuestion();
+            }
+        }
+
+        document.getElementById('btn-undo').onclick = () => {
+            if (currentIndex > 0) {
+                gsap.to('#question-container', { opacity: 0, x: 20, duration: 0.2, onComplete: () => {
+                    currentIndex--;
+                    renderQuestion();
+                }});
+            }
+        };
+
+        // Exit Modal
+        const modalExit = document.getElementById('modal-exit');
+        const modalExitContent = document.getElementById('modal-exit-content');
+        document.getElementById('btn-exit-test').onclick = () => {
+            modalExit.classList.remove('hidden');
+            gsap.to(modalExit, { opacity: 1, duration: 0.2 });
+            gsap.to(modalExitContent, { scale: 1, duration: 0.2 });
+        };
+        document.getElementById('btn-cancel-exit').onclick = () => {
+            gsap.to(modalExit, { opacity: 0, duration: 0.2, onComplete: () => modalExit.classList.add('hidden') });
+            gsap.to(modalExitContent, { scale: 0.95, duration: 0.2 });
+        };
+        document.getElementById('btn-confirm-exit').onclick = () => location.reload();
+
+        // SUBMIT & RESULT LOGIC
+        document.getElementById('btn-submit').onclick = () => {
+            const btn = document.getElementById('btn-submit');
+            btn.disabled = true;
+            document.getElementById('submit-text').innerHTML = '<svg class="animate-spin mr-2" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> 账单打印中...';
+            setTimeout(() => {
+                generateResult();
+                switchView(viewTest, viewResult);
+            }, 800);
+        };
+
+        function generateResult() {
+            let finalScores = { sen: 0, rum: 0, pls: 0, bnd: 0 };
+            historyList.forEach(h => {
+                finalScores.sen += Number(h.senScore) || 0;
+                finalScores.rum += Number(h.rumScore) || 0;
+                finalScores.pls += Number(h.plsScore) || 0;
+                finalScores.bnd += Number(h.bndScore) || 0;
+            });
+            
+            let resultKey = 'type_8'; 
+            if (finalScores.rum > 30 && finalScores.bnd < 15) resultKey = 'type_1';
+            else if (finalScores.sen > 25 && finalScores.rum > 25 && finalScores.pls > 25) resultKey = 'type_2';
+            else if (finalScores.sen > 25 && finalScores.pls > 25) resultKey = 'type_3';
+            else {
+                let max = Math.max(finalScores.sen, finalScores.rum, finalScores.pls, finalScores.bnd);
+                if (max === finalScores.pls) resultKey = 'type_4';
+                else if (max === finalScores.rum) resultKey = 'type_5';
+                else if (max === finalScores.sen) resultKey = 'type_6';
+                else if (max === finalScores.bnd && finalScores.sen < 15) resultKey = 'type_7';
+            }
+            
+            const res = results.find(r => r.id === resultKey) || results[0];
+            
+            let newId = Math.floor(Math.random()*9000)+1000;
+            try {
+                const history = JSON.parse(localStorage.getItem('quiz_history_emotional') || '[]');
+                if (!history.includes(newId)) {
+                    history.push(newId);
+                    localStorage.setItem('quiz_history_emotional', JSON.stringify(history));
+                }
+            } catch(e) {}
+            
+            document.getElementById('receipt-date').innerText = `NO. ${newId} // ${new Date().toLocaleDateString()}`;
+            document.getElementById('res-title').innerText = res.title;
+            document.getElementById('res-tags').innerHTML = res.tags.split(',').map(t => `<span class="text-[10px] bg-black text-white px-2 py-1 font-bold">${t}</span>`).join('');
+            
+            const total = finalScores.sen + finalScores.rum + finalScores.pls + finalScores.bnd;
+            document.getElementById('res-total').innerText = total;
+            
+            document.getElementById('score-sen').innerText = finalScores.sen;
+            document.getElementById('score-rum').innerText = finalScores.rum;
+            document.getElementById('score-pls').innerText = finalScores.pls;
+            document.getElementById('score-bnd').innerText = finalScores.bnd;
+            
+            const maxS = Math.max(finalScores.sen, finalScores.rum, finalScores.pls, finalScores.bnd, 1);
+            
+            if (isUnlocked) {
+                document.getElementById('unlock-overlay').style.display = 'none';
+            }
+            
+            const detailsList = document.getElementById('details-list');
+            const billsHTML = historyList.filter(h => h.billName).map(h => {
+                const maxAmount = Math.max(Number(h.senScore)||0, Number(h.rumScore)||0, Number(h.plsScore)||0, Number(h.bndScore)||0) || 15;
+                return `
+                <div class="flex justify-between items-end border-b border-gray-300 border-dotted pb-1">
+                    <span class="truncate pr-2">${h.billName}</span>
+                    <span class="shrink-0 font-bold">+${maxAmount}</span>
+                </div>
+                `;
+            }).join('');
+            detailsList.innerHTML = billsHTML || '<div class="text-gray-400 italic text-center">No details available</div>';
+
+            gsap.fromTo('#view-result', { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.8 });
+            document.getElementById('bar-sen').style.width = `${(finalScores.sen/maxS)*100}%`;
+            document.getElementById('bar-rum').style.width = `${(finalScores.rum/maxS)*100}%`;
+            document.getElementById('bar-pls').style.width = `${(finalScores.pls/maxS)*100}%`;
+            document.getElementById('bar-bnd').style.width = `${(finalScores.bnd/maxS)*100}%`;
+
+            document.getElementById('res-desc').innerText = res.desc;
+            document.getElementById('res-quote').innerText = `"${res.quote}"`;
+
+            checkUnlockState();
+        }
+
+        // Details toggle
+        let showDetails = false;
+        document.getElementById('btn-toggle-details').onclick = () => {
+            showDetails = !showDetails;
+            document.getElementById('btn-toggle-details').innerText = showDetails ? '[- 收起消费明细]' : '[+ 展开消费明细]';
+            document.getElementById('details-container').style.display = showDetails ? 'block' : 'none';
+        };
+
+        // Unlock Modal
+        const modalUnlock = document.getElementById('modal-unlock');
+        const modalUnlockContent = document.getElementById('modal-unlock-content');
+        function checkUnlockState() {
+            if(isUnlocked) {
+                document.getElementById('unlock-overlay').style.display = 'none';
+            } else {
+                document.getElementById('unlock-overlay').style.display = 'flex';
+            }
+        }
+        document.getElementById('btn-show-unlock').onclick = () => {
+            modalUnlock.classList.remove('hidden');
+            gsap.to(modalUnlock, { opacity: 1, duration: 0.2 });
+            gsap.to(modalUnlockContent, { scale: 1, duration: 0.2 });
+        };
+        document.getElementById('btn-close-unlock').onclick = () => {
+            gsap.to(modalUnlock, { opacity: 0, duration: 0.2, onComplete: () => modalUnlock.classList.add('hidden') });
+            gsap.to(modalUnlockContent, { scale: 0.95, duration: 0.2 });
+        };
+        document.getElementById('btn-verify').onclick = () => {
+            const code = document.getElementById('input-verify').value;
+            if(code.trim()) {
+                isUnlocked = true;
+                localStorage.setItem('emotional-friction_unlocked', 'true');
+                checkUnlockState();
+                document.getElementById('btn-close-unlock').click();
+            } else {
+                alert('请输入激活码');
+            }
+        };
+
+        // Restart
+        document.getElementById('btn-restart').onclick = () => location.reload();
+        
+        // Save Image
+        document.getElementById('btn-save').onclick = () => {
+            if (!isUnlocked) {
+                document.getElementById('btn-show-unlock').click();
+                return;
+            }
+            const btn = document.getElementById('btn-save');
+            btn.disabled = true;
+            document.getElementById('save-icon').innerHTML = '<svg class="animate-spin" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>';
+            document.getElementById('save-text').innerText = 'GENERATING...';
+            
+            htmlToImage.toJpeg(document.getElementById('poster-container'), { quality: 0.95, pixelRatio: 2 })
+                .then(function (dataUrl) {
+                    var link = document.createElement('a');
+                    link.download = 'emotional_receipt.jpg';
+                    link.href = dataUrl;
+                    link.click();
+                    btn.disabled = false;
+                    document.getElementById('save-icon').innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>';
+                    document.getElementById('save-text').innerText = '保存账单截图';
+                })
+                .catch(function (error) {
+                    console.error('oops, something went wrong!', error);
+                    alert('保存失败，请检查浏览器权限');
+                    btn.disabled = false;
+                    document.getElementById('save-icon').innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>';
+                    document.getElementById('save-text').innerText = '保存账单截图';
+                });
+        };
+
+    </script>
+</body>
+</html>
