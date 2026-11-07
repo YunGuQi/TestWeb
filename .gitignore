@@ -33,6 +33,7 @@ profiles/
 .env.*.local
 dev.db
 dev.db-journal
+domain_and_server_info.md
 
 # 压缩包与二进制可执行文件
 *.zip
