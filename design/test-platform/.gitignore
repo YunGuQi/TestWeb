@@ -1,0 +1,10 @@
+node_modules/
+.next/
+.env
+dev.db
+dev.db-journal
+.scratch/
+deploy*.zip
+*.tsbuildinfo
+test-results/
+scratch*

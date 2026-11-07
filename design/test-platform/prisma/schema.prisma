@@ -1,0 +1,70 @@
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-1.0.x", "debian-openssl-1.1.x", "debian-openssl-3.0.x", "rhel-openssl-1.0.x", "rhel-openssl-3.0.x", "linux-musl", "linux-musl-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Question {
+  id      Int      @id @default(autoincrement())
+  testId  String   @default("emotional-friction")
+  order   Int
+  text    String
+  options Option[]
+}
+
+model Option {
+  id         Int      @id @default(autoincrement())
+  text       String
+  scores     String   @db.Text
+  questionId Int
+  question   Question @relation(fields: [questionId], references: [id])
+
+  @@index([questionId], map: "Option_questionId_fkey")
+}
+
+model ResultConfig {
+  id        Int    @id @default(autoincrement())
+  testId    String @default("emotional-friction")
+  title     String
+  desc      String @db.Text
+  quote     String @db.Text
+  imageUrl  String
+  condition String
+}
+
+model GlobalConfig {
+  id             Int    @id @default(autoincrement())
+  testId         String @default("emotional-friction")
+  baseCount      Int    @default(0)
+  danmakuSpeed   Int    @default(50)
+  danmakuOpacity Int    @default(70)
+  danmakuContent String @db.LongText
+}
+
+model TestRecord {
+  id        String   @id @default(cuid())
+  testId    String   @default("emotional-friction")
+  deviceId  String?
+  answers   String   @db.Text
+  resultId  Int?
+  createdAt DateTime @default(now())
+}
+
+model ActivationCode {
+  id             Int      @id @default(autoincrement())
+  testId         String   @default("emotional-friction")
+  code           String
+  maxUses        Int      @default(3)
+  isDisabled     Boolean  @default(false)
+  devices        String?  @db.Text
+  boundResultKey String?
+  createdAt      DateTime @default(now())
+  isExported     Boolean  @default(false)
+  vendor         String   @default("main")
+
+  @@unique([code, testId])
+}

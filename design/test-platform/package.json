@@ -1,0 +1,46 @@
+{
+  "name": "test-platform",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "node -e \"try { require('child_process').execSync('chmod -R 755 ./node_modules/.bin/') } catch(e) {}\" && next start -p 3000",
+    "start": "node -e \"try { require('child_process').execSync('chmod -R 755 ./node_modules/.bin/') } catch(e) {}\" && next start -p 3000",
+    "build": "prisma generate && next build --webpack",
+    "pack": "node generate-inline-css.js && npm run build && node pack_dlp.js",
+    "postinstall": "prisma generate",
+    "test:api": "playwright test tests/api",
+    "capture": "tsx scripts/capture-results.ts"
+  },
+  "dependencies": {
+    "@marsidev/react-turnstile": "^1.6.0",
+    "@prisma/client": "^5.22.0",
+    "@types/node": "^26.1.1",
+    "@types/qrcode": "^1.5.6",
+    "@types/react": "latest",
+    "@types/react-dom": "latest",
+    "autoprefixer": "^10.5.4",
+    "dotenv": "^17.4.2",
+    "framer-motion": "^12.42.2",
+    "html-to-image": "^1.11.13",
+    "ioredis": "^6.0.0",
+    "jose": "^6.2.9",
+    "lucide-react": "^1.26.0",
+    "next": "16.2.11",
+    "pg": "^8.22.0",
+    "postcss": "^8.5.26",
+    "prisma": "^5.22.0",
+    "qrcode": "^1.5.4",
+    "react": "latest",
+    "react-dom": "latest",
+    "tailwindcss": "^3.4.19",
+    "ts-node": "^10.9.2",
+    "tsx": "^4.23.11",
+    "zustand": "^5.0.14"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.62.1",
+    "eslint": "latest",
+    "eslint-config-next": "latest",
+    "playwright": "^1.62.0",
+    "typescript": "^5.9.3"
+  }
+}

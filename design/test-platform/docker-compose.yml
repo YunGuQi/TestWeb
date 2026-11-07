@@ -1,0 +1,81 @@
+version: '3.8'
+
+services:
+  db:
+    image: mysql:8.0
+    restart: always
+    container_name: xhs-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-rootpassword_aws2026}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-test_platform}
+      MYSQL_USER: ${MYSQL_USER:-test_user}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-testpassword_aws2026}
+    volumes:
+      - mysql_data:/var/lib/mysql
+    command: >
+      --default-authentication-plugin=mysql_native_password
+      --character-set-server=utf8mb4
+      --collation-server=utf8mb4_unicode_ci
+      --innodb-buffer-pool-size=256M
+      --max-connections=50
+    deploy:
+      resources:
+        limits:
+          memory: 768M
+        reservations:
+          memory: 384M
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    restart: always
+    container_name: xhs-redis
+    command: redis-server --maxmemory 96mb --maxmemory-policy allkeys-lru --appendonly yes
+    volumes:
+      - redis_data:/data
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+        reservations:
+          memory: 64M
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    container_name: xhs-app
+    ports:
+      - "127.0.0.1:3000:3000"
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: mysql://${MYSQL_USER:-test_user}:${MYSQL_PASSWORD:-testpassword_aws2026}@db:3306/${MYSQL_DATABASE:-test_platform}
+      REDIS_URL: redis://redis:6379
+      JWT_SECRET: ${JWT_SECRET}
+      NEXT_PUBLIC_TURNSTILE_SITE_KEY: ${NEXT_PUBLIC_TURNSTILE_SITE_KEY}
+      TURNSTILE_SECRET_KEY: ${TURNSTILE_SECRET_KEY}
+      NEXT_PUBLIC_API_SALT: ${NEXT_PUBLIC_API_SALT}
+      ADMIN_LOGIN_PASSWORD: ${ADMIN_LOGIN_PASSWORD}
+      ADMIN_PREVIEW_SECRET: ${ADMIN_PREVIEW_SECRET}
+      NEXT_PUBLIC_ADMIN_PRIVACY_PASSWORD: ${NEXT_PUBLIC_ADMIN_PRIVACY_PASSWORD}
+      NODE_OPTIONS: "--max-old-space-size=512"
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    deploy:
+      resources:
+        limits:
+          memory: 768M
+        reservations:
+          memory: 384M
+
+volumes:
+  mysql_data:
+  redis_data:
