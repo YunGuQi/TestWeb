@@ -48,6 +48,10 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_API_SALT: ${NEXT_PUBLIC_API_SALT}
+        NEXT_PUBLIC_TURNSTILE_SITE_KEY: ${NEXT_PUBLIC_TURNSTILE_SITE_KEY}
+        NEXT_PUBLIC_ADMIN_PRIVACY_PASSWORD: ${NEXT_PUBLIC_ADMIN_PRIVACY_PASSWORD}
     restart: always
     container_name: xhs-app
     # app 仅暴露在 Docker 内部网络，由 nginx 容器代理，不对公网暴露 3000 端口

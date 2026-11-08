@@ -10,6 +10,11 @@ RUN npm ci
 
 COPY . .
 RUN npx prisma generate
+
+ARG NEXT_PUBLIC_API_SALT
+ARG NEXT_PUBLIC_TURNSTILE_SITE_KEY
+ARG NEXT_PUBLIC_ADMIN_PRIVACY_PASSWORD
+
 RUN npm run build
 
 # 生产运行阶段
