@@ -4,7 +4,7 @@
 - **称呼与技能汇报**：每次回复开头称呼“大哥”。仅在实际调阅技能正文时单行汇报生效技能名；内容严格精简凝练、直奔重点，通俗易懂，全力省 Token。
 - **研发三阶段刚性流水线（严格单向推进，严禁越级跳步）**：
   1. **阶段 1 方案计划 (Plan)**：经 `batch-grill-me` 明确范围并落盘轻量方案计划；**须大哥确认后方可进入下阶段**。
-  2. **阶段 2 规约与工单 (Spec & Tickets)**：**须先询问大哥确认指定执行体**，再发指令（PRD 走 `/to-spec`、工单走 `/to-tickets`）委派子代理A/新对话A落盘 `.scratch/<feature-slug>/issues/NN-*.md`（含 CodeGraph 锚点与 AC）；只出文档不改代码、只回摘要。
+  2. **阶段 2 规约与工单 (Spec & Tickets)**：**须先询问大哥确认指定执行体**，再发指令（PRD 走 `/to-spec`、工单走 `/to-tickets`）委派子代理A/新对话A发布 GitHub Issues 工单（含 CodeGraph 锚点与 AC）；只出文档不改代码、只回摘要。
   3. **阶段 3 施工与审查 (Execute & Review)**：**工单全量落盘后，须先询问大哥指定执行体**（严禁越级碰码）。子代理B/新对话B严格依工单改码并自跑机器闸门绿（记账 `npx vitest run` / 番茄 `npm run test:phaseNN`，含 build）；**主对话零代码、只审不改**，按 AC 逐条真机验收（`phone.py`）并回写回归清单。
   - **跨对话交接只传指针**：提示词仅含路径指针与产出纪律，严禁正文进上下文；执行体仅回报「路径清单 + 关键结论 + 需拍板项」。
 - **临时产物即刻清理**：排查日志（`*.log`）、临时脚本与截屏等任务结束前随手彻底清理，严禁滞留。
@@ -30,7 +30,7 @@
 
 ### Issue tracker
 
-Local markdown files under `.scratch/<feature>/`. See `docs/agents/issue-tracker.md`.
+GitHub issues on YunGuQi/TestWeb. See `docs/agents/issue-tracker.md`.
 
 ### Domain docs
 
