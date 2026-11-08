@@ -1,7 +1,8 @@
 # 编辑器与智能体配置
 .gemini
-.agent
 .agents
+# 智能体技能：仅排除历史废弃版本与暂存区
+.agent/skills/暂存/
 # 技能镜像目录：两处都是指向 .agent/skills 的 junction（见 ./link-skills.js），
 # 对 Git 隐形；加这两行是防止 junction 被 Git 穿透后误提交 250 MB 镜像。
 .claude/skills
