@@ -37,6 +37,8 @@
     "zustand": "^5.0.14"
   },
   "devDependencies": {
+    "@emnapi/core": "^1.11.3",
+    "@emnapi/runtime": "^1.11.3",
     "@playwright/test": "^1.62.1",
     "eslint": "latest",
     "eslint-config-next": "latest",
