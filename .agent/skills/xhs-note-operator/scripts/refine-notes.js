@@ -195,6 +195,28 @@ function checkBody({ bodyLines = [], coverLines = [], title = '' }) {
     }
   });
 
+  // 道具前后交代闭环：正文里不许出现前面没交代过的道具，凡是正文里第一次出现的实物（伞、雨、车等），前面 3 行或标题/封面里必须出现过
+  // 反面典型：寒衣节内耗那篇，正文前 8 行没雨没伞，最后一句突然写“我都忘了能跟谁借伞”
+  const UNANCHORED_PROPS = [
+    { prop: '伞', keywords: ['伞', '雨伞', '借伞', '打伞', '撑伞', '收伞'], anchorTerms: ['伞', '雨', '阴天', '下雨'] },
+    { prop: '雨', keywords: ['淋雨', '暴雨', '雨水', '冒雨', '被雨淋'], anchorTerms: ['雨', '天气', '下雨', '阴雨'] },
+    { prop: '车', keywords: ['打车', '出租车', '末班车', '公交车', '方向盘', '车牌'], anchorTerms: ['车', '打车', '通勤', '下班', '回家', '路上', '加班'] }
+  ];
+  const headerAndTop3 = `${combinedHeader} ${bodyLines.slice(0, 3).join(' ')}`;
+  for (const item of UNANCHORED_PROPS) {
+    for (let i = 3; i < bodyLines.length; i++) {
+      const line = bodyLines[i];
+      const matchWord = item.keywords.find(kw => line.includes(kw));
+      if (matchWord) {
+        const isAnchored = item.anchorTerms.some(term => headerAndTop3.includes(term));
+        if (!isAnchored) {
+          issues.push(`[道具未提前交代] 第 ${i + 1} 行首次出现实物道具“${matchWord}”，但封面/标题及前 3 行从未交代或铺垫过，属于后半段突兀天降道具（如前文无雨无伞文末突然天降借伞），判不合格重写`);
+        }
+        break;
+      }
+    }
+  }
+
   // 第二人称说教句式排查
   bodyLines.forEach((line, idx) => {
     if (SD.PREACHY_PATTERN && SD.PREACHY_PATTERN.test(line)) {
@@ -698,6 +720,7 @@ function runCli() {
       '缺少<=6字短行停顿': bodyIssues.filter(i => i.text.includes('缺少 ≤6 字短行停顿')).length,
       '前3行缺失场景微动作/具象情节': bodyIssues.filter(i => i.text.includes('前 3 行缺失生活场域道具')).length,
       '正文缺少逻辑闭环': bodyIssues.filter(i => i.text.includes('缺少逻辑闭环')).length,
+      '道具未提前交代/天降道具': bodyIssues.filter(i => i.text.includes('道具未提前交代')).length,
       '第二人称说教句': bodyIssues.filter(i => i.text.includes('第二人称说教')).length,
       '末行宣誓升华口号': bodyIssues.filter(i => i.text.includes('末行违规出现假大空宣誓')).length,
       '单行超15字': bodyIssues.filter(i => i.text.includes('单行超15字')).length,
