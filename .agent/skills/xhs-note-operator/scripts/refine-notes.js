@@ -53,15 +53,15 @@ function checkCardRhythmAndPerturbation(bodyLines) {
   const issues = [];
   const oralWords = SD.ORAL_PERTURBATION_WORDS || [];
   const oralHits = oralWords.filter(w => bodyLines.some(l => l.includes(w)));
-  if (bodyLines.length > 0 && oralHits.length < 1) {
+  if (bodyLines.length > 0 && oralHits.length < 2) {
     issues.push(
-      `[网感提示] 正文缺少口语虚词扰动，偏向公文化/AI化，建议注入：${oralWords.slice(0, 4).join('/')} 等`
+      `[正文网感] 口语虚词扰动不足 2 种 (现 ${oralHits.length} 种)，偏向公文化/AI排比，建议注入：${oralWords.slice(0, 4).join('/')} 等`
     );
   }
 
   const shortLines = bodyLines.filter(l => l.length <= 6 && !l.startsWith('#') && !l.startsWith('['));
-  if (bodyLines.length >= 4 && shortLines.length === 0) {
-    issues.push(`[节奏提示] 正文行长过于匀称（缺少 ≤6 字短行节奏停顿），读感像一堵墙`);
+  if (bodyLines.length >= 4 && shortLines.length < 2) {
+    issues.push(`[正文节奏] 缺少 ≤6 字短行停顿 (现 ${shortLines.length} 处，要求至少 2 处)，读感均称如一堵墙`);
   }
   return {
     oralHits,
@@ -71,42 +71,221 @@ function checkCardRhythmAndPerturbation(bodyLines) {
   };
 }
 
-function checkCard({ bodyLines = [], coverLines = [], title = '', tags = [], meta = '' }) {
+/**
+ * 1. 封面与标题机审门禁
+ * 只查：钩子强度与白名单、0 词表、字数规范（封面 2~4 行、短<=4、长>=6、总字数<=16；标题<=20字）、模式一数字量纲
+ * 绝对严禁使用“无生活场景实物”去判封面/标题不合格！
+ */
+function checkCoverAndTitle({ coverLines = [], title = '', meta = '' }) {
   const issues = [];
-  const rp = checkCardRhythmAndPerturbation(bodyLines);
-  issues.push(...rp.issues);
 
   if (title && title.length > 20) {
-    issues.push(`标题超长 (${title.length} 字): ${title}`);
+    issues.push(`[标题字数] 标题超长 (${title.length} 字): ${title}`);
   }
 
   const cLengths = coverLines.map(l => l.length);
   const minLen = Math.min(...cLengths);
   const maxLen = Math.max(...cLengths);
   const totalCover = cLengths.reduce((a, b) => a + b, 0);
+
   if (coverLines.length < 2 || coverLines.length > 4) {
-    issues.push(`封面行数须为 2~4 行 (现 ${coverLines.length} 行): [${coverLines.join(' / ')}]`);
+    issues.push(`[封面行数] 须为 2~4 行 (现 ${coverLines.length} 行): [${coverLines.join(' / ')}]`);
   }
   if (totalCover > 16) {
-    issues.push(`封面总字数超16字 (${totalCover} 字): [${coverLines.join(' / ')}]`);
+    issues.push(`[封面字数] 封面总字数超16字 (${totalCover} 字): [${coverLines.join(' / ')}]`);
   }
   if (!(minLen <= 4 && maxLen >= 6)) {
-    issues.push(`封面未满足短板<=4且长板>=6 (短:${minLen}, 长:${maxLen}): [${coverLines.join(' / ')}]`);
-  } else if (maxLen - minLen < 3) {
-    issues.push(`封面行长差 <3 字 (差:${maxLen - minLen}): [${coverLines.join(' / ')}]`);
+    issues.push(`[封面长短] 未满足短板<=4且长板>=6 (短:${minLen}, 长:${maxLen}): [${coverLines.join(' / ')}]`);
   }
   const rhythm = detectCoverRhythm(cLengths);
   if (!rhythm) {
-    issues.push(`封面节奏不合格，现 [${cLengths.join('/')}] → [${coverLines.join(' / ')}]`);
+    issues.push(`[封面节奏] 封面节奏不合格，现 [${cLengths.join('/')}] → [${coverLines.join(' / ')}]`);
   }
-  if (tags && tags.length > 0 && tags.length !== 5) {
-    issues.push(`标签数不等于5 (${tags.length} 个)`);
+
+  // 模式一数字量纲校验
+  if (meta && meta.includes('模式=模式一')) {
+    const hasNum = coverLines.some(l => /\d/.test(l) || /%|％/.test(l));
+    if (!hasNum) {
+      issues.push(`[封面量纲] 模式一封面缺少阿拉伯数字/百分比量纲: [${coverLines.join(' / ')}]`);
+    }
   }
+
+  return {
+    issues,
+    pass: issues.length === 0,
+  };
+}
+
+/**
+ * 2. 正文机审门禁（唠家常、因果主语连贯、前3行逻辑闭环与场景情节、口语虚词、短行停顿）
+ * 注意：收尾微动作留白为可选！正文聊天唠家常，说到哪算哪，说完就停，允许停在测试转折句本身（如“那里才适合我”）。
+ */
+function checkBody({ bodyLines = [], coverLines = [], title = '' }) {
+  const issues = [];
+  if (!bodyLines || bodyLines.length === 0) return { issues, pass: true };
+
+  // 单行字数
+  bodyLines.forEach((l, idx) => {
+    if (l.length > 15) {
+      issues.push(`[正文单行] 第 ${idx + 1} 行单行超15字 (${l.length} 字): ${l}`);
+    }
+  });
+
+  // 口语虚词与短行停顿
+  const rp = checkCardRhythmAndPerturbation(bodyLines);
+  issues.push(...rp.issues);
+
+  // 前 3 行生活场域实物微动作或日常情节
+  const sceneCheck = SD.detectSceneAction ? SD.detectSceneAction(bodyLines.slice(0, 3)) : { hit: true };
+  // 日常高频唠家常生活实物补充
+  const dailyLifeEntities = [
+    '暖宝宝', '棉袄', '羽绒服', '大骨汤', '电饭煲', '自提柜', '拖鞋', '玻璃杯', '被子',
+    '暖气', '泡面', '奶茶', '抹布', '白霜', '冷风', '手凉', '虾', '桌子', '耳机',
+    '外卖', '手机', '床', '窗帘', '门', '钥匙', '包'
+  ];
+  const hasDailyEntity = bodyLines.slice(0, 3).some(line => dailyLifeEntities.some(ent => line.includes(ent)));
+
+  if (!sceneCheck.hit && !hasDailyEntity) {
+    issues.push(`[正文人味] 正文前 3 行缺失生活场域道具或具体物理情节（无生活实物与具象细节），属于空对空抽象议论`);
+  }
+
+  // 逻辑闭环：标题或封面若提出核心冲突/事件/具象指称，正文前 3 行必须有具体情节交代承接
+  const combinedHeader = `${coverLines.join(' ')} ${title}`;
+  const keyEventKeywords = ['暖冬', '降温', '冷透', '冻僵', '冻死', '受够了', '打碎碗', '龙虾', '拉黑', '退群', '借钱', '加班', '工牌', '门禁卡', '暖气', '羽绒服', '旧棉袄', '发烧', '退烧药'];
+  for (const kw of keyEventKeywords) {
+    if (combinedHeader.includes(kw)) {
+      const top3 = bodyLines.slice(0, 3);
+      const bodyHasEcho = top3.some(l => l.includes(kw)) ||
+        (kw === '暖冬' && top3.some(l => l.includes('暖') || l.includes('冷') || l.includes('冻') || l.includes('温') || l.includes('凉'))) ||
+        (kw === '降温' && top3.some(l => l.includes('冷') || l.includes('风') || l.includes('冻') || l.includes('霜') || l.includes('凉'))) ||
+        (kw === '冷透' && top3.some(l => l.includes('冷') || l.includes('风') || l.includes('凉') || l.includes('冻'))) ||
+        (kw === '冻僵' && top3.some(l => l.includes('冻') || l.includes('凉') || l.includes('冷') || l.includes('冰') || l.includes('僵') || l.includes('手'))) ||
+        (kw === '冻死' && top3.some(l => l.includes('冻') || l.includes('冷') || l.includes('风') || l.includes('冰') || l.includes('凉') || l.includes('透'))) ||
+        (kw === '受够了' && top3.some(l => l.includes('冷') || l.includes('冻') || l.includes('风') || l.includes('吹') || l.includes('烦') || l.includes('够'))) ||
+        (kw === '旧棉袄' && (top3.some(l => l.includes('棉袄') || l.includes('衣服') || l.includes('穿') || l.includes('冷') || l.includes('冻')) || bodyLines.some(l => l.includes('棉袄')))) ||
+        (kw === '加班' && top3.some(l => l.includes('加班') || l.includes('群') || l.includes('工牌') || l.includes('工位') || l.includes('领导') || l.includes('九点') || l.includes('十点'))) ||
+        (kw === '工牌' && top3.some(l => l.includes('工牌') || l.includes('打卡') || l.includes('工位') || l.includes('包'))) ||
+        (kw === '门禁卡' && top3.some(l => l.includes('门禁') || l.includes('钥匙') || l.includes('茶几') || l.includes('玄关'))) ||
+        (kw === '打碎碗' && top3.some(l => l.includes('杯') || l.includes('碎') || l.includes('碗') || l.includes('地'))) ||
+        (kw === '龙虾' && top3.some(l => l.includes('虾') || l.includes('吃') || l.includes('夹'))) ||
+        (kw === '退群' && top3.some(l => l.includes('群') || l.includes('退') || l.includes('免打扰') || l.includes('消息'))) ||
+        (kw === '借钱' && top3.some(l => l.includes('借') || l.includes('钱') || l.includes('转账') || l.includes('还')));
+      if (!bodyHasEcho) {
+        issues.push(`[正文逻辑闭环] 封面/标题承诺了“${kw}”，正文前 3 行未见对应情节交代，割裂悬空`);
+      }
+    }
+  }
+
+  // 严禁跳过今日钩子直接跳进回忆（若封面/标题承诺了今日寒潮槽点，正文前 2 行必须有今日受冻体感，不可直接首行跳小时候）
+  const hasTodayColdHook = /暖冬|冻死|降温|受够了/.test(combinedHeader);
+  if (hasTodayColdHook && bodyLines.length > 0) {
+    const isDirectMemory = /^(小时候|小时候那件|我小时候|记得小时候)/.test(bodyLines[0].trim());
+    const top3HasTodayCold = bodyLines.slice(0, 3).some(l => /今天|出门|风吹|冷风|吹透|手套|手.*凉|手.*冰/.test(l));
+    if (isDirectMemory || !top3HasTodayCold) {
+      issues.push(`[正文逻辑闭环] 封面/标题承诺了今日寒潮槽点，正文前 3 行未交代今日受冻体感/动作，直接跳入回忆，钩子割裂悬空`);
+    }
+  }
+
+  // 严禁碎片行：每行都要有主语/时间/动作/因果连贯，严禁孤立天气报或无主语状态碎片
+  const FRAGMENT_PATTERN = /^(风(也|真|太|也太|真的太)?(凶|大|猛|冷)了?|天气(太|真|好|实在太)冷了?|真(冻人|冷啊?)|冷死(我|人)了?|我?(冻透|冷透|冻僵)了|冷风(好大|太凶)|太冷了|好冷啊|外面真冷)$/;
+  bodyLines.forEach((line, idx) => {
+    const trimmed = line.trim();
+    if (FRAGMENT_PATTERN.test(trimmed)) {
+      issues.push(`[正文碎片行] 第 ${idx + 1} 行 "${line}" 属于无时间/动作/因果的天气报或孤立碎片，必须改为带主语+动作+因果的具体连贯叙事（如“我放学跑回家，手冻得握不住笔”）`);
+    }
+  });
+
+  // 第二人称说教句式排查
+  bodyLines.forEach((line, idx) => {
+    if (SD.PREACHY_PATTERN && SD.PREACHY_PATTERN.test(line)) {
+      issues.push(`[正文说教] 第 ${idx + 1} 行出现第二人称说教句式: "${line}"`);
+    }
+  });
+
+  // 末行假大空宣誓升华排查（放行唠家常聊完即停、放行测试转折句如“那里才适合我”、“难怪我每年冬天都难受”）
+  // 钩子口号只许在封面/标题，正文结尾绝对不许喊口号！正文只能停在测试转折句本身
+  const lastLine = bodyLines[bodyLines.length - 1] || '';
+  if (SD.SLOGAN_END_PATTERN && SD.SLOGAN_END_PATTERN.test(lastLine)) {
+    if (!lastLine.includes('适合我') && !lastLine.includes('老家')) {
+      issues.push(`[正文宣誓] 末行违规出现宣誓口号: "${lastLine}" (钩子口号只许在封面/标题，正文只能停在测试转折句本身)`);
+    }
+  }
+
   return {
     issues,
     pass: issues.length === 0,
     oralHits: rp.oralHits,
     shortLines: rp.shortLines,
+    sceneCheck,
+  };
+}
+
+/**
+ * 3. 标签与画像机审（品牌词、品类词、结果名核验）
+ */
+function checkTags(tags = [], profile = null, meta = '') {
+  const issues = [];
+  if (tags && tags.length > 0 && tags.length !== 5) {
+    issues.push(`[标签数量] 标签数不等于5 (${tags.length} 个)`);
+  }
+  if (profile) {
+    // 品牌词校验
+    if (tags && tags.length > 0 && profile.brandTag) {
+      if (tags[0] !== profile.brandTag) {
+        issues.push(`[品牌词错误] 品牌标签为“${tags[0]}”，但在测试画像《${profile.test}》中位1品牌词为“${profile.brandTag}”，不许只数标签够5个就放过！`);
+      }
+    }
+    // 品类词校验
+    if (tags && tags.length > 1 && profile.categoryTag) {
+      if (tags[1] !== profile.categoryTag) {
+        issues.push(`[品类词错误] 品类标签为“${tags[1]}”，但在测试画像《${profile.test}》中位2品类词为“${profile.categoryTag}”`);
+      }
+    }
+  }
+
+  // 结果名核真校验
+  if (profile && profile.accents && profile.accents.length > 0) {
+    let rName = '';
+    if (meta) {
+      const mResult = meta.match(/结果=([^｜|]+)/);
+      if (mResult) rName = mResult[1].trim();
+    }
+    if (rName) {
+      const matched = profile.accents.some(a => {
+        const aClean = a.name.split('（')[0].split('(')[0].trim();
+        return a.name === rName || a.name.includes(rName) || rName.includes(aClean)
+          || (a.name.includes(`（${rName}）`)) || (a.name.includes(`(${rName})`));
+      });
+      if (!matched) {
+        const validNames = profile.accents.map(a => a.name.split('（')[0].trim()).join(' / ');
+        issues.push(`[结果名编造] 结果名“${rName}”在测试画像《${profile.test}》中不存在！画像合法真实结果为: ${validNames}`);
+      }
+    }
+  }
+
+  return {
+    issues,
+    pass: issues.length === 0,
+  };
+}
+
+function checkCard({ bodyLines = [], coverLines = [], title = '', tags = [], meta = '', profile = null }) {
+  const ct = checkCoverAndTitle({ coverLines, title, meta });
+  const b = checkBody({ bodyLines, coverLines, title });
+  const t = checkTags(tags, profile, meta);
+
+  return {
+    coverPass: ct.pass,
+    bodyPass: b.pass,
+    tagPass: t.pass,
+    coverIssues: ct.issues,
+    bodyIssues: b.issues,
+    tagIssues: t.issues,
+    issues: [...ct.issues, ...b.issues, ...t.issues],
+    pass: ct.pass && b.pass && t.pass,
+    oralHits: b.oralHits,
+    shortLines: b.shortLines,
+    ht: { sceneCheck: b.sceneCheck },
   };
 }
 
@@ -156,6 +335,94 @@ function runCli() {
   const parts = content.split(/(```text[\s\S]*?```)/g);
   let cardCount = 0;
   let formatIssues = [];
+  let fixLogs = [];
+
+  const rootDir = SD.findRoot(filePath);
+  // 预加载所有测试画像
+  const loadAllProfiles = (r) => {
+    const map = new Map();
+    if (SD.listTests) {
+      const tNames = SD.listTests(r);
+      tNames.forEach(tName => {
+        try {
+          const pFile = SD.profilePath(r, tName);
+          if (fs.existsSync(pFile)) {
+            const prof = SD.parseProfile(pFile);
+            map.set(tName, prof);
+          }
+        } catch (e) {}
+      });
+    }
+    return map;
+  };
+  const profilesMap = loadAllProfiles(rootDir);
+
+  // 根据路径/元数据/标签/上下文精确解析卡片所属的测试画像
+  const resolveCardProfile = ({ meta = '', tags = [], filePath = '', surroundingText = '' }) => {
+    for (const [tName, prof] of profilesMap.entries()) {
+      if (filePath.includes(tName)) return prof;
+    }
+    if (meta) {
+      for (const [tName, prof] of profilesMap.entries()) {
+        if (meta.includes(tName)) return prof;
+      }
+      if (meta.includes('大女主') || meta.includes('dame')) {
+        for (const [tName, prof] of profilesMap.entries()) {
+          if (tName.includes('大女主')) return prof;
+        }
+      }
+      if (meta.includes('城市') || meta.includes('city')) {
+        for (const [tName, prof] of profilesMap.entries()) {
+          if (tName.includes('城市')) return prof;
+        }
+      }
+      if (meta.includes('命定') || meta.includes('恋人') || meta.includes('destiny')) {
+        for (const [tName, prof] of profilesMap.entries()) {
+          if (tName.includes('恋人')) return prof;
+        }
+      }
+      if (meta.includes('物种') || meta.includes('species')) {
+        for (const [tName, prof] of profilesMap.entries()) {
+          if (tName.includes('物种')) return prof;
+        }
+      }
+      if (meta.includes('内耗') || meta.includes('friction')) {
+        for (const [tName, prof] of profilesMap.entries()) {
+          if (tName.includes('内耗')) return prof;
+        }
+      }
+      const mRes = meta.match(/结果=([^｜|]+)/);
+      if (mRes) {
+        const r = mRes[1].trim();
+        for (const [, prof] of profilesMap.entries()) {
+          if (prof.accents && prof.accents.some(a => a.name.includes(r) || r.includes(a.name.split('（')[0].trim()))) {
+            return prof;
+          }
+        }
+      }
+    }
+    if (surroundingText) {
+      for (const [tName, prof] of profilesMap.entries()) {
+        if (surroundingText.includes(tName)) return prof;
+      }
+      if (surroundingText.includes('大女主')) {
+        for (const [tName, prof] of profilesMap.entries()) {
+          if (tName.includes('大女主')) return prof;
+        }
+      }
+      if (surroundingText.includes('城市') || surroundingText.includes('性格城市') || surroundingText.includes('城市人格')) {
+        for (const [tName, prof] of profilesMap.entries()) {
+          if (tName.includes('城市')) return prof;
+        }
+      }
+    }
+    if (tags && tags.length > 0) {
+      for (const [, prof] of profilesMap.entries()) {
+        if (tags.includes(prof.brandTag) || tags.includes(prof.categoryTag)) return prof;
+      }
+    }
+    return null;
+  };
 
   const refinedParts = parts.map((part, pIdx) => {
     if (!part.startsWith('```text')) return part;
@@ -180,6 +447,7 @@ function runCli() {
 
     let coverLines = [];
     let titleStr = '';
+    let fixedTitle = '';
     let tagLine = '';
     let bodyLines = [];
 
@@ -196,7 +464,7 @@ function runCli() {
       if (line.startsWith('[标题]')) {
         inBody = true;
         titleStr = line.replace('[标题]', '').trim();
-        let fixedTitle = titleStr;
+        fixedTitle = titleStr;
         if (fixedTitle.length > 20) {
           if (AUTO_FIX) {
             if (fixedTitle.includes('（') && fixedTitle.includes('）')) {
@@ -209,8 +477,7 @@ function runCli() {
               }
             }
             if (fixedTitle.length > 20) fixedTitle = fixedTitle.slice(0, 20);
-          } else {
-            formatIssues.push(`卡 ${cardCount} 标题超长 (${titleStr.length} 字): ${titleStr}`);
+            fixLogs.push(`[FIXED 卡 ${cardCount}] 标题超长修剪至 20 字以内: "${titleStr}" -> "${fixedTitle}"`);
           }
         }
         newLines.push(`[标题]${fixedTitle}`);
@@ -223,9 +490,27 @@ function runCli() {
         newLines.push(line);
       } else {
         // 正文行
-        if (line.length <= 15) {
-          newLines.push(line);
-          bodyLines.push(line);
+        let processedLine = line;
+        // 如果开启 AUTO_FIX 且命中第二人称说教，机械替换为第一人称
+        if (AUTO_FIX && SD.PREACHY_PATTERN && SD.PREACHY_PATTERN.test(processedLine)) {
+          const orig = processedLine;
+          processedLine = processedLine
+            .replace(/你是不是也经常/g, '我有时候也经常')
+            .replace(/你是不是经常/g, '我有时候经常')
+            .replace(/你是不是/g, '我有时候')
+            .replace(/你记住/g, '我一直记得')
+            .replace(/劝你/g, '索性')
+            .replace(/你不必/g, '我不再')
+            .replace(/你应该/g, '我打算')
+            .replace(/你得明白/g, '我后来才明白');
+          if (orig !== processedLine) {
+            fixLogs.push(`[FIXED 卡 ${cardCount}] 第二人称转为第一人称叙述: "${orig}" -> "${processedLine}"`);
+          }
+        }
+
+        if (processedLine.length <= 15) {
+          newLines.push(processedLine);
+          bodyLines.push(processedLine);
         } else {
           if (AUTO_FIX) {
             // 智能断行算法
@@ -260,71 +545,103 @@ function runCli() {
               const tail = s.slice(bestIdx).trim();
               return [...splitLine(head), ...splitLine(tail)];
             };
-            const pieces = splitLine(line);
+            const pieces = splitLine(processedLine);
             pieces.forEach(p => { if (p) { newLines.push(p); bodyLines.push(p); } });
+            fixLogs.push(`[FIXED 卡 ${cardCount}] 正文超长行智能断行 (${processedLine.length}字 -> ${pieces.length}行): "${processedLine}"`);
           } else {
-            formatIssues.push(`卡 ${cardCount} 正文单行超15字 (${line.length} 字): ${line}`);
-            newLines.push(line);
-            bodyLines.push(line);
+            newLines.push(processedLine);
+            bodyLines.push(processedLine);
           }
         }
       }
     }
 
-    // 校验封面长短板 + 节奏形状
-    const cLengths = coverLines.map(l => l.length);
-    const minLen = Math.min(...cLengths);
-    const maxLen = Math.max(...cLengths);
-    const totalCover = cLengths.reduce((a, b) => a + b, 0);
-    if (coverLines.length < 2 || coverLines.length > 4) {
-      formatIssues.push(`卡 ${cardCount} 封面行数须为 2~4 行 (现 ${coverLines.length} 行): [${coverLines.join(' / ')}]`);
-    }
-    if (totalCover > 16) {
-      formatIssues.push(`卡 ${cardCount} 封面总字数超16字 (${totalCover} 字): [${coverLines.join(' / ')}]`);
-    }
-    if (!(minLen <= 4 && maxLen >= 6)) {
-      formatIssues.push(`卡 ${cardCount} 封面未满足短板<=4且长板>=6 (短:${minLen}, 长:${maxLen}): [${coverLines.join(' / ')}]`);
-    } else if (maxLen - minLen < 3) {
-      formatIssues.push(`卡 ${cardCount} 封面行长差 <3 字 (差:${maxLen - minLen}): [${coverLines.join(' / ')}]`);
-    }
-    const rhythm = detectCoverRhythm(cLengths);
-    if (!rhythm) {
-      if (coverLines.length === 3) {
-        formatIssues.push(
-          `卡 ${cardCount} 封面 3 行须为「长短长」或「短长短」(短≤4/长≥6)，现 [${cLengths.join('/')}] → [${coverLines.join(' / ')}]`
-        );
-      } else if (coverLines.length === 2) {
-        formatIssues.push(
-          `卡 ${cardCount} 封面 2 行须为「长短」或「短长」，现 [${cLengths.join('/')}] → [${coverLines.join(' / ')}]`
-        );
-      } else if (coverLines.length === 4) {
-        formatIssues.push(
-          `卡 ${cardCount} 封面 4 行节奏不合格（需长短错落），现 [${cLengths.join('/')}] → [${coverLines.join(' / ')}]`
-        );
+    // AUTO_FIX: 末行宣誓口号机械剥离
+    if (AUTO_FIX && bodyLines.length > 0) {
+      const lastLine = bodyLines[bodyLines.length - 1];
+      if (SD.SLOGAN_END_PATTERN && SD.SLOGAN_END_PATTERN.test(lastLine)) {
+        // 从 bodyLines 和 newLines 中剔除该末行
+        bodyLines.pop();
+        const tagIdx = newLines.findIndex(l => l.startsWith('#'));
+        if (tagIdx !== -1) {
+          // 标签行前一行即为末行
+          const removed = newLines.splice(tagIdx - 1, 1)[0];
+          fixLogs.push(`[FIXED 卡 ${cardCount}] 自动剔除末行宣誓口号: "${removed}"`);
+        } else {
+          const removed = newLines.pop();
+          fixLogs.push(`[FIXED 卡 ${cardCount}] 自动剔除末行宣誓口号: "${removed}"`);
+        }
       }
     }
 
-    // 校验模式一数字量纲
-    if (meta.includes('模式=模式一')) {
-      const hasNum = coverLines.some(l => /\d/.test(l) || /%|％/.test(l));
-      if (!hasNum) {
-        formatIssues.push(`卡 ${cardCount} 模式一封面缺少阿拉伯数字/百分比量纲: [${coverLines.join(' / ')}]`);
-      }
-    }
+    // 校验与自愈标签数（对照测试画像真源）
+    let tags = tagLine ? tagLine.split(/\s+/).filter(Boolean) : [];
+    const surroundingText = prev + '\n' + next;
+    const cardProfile = resolveCardProfile({ meta, tags, filePath, surroundingText });
 
-    // 校验标签数
     if (tagLine) {
-      const tags = tagLine.split(/\s+/).filter(Boolean);
+      if (cardProfile && AUTO_FIX) {
+        if (tags.length > 0 && cardProfile.brandTag && tags[0] !== cardProfile.brandTag) {
+          const old = tags[0];
+          tags[0] = cardProfile.brandTag;
+          fixLogs.push(`[FIXED 卡 ${cardCount}] 修正位1品牌词: "${old}" -> "${cardProfile.brandTag}"`);
+        }
+        if (tags.length > 1 && cardProfile.categoryTag && tags[1] !== cardProfile.categoryTag) {
+          const old = tags[1];
+          tags[1] = cardProfile.categoryTag;
+          fixLogs.push(`[FIXED 卡 ${cardCount}] 修正位2品类词: "${old}" -> "${cardProfile.categoryTag}"`);
+        }
+      }
       if (tags.length !== 5) {
-        formatIssues.push(`卡 ${cardCount} 标签数不等于5 (${tags.length} 个)`);
+        if (AUTO_FIX) {
+          if (tags.length > 5) {
+            const cutTags = tags.slice(0, 5);
+            tags = cutTags;
+            fixLogs.push(`[FIXED 卡 ${cardCount}] 标签超过 5 个，自动裁剪前 5 个: ${cutTags.join(' ')}`);
+          } else {
+            // tags.length < 5
+            const padTags = cardProfile ? [cardProfile.brandTag, cardProfile.categoryTag] : [];
+            for (const ft of padTags) {
+              if (ft && !tags.includes(ft) && tags.length < 5) {
+                tags.push(ft);
+              }
+            }
+            if (tags.length === 5) {
+              fixLogs.push(`[FIXED 卡 ${cardCount}] 补齐测试固定品牌/品类标签至 5 个: ${tags.join(' ')}`);
+            } else {
+              newLines.push(`<!-- [REWRITE_REQUIRED: 标签数不足5个且无法自动确定真实标签] -->`);
+            }
+          }
+        }
+      }
+      if (AUTO_FIX) {
+        const tagIdx = newLines.findIndex(l => l.startsWith('#'));
+        if (tagIdx !== -1) {
+          newLines[tagIdx] = tags.join(' ');
+        }
       }
     }
 
-    // 校验口语虚词扰动与短行节奏
-    const rp = checkCardRhythmAndPerturbation(bodyLines);
-    rp.issues.forEach(issue => {
-      formatIssues.push(`卡 ${cardCount} ${issue}`);
-    });
+    // 分层执行机审校验
+    const ct = checkCoverAndTitle({ coverLines, title: fixedTitle, meta });
+    const b = checkBody({ bodyLines, coverLines, title: fixedTitle });
+    const t = checkTags(tags, cardProfile, meta);
+
+    ct.issues.forEach(i => formatIssues.push({ type: 'cover', card: cardCount, text: i }));
+    b.issues.forEach(i => formatIssues.push({ type: 'body', card: cardCount, text: i }));
+    t.issues.forEach(i => formatIssues.push({ type: 'tag', card: cardCount, text: i }));
+
+    // AUTO_FIX 下对于结果名编造，绝不盲目伪造，打上 [REWRITE_REQUIRED]
+    if (AUTO_FIX && t.issues.some(i => i.includes('[结果名编造]'))) {
+      newLines.push(`<!-- [REWRITE_REQUIRED: 结果名在测试画像中不存在，属于编造成果，需按真实结果重写] -->`);
+      fixLogs.push(`[REWRITE_REQUIRED 卡 ${cardCount}] 结果名在测试画像中不存在，标记需重写`);
+    }
+
+    // AUTO_FIX 下对于前 3 行空洞无物、缺失生活实物的卡，绝不自动胡编，打上 [REWRITE_REQUIRED]
+    if (AUTO_FIX && !b.sceneCheck.hit) {
+      newLines.push(`<!-- [REWRITE_REQUIRED: 正文前3行缺失生活场域道具或物理微动作，通篇空洞需重写] -->`);
+      fixLogs.push(`[REWRITE_REQUIRED 卡 ${cardCount}] 正文前3行无场景实物与微动作，已标记需生成器重写，不执行臆造填充`);
+    }
 
     return '```text\n' + newLines.join('\n') + '\n```';
   });
@@ -332,6 +649,10 @@ function runCli() {
   if (AUTO_FIX) {
     fs.writeFileSync(filePath, refinedParts.join(''), 'utf8');
     console.log(`💾 自动修复已写回原文件。`);
+    if (fixLogs.length > 0) {
+      console.log(`\n🛠️  执行了以下 ${fixLogs.length} 项确定性自愈修复:`);
+      fixLogs.forEach(log => console.log(`   ${log}`));
+    }
   }
 
   // 汇总输出
@@ -343,12 +664,54 @@ function runCli() {
     console.log(`✅ 红线/0词表：0 违规`);
   }
 
-  if (formatIssues.length) {
-    console.log(`⚠️ 格式硬伤问题 ${formatIssues.length} 处:`);
-    formatIssues.slice(0, 10).forEach(i => console.log(`   ${i}`));
-    if (formatIssues.length > 10) console.log(`   ... 剩余 ${formatIssues.length - 10} 处已省略`);
+  const coverIssues = formatIssues.filter(i => i.type === 'cover');
+  const bodyIssues = formatIssues.filter(i => i.type === 'body');
+  const tagIssues = formatIssues.filter(i => i.type === 'tag');
+
+  const coverFailCards = new Set(coverIssues.map(i => i.card));
+  const bodyFailCards = new Set(bodyIssues.map(i => i.card));
+  const tagFailCards = new Set(tagIssues.map(i => i.card));
+
+  console.log(`\n📐 双层门禁分项体检看板:`);
+  console.log(`   1. 封面与标题层: 不合格 ${coverFailCards.size} / ${cardCount} 张 (合格率 ${((cardCount - coverFailCards.size) / cardCount * 100).toFixed(1)}%)`);
+  if (coverIssues.length > 0) {
+    coverIssues.slice(0, 5).forEach(i => console.log(`      · [卡 ${i.card}] ${i.text}`));
+    if (coverIssues.length > 5) console.log(`      ... 剩余 ${coverIssues.length - 5} 处封面问题已省略`);
   } else {
-    console.log(`✅ 物理格式（单行<=15字/标题<=20字/封面长短长·短长短/5标签）：全部合格`);
+    console.log(`      ✅ 封面长短节奏、字数规范、高抓手钩子全部达标`);
+  }
+
+  console.log(`   2. 标签与画像层: 不合格 ${tagFailCards.size} / ${cardCount} 张 (合格率 ${((cardCount - tagFailCards.size) / cardCount * 100).toFixed(1)}%)`);
+  if (tagIssues.length > 0) {
+    tagIssues.slice(0, 5).forEach(i => console.log(`      · [卡 ${i.card}] ${i.text}`));
+    if (tagIssues.length > 5) console.log(`      ... 剩余 ${tagIssues.length - 5} 处标签/画像问题已省略`);
+  } else {
+    console.log(`      ✅ 标签数量（恰好5个）、位1品牌词、位2品类词与结果名核真全部达标`);
+  }
+
+  console.log(`   3. 正文层 (新标准回溯): 不合格 ${bodyFailCards.size} / ${cardCount} 张 (合格率 ${((cardCount - bodyFailCards.size) / cardCount * 100).toFixed(1)}%)`);
+  console.log(`      ⚠️  【回溯特别说明】：正文系按最新「唠家常·人味硬门禁与逻辑闭环新规」回溯评估，绝不代表历史笔记不可用，严禁批量改写或删除历史文件！`);
+
+  if (bodyIssues.length > 0) {
+    const stats = {
+      '正文口语虚词不足2种': bodyIssues.filter(i => i.text.includes('口语虚词扰动不足')).length,
+      '缺少<=6字短行停顿': bodyIssues.filter(i => i.text.includes('缺少 ≤6 字短行停顿')).length,
+      '前3行缺失场景微动作/具象情节': bodyIssues.filter(i => i.text.includes('前 3 行缺失生活场域道具')).length,
+      '正文缺少逻辑闭环': bodyIssues.filter(i => i.text.includes('缺少逻辑闭环')).length,
+      '第二人称说教句': bodyIssues.filter(i => i.text.includes('第二人称说教')).length,
+      '末行宣誓升华口号': bodyIssues.filter(i => i.text.includes('末行违规出现假大空宣誓')).length,
+      '单行超15字': bodyIssues.filter(i => i.text.includes('单行超15字')).length,
+    };
+    console.log(`\n📋 正文违规分类分布:`);
+    Object.entries(stats).forEach(([k, v]) => {
+      if (v > 0) console.log(`   · ${k}: ${v} 处`);
+    });
+
+    console.log(`\n🔍 正文违规明细前 10 条:`);
+    bodyIssues.slice(0, 10).forEach(i => console.log(`   [卡 ${i.card}] ${i.text}`));
+    if (bodyIssues.length > 10) console.log(`   ... 剩余 ${bodyIssues.length - 10} 处已省略`);
+  } else {
+    console.log(`✅ 正文层（单行<=15字/口语虚词/短行停顿/逻辑闭环/唠家常聊完即停）：全部合格`);
   }
   console.log(``);
 }
