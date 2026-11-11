@@ -16,7 +16,7 @@
 - **页面直接修改**：修改测试页面必须直接编辑 HTML/CSS/JS 代码，**绝对禁止**编写 Python 脚本间接修补。单文件测试产品必须保持全内联（HTML+CSS+JS 在单个 `.html`）。
 
 ## 3. 按需加载与 Token 绝对禁令 (SSOT & Token Control)
-- **按需加载技能**：运营与排坑策略按需调阅 `/xhs-ll-ops-playbook`；端到端测试研发操盘调用 `/xhs-auto-operator`；图文笔记生产与草稿操盘调用 `/xhs-note-operator`；千帆商品主图与海报操盘调用 `/xhs-product-cover-operator`。
+- **按需加载技能**：战略决策与多维评审按需调阅 `/xhs-ops-council`；技术实现与工程底座按需调阅 `/xhs-ll-ops-playbook`；端到端测试研发操盘调用 `/xhs-auto-operator`；图文笔记生产与草稿操盘调用 `/xhs-note-operator`；千帆商品主图与海报操盘调用 `/xhs-product-cover-operator`。
 - **扫描禁令**：**绝对禁止**全量扫描 `教程/` 下的微信对话长文本，以及 `.bmp`、`.png`、`.mp4`、`.gif`、`.docx` 原始多媒体大文件。
 
 ## 4. 业务矩阵与部署军规 (Operations & Deployment)

@@ -53,9 +53,11 @@ function checkCardRhythmAndPerturbation(bodyLines) {
   const issues = [];
   const oralWords = SD.ORAL_PERTURBATION_WORDS || [];
   const oralHits = oralWords.filter(w => bodyLines.some(l => l.includes(w)));
-  if (bodyLines.length > 0 && oralHits.length < 2) {
+  // 微短帖（<=3行）要求至少 1 种口语虚词；常规帖（>=4行）要求至少 2 种
+  const minOral = bodyLines.length <= 3 ? 1 : 2;
+  if (bodyLines.length > 0 && oralHits.length < minOral) {
     issues.push(
-      `[正文网感] 口语虚词扰动不足 2 种 (现 ${oralHits.length} 种)，偏向公文化/AI排比，建议注入：${oralWords.slice(0, 4).join('/')} 等`
+      `[正文网感] 口语虚词扰动不足 ${minOral} 种 (现 ${oralHits.length} 种)，偏向公文化/AI排比，建议注入：${oralWords.slice(0, 4).join('/')} 等`
     );
   }
 
@@ -76,7 +78,7 @@ function checkCardRhythmAndPerturbation(bodyLines) {
  * 只查：钩子强度与白名单、0 词表、字数规范（封面 2~4 行、短<=4、长>=6、总字数<=16；标题<=20字）、模式一数字量纲
  * 绝对严禁使用“无生活场景实物”去判封面/标题不合格！
  */
-function checkCoverAndTitle({ coverLines = [], title = '', meta = '' }) {
+function checkCoverAndTitle({ coverLines = [], title = '', meta = '', profile = null }) {
   const issues = [];
 
   if (title && title.length > 20) {
@@ -102,12 +104,17 @@ function checkCoverAndTitle({ coverLines = [], title = '', meta = '' }) {
     issues.push(`[封面节奏] 封面节奏不合格，现 [${cLengths.join('/')}] → [${coverLines.join(' / ')}]`);
   }
 
-  // 模式一数字量纲校验
-  if (meta && meta.includes('模式=模式一')) {
+  // 模式一数字量纲与测试数据强检 (五位一体 ① 认领位)
+  if (meta && (meta.includes('模式=模式一') || meta.includes('模式一'))) {
     const hasNum = coverLines.some(l => /\d/.test(l) || /%|％/.test(l));
     if (!hasNum) {
-      issues.push(`[封面量纲] 模式一封面缺少阿拉伯数字/百分比量纲: [${coverLines.join(' / ')}]`);
+      issues.push(`[封面测试数据] 模式一封面缺失数值或百分比量纲，无法建立量化认领感: [${coverLines.join(' / ')}]`);
     }
+  }
+
+  // 严禁考试得分词
+  if (coverLines.some(l => /低于\d+分|考了\d+分|得分/.test(l))) {
+    issues.push(`[封面测试数据] 封面严禁出现考试得分词: [${coverLines.join(' / ')}]`);
   }
 
   return {
@@ -224,12 +231,71 @@ function checkBody({ bodyLines = [], coverLines = [], title = '' }) {
     }
   });
 
-  // 末行假大空宣誓升华排查（放行唠家常聊完即停、放行测试转折句如“那里才适合我”、“难怪我每年冬天都难受”）
-  // 钩子口号只许在封面/标题，正文结尾绝对不许喊口号！正文只能停在测试转折句本身
-  const lastLine = bodyLines[bodyLines.length - 1] || '';
-  if (SD.SLOGAN_END_PATTERN && SD.SLOGAN_END_PATTERN.test(lastLine)) {
-    if (!lastLine.includes('适合我') && !lastLine.includes('老家')) {
-      issues.push(`[正文宣誓] 末行违规出现宣誓口号: "${lastLine}" (钩子口号只许在封面/标题，正文只能停在测试转折句本身)`);
+  // 1. 全文宣誓口号排查（03 SSOT 规定：钩子口号只许在封面/标题，正文全篇严禁喊口号）
+  bodyLines.forEach((line, idx) => {
+    if (SD.SLOGAN_PATTERN && SD.SLOGAN_PATTERN.test(line)) {
+      if (!line.includes('适合我') && !line.includes('老家')) {
+        issues.push(`[正文口号] 第 ${idx + 1} 行违规出现口号宣誓句: "${line}" (钩子口号只许在封面/标题，正文全篇严禁喊口号)`);
+      }
+    }
+  });
+
+  // 2. 禁止单独一行的凑数词：口语词和短行必须嵌在有主语、有动作的句子里，严禁单独成行凑数
+  bodyLines.forEach((line, idx) => {
+    const trimmed = line.trim();
+    if (SD.STANDALONE_FILLER_PATTERN && SD.STANDALONE_FILLER_PATTERN.test(trimmed)) {
+      issues.push(`[正文凑数短行] 第 ${idx + 1} 行 "${line}" 属于单独一行的凑数词，口语词和短行必须嵌在有主语、有动作的句子里，严禁单独占一行凑数！`);
+    }
+  });
+
+  // 3. 正文表情符号排查（正文必须纯文本，严禁 emoji 表情符号 📦🍃🔑🌵 等）
+  const EMOJI_REGEX = /[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1FA00}-\u{1FAFF}\u{FE00}-\u{FE0F}\u{1F000}-\u{1F02F}\u{1F0A0}-\u{1F0FF}]/u;
+  bodyLines.forEach((line, idx) => {
+    if (EMOJI_REGEX.test(line)) {
+      issues.push(`[正文表情符号] 第 ${idx + 1} 行出现表情符号: "${line}" (正文严禁出现表情符号，必须纯文本)`);
+    }
+  });
+
+  // 4. 正文测试闭环强检
+  const testLoopRegex = /(测出|报告|指数|测试|自测|拿到.*卡片|得分|测评)/;
+  const hasTestClosedLoop = bodyLines.some(l => testLoopRegex.test(l));
+  if (!hasTestClosedLoop) {
+    issues.push(`[正文测试闭环] 正文缺失测试闭环词（测出/报告/指数/测试等），沦为私人孤立日记，无法形成测评转化`);
+  }
+
+  // 5. 正文末行暗号位强检 (五位一体 ⑤ 暗号位)
+  if (bodyLines.length === 0) {
+    issues.push(`[末行暗号位] 缺失有效接头暗号或收尾异常: 正文行数为空`);
+  } else {
+    const lastLine = bodyLines[bodyLines.length - 1].trim();
+    // 检查是否命中机械营销封杀词
+    const marketingBanWords = [
+      '敢不敢在评论区报个', '评论区报一下', '评论区报个', '快去测测看吧', '快去测测看',
+      '快去测', '赶紧去查查', '快来测', '评论区留言', '评论区告诉我', '戳评论区',
+      '快去试试', '测测你的', '测测你', '敢不敢'
+    ];
+    const hitBan = marketingBanWords.find(bw => lastLine.includes(bw));
+    if (hitBan) {
+      issues.push(`[末行暗号位] 缺失有效接头暗号或收尾异常: 末行违规命中机械营销套路词“${hitBan}”，严禁机械逼问，须改为部落接头暗号或刺痛清醒定调`);
+    } else if (!lastLine || /^[。，！？…—~#*\s]+$/.test(lastLine) || lastLine.length < 2) {
+      issues.push(`[末行暗号位] 缺失有效接头暗号或收尾异常: 末行有效字符不足 ("${lastLine}")`);
+    } else if (lastLine.length > 15) {
+      issues.push(`[末行暗号位] 缺失有效接头暗号或收尾异常: 末行暗号超长 (${lastLine.length} 字，必须 <= 15 字): "${lastLine}"`);
+    } else {
+      // 检查是否命中自闭单机模式
+      const solipsisticPattern = /(下班了|真清爽|一身轻松|屋里安静|屋里真安静|洗洗睡了|泡个热水澡)/;
+      // 允许自嘲反转、情绪共鸣、部落集结或自然释怀闭环词
+      const resonantEndingRegex = /(绝了|爽了|清静|世界.*安静了|闭环|不伺候|拉黑|解脱|翻篇|谁爱.*谁.*|自我感动|没编制|当保姆|自救|两清|集合|工位|对齐|整挺好|走人|掀桌|爱谁谁|不奉陪|体面|止损|放过|各自安好|互不相欠|自洽|救赎|清醒|认了|算了|翻盘|好过|值了|保平安|硬道理|当面说|装死|真香|不香吗|随她去|随他去|管他呢|管她呢|不伺候了|绑架|道德|早知道|发疯|在忍什么|不兜底|凭什么|解气|笑死|算清|保姆|脱敏|清爽|松弛|真准|认领|同频|姐妹)/;
+      const interactionRegex = /[？?吗吧]|(几级|对暗号|暗号|留个|扣|报|认领|测出|自测)/;
+
+      if (solipsisticPattern.test(lastLine) && !resonantEndingRegex.test(lastLine) && !interactionRegex.test(lastLine)) {
+        issues.push(`[末行暗号位] 末行违规命中自闭敷衍收尾模式: "${lastLine}"，缺乏情绪包袱与共振抓手，须改为自然释怀、自嘲反转或互动暗号`);
+      } else {
+        const hasValidEnding = interactionRegex.test(lastLine) || resonantEndingRegex.test(lastLine);
+        if (!hasValidEnding) {
+          issues.push(`[末行暗号位] 末行未命中互动暗号（？/吗/暗号/几级/认领）或共鸣定调/自嘲释怀/部落集结句（绝了/爽了/清静/闭环/拉黑/翻篇/自救等），属于单机自闭收尾: "${lastLine}"`);
+        }
+      }
     }
   }
 
@@ -285,6 +351,30 @@ function checkTags(tags = [], profile = null, meta = '') {
     }
   }
 
+  // 情绪档位与整活姿态画像合规校验（针对测试画像《大女主觉醒》结果一与结果六专属红线）
+  if (meta) {
+    const mResult = meta.match(/结果=([^｜|]+)/);
+    const mMood = meta.match(/档=([^｜|]+)/);
+    const mWild = meta.match(/整活=([^｜|]+)/);
+    const rName = mResult ? mResult[1].trim() : '';
+    const mood = mMood ? mMood[1].trim() : '';
+    const wild = mWild ? mWild[1].trim() : '';
+
+    if (rName === '内核超稳的满级大女主') {
+      if (['破防', '认命'].includes(mood)) {
+        issues.push(`[档位违规] 结果一“内核超稳的满级大女主”是唯一非创伤结果，严禁标记“${mood}”档，只允许“解气/冷笑”松弛档！`);
+      }
+    }
+    if (rName === '优雅自渡的暗夜蔷薇') {
+      if (['解气', '冷笑'].includes(mood)) {
+        issues.push(`[档位违规] 结果六“优雅自渡的暗夜蔷薇”为脆弱面，严禁标记“${mood}”硬边界档，只允许“破防/认命”脆弱认领档！`);
+      }
+      if (wild === '✓' || wild === 'true') {
+        issues.push(`[整活违规] 结果六“优雅自渡的暗夜蔷薇”为易碎侧（笑着懂事、委屈没说出口），画像严禁整活！`);
+      }
+    }
+  }
+
   return {
     issues,
     pass: issues.length === 0,
@@ -292,7 +382,7 @@ function checkTags(tags = [], profile = null, meta = '') {
 }
 
 function checkCard({ bodyLines = [], coverLines = [], title = '', tags = [], meta = '', profile = null }) {
-  const ct = checkCoverAndTitle({ coverLines, title, meta });
+  const ct = checkCoverAndTitle({ coverLines, title, meta, profile });
   const b = checkBody({ bodyLines, coverLines, title });
   const t = checkTags(tags, profile, meta);
 
@@ -308,6 +398,141 @@ function checkCard({ bodyLines = [], coverLines = [], title = '', tags = [], met
     oralHits: b.oralHits,
     shortLines: b.shortLines,
     ht: { sceneCheck: b.sceneCheck },
+  };
+}
+
+/**
+ * 批次反同构熔断体检引擎 (Batch Circuit Breaker)
+ * 统计整批卡片的高频词频、首行起手分布、热梗覆盖度及连续雷同起手
+ */
+function checkBatchCircuitBreakers(cardList = []) {
+  const issues = [];
+  const limits = SD.CIRCUIT_BREAKER_LIMITS || {
+    MAX_HEZHE_PER_BATCH: 1,
+    MAX_CECHU_HEAD_PER_BATCH: 2,
+    MIN_MEME_VARIETY: 6,
+    MAX_CONSECUTIVE_OPENING: 1,
+    tauntingQuestionMax: 0,
+    monotonousYouMax: 1,
+  };
+
+  const tauntingLimit = limits.tauntingQuestionMax ?? limits.MAX_TAUNTING_QUESTION ?? 0;
+  const monotonousYouLimit = limits.monotonousYouMax ?? limits.MAX_MONOTONOUS_YOU ?? 1;
+
+  if (!cardList || cardList.length === 0) {
+    return {
+      hezheCount: 0,
+      cechuHeadCount: 0,
+      tauntingCount: 0,
+      monotonousYouCount: 0,
+      memeVarietyCount: 0,
+      consecutiveOpeningViolations: 0,
+      endingDiversityViolations: 0,
+      matchedMemes: [],
+      issues: [],
+      pass: true,
+    };
+  }
+
+  // 1. 统计“合着”出现篇数
+  const hezheCards = cardList.filter(c => c.bodyLines && c.bodyLines.some(l => l.includes('合着')));
+  if (hezheCards.length > limits.MAX_HEZHE_PER_BATCH) {
+    issues.push(`[批次熔断] 口语虚词“合着”严重超标: 全批共 ${hezheCards.length} 篇卡片包含“合着” (卡号: ${hezheCards.map(c => c.cardNum).join(', ')})，上限为 ${limits.MAX_HEZHE_PER_BATCH} 篇`);
+  }
+
+  // 2. 统计正文首行以“测出”开头的卡片篇数
+  const cechuHeadCards = cardList.filter(c => c.bodyLines && c.bodyLines.length > 0 && /^测出/.test(c.bodyLines[0].trim()));
+  if (cechuHeadCards.length > limits.MAX_CECHU_HEAD_PER_BATCH) {
+    issues.push(`[批次熔断] 正文首行以“测出”破题同构超标: 全批共 ${cechuHeadCards.length} 篇卡片首行以“测出”开头 (卡号: ${cechuHeadCards.map(c => c.cardNum).join(', ')})，上限为 ${limits.MAX_CECHU_HEAD_PER_BATCH} 篇`);
+  }
+
+  // 3. 统计挑衅质问句“你敢”出现篇数 (tauntingQuestionMax: 0)
+  const tauntingCards = cardList.filter(c => c.bodyLines && c.bodyLines.some(l => l.includes('你敢')));
+  if (tauntingCards.length > tauntingLimit) {
+    issues.push(`[批次熔断] 挑衅质问句“你敢”严重超标: 全批共 ${tauntingCards.length} 篇卡片包含“你敢” (卡号: ${tauntingCards.map(c => c.cardNum).join(', ')})，上限为 ${tauntingLimit} 篇（严禁说教质问，根除AI机械爹味）`);
+  }
+
+  // 4. 统计单调反问句“你呢”出现篇数 (monotonousYouMax: 1)
+  const monotonousYouCards = cardList.filter(c => c.bodyLines && c.bodyLines.some(l => l.includes('你呢')));
+  if (monotonousYouCards.length > monotonousYouLimit) {
+    issues.push(`[批次熔断] 单调反问句“你呢”超标: 全批共 ${monotonousYouCards.length} 篇卡片包含“你呢” (卡号: ${monotonousYouCards.map(c => c.cardNum).join(', ')})，上限为 ${monotonousYouLimit} 篇（避免末行机械复读）`);
+  }
+
+  // 5. 统计全批覆盖热梗词种类丰富度 (Vocabulary Entropy)
+  const oralWords = SD.ORAL_PERTURBATION_WORDS || [];
+  const matchedMemes = new Set();
+  cardList.forEach(c => {
+    if (!c.bodyLines) return;
+    oralWords.forEach(w => {
+      if (c.bodyLines.some(l => l.includes(w))) {
+        matchedMemes.add(w);
+      }
+    });
+  });
+
+  const requiredVariety = Math.min(limits.MIN_MEME_VARIETY, cardList.length);
+  if (matchedMemes.size < requiredVariety) {
+    issues.push(`[批次熔断] 全批热梗词汇丰富度不足: 仅覆盖 ${matchedMemes.size} 种热梗词 (${Array.from(matchedMemes).join('/') || '无'})，最低要求 ${requiredVariety} 种`);
+  }
+
+  // 6. 连续雷同起手检测
+  let consecutiveOpeningViolations = 0;
+  for (let i = 0; i < cardList.length - 1; i++) {
+    const curHead = cardList[i].bodyLines && cardList[i].bodyLines[0] ? cardList[i].bodyLines[0].trim() : '';
+    const nextHead = cardList[i + 1].bodyLines && cardList[i + 1].bodyLines[0] ? cardList[i + 1].bodyLines[0].trim() : '';
+    if (!curHead || !nextHead) continue;
+
+    const isBothCechu = /^测出/.test(curHead) && /^测出/.test(nextHead);
+    const prefixLen = 4;
+    const curPrefix = curHead.slice(0, prefixLen);
+    const nextPrefix = nextHead.slice(0, prefixLen);
+    const isSamePrefix = curPrefix === nextPrefix && curPrefix.length >= 3;
+
+    if (isBothCechu || isSamePrefix) {
+      consecutiveOpeningViolations++;
+      issues.push(`[批次熔断] 连续雷同起手违规: 卡 ${cardList[i].cardNum} ("${curHead}") 与 卡 ${cardList[i + 1].cardNum} ("${nextHead}") 起手句式雷同`);
+    }
+  }
+
+  // 7. 末行去同构与多样性检测 (Ensure ending lines do not all look identical)
+  let endingDiversityViolations = 0;
+  const endingMap = new Map();
+  cardList.forEach(c => {
+    if (!c.bodyLines || c.bodyLines.length === 0) return;
+    const end = c.bodyLines[c.bodyLines.length - 1].trim().replace(/[。！!？? ]+$/, '');
+    if (!endingMap.has(end)) endingMap.set(end, []);
+    endingMap.get(end).push(c.cardNum);
+  });
+
+  endingMap.forEach((cardNums, endText) => {
+    if (cardNums.length > 1) {
+      endingDiversityViolations++;
+      issues.push(`[批次熔断] 末行完全复读违规: 卡号 [${cardNums.join(', ')}] 使用了完全相同的末行收尾 ("${endText}")`);
+    }
+  });
+
+  // 连续卡片末行雷同检查
+  for (let i = 0; i < cardList.length - 1; i++) {
+    const curEnd = cardList[i].bodyLines && cardList[i].bodyLines.length > 0 ? cardList[i].bodyLines[cardList[i].bodyLines.length - 1].trim().replace(/[。！!？? ]+$/, '') : '';
+    const nextEnd = cardList[i + 1].bodyLines && cardList[i + 1].bodyLines.length > 0 ? cardList[i + 1].bodyLines[cardList[i + 1].bodyLines.length - 1].trim().replace(/[。！!？? ]+$/, '') : '';
+    if (!curEnd || !nextEnd) continue;
+    if (curEnd.length >= 4 && nextEnd.length >= 4 && curEnd.slice(-4) === nextEnd.slice(-4)) {
+      endingDiversityViolations++;
+      issues.push(`[批次熔断] 连续雷同末行违规: 卡 ${cardList[i].cardNum} ("${curEnd}") 与 卡 ${cardList[i + 1].cardNum} ("${nextEnd}") 尾缀雷同`);
+    }
+  }
+
+  return {
+    hezheCount: hezheCards.length,
+    cechuHeadCount: cechuHeadCards.length,
+    tauntingCount: tauntingCards.length,
+    monotonousYouCount: monotonousYouCards.length,
+    memeVarietyCount: matchedMemes.size,
+    matchedMemes: Array.from(matchedMemes),
+    consecutiveOpeningViolations,
+    endingDiversityViolations,
+    issues,
+    pass: issues.length === 0,
   };
 }
 
@@ -446,6 +671,7 @@ function runCli() {
     return null;
   };
 
+  const validCards = [];
   const refinedParts = parts.map((part, pIdx) => {
     if (!part.startsWith('```text')) return part;
     cardCount++;
@@ -475,6 +701,10 @@ function runCli() {
 
     for (let i = 0; i < lines.length; i++) {
       let line = lines[i];
+
+      if (line.startsWith('<!--')) {
+        continue;
+      }
 
       if (line.startsWith('#')) {
         inBody = false;
@@ -645,7 +875,7 @@ function runCli() {
     }
 
     // 分层执行机审校验
-    const ct = checkCoverAndTitle({ coverLines, title: fixedTitle, meta });
+    const ct = checkCoverAndTitle({ coverLines, title: fixedTitle, meta, profile: cardProfile });
     const b = checkBody({ bodyLines, coverLines, title: fixedTitle });
     const t = checkTags(tags, cardProfile, meta);
 
@@ -660,10 +890,19 @@ function runCli() {
     }
 
     // AUTO_FIX 下对于前 3 行空洞无物、缺失生活实物的卡，绝不自动胡编，打上 [REWRITE_REQUIRED]
-    if (AUTO_FIX && !b.sceneCheck.hit) {
+    if (AUTO_FIX && b.issues.some(i => i.includes('[正文人味]'))) {
       newLines.push(`<!-- [REWRITE_REQUIRED: 正文前3行缺失生活场域道具或物理微动作，通篇空洞需重写] -->`);
       fixLogs.push(`[REWRITE_REQUIRED 卡 ${cardCount}] 正文前3行无场景实物与微动作，已标记需生成器重写，不执行臆造填充`);
     }
+
+    validCards.push({
+      cardNum: cardCount,
+      coverLines: [...coverLines],
+      title: fixedTitle || titleStr,
+      bodyLines: [...bodyLines],
+      tags: [...tags],
+      meta,
+    });
 
     return '```text\n' + newLines.join('\n') + '\n```';
   });
@@ -716,6 +955,7 @@ function runCli() {
 
   if (bodyIssues.length > 0) {
     const stats = {
+      '正文缺失测试闭环词': bodyIssues.filter(i => i.text.includes('测试闭环')).length,
       '正文口语虚词不足2种': bodyIssues.filter(i => i.text.includes('口语虚词扰动不足')).length,
       '缺少<=6字短行停顿': bodyIssues.filter(i => i.text.includes('缺少 ≤6 字短行停顿')).length,
       '前3行缺失场景微动作/具象情节': bodyIssues.filter(i => i.text.includes('前 3 行缺失生活场域道具')).length,
@@ -723,6 +963,7 @@ function runCli() {
       '道具未提前交代/天降道具': bodyIssues.filter(i => i.text.includes('道具未提前交代')).length,
       '第二人称说教句': bodyIssues.filter(i => i.text.includes('第二人称说教')).length,
       '末行宣誓升华口号': bodyIssues.filter(i => i.text.includes('末行违规出现假大空宣誓')).length,
+      '末行缺失有效接头暗号': bodyIssues.filter(i => i.text.includes('末行暗号位')).length,
       '单行超15字': bodyIssues.filter(i => i.text.includes('单行超15字')).length,
     };
     console.log(`\n📋 正文违规分类分布:`);
@@ -730,13 +971,66 @@ function runCli() {
       if (v > 0) console.log(`   · ${k}: ${v} 处`);
     });
 
-    console.log(`\n🔍 正文违规明细前 10 条:`);
-    bodyIssues.slice(0, 10).forEach(i => console.log(`   [卡 ${i.card}] ${i.text}`));
-    if (bodyIssues.length > 10) console.log(`   ... 剩余 ${bodyIssues.length - 10} 处已省略`);
+    console.log(`\n🔍 正文违规明细 (共 ${bodyIssues.length} 条):`);
+    bodyIssues.forEach(i => console.log(`   [卡 ${i.card}] ${i.text}`));
   } else {
     console.log(`✅ 正文层（单行<=15字/口语虚词/短行停顿/逻辑闭环/唠家常聊完即停）：全部合格`);
   }
+
+  // 五位一体分项门禁汇总 (认领位/追问位/赦免位/悬念位/暗号位)
+  const claimIssues = formatIssues.filter(i => i.type === 'cover' && (i.text.includes('封面') || i.text.includes('量纲') || i.text.includes('测试数据')));
+  const queryIssues = formatIssues.filter(i => i.type === 'cover' && i.text.includes('标题'));
+  const pardonIssues = formatIssues.filter(i => i.type === 'body' && (i.text.includes('前 3 行') || i.text.includes('逻辑闭环') || i.text.includes('测试闭环')));
+  const suspenseIssues = formatIssues.filter(i => i.type === 'body' && (i.text.includes('单行超15字') || i.text.includes('口语虚词') || i.text.includes('短行停顿') || i.text.includes('说教') || i.text.includes('口号') || i.text.includes('碎片行') || i.text.includes('道具未提前交代')));
+  const codeIssues = formatIssues.filter(i => i.type === 'body' && i.text.includes('末行暗号位'));
+
+  if (claimIssues.length === 0 && queryIssues.length === 0 && pardonIssues.length === 0 && suspenseIssues.length === 0 && codeIssues.length === 0 && redlineHits.length === 0) {
+    console.log(`\n🛡️  [五位一体门禁]: 认领位/追问位/赦免位/悬念位/暗号位 全部达标`);
+  } else {
+    const failedBits = [];
+    if (claimIssues.length > 0) failedBits.push(`认领位(${claimIssues.length}处)`);
+    if (queryIssues.length > 0) failedBits.push(`追问位(${queryIssues.length}处)`);
+    if (pardonIssues.length > 0) failedBits.push(`赦免位(${pardonIssues.length}处)`);
+    if (suspenseIssues.length > 0) failedBits.push(`悬念位(${suspenseIssues.length}处)`);
+    if (codeIssues.length > 0) failedBits.push(`暗号位(${codeIssues.length}处)`);
+    if (redlineHits.length > 0) failedBits.push(`红线词(${redlineHits.length}处)`);
+    console.log(`\n🛡️  [五位一体门禁]: 未全达标 -> 存在待优化项: ${failedBits.join(', ')}`);
+  }
+
+  // 批次反同构熔断看板与体检
+  const batchResult = checkBatchCircuitBreakers(validCards);
+  const cbLimits = SD.CIRCUIT_BREAKER_LIMITS || {
+    MAX_HEZHE_PER_BATCH: 1,
+    MAX_CECHU_HEAD_PER_BATCH: 2,
+    MIN_MEME_VARIETY: 6,
+    MAX_CONSECUTIVE_OPENING: 1,
+    tauntingQuestionMax: 0,
+    monotonousYouMax: 1,
+  };
+  const tauntingLimit = cbLimits.tauntingQuestionMax ?? cbLimits.MAX_TAUNTING_QUESTION ?? 0;
+  const monotonousYouLimit = cbLimits.monotonousYouMax ?? cbLimits.MAX_MONOTONOUS_YOU ?? 1;
+
+  console.log(`\n🛡️  [批次反同构熔断看板]:`);
+  console.log(`   · “合着”卡片篇数: ${batchResult.hezheCount} 篇 (上限 ${cbLimits.MAX_HEZHE_PER_BATCH} 篇) ${batchResult.hezheCount <= cbLimits.MAX_HEZHE_PER_BATCH ? '✅' : '❌'}`);
+  console.log(`   · 首行“测出”起手篇数: ${batchResult.cechuHeadCount} 篇 (上限 ${cbLimits.MAX_CECHU_HEAD_PER_BATCH} 篇) ${batchResult.cechuHeadCount <= cbLimits.MAX_CECHU_HEAD_PER_BATCH ? '✅' : '❌'}`);
+  console.log(`   · “你敢”挑衅质问篇数: ${batchResult.tauntingCount} 篇 (上限 ${tauntingLimit} 篇) ${batchResult.tauntingCount <= tauntingLimit ? '✅' : '❌'}`);
+  console.log(`   · “你呢”单调反问篇数: ${batchResult.monotonousYouCount} 篇 (上限 ${monotonousYouLimit} 篇) ${batchResult.monotonousYouCount <= monotonousYouLimit ? '✅' : '❌'}`);
+  console.log(`   · 热梗覆盖丰富度: ${batchResult.memeVarietyCount} 种 (${batchResult.matchedMemes.slice(0, 8).join('/')}${batchResult.memeVarietyCount > 8 ? '...' : ''}) (下限 ${cbLimits.MIN_MEME_VARIETY} 种) ${batchResult.memeVarietyCount >= cbLimits.MIN_MEME_VARIETY ? '✅' : '❌'}`);
+  console.log(`   · 连续雷同起手违规: ${batchResult.consecutiveOpeningViolations} 处 ${batchResult.consecutiveOpeningViolations === 0 ? '✅' : '❌'}`);
+  console.log(`   · 末行雷同复读违规: ${batchResult.endingDiversityViolations} 处 ${batchResult.endingDiversityViolations === 0 ? '✅' : '❌'}`);
+
+  if (batchResult.issues.length > 0) {
+    console.log(`\n⚠️  [批次熔断报警]:`);
+    batchResult.issues.forEach(iss => console.log(`   ❌ ${iss}`));
+  } else {
+    console.log(`   ✅ 批次反同构熔断检查全项通过`);
+  }
   console.log(``);
+
+  const hasErrors = redlineHits.length > 0 || formatIssues.length > 0 || !batchResult.pass;
+  if (hasErrors) {
+    process.exit(1);
+  }
 }
 
 if (require.main === module) {
@@ -747,5 +1041,6 @@ module.exports = {
   detectCoverRhythm,
   checkCardRhythmAndPerturbation,
   checkCard,
+  checkBatchCircuitBreakers,
   runCli,
 };
