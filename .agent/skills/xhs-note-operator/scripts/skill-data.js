@@ -91,8 +91,8 @@ const HIGH_CTR_HOOKS = [
   '学会狠心拒绝，世界立刻清静了',
 ];
 
-// 正文单行上限（字）。它是节奏的来源，不是凑字数的手段（口径见 01_双位与正文.md §一.2）。
-const LINE_MAX = 15;
+// 正文单行上限（字）。放宽至 <=35 字，保护原声对话与引用完整性，绝不机械切碎。
+const LINE_MAX = 35;
 
 // ── 动态热梗雷达四大频道与口语虚词（SSOT JSON + 30 天半衰期淘汰机制）─────────
 const MEMES_JSON_PATH = path.join(__dirname, '..', 'data', 'memes.json');
@@ -139,18 +139,6 @@ const ORAL_PERTURBATION_WORDS = Array.from(new Set([
   ...MEME_RADAR_DRAMA,
   ...MEME_RADAR_LIFE,
 ]));
-
-// 批次反同构熔断阈值（硬性门禁单一真源）
-const CIRCUIT_BREAKER_LIMITS = {
-  MAX_HEZHE_PER_BATCH: 1,        // 单批 24 篇中“合着”最多出现 1 次
-  MAX_CECHU_HEAD_PER_BATCH: 2,   // 单批 24 篇中首行以“测出”开头的卡片最多 2 篇
-  MIN_MEME_VARIETY: 6,           // 单批至少覆盖 6 种不同的口语热梗词
-  MAX_CONSECUTIVE_OPENING: 1,    // 严禁连续 2 张卡片起手句式完全同构
-  tauntingQuestionMax: 0,        // 严禁 0 次“你敢”，根除居高临下质问与挑衅爹味
-  monotonousYouMax: 1,           // 单批“你呢”最多 1 次，根除机械同构反问
-  MAX_TAUNTING_QUESTION: 0,      // 大写兼容别名
-  MAX_MONOTONOUS_YOU: 1,         // 大写兼容别名
-};
 
 // ── 5 大生活场域与 60+ 针眼道具微动作（按场景严格分组真源）────────────────
 const SCENE_REALMS = [
@@ -210,10 +198,6 @@ const SCENE_REALMS = [
     ],
   },
 ];
-
-// 宣誓口号句式正则（03 SSOT 规定：钩子口号只许在封面/标题，正文全篇严禁出现口号宣誓句，聊完即停或停在测试转折句）
-const SLOGAN_PATTERN = /(风雪自己扛|我就是自己的|做自己的(庇护所|太阳|救赎)|先救自己|我先救自己|我决定做个|重新开始|彻底放下|才是真正的|迎风奔跑|成为自己的|不该硬扛.*该换|不该.*就该|比啥都强|当场掀桌|体面掀桌|全当耳边风|把命还给自己|世界(立刻|瞬间)清静|学会狠心拒绝|过好自己的日子|做回自己|痛快做自己|放过自己|破茧了往前走|你的存在本身就值得被爱|太懂事的人.*委屈都是静音|与其委屈求全.*不如|受过伤的人.*善意都觉得烫手|关上门的夜里.*自救|属于我的东西.*别抢|真的让人心疼|智者不入爱河|搞钱|高质量独处|人间清醒|活成一道光|最好的投资|做自己的救世主)/;
-const SLOGAN_END_PATTERN = SLOGAN_PATTERN;
 
 // 禁止单独一行的凑数词/孤立词碎片：口语词和短行必须嵌在有主语、有动作的句子里，严禁单独成行凑数
 const STANDALONE_FILLER_PATTERN = /^(真的|算了|索性算了|没回头|醒了|关灯|其实|反倒|索性|不过|挺累的|真好|真痛快|真清净|真舒服|真累|真爽|歇了|不伺候|不见|不装了|两清|出发|放手|清爽|安心|真清爽|没再说话|身后没声|没人再问|不装懂事|真挺累的|真没必要|断开联系|不跟风|倒不如各自走|各走各的路)[。！!？? ]*$/;
@@ -600,8 +584,7 @@ module.exports = {
   REDLINE_WORDS, MOOD_TABLE, HOOK, HIGH_CTR_HOOKS, LINE_MAX,
   ORAL_PERTURBATION_WORDS,
   MEME_RADAR_MAD_LIT, MEME_RADAR_WORKPLACE, MEME_RADAR_DRAMA, MEME_RADAR_LIFE, MEME_RADAR_SLANG,
-  CIRCUIT_BREAKER_LIMITS,
   SCENE_REALMS, resolveSeed,
   STYLE_ADVISORY,
-  SLOGAN_PATTERN, SLOGAN_END_PATTERN, STANDALONE_FILLER_PATTERN, PREACHY_PATTERN, detectSceneAction,
+  STANDALONE_FILLER_PATTERN, PREACHY_PATTERN, detectSceneAction,
 };

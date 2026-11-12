@@ -635,17 +635,8 @@ function runCli() {
         titleStr = line.replace('[标题]', '').trim();
         fixedTitle = titleStr;
         if (fixedTitle.length > 20 && AUTO_FIX) {
-          if (fixedTitle.includes('（') && fixedTitle.includes('）')) {
-            const m = fixedTitle.match(/^(.*?)（(.*?)）$/);
-            if (m) {
-              let pre = m[1], post = m[2];
-              let maxPre = 20 - post.length - 2;
-              if (pre.length > maxPre) pre = pre.slice(0, maxPre);
-              fixedTitle = `${pre}（${post}）`;
-            }
-          }
-          if (fixedTitle.length > 20) fixedTitle = fixedTitle.slice(0, 20);
-          fixLogs.push(`[FIXED 卡 ${cardCount}] 标题超长修剪至 20 字以内: "${titleStr}" -> "${fixedTitle}"`);
+          // 标题超长绝不粗暴截字，仅打出建议日志由作者人工精简，保护语义完整
+          fixLogs.push(`[WARN 卡 ${cardCount}] 标题超长 (${fixedTitle.length} 字 > 20 字)，已保留原句，建议人工精简: "${titleStr}"`);
         }
         newLines.push(`[标题]${fixedTitle}`);
         continue;

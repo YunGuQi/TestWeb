@@ -81,7 +81,7 @@ function pickCoverRhythm(lines, cardOrdinal) {
 // 互动钩子：形态 → 原句池（情绪轻叹 / 清醒定调 / 扎心自白 / 反思自问，杜绝问卷式小编感）。
 // 三条硬约束，缺一条这张表就是废的（下面有断言，违反就地停机）：
 //   ① 每条都必须命中 skill-data.js 的 HOOK 词库；
-//   ② 每条都 ≤ 单行上限（skill-data.js 的 LINE_MAX，≤15 字）；
+//   ② 每条都 ≤ 单行上限（skill-data.js 的 LINE_MAX，≤35 字）；
 //   ③ 池内不重复（复用计数才有意义）。
 // 每个形态给 4 条，配合「同句全批最多复用 2 次」可支撑到 16 个结果（需求 8 次/形态）。
 const HOOK_FORMS = [
