@@ -34,7 +34,6 @@ profiles/
 .env.*.local
 dev.db
 dev.db-journal
-domain_and_server_info.md
 
 # 压缩包与二进制可执行文件
 *.zip
@@ -87,7 +86,6 @@ design/product-docs/*.png
 # 本地发布控制台与敏感账号文件（绝对禁止上传）
 accounts.json
 mobile-hub.config.json
-design/xhs-draft-console/
 **/profiles/
 
 # test-platform 静态大图（按规范分离，不随第一批核心代码推送）

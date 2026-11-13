@@ -1,0 +1,11 @@
+node_modules/
+.next/
+.tmp-test-runtime/
+.tmp-api-runtime/
+.tmp*
+*.log
+.tsbuildinfo
+profiles/
+dist/
+mobile-hub.config.json
+
