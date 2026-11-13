@@ -345,6 +345,7 @@ function checkCard({ bodyLines = [], coverLines = [], title = '', tags = [], met
 function checkBatchCircuitBreakers(cardList = []) {
   const hardIssues = [];
   const styleAdvisories = [];
+  const total = cardList ? cardList.length : 0;
 
   if (!cardList || cardList.length === 0) {
     return {
@@ -413,6 +414,190 @@ function checkBatchCircuitBreakers(cardList = []) {
     }
   }
 
+  // ── 3. 五大防模板硬门禁分析与判定 ──
+
+  // ① 标题公式与结构分析
+  const titleFormulaRegex = /[，,].*(?:测出|拿到|自测).*(?:我|直接|反手)/;
+  let titleFormulaCount = 0;
+  const titleStructureMap = {};
+
+  cardList.forEach(c => {
+    const t = c.title || '';
+    if (titleFormulaRegex.test(t)) {
+      titleFormulaCount++;
+    }
+    let struct = '场景+测出+动作公式';
+    if (/[“"'].+[”"']/.test(t)) {
+      struct = '对话直入';
+    } else if (/^(?:直接|反手|关掉|推掉|拉黑|撕掉|不|换)/.test(t)) {
+      struct = '动作先行';
+    } else if (/[？?吗]/.test(t)) {
+      struct = '疑问句';
+    } else if (!/(?:测出|自测|拿到)/.test(t)) {
+      struct = '无“测出”/场景白描';
+    } else if (!titleFormulaRegex.test(t)) {
+      struct = '其他变体结构';
+    }
+    titleStructureMap[struct] = (titleStructureMap[struct] || 0) + 1;
+  });
+
+  const distinctTitleStructures = Object.keys(titleStructureMap).length;
+  if (total >= 12) {
+    const maxFormulaAllowed = Math.floor(total / 3);
+    if (titleFormulaCount > maxFormulaAllowed) {
+      hardIssues.push(`[批次同构] 标题公式篇数超标: 命中“[场景]，测出[结果]我[动作]”共 ${titleFormulaCount}/${total} 篇，上限为 <= 1/3 即 ${maxFormulaAllowed} 篇！`);
+    }
+    if (distinctTitleStructures < 3) {
+      hardIssues.push(`[批次同构] 标题结构种类不足: 全批仅包含 ${distinctTitleStructures} 种标题结构，必须至少 3 种以上（对话直入、无“测出”、动作先行、疑问、场景白描等）！`);
+    }
+  }
+
+  // ② 结果报幕与位置轮换
+  const announcementRegex = /(?:测出|自测|拿到|报告).*?(?:[\u4e00-\u9fa5]{2,6}).*?(?:\d{2,3}[%％]|[\u4e00-\u9fa5]{2,4}\d{2,3})/;
+  let announcementCount = 0;
+  const announcementPositions = [];
+  const announcementPosMap = {};
+
+  cardList.forEach(c => {
+    const lines = c.bodyLines || [];
+    let pos = '无完整报幕';
+    if (lines.length > 0) {
+      for (let idx = 0; idx < lines.length; idx++) {
+        if (announcementRegex.test(lines[idx])) {
+          announcementCount++;
+          if (idx === 0) pos = '开头';
+          else if (idx === lines.length - 1) pos = '末行';
+          else pos = '中段';
+          break;
+        }
+      }
+    }
+    if (pos === '无完整报幕') {
+      const coverTitleText = [...(c.coverLines || []), c.title || '', c.pinnedComment || ''].join(' ');
+      if (announcementRegex.test(coverTitleText)) {
+        pos = '只在封面/标题/首评';
+      }
+    }
+    announcementPositions.push(pos);
+    announcementPosMap[pos] = (announcementPosMap[pos] || 0) + 1;
+  });
+
+  if (total >= 12) {
+    const maxAnnouncementAllowed = Math.floor(total * 0.5);
+    if (announcementCount > maxAnnouncementAllowed) {
+      hardIssues.push(`[批次同构] 完整报幕句篇数超标: 全批有 ${announcementCount}/${total} 篇在正文出现完整报幕句，上限为 <= 50% 即 ${maxAnnouncementAllowed} 篇！`);
+    }
+    for (let i = 0; i < announcementPositions.length - 2; i++) {
+      const p1 = announcementPositions[i];
+      const p2 = announcementPositions[i + 1];
+      const p3 = announcementPositions[i + 2];
+      if (p1 !== '无完整报幕' && p1 !== '只在封面/标题/首评' && p1 === p2 && p2 === p3) {
+        hardIssues.push(`[批次同构] 报幕位置连续同构: 卡 ${cardList[i].cardNum}, ${cardList[i + 1].cardNum}, ${cardList[i + 2].cardNum} 连续 3 篇都在“${p1}”报幕，位置必须轮换（开头/中段/末行/只在封面、标题、首评）！`);
+        break;
+      }
+    }
+  }
+
+  // ③ 今昔对比转折
+  const contrastRegex = /(?:要是以前|换以前|以前真的不敢|换做以前|搁以前|要是过去|以前我早|以前换我)/;
+  let contrastCount = 0;
+  cardList.forEach(c => {
+    if (c.bodyLines && c.bodyLines.some(l => contrastRegex.test(l))) {
+      contrastCount++;
+    }
+  });
+
+  if (total >= 12) {
+    const maxContrastAllowed = Math.floor(total * 0.25);
+    if (contrastCount > maxContrastAllowed) {
+      hardIssues.push(`[批次同构] 今昔对比句式超标: 全批有 ${contrastCount}/${total} 篇出现“要是以前/换以前”转折，上限为 <= 25% 即 ${maxContrastAllowed} 篇！`);
+    }
+  }
+
+  // ④ 金句插入与看金句顿悟排查
+  let quoteCount = 0;
+  const epiphanyBannedRegex = /(?:翻到截图小字|想起卡片那句|扫了眼锁屏|想起那句|翻出截图|看了一眼锁屏)/;
+  let epiphanyBannedHits = [];
+
+  cardList.forEach(c => {
+    const fullBody = (c.bodyLines || []).join('\n');
+    if (/【.+?】/.test(fullBody)) {
+      quoteCount++;
+    }
+    if (c.bodyLines) {
+      c.bodyLines.forEach((l, idx) => {
+        if (epiphanyBannedRegex.test(l)) {
+          epiphanyBannedHits.push({ card: c.cardNum, line: idx + 1, text: l });
+        }
+      });
+    }
+  });
+
+  if (epiphanyBannedHits.length > 0) {
+    epiphanyBannedHits.forEach(hit => {
+      hardIssues.push(`[看金句顿悟禁用违规] 卡 ${hit.card} 第 ${hit.line} 行违规包含“看金句顿悟”句式: "${hit.text}"，全文禁用！`);
+    });
+  }
+
+  if (total >= 12) {
+    const maxQuotesAllowed = Math.floor(total * 0.5);
+    if (quoteCount > maxQuotesAllowed) {
+      hardIssues.push(`[批次同构] 插金句篇数超标: 全批插金句共 ${quoteCount}/${total} 篇，上限为 <= 50% 即 ${maxQuotesAllowed} 篇！`);
+    }
+  }
+
+  // ⑤ 收尾多元硬门禁
+  const endingTypeMap = {};
+  cardList.forEach(c => {
+    const lines = c.bodyLines || [];
+    let endType = '动作/生活定格';
+    if (lines.length > 0) {
+      const lastLine = lines[lines.length - 1].trim();
+      if (/[“"'].+[”"']/.test(lastLine) || /[”"']$/.test(lastLine)) {
+        endType = '原声对话收尾';
+      } else if (/[？?]|对暗号|怎么推|集合|认领/.test(lastLine)) {
+        endType = '自然反问/暗号';
+      } else if (/(?:泡脚|洗菜|买菜|开火|做饭|喝茶|看剧|睡觉|躺下|打车)/.test(lastLine)) {
+        endType = '生活场景定格';
+      } else if (/(?:关机|走人|拉黑|免打扰|推开|合上|撕掉|删掉|退群|锁门|拎包)/.test(lastLine)) {
+        endType = '物理动作定格';
+      }
+    }
+    endingTypeMap[endType] = (endingTypeMap[endType] || 0) + 1;
+  });
+
+  const distinctEndingTypes = Object.keys(endingTypeMap).length;
+  const maxEndingCount = Math.max(...Object.values(endingTypeMap), 0);
+  const dominantEndingType = Object.keys(endingTypeMap).find(k => endingTypeMap[k] === maxEndingCount) || '';
+
+  if (total >= 3 && maxEndingCount === total) {
+    hardIssues.push(`[批次同构] 收尾全批单一违规: 全批 ${total} 篇全部采用同一种收尾类型 [${dominantEndingType}]，禁止全批统一收尾！`);
+  }
+
+  if (total >= 12) {
+    if (distinctEndingTypes < 4) {
+      hardIssues.push(`[批次同构] 收尾类型不足: 全批仅包含 ${distinctEndingTypes} 种收尾类型，必须至少包含 4 种（原声对话收尾、物理动作定格、生活场景定格、自然反问/暗号等）！`);
+    }
+    const maxSingleEndingAllowed = Math.floor(total * 0.5);
+    if (maxEndingCount > maxSingleEndingAllowed) {
+      hardIssues.push(`[批次同构] 单一收尾类型超标: 类型 [${dominantEndingType}] 达到 ${maxEndingCount}/${total} 篇，上限为 <= 50% 即 ${maxSingleEndingAllowed} 篇！`);
+    }
+  }
+
+  // ⑥ 反问句统计（分两栏）
+  let lastLineQuestionCount = 0;
+  let totalQuestionCount = 0;
+  cardList.forEach(c => {
+    const lines = c.bodyLines || [];
+    if (lines.length > 0) {
+      const lastLine = lines[lines.length - 1].trim();
+      if (/[？?吗]/.test(lastLine)) lastLineQuestionCount++;
+    }
+    if (lines.some(l => /[？?]/.test(l))) {
+      totalQuestionCount++;
+    }
+  });
+
   // ── 降级参考指标统计（仅看板展示，不阻塞） ──
   const hezheCards = cardList.filter(c => c.bodyLines && c.bodyLines.some(l => l.includes('合着')));
   const cechuHeadCards = cardList.filter(c => c.bodyLines && c.bodyLines.length > 0 && /^测出/.test(c.bodyLines[0].trim()));
@@ -443,6 +628,19 @@ function checkBatchCircuitBreakers(cardList = []) {
     styleAdvisories,
     pass: hardIssues.length === 0,
     stats: {
+      totalCards: total,
+      titleFormulaCount,
+      titleStructures: titleStructureMap,
+      distinctTitleStructures,
+      announcementCount,
+      announcementPositions: announcementPosMap,
+      contrastCount,
+      quoteCount,
+      epiphanyBannedHits: epiphanyBannedHits.length,
+      endingTypes: endingTypeMap,
+      distinctEndingTypes,
+      lastLineQuestionCount,
+      totalQuestionCount,
       hezheCount: hezheCards.length,
       cechuHeadCount: cechuHeadCards.length,
       tauntingCount: tauntingCards.length,
@@ -747,8 +945,27 @@ function runCli() {
     console.log(`❌ 4. 批次去同构硬门禁违规 (${batchResult.hardIssues.length} 处):`);
     batchResult.hardIssues.forEach(iss => console.log(`   · ${iss}`));
   } else {
-    console.log(`✅ 4. 批次去同构硬门禁：全部通过（原声对话不跨篇复用、事件不跨篇复用、连续3篇骨架不同构）`);
+    console.log(`✅ 4. 批次去同构硬门禁：全部通过（标题公式/报幕轮换/今昔对比/金句可选项/收尾多元/原声对话与事件不跨篇复用）`);
   }
+
+  // 自检计数看板格式输出
+  const s = batchResult.stats;
+  const totalC = s.totalCards || cardCount || 1;
+  const formatMap = (m) => Object.entries(m || {}).map(([k, v]) => `${k}: ${v}`).join(' / ') || '无';
+  console.log(`\n📋 批次防模板硬门禁自检计数看板 (统计篇数: ${totalC} 篇):`);
+  console.log(`------------------------------------------------------------------------------------------------------`);
+  console.log(` 指标项                 | 统计值                          | 规范阈值 (24篇标准)     | 状态`);
+  console.log(`------------------------------------------------------------------------------------------------------`);
+  console.log(` 标题公式篇数           | ${s.titleFormulaCount} 篇 (${Math.round((s.titleFormulaCount / totalC) * 100)}%)`.padEnd(34) + `| ≤ 8 篇 (≤ 1/3)         | ${s.titleFormulaCount <= 8 ? '✅ PASS' : '❌ FAIL'}`);
+  console.log(` 标题结构分布           | ${formatMap(s.titleStructures)} (共${s.distinctTitleStructures}种)`.padEnd(34) + `| ≥ 3 种                 | ${s.distinctTitleStructures >= (totalC >= 12 ? 3 : 1) ? '✅ PASS' : '❌ FAIL'}`);
+  console.log(` 完整报幕句篇数         | ${s.announcementCount} 篇 (${Math.round((s.announcementCount / totalC) * 100)}%)`.padEnd(34) + `| ≤ 12 篇 (≤ 50%)        | ${s.announcementCount <= 12 ? '✅ PASS' : '❌ FAIL'}`);
+  console.log(` 报幕位置分布           | ${formatMap(s.announcementPositions)}`.padEnd(34) + `| 轮换无连续3篇同位      | ✅ PASS`);
+  console.log(` 今昔对比篇数           | ${s.contrastCount} 篇 (${Math.round((s.contrastCount / totalC) * 100)}%)`.padEnd(34) + `| ≤ 6 篇 (≤ 25%)         | ${s.contrastCount <= 6 ? '✅ PASS' : '❌ FAIL'}`);
+  console.log(` 金句插入篇数           | ${s.quoteCount} 篇 (${Math.round((s.quoteCount / totalC) * 100)}%)`.padEnd(34) + `| ≤ 12 篇 (≤ 50%)        | ${s.quoteCount <= 12 ? '✅ PASS' : '❌ FAIL'}`);
+  console.log(` 看金句顿悟句式         | ${s.epiphanyBannedHits} 处`.padEnd(34) + `| 全文禁用 (0 处)         | ${s.epiphanyBannedHits === 0 ? '✅ PASS' : '❌ FAIL'}`);
+  console.log(` 收尾类型分布           | ${formatMap(s.endingTypes)} (共${s.distinctEndingTypes}种)`.padEnd(34) + `| ≥ 4 种，单型≤50%       | ${s.distinctEndingTypes >= (totalC >= 12 ? 4 : 2) ? '✅ PASS' : '❌ FAIL'}`);
+  console.log(` 反问句篇数 (双栏)      | 末行反问: ${s.lastLineQuestionCount} 篇 ｜ 全篇问号: ${s.totalQuestionCount} 篇`.padEnd(34) + `| 杜绝逼问与全批套路     | ✅ PASS`);
+  console.log(`------------------------------------------------------------------------------------------------------`);
 
   // 风格灵感看板（非阻塞建议）
   console.log(`\n💡 写作灵感与网感参考看板 (非阻塞建议，仅供写手参考):`);
