@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <title>手机复制板 · Copy Board</title>
+  <script>
+    if (window.location.pathname && !window.location.pathname.endsWith('/') && !window.location.pathname.includes('.')) {
+      window.location.replace(window.location.pathname + '/' + window.location.search + window.location.hash);
+    }
+  </script>
+  <link rel="stylesheet" href="./style.css?v=20261114_copy1">
+</head>
+<body>
+  <!-- 口令锁：无默认值、无预填 -->
+  <div id="security-modal" class="modal-overlay" style="display: flex;">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="lock-icon">🔒</div>
+        <h2>访问授权验证</h2>
+        <p id="modal-desc" class="modal-desc">正在检查服务器口令配置…</p>
+      </div>
+      <div class="modal-body">
+        <div id="passcode-form" class="input-group" style="display: none;">
+          <input type="password" id="passcode-input" value="" placeholder="请输入通行口令" autocomplete="off" autocapitalize="off" spellcheck="false">
+        </div>
+        <button id="btn-unlock" class="btn-primary" type="button" style="margin-top: 6px; display: none;">进入复制板</button>
+        <p id="auth-hint" class="modal-desc" style="margin-top: 12px; color: #fbbf24;"></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 微信引导 -->
+  <div id="wechat-modal" class="modal-overlay" style="display: none;">
+    <div class="wechat-guide-content">
+      <div class="wechat-arrow">↗</div>
+      <h3>请在系统浏览器中打开</h3>
+      <p>微信内置浏览器可能限制复制与存图。<br>请点击右上角 <strong>···</strong>，选择<strong>【在浏览器打开】</strong></p>
+      <button id="btn-close-wechat" class="btn-secondary">我知道了</button>
+    </div>
+  </div>
+
+  <!-- 全屏图片 Lightbox -->
+  <div id="lightbox-modal" class="lightbox-overlay" style="display: none;">
+    <div class="lightbox-close">✕</div>
+    <img id="lightbox-img" src="" alt="切片大图">
+    <div class="lightbox-actions">
+      <button id="btn-lightbox-download" class="btn-lightbox-download" type="button">📥 保存原图到手机相册</button>
+      <div class="lightbox-tip">如果无法自动保存，长按图片选择“存储图像”</div>
+    </div>
+  </div>
+
+  <!-- 主工作台（默认隐藏，口令通过后显示） -->
+  <div id="app-container" class="app-layout" style="display: none;">
+    <header class="app-header">
+      <div class="header-left">
+        <span class="hub-logo">📋</span>
+        <span id="product-name" class="product-title">手机复制板</span>
+      </div>
+      <div class="header-right">
+        <label for="md-file-input" class="header-action-btn" title="导入发帖文案.md">
+          <span>📂 导入文案</span>
+          <input type="file" id="md-file-input" accept=".md,text/markdown,text/plain" style="display: none;">
+        </label>
+        <label for="img-file-input" class="header-action-btn" title="导入切片图片（按文件名匹配）">
+          <span>🖼️ 导入切片</span>
+          <input type="file" id="img-file-input" accept="image/*" multiple style="display: none;">
+        </label>
+        <button id="btn-relock" class="icon-btn" title="重新锁定口令">🔒</button>
+      </div>
+    </header>
+
+    <section class="control-bar">
+      <div class="filter-row">
+        <div class="select-group suite-select-wrap">
+          <label for="suite-filter" class="control-label">套件:</label>
+          <select id="suite-filter"></select>
+        </div>
+        <div class="select-group account-select-wrap">
+          <label for="account-filter" class="control-label">账号:</label>
+          <select id="account-filter">
+            <option value="all">全部账号</option>
+          </select>
+        </div>
+      </div>
+      <div class="filter-row sub-row">
+        <label class="toggle-wrap" title="仅看未发布笔记">
+          <input type="checkbox" id="hide-published">
+          <span class="toggle-slider"></span>
+          <span class="toggle-text">仅未发</span>
+        </label>
+        <div class="progress-badge">
+          <span id="progress-indicator">00 / 00</span>
+        </div>
+      </div>
+    </section>
+
+    <nav class="nav-bar">
+      <button id="btn-prev" class="nav-btn prev-btn">◀ 上一条</button>
+      <div class="card-quick-info">
+        <span id="badge-code" class="tag-badge badge-result">r1</span>
+        <span id="badge-mode" class="tag-badge badge-mode">模式一</span>
+      </div>
+      <button id="btn-next" class="nav-btn next-btn">下一条 ▶</button>
+    </nav>
+
+    <div id="conflict-banner" class="conflict-alert" style="display: none;">
+      <span class="alert-icon">⚠️</span>
+      <span id="conflict-text">该卡片此前已被发布，请勿重复发帖！</span>
+    </div>
+
+    <main id="card-view" class="card-viewport">
+      <div id="published-stamp" class="stamp-overlay" style="display: none;">
+        <div class="stamp-box">
+          <div class="stamp-inner">
+            <span class="stamp-status">已发布</span>
+            <span id="stamp-account" class="stamp-account">安安</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-meta-header">
+        <h2 id="card-result-name" class="card-result-name">请先导入发帖文案</h2>
+        <span id="card-goods" class="card-goods-tag">点击右上角「导入文案」</span>
+      </div>
+
+      <section class="gallery-section">
+        <div class="gallery-header-row">
+          <span class="gallery-hint">切片画廊（点击查看大图 · 独立保存）</span>
+          <button id="btn-save-all-slices" class="btn-save-all" type="button">📥 保存全部图片</button>
+        </div>
+        <div id="slice-gallery" class="slice-gallery">
+          <div style="padding: 24px; text-align: center; color: #94a3b8;">导入文案与切片图后在此显示</div>
+        </div>
+      </section>
+
+      <section class="copy-actions-grid">
+        <div class="action-card">
+          <div class="action-card-header">
+            <span class="action-title">封面大字文案（3行）</span>
+            <button id="btn-copy-cover" class="btn-copy" type="button">
+              <span class="btn-copy-text">📋 复制封面</span>
+            </button>
+          </div>
+          <div id="preview-cover" class="action-preview text-muted"></div>
+        </div>
+
+        <div class="action-card">
+          <div class="action-card-header">
+            <span class="action-title">标题</span>
+            <button id="btn-copy-title" class="btn-copy" type="button">
+              <span class="btn-copy-text">📋 复制标题</span>
+            </button>
+          </div>
+          <div id="preview-title" class="action-preview font-bold"></div>
+        </div>
+
+        <div class="action-card">
+          <div class="action-card-header">
+            <span class="action-title">正文</span>
+            <button id="btn-copy-body" class="btn-copy" type="button">
+              <span class="btn-copy-text">📋 复制正文</span>
+            </button>
+          </div>
+          <div id="preview-body" class="action-preview action-preview-scroll"></div>
+        </div>
+
+        <div class="action-card">
+          <div class="action-card-header">
+            <span class="action-title">话题标签（5个）</span>
+            <button id="btn-copy-tags" class="btn-copy" type="button">
+              <span class="btn-copy-text">📋 复制标签</span>
+            </button>
+          </div>
+          <div id="preview-tags" class="action-preview text-tags"></div>
+        </div>
+      </section>
+
+      <section class="bottom-actions">
+        <button id="btn-launch-xhs" class="btn-cta btn-launch" type="button">
+          <span class="cta-icon">🚀</span>
+          <span>打开小红书 App（手动粘贴）</span>
+        </button>
+        <button id="btn-toggle-publish" class="btn-cta btn-publish" type="button">
+          <span class="cta-icon">✅</span>
+          <span id="btn-publish-text">标记为已发布</span>
+        </button>
+      </section>
+    </main>
+  </div>
+
+  <div id="app-toast" class="toast-container" style="display: none;">
+    <div id="toast-text" class="toast-msg">已复制到剪贴板</div>
+  </div>
+
+  <script src="./data.js?v=20261114_copy1"></script>
+  <script src="./parse-md.js?v=20261114_copy1"></script>
+  <script src="./app.js?v=20261114_copy1"></script>
+</body>
+</html>

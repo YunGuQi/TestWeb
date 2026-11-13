@@ -213,37 +213,54 @@
     }
   }
 
-  /** 口令锁校验与阻断 (默认直通卡片工作台) */
+  /** 口令锁：无 authHash 则拒绝进入；有 token 且匹配才放行 */
   async function initSecurity() {
     localStorage.removeItem('xhs_lock_until');
     localStorage.removeItem('xhs_fail_count');
 
-    // 默认直接放行进入工作台
-    state.isLocked = false;
-    if (el.securityModal) el.securityModal.style.display = 'none';
-    if (el.appContainer) el.appContainer.style.display = 'flex';
-    initAppView();
+    const targetHash = state.data?.authHash;
+    if (!targetHash) {
+      state.isLocked = true;
+      if (el.appContainer) el.appContainer.style.display = 'none';
+      if (el.securityModal) el.securityModal.style.display = 'flex';
+      showToast('未配置访问口令，已拒绝进入（请导出时设置口令）', 3000);
+      return;
+    }
+
+    const token = localStorage.getItem('xhs_hub_token');
+    if (token && token === targetHash) {
+      state.isLocked = false;
+      if (el.securityModal) el.securityModal.style.display = 'none';
+      if (el.appContainer) el.appContainer.style.display = 'flex';
+      initAppView();
+      return;
+    }
+
+    state.isLocked = true;
+    if (el.appContainer) el.appContainer.style.display = 'none';
+    if (el.securityModal) el.securityModal.style.display = 'flex';
+    if (el.passcodeInput) el.passcodeInput.value = '';
   }
 
-  /** 触发解锁验证 */
+  /** 触发解锁验证（无默认口令；未配置 authHash 时拒绝进入） */
   async function handleUnlock() {
-    let pwd = (el.passcodeInput.value || '').trim();
+    const pwd = (el.passcodeInput.value || '').trim();
     if (!pwd) {
-      pwd = 'xhs2026';
-      el.passcodeInput.value = 'xhs2026';
+      showToast('请输入口令');
+      return;
     }
 
     const hash = sha256Pure(pwd);
     const targetHash = state.data?.authHash;
 
-    // 双重校验：哈希匹配 或 兼容默认口令明文 (xhs2026 / xhs-post-2026)
-    const isHashMatch = Boolean(targetHash && hash === targetHash);
-    const isPlainMatch = ['xhs2026', 'xhs-post-2026', 'admin'].includes(pwd.toLowerCase());
+    if (!targetHash) {
+      showToast('未配置访问口令，请在导出时设置密码，勿使用默认值', 2500);
+      el.passcodeInput.value = '';
+      return;
+    }
 
-    if (!targetHash || isHashMatch || isPlainMatch) {
-      // 验证成功
-      const token = targetHash || hash;
-      localStorage.setItem('xhs_hub_token', token);
+    if (hash === targetHash) {
+      localStorage.setItem('xhs_hub_token', targetHash);
       localStorage.removeItem('xhs_fail_count');
       localStorage.removeItem('xhs_lock_until');
       state.isLocked = false;
@@ -252,12 +269,11 @@
       showToast('口令验证成功，欢迎回来！');
       initAppView();
     } else {
-      // 验证失败：仅微振动与晃动提示，绝不锁定用户
       triggerHaptic(60);
       el.passcodeInput.classList.add('input-shake');
       setTimeout(() => el.passcodeInput.classList.remove('input-shake'), 400);
-      el.passcodeInput.value = 'xhs2026';
-      showToast('口令错误，已自动填入默认口令: xhs2026', 2000);
+      el.passcodeInput.value = '';
+      showToast('口令错误', 2000);
     }
   }
 
@@ -267,7 +283,7 @@
     state.isLocked = true;
     el.appContainer.style.display = 'none';
     el.securityModal.style.display = 'flex';
-    el.passcodeInput.value = 'xhs2026';
+    el.passcodeInput.value = '';
     showToast('工作台已重新锁定');
   }
 
