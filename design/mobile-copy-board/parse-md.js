@@ -107,7 +107,7 @@
         type: 'slice',
         label: '切片图',
         filename: sliceKey,
-        url: 'slices/' + sliceKey,
+        url: './data/slices/' + sliceKey,
       });
     }
 

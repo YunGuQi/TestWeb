@@ -275,10 +275,11 @@
     if (!url) return '';
     if (url.startsWith('blob:') || url.startsWith('http') || url.startsWith('data:')) return url;
     if (url.startsWith('/')) return url;
+    const cleanUrl = url.replace(/^\.\//, '');
     const basePath = window.location.pathname.endsWith('/')
       ? window.location.pathname
       : window.location.pathname + '/';
-    return basePath + url;
+    return basePath + cleanUrl;
   }
 
   function renderCurrentCard() {
@@ -358,9 +359,12 @@
         imgEl.alt = img.label || '切片';
         imgEl.loading = 'lazy';
         imgEl.addEventListener('error', () => {
-          imgEl.alt = '图片未找到';
-          imgEl.style.opacity = '0.35';
-          label.textContent = (img.label || `P${idx + 1}`) + '（未找到，请导入切片）';
+          item.innerHTML = `
+            <span class="gallery-label">${img.label || '切片图'}</span>
+            <div style="height: 140px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.03); border-radius: 8px; color: #94a3b8; font-size: 13px; border: 1px dashed rgba(255,255,255,0.1);">
+              暂无切片
+            </div>
+          `;
         });
         imgEl.addEventListener('click', () => openLightbox(resolvedUrl, filename));
 
@@ -383,7 +387,7 @@
       });
     } else {
       el.sliceGallery.innerHTML =
-        '<div style="padding: 24px; text-align: center; color: #94a3b8;">本卡暂无切片图，可点右上角「导入切片」</div>';
+        '<div style="padding: 24px; text-align: center; color: #94a3b8;">暂无切片</div>';
     }
 
     // 封面展示全部行（通常 3 行）
@@ -512,7 +516,7 @@
             type: 'slice',
             label: '切片图',
             filename: sliceKey,
-            url: 'slices/' + sliceKey,
+            url: './data/slices/' + sliceKey,
           });
         }
         card.images = images;
