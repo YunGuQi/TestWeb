@@ -13,6 +13,7 @@
     hidePublished: false,
     publishedMap: {},
     localImageMap: {},
+    isLoadingRemote: false,
   };
 
   const el = {
@@ -146,50 +147,110 @@
     (state.suites || []).forEach((suite) => {
       const opt = document.createElement('option');
       opt.value = suite.id;
-      const count = suite.totalCards || (suite.cards ? suite.cards.length : 0);
-      opt.textContent = `${suite.name} (${count}条)`;
+      const count = suite.totalCards != null ? suite.totalCards : (suite.cards ? suite.cards.length : 0);
+      const text = suite.displayName || `${suite.date ? suite.date + ' ' : ''}${suite.filename || suite.name} (${count}卡)`;
+      opt.textContent = text;
       el.suiteFilter.appendChild(opt);
     });
-    el.suiteFilter.value = state.activeSuiteId;
+    if (state.activeSuiteId) {
+      el.suiteFilter.value = state.activeSuiteId;
+    }
   }
 
-  function switchSuite(suiteId, shouldToast = true) {
+  async function switchSuite(suiteId, shouldToast = true) {
     const suite = state.suites.find((s) => s.id === suiteId);
     if (!suite) return;
+
+    // 若为远程且尚未解析拉取 cards
+    if (suite.isRemote && (!suite.cards || !suite.cards.length)) {
+      try {
+        state.isLoadingRemote = true;
+        if (shouldToast) showToast(`正在加载 ${suite.filename || suite.name}...`, 1000);
+        const resp = await fetch(`./data/${encodeURIComponent(suite.filename)}?_t=${Date.now()}`);
+        if (!resp.ok) {
+          throw new Error(`HTTP ${resp.status}`);
+        }
+        const mdText = await resp.text();
+        const parsed = window.CopyBoardParse.parseCopyMd(mdText, {
+          localImageMap: state.localImageMap,
+        });
+        suite.cards = parsed.cards || [];
+        suite.totalCards = suite.cards.length;
+      } catch (err) {
+        showToast(`加载文案失败: ${err && err.message ? err.message : err}`);
+        return;
+      } finally {
+        state.isLoadingRemote = false;
+      }
+    }
+
     state.activeSuiteId = suite.id;
     state.cards = suite.cards || [];
     state.currentIndex = 0;
     if (el.suiteFilter) el.suiteFilter.value = suite.id;
-    if (el.productName) el.productName.textContent = suite.productName || suite.name;
+    if (el.productName) el.productName.textContent = suite.productName || suite.title || suite.name;
     localStorage.setItem('xhs_copy_active_suite', suite.id);
     filterCards();
     renderCurrentCard();
-    if (shouldToast) showToast(`已切换至: ${suite.name}`);
+    if (shouldToast) {
+      const count = suite.cards ? suite.cards.length : 0;
+      showToast(`已切换至: ${suite.title || suite.filename || suite.name} (${count}卡)`);
+    }
   }
 
-  function initSuites(data) {
-    if (data && Array.isArray(data.suites) && data.suites.length > 0) {
-      state.suites = data.suites;
-      const savedSuiteId = localStorage.getItem('xhs_copy_active_suite');
-      const hasSaved = savedSuiteId && data.suites.some((s) => s.id === savedSuiteId);
-      state.activeSuiteId = hasSaved
-        ? savedSuiteId
-        : data.activeSuiteId || data.suites[0].id;
-    } else {
-      state.suites = [
-        {
-          id: 'empty',
-          name: '等待导入文案',
-          category: '本地',
-          productName: '手机复制板',
-          totalCards: 0,
-          cards: [],
-        },
-      ];
-      state.activeSuiteId = 'empty';
+  async function loadRemoteDataAndInit() {
+    try {
+      const resp = await fetch(`./data/index.json?_t=${Date.now()}`, { cache: 'no-store' });
+      if (resp.ok) {
+        const list = await resp.json();
+        if (Array.isArray(list) && list.length > 0) {
+          state.suites = list.map((item) => {
+            const count = item.totalCards != null ? item.totalCards : 0;
+            const displayName = `${item.date ? item.date + ' ' : ''}${item.filename} (${count}卡)`;
+            return {
+              id: item.id || item.filename,
+              filename: item.filename,
+              date: item.date || '',
+              title: item.title || item.filename,
+              name: item.title || item.filename,
+              displayName: displayName,
+              totalCards: count,
+              productName: '大女主觉醒测试',
+              isRemote: true,
+              cards: null,
+            };
+          });
+
+          // 默认加载最新一份（列表第一项）
+          const latestSuite = state.suites[0];
+          state.activeSuiteId = latestSuite.id;
+          renderSuiteOptions();
+          await switchSuite(latestSuite.id, false);
+          return;
+        }
+      }
+    } catch (err) {
+      console.warn('拉取服务器文案索引失败，回退到本地数据', err);
     }
+
+    initFallbackSuites();
+  }
+
+  function initFallbackSuites() {
+    state.suites = [
+      {
+        id: 'empty',
+        name: '等待导入文案',
+        displayName: '等待导入文案 (0卡)',
+        category: '本地',
+        productName: '手机复制板',
+        totalCards: 0,
+        cards: [],
+      },
+    ];
+    state.activeSuiteId = 'empty';
     renderSuiteOptions();
-    switchSuite(state.activeSuiteId, false);
+    switchSuite('empty', false);
   }
 
   function filterCards() {
@@ -224,8 +285,8 @@
     const { filteredCards, currentIndex, activeAccount } = state;
 
     if (!filteredCards || filteredCards.length === 0) {
-      el.cardResultName.textContent = '请先导入发帖文案';
-      el.cardGoods.textContent = '右上角「导入文案」选择 .md 文件';
+      el.cardResultName.textContent = state.isLoadingRemote ? '正在从服务器加载文案…' : '请先选择或导入发帖文案';
+      el.cardGoods.textContent = state.isLoadingRemote ? '请稍候，正在获取卡片数据' : '选择上方文案或右上角「导入文案」';
       el.previewCover.textContent = '';
       el.previewTitle.textContent = '';
       el.previewBody.textContent = '';
@@ -486,10 +547,13 @@
       const newSuiteId = 'imported_' + Date.now().toString(36);
       const newSuite = {
         id: newSuiteId,
+        filename: fileName || 'local.md',
         name: `📂 ${cleanName}`,
+        displayName: `[本地导入] ${fileName || cleanName} (${result.cards.length}卡)`,
         category: '本地导入',
         productName: cleanName,
         totalCards: result.cards.length,
+        isRemote: false,
         cards: result.cards,
       };
       state.suites = state.suites.filter((s) => s.id !== 'empty');
@@ -682,7 +746,7 @@
       setupGestures();
       appViewBound = true;
     }
-    initSuites(state.data);
+    loadRemoteDataAndInit();
   }
 
   function main() {
