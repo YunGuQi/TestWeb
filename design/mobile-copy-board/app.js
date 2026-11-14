@@ -2,7 +2,17 @@
 (function () {
   'use strict';
 
+  const TESTS = [
+    { id: 'family-origin', name: '大女主觉醒测试' },
+    { id: 'emo', name: '深度情绪内耗测试' },
+    { id: 'destiny-lover', name: '命定恋人测试' },
+    { id: 'city', name: '性格城市匹配测试' },
+    { id: 'love-species', name: '恋爱物种分析' },
+  ];
+
   const state = {
+    tests: TESTS,
+    activeTestId: 'family-origin',
     data: null,
     suites: [],
     activeSuiteId: 'empty',
@@ -23,6 +33,7 @@
     lightboxImg: document.getElementById('lightbox-img'),
     appContainer: document.getElementById('app-container'),
     productName: document.getElementById('product-name'),
+    testFilter: document.getElementById('test-filter'),
     suiteFilter: document.getElementById('suite-filter'),
     accountFilter: document.getElementById('account-filter'),
     hidePublished: document.getElementById('hide-published'),
@@ -99,19 +110,14 @@
         document.execCommand('copy');
         document.body.removeChild(ta);
       }
-      triggerHaptic(25);
-      showToast(`已复制【${labelName}】到剪贴板`);
+      triggerHaptic(20);
+      showToast(`已复制${labelName || ''}`);
       if (btnEl) {
-        const originalHtml = btnEl.innerHTML;
-        btnEl.classList.add('copied');
-        btnEl.innerHTML = `<span class="icon">✓</span> 已复制${labelName}`;
-        setTimeout(() => {
-          btnEl.classList.remove('copied');
-          btnEl.innerHTML = originalHtml;
-        }, 1500);
+        btnEl.classList.add('copy-success');
+        setTimeout(() => btnEl.classList.remove('copy-success'), 1200);
       }
-    } catch (_) {
-      showToast('复制失败，请长按文本手动复制');
+    } catch (err) {
+      showToast(`复制失败: ${err.message || err}`);
     }
   }
 
@@ -129,10 +135,10 @@
     }
   }
 
-
   function getRecordKey(cardId, suiteId) {
     const sId = suiteId || state.activeSuiteId || 'default';
-    return `${sId}__${cardId}`;
+    const tId = state.activeTestId || 'family-origin';
+    return `${tId}__${sId}__${cardId}`;
   }
 
   function getPublishRecord(cardId, suiteId) {
@@ -141,14 +147,41 @@
     return null;
   }
 
+  function renderTestOptions() {
+    if (!el.testFilter) return;
+    el.testFilter.innerHTML = '';
+    state.tests.forEach((t) => {
+      const opt = document.createElement('option');
+      opt.value = t.id;
+      opt.textContent = t.name;
+      el.testFilter.appendChild(opt);
+    });
+    el.testFilter.value = state.activeTestId;
+  }
+
   function renderSuiteOptions() {
     if (!el.suiteFilter) return;
     el.suiteFilter.innerHTML = '';
-    (state.suites || []).forEach((suite) => {
+    if (!state.suites || state.suites.length === 0) {
+      const opt = document.createElement('option');
+      opt.value = 'empty';
+      opt.textContent = '暂无文案';
+      el.suiteFilter.appendChild(opt);
+      el.suiteFilter.value = 'empty';
+      return;
+    }
+    state.suites.forEach((suite) => {
       const opt = document.createElement('option');
       opt.value = suite.id;
-      const count = suite.totalCards != null ? suite.totalCards : (suite.cards ? suite.cards.length : 0);
-      const text = suite.displayName || `${suite.date ? suite.date + ' ' : ''}${suite.filename || suite.name} (${count}卡)`;
+      const count =
+        suite.totalCards != null
+          ? suite.totalCards
+          : suite.cards
+          ? suite.cards.length
+          : 0;
+      const text =
+        suite.displayName ||
+        `${suite.date ? suite.date + ' ' : ''}${suite.filename || suite.name} (${count}卡)`;
       opt.textContent = text;
       el.suiteFilter.appendChild(opt);
     });
@@ -157,7 +190,98 @@
     }
   }
 
+  async function switchTest(testId, shouldToast = true) {
+    const testDef = state.tests.find((t) => t.id === testId) || state.tests[0];
+    state.activeTestId = testDef.id;
+    if (el.testFilter) el.testFilter.value = testDef.id;
+
+    // 动态同步页面标题和顶栏标题
+    if (el.productName) el.productName.textContent = testDef.name;
+    document.title = `${testDef.name} - 手机复制板`;
+
+    // 刚性重置：卡片回到 01、账号筛选重置为全部、仅未发重置为关
+    state.currentIndex = 0;
+    state.activeAccount = 'all';
+    if (el.accountFilter) el.accountFilter.value = 'all';
+    state.hidePublished = false;
+    if (el.hidePublished) el.hidePublished.checked = false;
+
+    state.suites = [];
+    state.cards = [];
+    state.filteredCards = [];
+    state.activeSuiteId = 'empty';
+
+    localStorage.setItem('xhs_copy_active_test', testDef.id);
+
+    try {
+      state.isLoadingRemote = true;
+      renderCurrentCard();
+      const resp = await fetch(`./data/${testDef.id}/index.json?_t=${Date.now()}`, {
+        cache: 'no-store',
+      });
+      if (resp.ok) {
+        const list = await resp.json();
+        if (Array.isArray(list) && list.length > 0) {
+          state.suites = list.map((item) => {
+            const count = item.totalCards != null ? item.totalCards : 0;
+            const displayName = `${item.date ? item.date + ' ' : ''}${item.filename} (${count}卡)`;
+            return {
+              id: item.id || item.filename,
+              filename: item.filename,
+              date: item.date || '',
+              title: item.title || item.filename,
+              name: item.title || item.filename,
+              displayName: displayName,
+              totalCards: count,
+              productName: testDef.name,
+              isRemote: true,
+              cards: null,
+            };
+          });
+
+          renderSuiteOptions();
+          const firstSuite = state.suites[0];
+          await switchSuite(firstSuite.id, false);
+          if (shouldToast) {
+            showToast(`已切换至: ${testDef.name}`);
+          }
+          return;
+        }
+      }
+    } catch (err) {
+      console.warn(`拉取 ${testDef.id} 文案索引失败:`, err);
+    } finally {
+      state.isLoadingRemote = false;
+    }
+
+    // 该测试暂无文案
+    initEmptyTestState(testDef.name);
+    if (shouldToast) {
+      showToast(`${testDef.name}: 暂无文案`);
+    }
+  }
+
+  function initEmptyTestState(testName) {
+    state.suites = [];
+    state.activeSuiteId = 'empty';
+    state.cards = [];
+    state.filteredCards = [];
+    state.currentIndex = 0;
+
+    if (el.suiteFilter) {
+      el.suiteFilter.innerHTML = '<option value="empty">暂无文案</option>';
+      el.suiteFilter.value = 'empty';
+    }
+    filterCards();
+    renderCurrentCard();
+  }
+
   async function switchSuite(suiteId, shouldToast = true) {
+    if (suiteId === 'empty') {
+      const testDef = state.tests.find((t) => t.id === state.activeTestId);
+      initEmptyTestState(testDef ? testDef.name : '手机复制板');
+      return;
+    }
     const suite = state.suites.find((s) => s.id === suiteId);
     if (!suite) return;
 
@@ -166,13 +290,16 @@
       try {
         state.isLoadingRemote = true;
         if (shouldToast) showToast(`正在加载 ${suite.filename || suite.name}...`, 1000);
-        const resp = await fetch(`./data/${encodeURIComponent(suite.filename)}?_t=${Date.now()}`);
+        const resp = await fetch(
+          `./data/${state.activeTestId}/${encodeURIComponent(suite.filename)}?_t=${Date.now()}`
+        );
         if (!resp.ok) {
           throw new Error(`HTTP ${resp.status}`);
         }
         const mdText = await resp.text();
         const parsed = window.CopyBoardParse.parseCopyMd(mdText, {
           localImageMap: state.localImageMap,
+          testId: state.activeTestId,
         });
         suite.cards = parsed.cards || [];
         suite.totalCards = suite.cards.length;
@@ -188,7 +315,10 @@
     state.cards = suite.cards || [];
     state.currentIndex = 0;
     if (el.suiteFilter) el.suiteFilter.value = suite.id;
-    if (el.productName) el.productName.textContent = suite.productName || suite.title || suite.name;
+    const testDef = state.tests.find((t) => t.id === state.activeTestId);
+    if (el.productName) {
+      el.productName.textContent = testDef ? testDef.name : suite.productName || '手机复制板';
+    }
     localStorage.setItem('xhs_copy_active_suite', suite.id);
     filterCards();
     renderCurrentCard();
@@ -196,61 +326,6 @@
       const count = suite.cards ? suite.cards.length : 0;
       showToast(`已切换至: ${suite.title || suite.filename || suite.name} (${count}卡)`);
     }
-  }
-
-  async function loadRemoteDataAndInit() {
-    try {
-      const resp = await fetch(`./data/index.json?_t=${Date.now()}`, { cache: 'no-store' });
-      if (resp.ok) {
-        const list = await resp.json();
-        if (Array.isArray(list) && list.length > 0) {
-          state.suites = list.map((item) => {
-            const count = item.totalCards != null ? item.totalCards : 0;
-            const displayName = `${item.date ? item.date + ' ' : ''}${item.filename} (${count}卡)`;
-            return {
-              id: item.id || item.filename,
-              filename: item.filename,
-              date: item.date || '',
-              title: item.title || item.filename,
-              name: item.title || item.filename,
-              displayName: displayName,
-              totalCards: count,
-              productName: '大女主觉醒测试',
-              isRemote: true,
-              cards: null,
-            };
-          });
-
-          // 默认加载最新一份（列表第一项）
-          const latestSuite = state.suites[0];
-          state.activeSuiteId = latestSuite.id;
-          renderSuiteOptions();
-          await switchSuite(latestSuite.id, false);
-          return;
-        }
-      }
-    } catch (err) {
-      console.warn('拉取服务器文案索引失败，回退到本地数据', err);
-    }
-
-    initFallbackSuites();
-  }
-
-  function initFallbackSuites() {
-    state.suites = [
-      {
-        id: 'empty',
-        name: '等待导入文案',
-        displayName: '等待导入文案 (0卡)',
-        category: '本地',
-        productName: '手机复制板',
-        totalCards: 0,
-        cards: [],
-      },
-    ];
-    state.activeSuiteId = 'empty';
-    renderSuiteOptions();
-    switchSuite('empty', false);
   }
 
   function filterCards() {
@@ -286,15 +361,31 @@
     const { filteredCards, currentIndex, activeAccount } = state;
 
     if (!filteredCards || filteredCards.length === 0) {
-      el.cardResultName.textContent = state.isLoadingRemote ? '正在从服务器加载文案…' : '请先选择或导入发帖文案';
-      el.cardGoods.textContent = state.isLoadingRemote ? '请稍候，正在获取卡片数据' : '选择上方文案或右上角「导入文案」';
-      el.previewCover.textContent = '';
-      el.previewTitle.textContent = '';
-      el.previewBody.textContent = '';
+      const testDef = state.tests.find((t) => t.id === state.activeTestId);
+      const testName = testDef ? testDef.name : '该测试';
+      const isRemoteEmpty =
+        !state.suites || state.suites.length === 0 || state.activeSuiteId === 'empty';
+
+      el.cardResultName.textContent = state.isLoadingRemote
+        ? '正在从服务器加载文案…'
+        : isRemoteEmpty
+        ? '暂无文案'
+        : '请先选择或导入发帖文案';
+      el.cardGoods.textContent = state.isLoadingRemote
+        ? '请稍候，正在获取卡片数据'
+        : isRemoteEmpty
+        ? `【${testName}】暂未录入文案`
+        : '选择上方文案或右上角「导入文案」';
+      el.previewCover.textContent = isRemoteEmpty ? '（暂无文案）' : '';
+      el.previewTitle.textContent = isRemoteEmpty ? '（暂无文案）' : '';
+      el.previewBody.textContent = isRemoteEmpty ? '（暂无文案）' : '';
       el.previewTags.textContent = '';
-      el.sliceGallery.innerHTML =
-        '<div style="padding: 24px; text-align: center; color: #94a3b8;">暂无切片。导入文案后可再点「导入切片」匹配图片文件名</div>';
-      el.progressIndicator.textContent = '0 / 0';
+      el.sliceGallery.innerHTML = isRemoteEmpty
+        ? '<div style="padding: 32px 16px; text-align: center; color: #94a3b8; font-size: 14px;">暂无切片</div>'
+        : '<div style="padding: 24px; text-align: center; color: #94a3b8;">暂无切片。导入文案后可再点「导入切片」匹配图片文件名</div>';
+      el.progressIndicator.textContent = '00 / 00';
+      el.badgeCode.textContent = '--';
+      el.badgeMode.textContent = '--';
       el.btnPrev.disabled = true;
       el.btnNext.disabled = true;
       el.conflictBanner.style.display = 'none';
@@ -309,8 +400,9 @@
 
     el.btnPrev.disabled = currentIndex === 0;
     el.btnNext.disabled = currentIndex === filteredCards.length - 1;
-    el.progressIndicator.textContent =
-      `${String(currentIndex + 1).padStart(2, '0')} / ${String(filteredCards.length).padStart(2, '0')}`;
+    el.progressIndicator.textContent = `${String(currentIndex + 1).padStart(2, '0')} / ${String(
+      filteredCards.length
+    ).padStart(2, '0')}`;
 
     el.badgeCode.textContent = card.resultCode || 'r1';
     el.badgeMode.textContent = card.mode || '模式一';
@@ -326,7 +418,9 @@
       el.btnPublishText.textContent = '↺ 撤销标记已发布';
       if (activeAccount !== 'all' && rec.account !== activeAccount) {
         el.conflictBanner.style.display = 'flex';
-        el.conflictText.textContent = `⚠️ 预警：该卡片已于 ${formatDate(rec.publishedAt)} 由【${rec.account}】发布`;
+        el.conflictText.textContent = `⚠️ 预警：该卡片已于 ${formatDate(
+          rec.publishedAt
+        )} 由【${rec.account}】发布`;
       } else {
         el.conflictBanner.style.display = 'none';
       }
@@ -351,22 +445,35 @@
         label.textContent = img.label || `P${idx + 1}`;
 
         const resolvedUrl = resolveImageUrl(img.url);
-        const filename = img.filename || `${card.id}_${img.type || 'p' + (idx + 1)}.png`;
+        const resolvedFallbackUrl = img.fallbackUrl ? resolveImageUrl(img.fallbackUrl) : '';
+        const filename = img.filename || `${card.id}_slice.png`;
 
         const imgEl = document.createElement('img');
         imgEl.className = 'gallery-img';
         imgEl.src = resolvedUrl;
         imgEl.alt = img.label || '切片';
         imgEl.loading = 'lazy';
+
+        let triedFallback = false;
         imgEl.addEventListener('error', () => {
+          // 双规则兜底：规则1（slice字段）找不到时，自动尝试规则2（{cardId}_slice.png）
+          if (!triedFallback && resolvedFallbackUrl && imgEl.src !== resolvedFallbackUrl) {
+            triedFallback = true;
+            console.warn(
+              `[CopyBoard] 主切片未找到 (${img.filename})，自动回退备用规则 (${img.rule2}): ${resolvedFallbackUrl}`
+            );
+            imgEl.src = resolvedFallbackUrl;
+            return;
+          }
           item.innerHTML = `
             <span class="gallery-label">${img.label || '切片图'}</span>
-            <div style="height: 140px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.03); border-radius: 8px; color: #94a3b8; font-size: 13px; border: 1px dashed rgba(255,255,255,0.1);">
-              暂无切片
+            <div style="height: 140px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.03); border-radius: 8px; color: #94a3b8; font-size: 13px; border: 1px dashed rgba(255,255,255,0.1); flex-direction: column; gap: 4px;">
+              <span>暂无切片</span>
+              <span style="font-size: 11px; color: #64748b;">${filename}</span>
             </div>
           `;
         });
-        imgEl.addEventListener('click', () => openLightbox(resolvedUrl, filename));
+        imgEl.addEventListener('click', () => openLightbox(imgEl.src || resolvedUrl, filename));
 
         const footer = document.createElement('div');
         footer.className = 'gallery-footer';
@@ -376,7 +483,7 @@
         saveBtn.innerHTML = '📥 保存此图';
         saveBtn.addEventListener('click', (e) => {
           e.stopPropagation();
-          downloadImageBlob(resolvedUrl, filename);
+          downloadImageBlob(imgEl.src || resolvedUrl, filename);
         });
         footer.appendChild(saveBtn);
 
@@ -411,41 +518,37 @@
     el.lightboxModal.style.display = 'flex';
   }
 
-  function closeLightbox(e) {
-    if (
-      e &&
-      e.target &&
-      (e.target.id === 'btn-lightbox-download' || e.target.closest('#btn-lightbox-download'))
-    ) {
-      return;
-    }
-    if (el.lightboxModal) {
-      el.lightboxModal.style.display = 'none';
-      if (el.lightboxImg) el.lightboxImg.src = '';
-    }
+  function closeLightbox() {
+    if (!el.lightboxModal) return;
+    el.lightboxModal.style.display = 'none';
   }
 
   async function downloadImageBlob(url, filename) {
     if (!url) return;
-    showToast('正在准备保存图片...', 800);
     try {
+      showToast('正在准备保存图片...', 1000);
       const resp = await fetch(url);
-      if (!resp.ok) throw new Error('网络请求异常');
+      if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
       const blob = await resp.blob();
       const blobUrl = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = blobUrl;
-      a.download = filename || 'xhs_card_' + Date.now() + '.png';
+      a.download = filename || 'xhs_slice.png';
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
-      setTimeout(() => URL.revokeObjectURL(blobUrl), 2000);
-      triggerHaptic(30);
-      showToast('✅ 已开始下载，请检查手机相册/文件管理器！', 2500);
-    } catch (_) {
-      const newWin = window.open(url, '_blank');
-      if (!newWin) window.location.href = url;
-      showToast('若无法自动保存，请长按图片选择“存储图像”', 3500);
+      setTimeout(() => URL.revokeObjectURL(blobUrl), 30000);
+      triggerHaptic(20);
+      showToast(`已开始下载: ${filename}`);
+    } catch (err) {
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename || 'xhs_slice.png';
+      a.target = '_blank';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      showToast('已调起图片保存');
     }
   }
 
@@ -453,18 +556,18 @@
     const { filteredCards, currentIndex } = state;
     if (!filteredCards || !filteredCards[currentIndex]) return;
     const card = filteredCards[currentIndex];
-    const images = card.images || [];
-    if (images.length === 0) {
-      showToast('当前卡片没有图片切片');
+    const images = (card.images || []).filter((img) => img.url);
+    if (!images.length) {
+      showToast('当前卡片没有可保存的图片');
       return;
     }
-    showToast(`正在保存本卡全部 ${images.length} 张图片...`, 1500);
+    showToast(`正在保存 ${images.length} 张图片...`, 1500);
     for (let i = 0; i < images.length; i++) {
       const img = images[i];
       const resolvedUrl = resolveImageUrl(img.url);
-      const fn = img.filename || `${card.id}_${img.type || 'p' + (i + 1)}.png`;
-      await downloadImageBlob(resolvedUrl, fn);
-      await new Promise((r) => setTimeout(r, 400));
+      const filename = img.filename || `${card.id}_p${i + 1}.png`;
+      await downloadImageBlob(resolvedUrl, filename);
+      await new Promise((r) => setTimeout(r, 350));
     }
   }
 
@@ -472,55 +575,12 @@
     state.suites.forEach((suite) => {
       (suite.cards || []).forEach((card) => {
         if (!window.CopyBoardParse) return;
-        const rebuilt = window.CopyBoardParse.parseCopyMd(
-          '```text\n[封面]\n\n[标题]' +
-            (card.title || '') +
-            '\n' +
-            (card.body || '') +
-            '\n' +
-            (card.formattedTags || '') +
-            '\n```\n`cardId=' +
-            card.id +
-            '｜切片=' +
-            (card.slice || '') +
-            '｜商品=' +
-            (card.goods || '') +
-            '｜状态=｜结果=' +
-            (card.resultName || '') +
-            '｜模式=' +
-            (card.mode || '') +
-            '`',
-          { localImageMap: state.localImageMap }
+        card.images = window.CopyBoardParse.buildImages(
+          card.id,
+          card.slice,
+          state.localImageMap,
+          state.activeTestId
         );
-        // 更直接：按文件名重挂 images
-        const images = [];
-        const coverKey = card.id + '_p1.png';
-        const sliceKey = card.slice || card.id + '_slice.png';
-        if (state.localImageMap[coverKey] || state.localImageMap[card.id + '_cover.png']) {
-          images.push({
-            type: 'cover',
-            label: 'P1 封面图',
-            filename: coverKey,
-            url: state.localImageMap[coverKey] || state.localImageMap[card.id + '_cover.png'],
-          });
-        }
-        if (state.localImageMap[sliceKey]) {
-          images.push({
-            type: 'slice',
-            label: '切片图',
-            filename: sliceKey,
-            url: state.localImageMap[sliceKey],
-          });
-        } else if (sliceKey) {
-          images.push({
-            type: 'slice',
-            label: '切片图',
-            filename: sliceKey,
-            url: './data/slices/' + sliceKey,
-          });
-        }
-        card.images = images;
-        void rebuilt;
       });
     });
     const suite = state.suites.find((s) => s.id === state.activeSuiteId);
@@ -537,6 +597,7 @@
     try {
       const result = window.CopyBoardParse.parseCopyMd(mdText, {
         localImageMap: state.localImageMap,
+        testId: state.activeTestId,
       });
       if (result.errors && result.errors.length && (!result.cards || !result.cards.length)) {
         showToast(result.errors[0]);
@@ -547,6 +608,8 @@
         return;
       }
 
+      const testDef = state.tests.find((t) => t.id === state.activeTestId);
+      const testName = testDef ? testDef.name : '本地导入';
       const cleanName = fileName ? fileName.replace(/\.md$/i, '') : '本地导入文案';
       const newSuiteId = 'imported_' + Date.now().toString(36);
       const newSuite = {
@@ -555,7 +618,7 @@
         name: `📂 ${cleanName}`,
         displayName: `[本地导入] ${fileName || cleanName} (${result.cards.length}卡)`,
         category: '本地导入',
-        productName: cleanName,
+        productName: testName,
         totalCards: result.cards.length,
         isRemote: false,
         cards: result.cards,
@@ -581,7 +644,7 @@
       added += 1;
     });
     refreshCardImagesFromLocalMap();
-    showToast(`已导入 ${added} 张切片图（按文件名匹配 card 切片字段）`);
+    showToast(`已导入 ${added} 张切片图（当前测试: ${state.activeTestId}）`);
   }
 
   function togglePublishStatus() {
@@ -597,82 +660,111 @@
       triggerHaptic(20);
       showToast('已撤销发布标记');
     } else {
-      const acc =
-        activeAccount === 'all'
-          ? state.data?.accounts?.[0] || '安安 (老号)'
-          : activeAccount;
+      const targetAcc =
+        activeAccount === 'all' ? state.data?.accounts?.[0] || '老号' : activeAccount;
       state.publishedMap[key] = {
-        suiteId: state.activeSuiteId,
-        cardId: card.id,
-        account: acc,
         published: true,
+        account: targetAcc,
         publishedAt: new Date().toISOString(),
       };
       localStorage.setItem('xhs_copy_records_v1', JSON.stringify(state.publishedMap));
-      triggerHaptic([30, 20, 30]);
-      showToast(`已标记为【${acc}】发布（仅本地标记，不会自动发帖）`);
+      triggerHaptic(40);
+      showToast(`已标记为 [${targetAcc}] 发布`);
     }
-    if (state.hidePublished) filterCards();
+    filterCards();
     renderCurrentCard();
   }
 
   function launchXhsApp() {
-    const isWechat = /MicroMessenger/i.test(navigator.userAgent);
-    if (isWechat) {
+    triggerHaptic(30);
+    const ua = navigator.userAgent || '';
+    const isWeChat = /MicroMessenger/i.test(ua);
+    if (isWeChat) {
       if (el.wechatModal) el.wechatModal.style.display = 'flex';
       return;
     }
-    triggerHaptic(30);
-    window.location.href = 'xhsdiscover://';
+    const schemes = ['xhsdiscover://', 'xhs://'];
+    let idx = 0;
+    function tryNext() {
+      if (idx >= schemes.length) {
+        showToast('请直接手动在手机桌面打开小红书 App');
+        return;
+      }
+      const s = schemes[idx++];
+      window.location.href = s;
+      setTimeout(tryNext, 600);
+    }
+    tryNext();
   }
 
   function setupGestures() {
-    let startX = 0;
-    let startY = 0;
+    if (!el.cardView) return;
+    let touchStartX = 0;
+    let touchStartY = 0;
+    let touchEndX = 0;
+    let touchEndY = 0;
+
     el.cardView.addEventListener(
       'touchstart',
       (e) => {
-        if (e.touches && e.touches[0]) {
-          startX = e.touches[0].clientX;
-          startY = e.touches[0].clientY;
-        }
-      },
-      { passive: true }
-    );
-    el.cardView.addEventListener(
-      'touchend',
-      (e) => {
-        if (e.changedTouches && e.changedTouches[0]) {
-          const deltaX = e.changedTouches[0].clientX - startX;
-          const deltaY = e.changedTouches[0].clientY - startY;
-          if (Math.abs(deltaY) < 40) {
-            if (deltaX > 50 && state.currentIndex > 0) {
-              state.currentIndex--;
-              renderCurrentCard();
-            } else if (deltaX < -50 && state.currentIndex < state.filteredCards.length - 1) {
-              state.currentIndex++;
-              renderCurrentCard();
-            }
-          }
-        }
+        if (!e.touches || !e.touches[0]) return;
+        touchStartX = e.touches[0].clientX;
+        touchStartY = e.touches[0].clientY;
       },
       { passive: true }
     );
 
+    el.cardView.addEventListener(
+      'touchend',
+      (e) => {
+        if (!e.changedTouches || !e.changedTouches[0]) return;
+        touchEndX = e.changedTouches[0].clientX;
+        touchEndY = e.changedTouches[0].clientY;
+        handleSwipe();
+      },
+      { passive: true }
+    );
+
+    function handleSwipe() {
+      const deltaX = touchEndX - touchStartX;
+      const deltaY = touchEndY - touchStartY;
+      if (Math.abs(deltaX) > 60 && Math.abs(deltaX) > Math.abs(deltaY) * 1.5) {
+        if (deltaX < 0) {
+          if (state.currentIndex < state.filteredCards.length - 1) {
+            state.currentIndex++;
+            renderCurrentCard();
+            triggerHaptic(15);
+          }
+        } else {
+          if (state.currentIndex > 0) {
+            state.currentIndex--;
+            renderCurrentCard();
+            triggerHaptic(15);
+          }
+        }
+      }
+    }
+
     window.addEventListener('keydown', (e) => {
-      if (state.isLocked) return;
-      if (e.key === 'ArrowLeft' && state.currentIndex > 0) {
-        state.currentIndex--;
-        renderCurrentCard();
-      } else if (e.key === 'ArrowRight' && state.currentIndex < state.filteredCards.length - 1) {
-        state.currentIndex++;
-        renderCurrentCard();
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+      if (e.key === 'ArrowRight' || e.key === 'PageDown') {
+        if (state.currentIndex < state.filteredCards.length - 1) {
+          state.currentIndex++;
+          renderCurrentCard();
+        }
+      } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+        if (state.currentIndex > 0) {
+          state.currentIndex--;
+          renderCurrentCard();
+        }
       }
     });
   }
 
   function initAppView() {
     if (!appViewBound) {
+      renderTestOptions();
+
       const accounts = state.data?.accounts || ['安安 (老号)', '新号_01'];
       el.accountFilter.innerHTML = '<option value="all">全部账号</option>';
       accounts.forEach((acc) => {
@@ -684,6 +776,9 @@
       el.accountFilter.value = state.activeAccount;
       el.hidePublished.checked = state.hidePublished;
 
+      if (el.testFilter) {
+        el.testFilter.addEventListener('change', (e) => switchTest(e.target.value));
+      }
       if (el.suiteFilter) {
         el.suiteFilter.addEventListener('change', (e) => switchSuite(e.target.value));
       }
@@ -750,7 +845,11 @@
       setupGestures();
       appViewBound = true;
     }
-    loadRemoteDataAndInit();
+
+    const savedTest = localStorage.getItem('xhs_copy_active_test');
+    const initialTestId =
+      savedTest && state.tests.some((t) => t.id === savedTest) ? savedTest : 'family-origin';
+    switchTest(initialTestId, false);
   }
 
   function main() {
@@ -762,14 +861,13 @@
       state.publishedMap = {};
     }
 
-    state.data =
-      window.__HUB_DATA__ || {
-        productName: '手机复制板',
-        accounts: ['安安 (老号)', '新号_01'],
-        activeSuiteId: 'empty',
-        suites: [],
-        cards: [],
-      };
+    state.data = window.__HUB_DATA__ || {
+      productName: '手机复制板',
+      accounts: ['安安 (老号)', '新号_01'],
+      activeSuiteId: 'empty',
+      suites: [],
+      cards: [],
+    };
     state.cards = state.data.cards || [];
 
     initAppView();

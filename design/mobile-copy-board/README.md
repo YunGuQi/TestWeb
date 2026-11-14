@@ -1,64 +1,99 @@
 # 手机复制板（/copy）
 
-从 `xhs-draft-console/public/mobile-hub` 拆出的**纯静态公开访问**手机复制板。
+从 `xhs-draft-console/public/mobile-hub` 拆出的**纯静态公开访问**多测试矩阵文案复制板。
 
 - 地址：`https://test.mutong-xhs.top/copy/`
-- 能力：服务端静态索引 + 自动拉取文案 md + 服务端自动拉取切片图 → 按卡展开 → 封面/标题/正文/标签一键复制 → 切片画廊预览/大图/单张保存/批量保存全部图片
-- 访问控制：公开访问，无需口令，无需 PHP 后端，纯前端客户端解析与复制
-- **不做**：自动填表、自动发帖、CDP、Chrome 用户目录、定时发布
+- 支持 5 大测试切换：
+  1. `family-origin`：大女主觉醒测试
+  2. `emo`：深度情绪内耗测试
+  3. `destiny-lover`：命定恋人测试
+  4. `city`：性格城市匹配测试
+  5. `love-species`：恋爱物种分析
+- 能力：服务端静态按测试索引 + 自动拉取文案 md + 服务端自动拉取切片图 → 按卡展开 → 封面/标题/正文/标签一键复制 → 切片画廊预览/大图/单张保存/批量保存全部图片
+- 容错与兜底：无文案测试优雅显示「暂无文案」；切片图支持双规则（`card.slice` 与 `{cardId}_slice.png`）自动回退与占位，绝不阻断操作。
+- 访问控制：公开访问，无需口令，无需后端服务，纯前端客户端解析与复制。
+- **明确禁止**：自动填表、自动发帖、CDP、Chrome 用户目录、定时发布。
 
 ---
 
-## 核心机制：服务器端拉数据与切片图（免各设备本地导入）
+## 目录结构规范：按测试分目录隔离
 
-1. **自动加载最新文案**：手机/电脑打开 `/copy/` 时，页面自动从 `./data/index.json` 拉取文案索引，默认直接展示最新一份文案（排在首位的文件），无需任何手动操作。
-2. **切片图服务端自动拉取**：解析出每张卡要的切片文件名后，自动通过相对路径 `./data/slices/<sliceName>` 从服务器拉取对应切片图并渲染在画廊中。支持点击查看大图、单张保存以及「保存全部图片」。若图片不存在，该卡显示「暂无切片」，绝不报错、绝不阻挡文案展示与复制。
-3. **文案切换下拉框**：顶部选择器按「日期 + 文件名 + 卡片数」列出服务器上所有可用文案文件，选中即可秒级无缝切换，对应切片图同步精准刷新。
-4. **本地导入兜底**：右上角保留「导入文案」与「导入切片」按钮，仅供本地临时测试未打包的临时文件。正常使用流程完全走服务器拉取。
-5. **数据与切片存储目录**：
-   - 本地源码：
-     - 文案与索引：`design/mobile-copy-board/data/`
-     - 服务端切片图：`design/mobile-copy-board/data/slices/`
-   - 服务器路径：
-     - 文案与索引：`/www/wwwroot/copy-board/data/`
-     - 切片图路径：`/www/wwwroot/copy-board/data/slices/`
-   - 不依赖任何 Windows 本地磁盘路径，纯相对路径直读静态文件。
+所有文案与切片静态资源按测试 ID 完全隔离存储：
+
+```text
+design/mobile-copy-board/data/
+├── tests.json                    # 5 大测试基础清单
+├── family-origin/                # 大女主觉醒测试
+│   ├── index.json                # 文案索引
+│   ├── 2026-11-09_批量第1批4篇.md
+│   ├── 2026-11-09_试扩4篇.md
+│   ├── 2026-11-09_试点4篇.md
+│   ├── 2026-11-09_发帖文案.md
+│   ├── 2026-10-28_发帖文案.md
+│   ├── 2026-10-10_发帖文案.md
+│   └── slices/                   # 切片图 (r1_m1_slice.png ~ r6_m4_slice.png 等)
+├── emo/                          # 深度情绪内耗测试
+│   ├── index.json                # 暂无文案时为 []
+│   └── slices/                   # 60 张切片图
+├── destiny-lover/                # 命定恋人测试
+│   ├── index.json                # 暂无文案时为 []
+│   └── slices/                   # 96 张切片图
+├── city/                         # 性格城市匹配测试
+│   ├── index.json                # 暂无文案时为 []
+│   └── slices/                   # 96 张切片图
+└── love-species/                 # 恋爱物种分析
+    ├── index.json                # 暂无文案时为 []
+    └── slices/                   # 96 张切片图
+```
 
 ---
 
-## 刚性工作流：以后生成新文案与切片图的标准流程
+## 切片图加载双规则与容错机制
 
-电脑上每生成一份新日期的文案 Markdown 和对应的切片图，必须严格遵循以下流水线：
+为彻底杜绝卡片切片图找不到（如 r6 等卡片），解析与渲染流水线采用**双规则级联检索**：
+
+1. **规则一（优先指定）**：读取卡片元数据中的 `切片=xxx.png`（`card.slice`）。
+2. **规则二（标准兜底）**：读取标准命名 `{cardId}_slice.png`。
+3. **前端自动容错**：
+   - 图片发起请求时优先使用规则一；
+   - 若规则一图片触发 `error`，自动无缝重定向尝试规则二；
+   - 若两者均未命中，安全退化为「暂无切片」占位框并显示预期文件名，绝不抛错，保证文案复制功能 100% 正常。
+
+---
+
+## 刚性工作流：新增/更新测试文案与切片图标准流水线
+
+电脑上每为某个测试生成新文案 Markdown 或切片图，严格遵循以下流程：
 
 1. **归档原文档与原始图片**：
-   - 将新文案 `.md` 放入产品文档目录（如 `design/product-docs/大女主觉醒测试/docs/`）；
-   - 将生成的切片图放入原图文件夹（如 `design/product-docs/大女主觉醒测试/assets/结果测试截图/cards/` 或对应产品 assets 目录）；
-2. **同步至复制板并刷新索引**：
-   - 复制一份新文案 `.md` 到 `design/mobile-copy-board/data/`；
-   - 复制对应的切片图到 `design/mobile-copy-board/data/slices/`（或直接运行同步脚本）；
-   - 运行自动同步脚本：
+   - 将新文案 `.md` 放入对应测试的文档目录（如 `design/product-docs/大女主觉醒测试/docs/`）；
+   - 将生成的切片图放入产品 assets 目录；
+2. **同步至复制板并刷新多测试索引**：
+   - 将新文案 `.md` 放入 `design/mobile-copy-board/data/<测试id>/`；
+   - 将对应切片图放入 `design/mobile-copy-board/data/<测试id>/slices/`（或直接让脚本自动拉取）；
+   - 执行同步脚本：
      ```bash
      node design/mobile-copy-board/sync-data.js
      ```
-     脚本将自动扫描候选源目录补齐缺失切片图，并自动更新 `index.json`。
+     该脚本会自动扫描所有 5 个测试目录，验证每张卡片的规则一/规则二切片就绪情况，从候选池自动同步补齐图片，并刷新各自的 `index.json` 与顶层 `tests.json`。
 3. **提交并推送到 GitHub**：
    ```bash
    git add design/mobile-copy-board/
-   git commit -m "feat(copy-board): 发布新文案与切片图"
+   git commit -m "feat(copy-board): 更新测试文案与切片"
    git push origin deploy/aws
    ```
 4. **同步部署到宝塔服务器**：
    ```bash
-   scp -r design/mobile-copy-board/data root@114.132.183.186:/www/wwwroot/copy-board/
+   scp -r design/mobile-copy-board/* root@114.132.183.186:/www/wwwroot/copy-board/
    ```
 
-**效果**：完成上述步骤后，所有团队成员及手机设备**无需做任何导入**，只需在手机浏览器中刷新 `https://test.mutong-xhs.top/copy/`，即可直接看到新文案和对应切片图。
+**手机端效果**：团队成员无需在手机端导入任何文件，刷新 `https://test.mutong-xhs.top/copy/` 即可通过顶部「测试」选择器自由切换 5 大测试，查看对应文案、卡片与切片。
 
 ---
 
-## 部署目录与配置
+## 宝塔部署路径参考
 
-- 静态文件根目录：`/www/wwwroot/copy-board/`
-- 数据文件根目录：`/www/wwwroot/copy-board/data/`
-- 切片文件根目录：`/www/wwwroot/copy-board/data/slices/`
-- Nginx 扩展配置：`/www/server/panel/vhost/nginx/extension/test-platform/copy.conf`
+- 静态页面根目录：`/www/wwwroot/copy-board/`
+- 数据总目录：`/www/wwwroot/copy-board/data/`
+- 各测试数据目录：`/www/wwwroot/copy-board/data/<testId>/`
+- 各测试切片目录：`/www/wwwroot/copy-board/data/<testId>/slices/`

@@ -809,11 +809,19 @@ body {
     align-items: stretch;
     gap: 8px;
   }
+  .test-select-wrap,
   .suite-select-wrap,
   .account-select-wrap {
     flex: auto;
     width: 100%;
   }
+}
+.test-select-wrap {
+  flex: 1;
+  width: 100%;
+}
+.test-row {
+  margin-bottom: 8px;
 }
   </style>
 </head>
@@ -858,6 +866,12 @@ body {
     </header>
 
     <section class="control-bar">
+      <div class="filter-row test-row">
+        <div class="select-group test-select-wrap">
+          <label for="test-filter" class="control-label">测试:</label>
+          <select id="test-filter"></select>
+        </div>
+      </div>
       <div class="filter-row">
         <div class="select-group suite-select-wrap">
           <label for="suite-filter" class="control-label">文案:</label>
@@ -980,8 +994,8 @@ body {
     <div id="toast-text" class="toast-msg">已复制到剪贴板</div>
   </div>
 
-  <script src="./data.js?v=20261114_slices"></script>
-  <script src="./parse-md.js?v=20261114_slices"></script>
-  <script src="./app.js?v=20261114_slices"></script>
+  <script src="./data.js?v=20261114_multitest"></script>
+  <script src="./parse-md.js?v=20261114_multitest"></script>
+  <script src="./app.js?v=20261114_multitest"></script>
 </body>
 </html>

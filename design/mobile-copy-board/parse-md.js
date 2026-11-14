@@ -10,7 +10,7 @@
   function parseMetaLine(inner) {
     var fields = {};
     String(inner || '')
-      .split('｜')
+      .split(/[｜|]/)
       .forEach(function (part) {
         var i = part.indexOf('=');
         if (i <= 0) return;
@@ -80,11 +80,17 @@
       .join(' ');
   }
 
-  function buildImages(cardId, sliceName, localImageMap) {
+  function buildImages(cardId, sliceName, localImageMap, testId) {
     var images = [];
     var map = localImageMap || {};
     var coverKey = cardId + '_p1.png';
-    var sliceKey = sliceName || cardId + '_slice.png';
+    var tId = testId || 'family-origin';
+    var sliceBaseUrl = './data/' + tId + '/slices/';
+
+    var rule1 = (sliceName || '').trim();
+    var rule2 = cardId ? (cardId.trim() + '_slice.png') : '';
+    var primaryKey = rule1 || rule2;
+    var fallbackKey = (rule2 && rule2 !== primaryKey) ? rule2 : '';
 
     if (map[coverKey] || map[cardId + '_cover.png']) {
       images.push({
@@ -95,19 +101,35 @@
       });
     }
 
-    if (map[sliceKey]) {
+    if (map[primaryKey]) {
       images.push({
         type: 'slice',
         label: '切片图',
-        filename: sliceKey,
-        url: map[sliceKey],
+        filename: primaryKey,
+        rule1: rule1,
+        rule2: rule2,
+        url: map[primaryKey],
+        fallbackUrl: '',
       });
-    } else if (sliceKey) {
+    } else if (map[fallbackKey]) {
       images.push({
         type: 'slice',
         label: '切片图',
-        filename: sliceKey,
-        url: './data/slices/' + sliceKey,
+        filename: fallbackKey,
+        rule1: rule1,
+        rule2: rule2,
+        url: map[fallbackKey],
+        fallbackUrl: '',
+      });
+    } else if (primaryKey) {
+      images.push({
+        type: 'slice',
+        label: '切片图',
+        filename: primaryKey,
+        rule1: rule1,
+        rule2: rule2,
+        url: sliceBaseUrl + primaryKey,
+        fallbackUrl: fallbackKey ? (sliceBaseUrl + fallbackKey) : '',
       });
     }
 
@@ -125,13 +147,14 @@
 
   /**
    * @param {string} mdText
-   * @param {{ localImageMap?: Record<string,string> }} [opts]
+   * @param {{ localImageMap?: Record<string,string>, testId?: string }} [opts]
    * @returns {{ cards: Array, errors: string[] }}
    */
   function parseCopyMd(mdText, opts) {
     var errors = [];
     var cards = [];
     var localImageMap = (opts && opts.localImageMap) || {};
+    var testId = (opts && opts.testId) || 'family-origin';
     var index = 0;
     var m;
     FENCE_RE.lastIndex = 0;
@@ -172,7 +195,7 @@
         body: block.body || '',
         tags: block.tags || [],
         formattedTags: formatTags(block.tags || []),
-        images: buildImages(cardId, sliceName, localImageMap),
+        images: buildImages(cardId, sliceName, localImageMap, testId),
       });
     }
 
@@ -188,5 +211,6 @@
     parseMetaLine: parseMetaLine,
     parseTextBlock: parseTextBlock,
     formatTags: formatTags,
+    buildImages: buildImages,
   };
 })(typeof window !== 'undefined' ? window : globalThis);
