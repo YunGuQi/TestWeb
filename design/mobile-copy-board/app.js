@@ -1,8 +1,6 @@
-// 手机复制板 · 纯展示/复制（无自动发帖、无 CDP、无 worker）
+// 手机复制板 · 纯展示/复制（公开访问、无口令、无自动发帖、无 CDP、无 worker）
 (function () {
   'use strict';
-
-  const AUTH_BASE = './auth';
 
   const state = {
     data: null,
@@ -14,25 +12,16 @@
     activeAccount: 'all',
     hidePublished: false,
     publishedMap: {},
-    isLocked: true,
     localImageMap: {},
-    authConfigured: false,
   };
 
   const el = {
-    securityModal: document.getElementById('security-modal'),
-    passcodeInput: document.getElementById('passcode-input'),
-    btnUnlock: document.getElementById('btn-unlock'),
-    modalDesc: document.getElementById('modal-desc'),
-    passcodeForm: document.getElementById('passcode-form'),
-    authHint: document.getElementById('auth-hint'),
     wechatModal: document.getElementById('wechat-modal'),
     btnCloseWechat: document.getElementById('btn-close-wechat'),
     lightboxModal: document.getElementById('lightbox-modal'),
     lightboxImg: document.getElementById('lightbox-img'),
     appContainer: document.getElementById('app-container'),
     productName: document.getElementById('product-name'),
-    btnRelock: document.getElementById('btn-relock'),
     suiteFilter: document.getElementById('suite-filter'),
     accountFilter: document.getElementById('account-filter'),
     hidePublished: document.getElementById('hide-published'),
@@ -139,132 +128,6 @@
     }
   }
 
-  function showLockedUI(opts) {
-    state.isLocked = true;
-    if (el.appContainer) el.appContainer.style.display = 'none';
-    if (el.securityModal) el.securityModal.style.display = 'flex';
-    if (el.passcodeInput) el.passcodeInput.value = '';
-
-    const configured = !!opts.configured;
-    const message = opts.message || '';
-    state.authConfigured = configured;
-
-    if (el.modalDesc) {
-      el.modalDesc.textContent = configured
-        ? '工作台受服务器口令保护，请输入通行口令'
-        : '服务器未配置口令，已拒绝进入';
-    }
-    if (el.passcodeForm) el.passcodeForm.style.display = configured ? 'block' : 'none';
-    if (el.btnUnlock) el.btnUnlock.style.display = configured ? 'block' : 'none';
-    if (el.authHint) el.authHint.textContent = message;
-  }
-
-  function enterApp() {
-    state.isLocked = false;
-    if (el.securityModal) el.securityModal.style.display = 'none';
-    if (el.appContainer) el.appContainer.style.display = 'flex';
-    initAppView();
-  }
-
-  async function fetchAuthStatus() {
-    const resp = await fetch(`${AUTH_BASE}/status.php?_t=${Date.now()}`, {
-      credentials: 'same-origin',
-      cache: 'no-store',
-    });
-    if (!resp.ok) throw new Error('口令服务不可用 (HTTP ' + resp.status + ')');
-    return resp.json();
-  }
-
-  async function initSecurity() {
-    try {
-      const status = await fetchAuthStatus();
-      if (!status.configured) {
-        showLockedUI({
-          configured: false,
-          message:
-            status.hint ||
-            '请到宝塔配置口令：复制 auth/config.example.php 为 config.local.php 并填写口令，或设置环境变量 COPY_BOARD_PASSWORD。',
-        });
-        return;
-      }
-      if (status.authed) {
-        enterApp();
-        return;
-      }
-      showLockedUI({
-        configured: true,
-        message: '口令由宝塔服务器端配置，不存放在网页代码里。',
-      });
-    } catch (err) {
-      showLockedUI({
-        configured: false,
-        message:
-          '无法连接口令校验接口：' +
-          (err && err.message ? err.message : '未知错误') +
-          '。请确认宝塔已部署 /copy/auth/*.php 且 PHP 可用。',
-      });
-    }
-  }
-
-  async function handleUnlock() {
-    if (!state.authConfigured) {
-      showToast('服务器未配置口令，无法进入');
-      return;
-    }
-    const pwd = (el.passcodeInput && el.passcodeInput.value ? el.passcodeInput.value : '').trim();
-    if (!pwd) {
-      showToast('请输入口令');
-      if (el.passcodeInput) el.passcodeInput.focus();
-      return;
-    }
-    try {
-      const resp = await fetch(`${AUTH_BASE}/verify.php`, {
-        method: 'POST',
-        credentials: 'same-origin',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password: pwd }),
-      });
-      const data = await resp.json().catch(() => ({}));
-      if (el.passcodeInput) el.passcodeInput.value = '';
-
-      if (!data.configured) {
-        showLockedUI({
-          configured: false,
-          message: data.error || '服务器未配置口令，拒绝进入。',
-        });
-        return;
-      }
-      if (!resp.ok || !data.ok) {
-        triggerHaptic(60);
-        if (el.passcodeInput) el.passcodeInput.classList.add('input-shake');
-        setTimeout(() => {
-          if (el.passcodeInput) el.passcodeInput.classList.remove('input-shake');
-        }, 400);
-        showToast(data.error || '口令错误', 2000);
-        return;
-      }
-      showToast('口令验证成功');
-      enterApp();
-    } catch (err) {
-      showToast('校验失败：' + (err && err.message ? err.message : '网络异常'));
-    }
-  }
-
-  async function handleRelock() {
-    try {
-      await fetch(`${AUTH_BASE}/logout.php`, {
-        method: 'POST',
-        credentials: 'same-origin',
-      });
-    } catch (_) {}
-    showLockedUI({
-      configured: state.authConfigured,
-      message: state.authConfigured
-        ? '工作台已重新锁定'
-        : '服务器未配置口令，拒绝进入。',
-    });
-    showToast('工作台已重新锁定');
-  }
 
   function getRecordKey(cardId, suiteId) {
     const sId = suiteId || state.activeSuiteId || 'default';
@@ -782,7 +645,6 @@
       });
       el.btnLaunchXhs.addEventListener('click', launchXhsApp);
       el.btnTogglePublish.addEventListener('click', togglePublishStatus);
-      el.btnRelock.addEventListener('click', handleRelock);
       if (el.btnSaveAllSlices) {
         el.btnSaveAllSlices.addEventListener('click', downloadAllCurrentImages);
       }
@@ -823,7 +685,7 @@
     initSuites(state.data);
   }
 
-  async function main() {
+  function main() {
     try {
       state.publishedMap = JSON.parse(localStorage.getItem('xhs_copy_records_v1') || '{}');
       state.activeAccount = localStorage.getItem('xhs_copy_active_account') || 'all';
@@ -831,11 +693,6 @@
     } catch (_) {
       state.publishedMap = {};
     }
-
-    el.btnUnlock.addEventListener('click', handleUnlock);
-    el.passcodeInput.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') handleUnlock();
-    });
 
     state.data =
       window.__HUB_DATA__ || {
@@ -847,7 +704,7 @@
       };
     state.cards = state.data.cards || [];
 
-    await initSecurity();
+    initAppView();
   }
 
   if (document.readyState === 'loading') {

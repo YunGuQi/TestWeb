@@ -34,9 +34,6 @@ profiles/
 .env.*.local
 dev.db
 dev.db-journal
-# 手机复制板服务器口令（仅宝塔本地，禁止进库）
-design/mobile-copy-board/auth/config.local.php
-
 # 压缩包与二进制可执行文件
 *.zip
 *.7z
