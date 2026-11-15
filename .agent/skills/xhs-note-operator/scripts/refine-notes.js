@@ -135,10 +135,10 @@ function checkCoverAndTitle({ coverLines = [], title = '', meta = '' }) {
     advisories.push(`[封面节奏提示] 建议封面采用长短长或短长短错落节奏 (现 [${cLengths.join('/')}]): [${coverLines.join(' / ')}]`);
   }
 
-  // 模式一数字量纲提示
+  // 模式一数字量纲提示（仅限有雷达或真实分值的测试，避免无雷达测试误导）
   if (meta && (meta.includes('模式=模式一') || meta.includes('模式一'))) {
     const hasNum = coverLines.some(l => /\d/.test(l) || /%|％/.test(l));
-    if (!hasNum) {
+    if (!hasNum && !meta.includes('深度情绪内耗') && !meta.includes('性格城市')) {
       advisories.push(`[封面认领提示] 模式一建议封面展示数值或百分比量纲强化认领感: [${coverLines.join(' / ')}]`);
     }
   }
@@ -160,7 +160,7 @@ function checkCoverAndTitle({ coverLines = [], title = '', meta = '' }) {
  * 硬门禁：无机械营销封杀词、纯文本无 emoji、测试自然出现一次闭环
  * 风格降级：场景实物、短行、末行词表全部降为灵感参考
  */
-function checkBody({ bodyLines = [], coverLines = [], title = '' }) {
+function checkBody({ bodyLines = [], coverLines = [], title = '', ssotResult = null }) {
   const issues = [];
   const advisories = [];
   if (!bodyLines || bodyLines.length === 0) return { issues, advisories, pass: true };
@@ -205,9 +205,13 @@ function checkBody({ bodyLines = [], coverLines = [], title = '' }) {
     issues.push(`[测试未自然出现] 正文全篇未见测试道具或金句痕迹（测出/自测/卡片/截图/锁屏/金句等），未形成测试闭环`);
   }
 
-  // 末行检查：严禁机械营销套路词（硬门禁）
+  // 末行检查：严禁机械营销套路词（硬门禁）与命名烂尾拦截
   if (bodyLines.length > 0) {
     const lastLine = bodyLines[bodyLines.length - 1].trim();
+    const endingType = classifyEndingType(lastLine, ssotResult);
+    if (endingType === '命名烂尾(违规)') {
+      issues.push(`[命名烂尾违规] 末行 “${lastLine}” 仅单句报出测试结果名称，无生活微动作或原声对话承接，严禁命名烂尾`);
+    }
     const marketingBanWords = [
       '敢不敢在评论区报个', '评论区报一下', '评论区报个', '快去测测看吧', '快去测测看',
       '快去测', '赶紧去查查', '快来测', '评论区留言', '评论区告诉我', '戳评论区',
@@ -291,9 +295,15 @@ function checkTags(tags = [], profile = null, meta = '') {
 /**
  * 4. SSOT 真源防编造强检门禁（雷达维度与得分、金句原文逐字核验）
  */
-function checkRadarAndSSOT({ card, ssotResult, pinnedComment = '' }) {
+function checkRadarAndSSOT({ card, ssotResult, pinnedComment = '', resultName = '', allResultsCount = 0 }) {
   const issues = [];
-  if (!ssotResult) return { issues, pass: true };
+  if (!ssotResult) {
+    if (resultName || allResultsCount > 0) {
+      issues.push(`[SSOT穿透失败] 结果名 “${resultName || '未指定'}” 未在真源中登记！`);
+      return { issues, pass: false };
+    }
+    return { issues, pass: true };
+  }
 
   const rawRadar = Array.isArray(ssotResult.raw?.radar)
     ? ssotResult.raw.radar
@@ -313,13 +323,21 @@ function checkRadarAndSSOT({ card, ssotResult, pinnedComment = '' }) {
   ].join('\n');
 
   // 1. 检查测出/雷达指标提法：例如 测出共情97 / 疏离感98% / 测出内核90+
-  const regex = /(?:测出|指数|得分|分数)?\s*([\u4e00-\u9fa5]{2,4})\s*[:：=为]?\s*(\d{2,3}|\d{2}\+)[%％\+]?/g;
+  const regex = /(?:测出|指数|得分|分数)?\s*([\u4e00-\u9fa5a-zA-Z]{2,10})\s*[:：=为]?\s*(\d{2,3}|\d{2}\+)[%％\+]?/g;
   let match;
+  const rawTextSSOT = JSON.stringify(ssotResult.raw || {});
+
   while ((match = regex.exec(fullText)) !== null) {
     const dim = match[1];
     const scoreStr = match[2];
-    const ignoredDims = ['二十', '三十', '四十', '五十', '九点', '十点', '一年', '两年', '半年', '几级', '前排', '第一', '第二', '第三', '年级'];
+    const matchedStr = match[0].trim();
+    const ignoredDims = ['二十', '三十', '四十', '五十', '九点', '十点', '一年', '两年', '半年', '几级', '前排', '第一', '第二', '第三', '年级', '几个', '一次', '两次', '小时', '三碗', '三个'];
     if (ignoredDims.some(d => dim.includes(d))) continue;
+
+    // 如果真源的原始 JSON 里完全包含了这一串（例如 "82% 情绪电量" 或 "恋爱脑中毒指数：92%"），视为真源天然字段引用
+    if (rawTextSSOT.includes(scoreStr) && (rawTextSSOT.includes(dim) || rawTextSSOT.includes(matchedStr))) {
+      continue;
+    }
 
     const foundSubject = subjects.find(s => s.name.includes(dim) || dim.includes(s.name));
     if (foundSubject) {
@@ -327,9 +345,21 @@ function checkRadarAndSSOT({ card, ssotResult, pinnedComment = '' }) {
       if (numScore !== foundSubject.val) {
         issues.push(`[SSOT雷达数值编造] 维度“${foundSubject.name}”真实得分为 ${foundSubject.val}，文案内编造写为 “${dim}${scoreStr}”`);
       }
-    } else if (dim.length >= 2 && (match[0].includes('测出') || ['内核', '边界', '松弛', '焦虑', '要强', '果敢', '坦诚', '共情', '悦己', '信任', '责任', '随和', '淡漠', '反叛', '孤独', '讨好'].some(k => dim.includes(k)))) {
-      const validNames = subjects.map(s => `${s.name}${s.val}`).join(' / ');
-      issues.push(`[SSOT雷达指标编造] 发现编造维度 “${dim}${scoreStr}”，真实结果《${ssotResult.name}》雷达指标仅为: ${validNames}`);
+    } else {
+      const isPercentOrScore = matchedStr.includes('%') || matchedStr.includes('％') || matchedStr.includes('测出') || matchedStr.includes('指数') || matchedStr.includes('得分');
+      const isTraitWord = ['内核', '边界', '松弛', '焦虑', '要强', '果敢', '坦诚', '共情', '悦己', '信任', '责任', '随和', '淡漠', '反叛', '孤独', '讨好', '钝感', '钝感力', '敏感', '敏感力', '嘴硬', '抗压', '防御', 'sens', 'ruminate', 'please', 'bound'].some(k => dim.toLowerCase().includes(k.toLowerCase()));
+
+      if (subjects.length > 0) {
+        if (isPercentOrScore || isTraitWord) {
+          const validNames = subjects.map(s => `${s.name}${s.val}`).join(' / ');
+          issues.push(`[SSOT雷达指标编造] 发现编造维度 “${matchedStr}”，真实结果《${ssotResult.name}》雷达指标仅为: ${validNames}`);
+        }
+      } else {
+        // 无雷达测试（如城市性格、部分无雷达测试）
+        if (isPercentOrScore || isTraitWord) {
+          issues.push(`[无雷达测试硬造数值] [SSOT雷达指标编造] 本测试《${ssotResult.name}》真源不含雷达维度，文案中发现编造指标 “${matchedStr}”`);
+        }
+      }
     }
   }
 
@@ -366,11 +396,20 @@ function checkRadarAndSSOT({ card, ssotResult, pinnedComment = '' }) {
 /**
  * 复合卡片单卡检查
  */
-function checkCard({ bodyLines = [], coverLines = [], title = '', tags = [], meta = '', profile = null, ssotResult = null, pinnedComment = '' }) {
+function checkCard({ bodyLines = [], coverLines = [], title = '', tags = [], meta = '', profile = null, ssotResult = null, pinnedComment = '', resultName = '', allResultsCount = 0 }) {
+  let effectiveResultName = resultName;
+  if (!effectiveResultName && meta) {
+    const m = meta.match(/结果=([^｜|]+)/);
+    if (m) effectiveResultName = m[1].trim();
+  }
+  if (!effectiveResultName && tags && tags.length > 2) {
+    effectiveResultName = tags[2].replace(/^#/, '').trim();
+  }
+
   const ct = checkCoverAndTitle({ coverLines, title, meta });
-  const b = checkBody({ bodyLines, coverLines, title });
+  const b = checkBody({ bodyLines, coverLines, title, ssotResult });
   const t = checkTags(tags, profile, meta);
-  const ssot = checkRadarAndSSOT({ card: { coverLines, title, bodyLines }, ssotResult, pinnedComment });
+  const ssot = checkRadarAndSSOT({ card: { coverLines, title, bodyLines }, ssotResult, pinnedComment, resultName: effectiveResultName, allResultsCount });
 
   const hardIssues = [...ct.issues, ...b.issues, ...t.issues, ...ssot.issues];
   const advisories = [...ct.advisories, ...b.advisories];
@@ -391,6 +430,61 @@ function checkCard({ bodyLines = [], coverLines = [], title = '', tags = [], met
     shortLines: b.shortLines,
     ht: { sceneCheck: b.sceneCheck },
   };
+}
+
+/**
+ * 收尾类型分类器（支持 5 种健康类型与命名烂尾拦截）
+ */
+function classifyEndingType(lastLine, ssotResult = null) {
+  if (!lastLine) return '未分类';
+  const trimmed = lastLine.trim();
+
+  const actionPattern = /(?:关机|走人|拉黑|免打扰|推开|合上|撕掉|删掉|退群|锁门|拎包|喝茶|吹开|拿上|戴上|扣上|锁屏|扣手机|熄屏|熄灯|站在原地|扫地|切菜|倒水|漱口|发呆|翻身|看窗|吸气|刹车|叹气|扒饭)/;
+  const scenePattern = /(?:泡脚|洗菜|买菜|开火|做饭|看剧|睡觉|躺下|打车|公园|看银杏|散步|沙发|夕阳|夜市|回家|进门)/;
+
+  // 1. 拦截命名烂尾（例如单纯以 "测完才知道我是XX" 或 "测出XX" 结束且无微动作/对话）
+  if (/(?:^测[出完得]|^自测|^查了|^读完|^写完|原来我是|发现自己是)/.test(trimmed) && !/[“"']/.test(trimmed) && !actionPattern.test(trimmed) && !scenePattern.test(trimmed) && trimmed.length <= 30) {
+    return '命名烂尾(违规)';
+  }
+
+  // 2. 原声对话收尾
+  if (/[“"'].+[”"']/.test(trimmed) || /[”"']$/.test(trimmed)) {
+    return '原声对话收尾';
+  }
+
+  // 3. 自然反问/暗号
+  if (/[？?]|对暗号|怎么推|集合|认领/.test(trimmed)) {
+    return '自然反问/暗号';
+  }
+
+  // 4. 金句收束（优先校验是否来自 SSOT quote / antidoteList / content）
+  if (ssotResult?.raw) {
+    const validQuotes = [
+      ssotResult.raw.quote,
+      ...(Array.isArray(ssotResult.raw.antidoteList) ? ssotResult.raw.antidoteList : []),
+      ssotResult.raw.content
+    ].filter(Boolean);
+    const cleanLast = trimmed.replace(/[【】“”"'\s，。！？、]/g, '');
+    const isQuote = validQuotes.some(q => {
+      const cleanQ = q.replace(/[“”"'\s，。！？、]/g, '');
+      return cleanQ.includes(cleanLast) || cleanLast.includes(cleanQ);
+    });
+    if (isQuote && cleanLast.length >= 4) {
+      return '金句收束';
+    }
+  }
+
+  // 5. 物理动作定格
+  if (actionPattern.test(trimmed)) {
+    return '物理动作定格';
+  }
+
+  // 6. 生活场景定格
+  if (scenePattern.test(trimmed)) {
+    return '生活场景定格';
+  }
+
+  return '生活场景定格';
 }
 
 /**
@@ -683,18 +777,15 @@ function checkBatchCircuitBreakers(cardList = []) {
     let endType = '未分类';
     if (lines.length > 0) {
       const lastLine = lines[lines.length - 1].trim();
-      if (/[“"'].+[”"']/.test(lastLine) || /[”"']$/.test(lastLine)) {
-        endType = '原声对话收尾';
-      } else if (/[？?]|对暗号|怎么推|集合|认领/.test(lastLine)) {
-        endType = '自然反问/暗号';
-      } else if (/(?:泡脚|洗菜|买菜|开火|做饭|喝茶|看剧|睡觉|躺下|打车)/.test(lastLine)) {
-        endType = '生活场景定格';
-      } else if (/(?:关机|走人|拉黑|免打扰|推开|合上|撕掉|删掉|退群|锁门|拎包)/.test(lastLine)) {
-        endType = '物理动作定格';
-      }
+      endType = classifyEndingType(lastLine, c.ssotResult);
     }
     endingTypeMap[endType] = (endingTypeMap[endType] || 0) + 1;
   });
+
+  if (endingTypeMap['单纯报菜名(违规)'] || endingTypeMap['命名烂尾(违规)']) {
+    const badCount = (endingTypeMap['单纯报菜名(违规)'] || 0) + (endingTypeMap['命名烂尾(违规)'] || 0);
+    hardIssues.push(`[收尾禁用违规] 发现 ${badCount} 篇收尾采用命名烂尾/单纯报菜名（如“测完才知道我是XX”），严禁直接用测试结果做尾句，必须落在具体生活微动作或原声对话！`);
+  }
 
   const distinctEndingTypes = Object.keys(endingTypeMap).length;
   const maxEndingCount = Math.max(...Object.values(endingTypeMap), 0);
@@ -1052,7 +1143,11 @@ function runCli() {
       rName = tags[2].replace(/^#/, '').trim();
     }
     if (rName && allResults.length > 0) {
-      ssotResult = allResults.find(r => r.name === rName || r.name.includes(rName) || rName.includes(r.name));
+      const cleanRName = rName.replace(/[【】]/g, '').trim();
+      ssotResult = allResults.find(r => {
+        const rClean = r.name.replace(/[【】]/g, '').trim();
+        return r.name === rName || rClean === cleanRName || rClean.includes(cleanRName) || cleanRName.includes(rClean) || r.name.includes(rName) || rName.includes(r.name);
+      });
     }
     if (!ssotResult && meta && allResults.length > 0) {
       const mCardId = meta.match(/cardId=([a-zA-Z0-9]+)/);
@@ -1072,6 +1167,8 @@ function runCli() {
       profile: cardProfile,
       ssotResult,
       pinnedComment,
+      resultName: rName,
+      allResultsCount: allResults.length,
     });
 
     // 计算正文去标点实算字数
@@ -1291,6 +1388,7 @@ module.exports = {
   checkBody,
   checkTags,
   checkRadarAndSSOT,
+  classifyEndingType,
   checkCard,
   checkBatchCircuitBreakers,
   countBodyCharsNoPunctuation,
