@@ -289,15 +289,27 @@ function checkRadarAndSSOT({ card, ssotResult, pinnedComment = '' }) {
     }
   }
 
-  // 2. 检查金句 quote 引用
-  if (ssotResult.raw.quote) {
-    const trueQuote = ssotResult.raw.quote.replace(/[“”"'\s，。！？、]/g, '');
+  // 2. 检查金句 quote 引用（严格对齐 SSOT：支持 quote、antidoteList 建议金句与 content 结论）
+  if (ssotResult.raw) {
+    const validSources = [];
+    if (ssotResult.raw.quote) validSources.push(ssotResult.raw.quote);
+    if (Array.isArray(ssotResult.raw.antidoteList)) {
+      validSources.push(...ssotResult.raw.antidoteList);
+    }
+    if (ssotResult.raw.content) {
+      validSources.push(ssotResult.raw.content);
+    }
+
     const cleanBody = (card.bodyLines || []).join('\n');
     const bracketMatches = cleanBody.match(/【(.*?)】/g);
     if (bracketMatches) {
       for (const bm of bracketMatches) {
         const quoteSub = bm.replace(/[【】“”"'\s，。！？、]/g, '');
-        if (quoteSub.length >= 4 && !trueQuote.includes(quoteSub) && !quoteSub.includes(trueQuote)) {
+        const matched = validSources.some(src => {
+          const cleanSrc = src.replace(/[“”"'\s，。！？、]/g, '');
+          return cleanSrc.includes(quoteSub) || quoteSub.includes(cleanSrc);
+        });
+        if (quoteSub.length >= 4 && !matched) {
           issues.push(`[SSOT金句捏造] 引用金句 “${bm}” 未在真源中找到匹配，真源金句为: “${ssotResult.raw.quote}”`);
         }
       }
