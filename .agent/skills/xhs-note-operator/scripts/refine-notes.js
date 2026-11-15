@@ -295,7 +295,11 @@ function checkRadarAndSSOT({ card, ssotResult, pinnedComment = '' }) {
   const issues = [];
   if (!ssotResult) return { issues, pass: true };
 
-  const rawRadar = ssotResult.raw.radar || [];
+  const rawRadar = Array.isArray(ssotResult.raw?.radar)
+    ? ssotResult.raw.radar
+    : (ssotResult.raw?.radar && typeof ssotResult.raw.radar === 'object'
+        ? Object.entries(ssotResult.raw.radar).map(([k, v]) => ({ label: k, value: v }))
+        : []);
   const subjects = rawRadar.map(r => ({
     name: (r.subject || r.label || '').trim(),
     val: Number(r.A ?? r.value ?? 0)
