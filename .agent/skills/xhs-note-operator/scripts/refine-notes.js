@@ -942,12 +942,14 @@ function runCli() {
   };
 
   const validCards = [];
-  const refinedParts = parts.map((part, pIdx) => {
-    if (!part.startsWith('```text')) return part;
+  const refinedParts = [...parts];
+  for (let pIdx = 0; pIdx < refinedParts.length; pIdx++) {
+    const part = refinedParts[pIdx];
+    if (!part.startsWith('```text')) continue;
     cardCount++;
 
     const textMatch = part.match(/```text([\s\S]*?)```/);
-    if (!textMatch) return part;
+    if (!textMatch) continue;
 
     const rawBody = textMatch[1].trim();
     let meta = '';
@@ -1082,7 +1084,7 @@ function runCli() {
     }
 
     // 模式档位区间拦截：若识别到模式且有自检行或指定了四模式试点档，越界强制 exit 1 阻断
-    if (detectedPattern && PATTERN_RANGES[detectedPattern] && (claimedTarget || surroundingText.includes('试点') || surroundingText.includes('自检'))) {
+    if (detectedPattern && PATTERN_RANGES[detectedPattern] && (claimedTarget || /四模式试点|试点执行档/.test(surroundingText))) {
       const pRange = PATTERN_RANGES[detectedPattern];
       if (actualChars < pRange.min || actualChars > pRange.max) {
         hardFormatIssues.push({
@@ -1131,8 +1133,8 @@ function runCli() {
       ssotResult,
     });
 
-    return '```text\n' + newLines.join('\n') + '\n```';
-  });
+    refinedParts[pIdx] = '```text\n' + newLines.join('\n') + '\n```';
+  }
 
   if (AUTO_FIX || hasAutoHealed) {
     fs.writeFileSync(filePath, refinedParts.join(''), 'utf8');
