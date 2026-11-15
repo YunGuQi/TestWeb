@@ -20,7 +20,7 @@ const path = require('path');
 const SD = require(path.join(__dirname, 'skill-data.js'));
 
 // 去标点字符集（写死）：中文标点 ，。！？、；：·—…～“”‘’ ；英文标点 ,.!?;:"'[] ；所有空白字符（空格、换行、制表符）
-const STRIP_PUNCT_REGEX = /[，。！？、；：·—…～“”‘’\,\.\!\?\;\:\"\'\[\]\s]/g;
+const STRIP_PUNCT_REGEX = /[，。！？、；：·—…～“”‘’\,\.\!\?\;\:\"\'\[\]\`\s]/g;
 
 function countBodyCharsNoPunctuation(textOrLines) {
   if (!textOrLines) return 0;
@@ -199,7 +199,7 @@ function checkBody({ bodyLines = [], coverLines = [], title = '' }) {
   });
 
   // 测试自然出现一次闭环强检
-  const testLoopRegex = /(测出|报告|指数|测试|自测|拿到.*卡片|得分|测评|截图|锁屏|卡片|底气|铠甲|大女主|黑莲花|六边形|结界|蔷薇|破茧)/;
+  const testLoopRegex = /(测出|测完|报告|指数|测试|自测|拿到.*卡片|得分|测评|截图|锁屏|卡片|底气|铠甲|大女主|黑莲花|六边形|结界|蔷薇|破茧)/;
   const hasTestClosedLoop = bodyLines.some(l => testLoopRegex.test(l));
   if (!hasTestClosedLoop) {
     issues.push(`[测试未自然出现] 正文全篇未见测试道具或金句痕迹（测出/自测/卡片/截图/锁屏/金句等），未形成测试闭环`);
@@ -986,6 +986,31 @@ function runCli() {
         continue;
       }
 
+      if (line.startsWith('[标签]')) {
+        inBody = false;
+        tagLine = line.replace('[标签]', '').trim();
+        newLines.push(line);
+        continue;
+      }
+
+      if (line.startsWith('[正文]')) {
+        inBody = true;
+        newLines.push(line);
+        continue;
+      }
+
+      if (line.startsWith('[首评]') || line.startsWith('首评：') || line.startsWith('首评:')) {
+        inBody = false;
+        newLines.push(line);
+        continue;
+      }
+
+      if (line.startsWith('[自检]') || line.startsWith('自检：') || line.startsWith('自检:')) {
+        inBody = false;
+        newLines.push(line);
+        continue;
+      }
+
       if (line.startsWith('[标题]')) {
         inBody = true;
         titleStr = line.replace('[标题]', '').trim();
@@ -999,7 +1024,13 @@ function runCli() {
       }
 
       if (!inBody) {
-        coverLines.push(line.replace('[封面]', '').trim());
+        const rawCover = line.replace('[封面]', '').trim();
+        if (rawCover.includes('/') && !rawCover.includes('//')) {
+          const splitCovers = rawCover.split(/\s*\/\s*/).filter(Boolean);
+          coverLines.push(...splitCovers);
+        } else {
+          coverLines.push(rawCover);
+        }
         newLines.push(line);
       } else {
         newLines.push(line);
