@@ -19,8 +19,8 @@ const fs = require('fs');
 const path = require('path');
 const SD = require(path.join(__dirname, 'skill-data.js'));
 
-// 去标点字符集（写死）：中文标点 ，。！？、；：·—…～“”‘’ ；英文标点 ,.!?;:"'[] ；所有空白字符（空格、换行、制表符）
-const STRIP_PUNCT_REGEX = /[，。！？、；：·—…～“”‘’\,\.\!\?\;\:\"\'\[\]\`\s]/g;
+// 去标点字符集（写死）：中文标点 ，。！？、；：·—…～“”‘’【】 ；英文标点 ,.!?;:"'[] ；所有空白字符（空格、换行、制表符）
+const STRIP_PUNCT_REGEX = /[，。！？、；：·—…～“”‘’【】\,\.\!\?\;\:\"\'\[\]\s]/g;
 
 function countBodyCharsNoPunctuation(textOrLines) {
   if (!textOrLines) return 0;
@@ -1024,13 +1024,7 @@ function runCli() {
       }
 
       if (!inBody) {
-        const rawCover = line.replace('[封面]', '').trim();
-        if (rawCover.includes('/') && !rawCover.includes('//')) {
-          const splitCovers = rawCover.split(/\s*\/\s*/).filter(Boolean);
-          coverLines.push(...splitCovers);
-        } else {
-          coverLines.push(rawCover);
-        }
+        coverLines.push(line.replace('[封面]', '').trim());
         newLines.push(line);
       } else {
         newLines.push(line);
