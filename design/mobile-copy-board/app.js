@@ -67,6 +67,23 @@
     imgFileInput: document.getElementById('img-file-input'),
     btnSaveAllSlices: document.getElementById('btn-save-all-slices'),
     btnLightboxDownload: document.getElementById('btn-lightbox-download'),
+    cropModal: document.getElementById('crop-modal'),
+    cropModalSub: document.getElementById('crop-modal-sub'),
+    btnCropCloseX: document.getElementById('btn-crop-close-x'),
+    cropViewport: document.getElementById('crop-viewport'),
+    cropOriginalImg: document.getElementById('crop-original-img'),
+    cropBox: document.getElementById('crop-box'),
+    cropPreviewCanvas: document.getElementById('crop-preview-canvas'),
+    cropOffsetText: document.getElementById('crop-offset-text'),
+    cropRangeText: document.getElementById('crop-range-text'),
+    cropSlider: document.getElementById('crop-slider'),
+    btnCropStepUp50: document.getElementById('btn-crop-step-up-50'),
+    btnCropStepUp10: document.getElementById('btn-crop-step-up-10'),
+    btnCropStepDown10: document.getElementById('btn-crop-step-down-10'),
+    btnCropStepDown50: document.getElementById('btn-crop-step-down-50'),
+    btnCropReset: document.getElementById('btn-crop-reset'),
+    btnCropCancel: document.getElementById('btn-crop-cancel'),
+    btnCropConfirm: document.getElementById('btn-crop-confirm'),
   };
 
   let toastTimer = null;
@@ -145,6 +162,83 @@
     const key = getRecordKey(cardId, suiteId);
     if (state.publishedMap[key]) return state.publishedMap[key];
     return null;
+  }
+
+  const RESULT_ORIGINALS_MAP = {
+    r1: 'r1.png',
+    r2: 'r2.png',
+    r3: 'r3.png',
+    r4: 'r4.png',
+    r5: 'r5.png',
+    r6: 'r6.png',
+  };
+
+  function getOriginalImageInfo(card) {
+    if (state.activeTestId !== 'family-origin' || !card) return null;
+    let code = (card.resultCode || '').toLowerCase();
+    if (!RESULT_ORIGINALS_MAP[code]) {
+      const m = String(card.id || '').match(/r[1-6]/i);
+      if (m) code = m[0].toLowerCase();
+    }
+    const origFile = RESULT_ORIGINALS_MAP[code];
+    if (!origFile) return null;
+    return {
+      resultCode: code,
+      filename: origFile,
+      url: `./data/family-origin/originals/${origFile}`,
+    };
+  }
+
+  function getSavedCropOffset(card) {
+    if (!card) return null;
+    const cardKey = `xhs_crop_offset_${card.id}`;
+    const resKey = `xhs_crop_offset_${(card.resultCode || '').toLowerCase()}`;
+    const val = localStorage.getItem(cardKey) || localStorage.getItem(resKey);
+    if (val !== null && !isNaN(Number(val))) {
+      return parseInt(val, 10);
+    }
+    return null;
+  }
+
+  function saveCropOffset(card, offset) {
+    if (!card) return;
+    const cardKey = `xhs_crop_offset_${card.id}`;
+    const resKey = `xhs_crop_offset_${(card.resultCode || '').toLowerCase()}`;
+    localStorage.setItem(cardKey, String(offset));
+    localStorage.setItem(resKey, String(offset));
+  }
+
+  const croppedBlobCache = {};
+
+  async function getCroppedSliceUrl(origUrl, offset, naturalW, cropH) {
+    const cacheKey = `${origUrl}_${offset}`;
+    if (croppedBlobCache[cacheKey]) {
+      return croppedBlobCache[cacheKey];
+    }
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = () => {
+        const w = naturalW || img.naturalWidth || 1074;
+        const h = cropH || Math.round(img.naturalHeight / 3);
+        const canvas = document.createElement('canvas');
+        canvas.width = w;
+        canvas.height = h;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, offset, w, h, 0, 0, w, h);
+        canvas.toBlob((blob) => {
+          if (blob) {
+            const url = URL.createObjectURL(blob);
+            croppedBlobCache[cacheKey] = url;
+            resolve(url);
+          } else {
+            resolve(origUrl);
+          }
+        }, 'image/png');
+      };
+      img.onerror = () => resolve(origUrl);
+      img.src = origUrl;
+    });
   }
 
   function renderTestOptions() {
@@ -454,6 +548,18 @@
         imgEl.alt = img.label || '切片';
         imgEl.loading = 'lazy';
 
+        const origInfo = getOriginalImageInfo(card);
+        const savedOffset = origInfo ? getSavedCropOffset(card) : null;
+
+        // 若大女主测试且本地曾重裁过，自动按保存的偏移量裁剪展示
+        if (origInfo && savedOffset !== null) {
+          getCroppedSliceUrl(origInfo.url, savedOffset).then((customUrl) => {
+            if (customUrl && imgEl.isConnected) {
+              imgEl.src = customUrl;
+            }
+          });
+        }
+
         let triedFallback = false;
         imgEl.addEventListener('error', () => {
           // 双规则兜底：规则1（slice字段）找不到时，自动尝试规则2（{cardId}_slice.png）
@@ -486,6 +592,19 @@
           downloadImageBlob(imgEl.src || resolvedUrl, filename);
         });
         footer.appendChild(saveBtn);
+
+        // 仅大女主觉醒测试切片显示“🔄 重裁”按钮
+        if (origInfo) {
+          const recropBtn = document.createElement('button');
+          recropBtn.className = 'btn-recrop-slice';
+          recropBtn.type = 'button';
+          recropBtn.innerHTML = '🔄 重裁';
+          recropBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            openCropModal(card, img, imgEl);
+          });
+          footer.appendChild(recropBtn);
+        }
 
         item.appendChild(label);
         item.appendChild(imgEl);
@@ -568,6 +687,264 @@
       const filename = img.filename || `${card.id}_p${i + 1}.png`;
       await downloadImageBlob(resolvedUrl, filename);
       await new Promise((r) => setTimeout(r, 350));
+    }
+  }
+
+  // ====== 切片重裁模块 (大女主觉醒测试专属) ======
+  const cropState = {
+    active: false,
+    card: null,
+    imgData: null,
+    targetImgEl: null,
+    origInfo: null,
+    imgObj: null,
+    naturalW: 1074,
+    naturalH: 6288,
+    cropH: 2096,
+    maxOffset: 4192,
+    currentOffset: 1048,
+    defaultOffset: 1048,
+    isDragging: false,
+    dragStartY: 0,
+    dragStartOffset: 0,
+  };
+
+  function setCropOffset(offset) {
+    if (!cropState.imgObj) return;
+    cropState.currentOffset = Math.max(0, Math.min(cropState.maxOffset, Math.round(offset)));
+    syncCropUI();
+  }
+
+  function syncCropUI() {
+    if (!cropState.imgObj) return;
+    if (el.cropOffsetText) el.cropOffsetText.textContent = String(cropState.currentOffset);
+    if (el.cropRangeText) el.cropRangeText.textContent = `(范围: 0 ~ ${cropState.maxOffset} px)`;
+    if (el.cropSlider) el.cropSlider.value = String(cropState.currentOffset);
+
+    // 视口与裁剪框尺寸匹配
+    if (el.cropViewport && el.cropBox) {
+      const vpHeight = el.cropViewport.clientHeight || 280;
+      const scale = vpHeight / cropState.naturalH;
+      const boxHeight = Math.max(20, Math.round(cropState.cropH * scale));
+      const boxTop = Math.round(cropState.currentOffset * scale);
+      el.cropBox.style.height = `${boxHeight}px`;
+      el.cropBox.style.top = `${boxTop}px`;
+    }
+
+    // 实时 Canvas 预览
+    renderCropPreview();
+  }
+
+  function renderCropPreview() {
+    if (!cropState.imgObj || !el.cropPreviewCanvas) return;
+    const canvas = el.cropPreviewCanvas;
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(
+      cropState.imgObj,
+      0, cropState.currentOffset, cropState.naturalW, cropState.cropH,
+      0, 0, canvas.width, canvas.height
+    );
+  }
+
+  function openCropModal(card, imgData, imgEl) {
+    const origInfo = getOriginalImageInfo(card);
+    if (!origInfo) {
+      showToast('未找到该卡对应的原图全景');
+      return;
+    }
+    cropState.active = true;
+    cropState.card = card;
+    cropState.imgData = imgData;
+    cropState.targetImgEl = imgEl;
+    cropState.origInfo = origInfo;
+
+    if (el.cropModalSub) {
+      el.cropModalSub.textContent = `${card.resultCode || 'r1'} · ${card.resultName || ''} (${origInfo.filename})`;
+    }
+
+    if (el.cropOriginalImg) {
+      el.cropOriginalImg.src = origInfo.url;
+    }
+
+    showToast('正在加载原图全图...', 800);
+
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => {
+      cropState.imgObj = img;
+      cropState.naturalW = img.naturalWidth || 1074;
+      cropState.naturalH = img.naturalHeight || 6288;
+      cropState.cropH = Math.round(cropState.naturalH / 3);
+      cropState.maxOffset = Math.max(0, cropState.naturalH - cropState.cropH);
+      cropState.defaultOffset = Math.round(cropState.maxOffset / 4);
+
+      const saved = getSavedCropOffset(card);
+      cropState.currentOffset = (saved !== null)
+        ? Math.max(0, Math.min(cropState.maxOffset, saved))
+        : cropState.defaultOffset;
+
+      if (el.cropSlider) {
+        el.cropSlider.min = '0';
+        el.cropSlider.max = String(cropState.maxOffset);
+        el.cropSlider.value = String(cropState.currentOffset);
+      }
+
+      if (el.cropPreviewCanvas) {
+        el.cropPreviewCanvas.width = 600;
+        el.cropPreviewCanvas.height = Math.round(600 * (cropState.cropH / cropState.naturalW));
+      }
+
+      if (el.cropModal) el.cropModal.style.display = 'flex';
+      requestAnimationFrame(() => {
+        syncCropUI();
+      });
+    };
+    img.onerror = () => {
+      showToast('加载原图失败，请检查网络或服务器文件');
+    };
+    img.src = origInfo.url;
+  }
+
+  function closeCropModal() {
+    cropState.active = false;
+    cropState.imgObj = null;
+    if (el.cropModal) el.cropModal.style.display = 'none';
+  }
+
+  async function confirmRecrop() {
+    if (!cropState.imgObj || !cropState.card) {
+      closeCropModal();
+      return;
+    }
+    try {
+      showToast('正在按原图分辨率裁切...', 1000);
+      const outCanvas = document.createElement('canvas');
+      outCanvas.width = cropState.naturalW;
+      outCanvas.height = cropState.cropH;
+      const ctx = outCanvas.getContext('2d');
+      ctx.drawImage(
+        cropState.imgObj,
+        0, cropState.currentOffset, cropState.naturalW, cropState.cropH,
+        0, 0, cropState.naturalW, cropState.cropH
+      );
+
+      outCanvas.toBlob((blob) => {
+        if (!blob) {
+          showToast('生成裁剪图片失败');
+          return;
+        }
+        const filename = cropState.imgData?.filename || `${cropState.card.id}_slice.png`;
+        const blobUrl = URL.createObjectURL(blob);
+
+        // 存入内存缓存
+        const cacheKey = `${cropState.origInfo.url}_${cropState.currentOffset}`;
+        croppedBlobCache[cacheKey] = blobUrl;
+
+        // 保存位置到 localStorage
+        saveCropOffset(cropState.card, cropState.currentOffset);
+
+        // 更新当前页面画廊该切片展示
+        if (cropState.targetImgEl) {
+          cropState.targetImgEl.src = blobUrl;
+        }
+
+        // 自动触发原生下载
+        const a = document.createElement('a');
+        a.href = blobUrl;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+
+        triggerHaptic(30);
+        showToast(`已重裁并下载: ${filename}`);
+        closeCropModal();
+      }, 'image/png');
+    } catch (err) {
+      showToast(`裁图失败: ${err.message || err}`);
+    }
+  }
+
+  function initCropInteraction() {
+    if (!el.cropViewport) return;
+
+    if (el.cropSlider) {
+      el.cropSlider.addEventListener('input', () => {
+        setCropOffset(parseInt(el.cropSlider.value, 10));
+      });
+    }
+
+    if (el.btnCropStepUp50) {
+      el.btnCropStepUp50.addEventListener('click', (e) => {
+        e.preventDefault();
+        setCropOffset(cropState.currentOffset - 50);
+      });
+    }
+    if (el.btnCropStepUp10) {
+      el.btnCropStepUp10.addEventListener('click', (e) => {
+        e.preventDefault();
+        setCropOffset(cropState.currentOffset - 10);
+      });
+    }
+    if (el.btnCropStepDown10) {
+      el.btnCropStepDown10.addEventListener('click', (e) => {
+        e.preventDefault();
+        setCropOffset(cropState.currentOffset + 10);
+      });
+    }
+    if (el.btnCropStepDown50) {
+      el.btnCropStepDown50.addEventListener('click', (e) => {
+        e.preventDefault();
+        setCropOffset(cropState.currentOffset + 50);
+      });
+    }
+    if (el.btnCropReset) {
+      el.btnCropReset.addEventListener('click', (e) => {
+        e.preventDefault();
+        setCropOffset(cropState.defaultOffset);
+      });
+    }
+
+    // Pointer Events（手指 Touch 与 鼠标 Drag）
+    el.cropViewport.addEventListener('pointerdown', (e) => {
+      if (!cropState.imgObj) return;
+      cropState.isDragging = true;
+      cropState.dragStartY = e.clientY;
+      cropState.dragStartOffset = cropState.currentOffset;
+      try {
+        el.cropViewport.setPointerCapture(e.pointerId);
+      } catch (_) {}
+    });
+
+    el.cropViewport.addEventListener('pointermove', (e) => {
+      if (!cropState.isDragging || !cropState.imgObj) return;
+      const deltaYScreen = e.clientY - cropState.dragStartY;
+      const vpHeight = el.cropViewport.clientHeight || 280;
+      const scale = vpHeight / cropState.naturalH;
+      const deltaYReal = deltaYScreen / scale;
+      setCropOffset(Math.round(cropState.dragStartOffset + deltaYReal));
+    });
+
+    const stopDrag = (e) => {
+      if (cropState.isDragging) {
+        cropState.isDragging = false;
+        try {
+          if (e && e.pointerId != null) el.cropViewport.releasePointerCapture(e.pointerId);
+        } catch (_) {}
+      }
+    };
+    el.cropViewport.addEventListener('pointerup', stopDrag);
+    el.cropViewport.addEventListener('pointercancel', stopDrag);
+
+    if (el.btnCropCloseX) el.btnCropCloseX.addEventListener('click', closeCropModal);
+    if (el.btnCropCancel) el.btnCropCancel.addEventListener('click', closeCropModal);
+    if (el.btnCropConfirm) el.btnCropConfirm.addEventListener('click', confirmRecrop);
+
+    if (el.cropModal) {
+      el.cropModal.addEventListener('click', (e) => {
+        if (e.target === el.cropModal) closeCropModal();
+      });
     }
   }
 
@@ -843,6 +1220,7 @@
         el.wechatModal.style.display = 'none';
       });
       setupGestures();
+      initCropInteraction();
       appViewBound = true;
     }
 

@@ -122,3 +122,30 @@ design/mobile-copy-board/data/
 - 数据总目录：`/www/wwwroot/copy-board/data/`
 - 各测试数据目录：`/www/wwwroot/copy-board/data/<testId>/`
 - 各测试切片目录：`/www/wwwroot/copy-board/data/<testId>/slices/`
+- 大女主觉醒测试原图全景目录：`/www/wwwroot/copy-board/data/family-origin/originals/` (r1.png ~ r6.png)
+
+---
+
+## 大女主觉醒测试专属切片重裁功能 (Recrop Feature)
+
+为满足切片画面起始位置个性化调整与重新采样需求，针对大女主觉醒测试增加了纯前端切片重裁工作台：
+
+1. **6 张母本全景原图映射**：
+   - 部署路径：`data/family-origin/originals/`
+   - `r1` (内核超稳的满级大女主) ➔ `r1.png`
+   - `r2` (带刺盛开的傲骨黑莲花) ➔ `r2.png`
+   - `r3` (清冷清醒的结界女王) ➔ `r3.png`
+   - `r4` (优雅自渡的暗夜蔷薇) ➔ `r4.png`
+   - `r5` (气场全开的六边形女王) ➔ `r5.png`
+   - `r6` (不被驯化的破茧大女主) ➔ `r6.png`
+
+2. **操作与交互**：
+   - 卡片切片下方提供「📥 保存此图」与「🔄 重裁」两个并列按钮；
+   - 点击「🔄 重裁」调起切片重裁面板，左侧为原图全景与红框裁剪区，右侧为 1:2 高清实时输出预览；
+   - 支持**手指/鼠标上下拖动**、**滑杆拖拽**以及 **▲ 上移 / ▼ 下移（±10px、±50px）与 ↺ 默认恢复**三向联动的起始位置微调；
+   - 点击「确认重裁并下载」：
+     * 利用离屏 Canvas 按原图原始宽度（1074px）及 1/3 高度全分辨率裁剪输出 PNG；
+     * 自动保存并触发浏览器原生下载，文件名保持为 `{cardId}_slice.png`；
+     * 自动在客户端持久化存储起始位置（`localStorage.getItem('xhs_crop_offset_' + card.id)` 及 `xhs_crop_offset_${resultCode}`）；
+     * 刷新页面后自动读取本地存储的偏移位置，无缝实时渲染重裁后的切片图像；
+   - 弹窗显著提示：`已下载新切片，替换服务器文件后所有人可见`。
