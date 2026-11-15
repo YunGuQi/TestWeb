@@ -439,11 +439,11 @@ function classifyEndingType(lastLine, ssotResult = null) {
   if (!lastLine) return '未分类';
   const trimmed = lastLine.trim();
 
-  const actionPattern = /(?:关机|走人|拉黑|免打扰|推开|合上|撕掉|删掉|退群|锁门|拎包|喝茶|吹开|拿上|戴上|扣上|锁屏|扣手机|熄屏|熄灯|站在原地|扫地|切菜|倒水|漱口|发呆|翻身|看窗|吸气|刹车|叹气|扒饭)/;
+  const actionPattern = /(?:关机|走人|拉黑|免打扰|推开|合上|撕掉|删掉|退群|锁门|拎包|喝茶|吹开|拿上|戴上|扣上|锁屏|扣手机|拍手机|熄屏|熄灯|站在原地|扫地|切菜|倒水|漱口|发呆|翻身|看窗|吸气|刹车|叹气|扒饭)/;
   const scenePattern = /(?:泡脚|洗菜|买菜|开火|做饭|看剧|睡觉|躺下|打车|公园|看银杏|散步|沙发|夕阳|夜市|回家|进门)/;
 
-  // 1. 拦截命名烂尾（例如单纯以 "测完才知道我是XX" 或 "测出XX" 结束且无微动作/对话）
-  if (/(?:^测[出完得]|^自测|^查了|^读完|^写完|原来我是|发现自己是)/.test(trimmed) && !/[“"']/.test(trimmed) && !actionPattern.test(trimmed) && !scenePattern.test(trimmed) && trimmed.length <= 30) {
+  // 1. 拦截命名烂尾（例如末行无微动作/无场景直接以 "测完才知道我是XX"、"我测出来是XX"、"做完才发现我是XX" 等单句结束）
+  if (/(?:测[出完得]|做[出完得]|自测|查了|读完|写完|原来我是|发现自己是)/.test(trimmed) && !/[“"']/.test(trimmed) && !actionPattern.test(trimmed) && !scenePattern.test(trimmed) && trimmed.length <= 30) {
     return '命名烂尾(违规)';
   }
 
@@ -484,7 +484,7 @@ function classifyEndingType(lastLine, ssotResult = null) {
     return '生活场景定格';
   }
 
-  return '生活场景定格';
+  return '未分类';
 }
 
 /**
