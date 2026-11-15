@@ -84,6 +84,7 @@
     btnCropReset: document.getElementById('btn-crop-reset'),
     btnCropCancel: document.getElementById('btn-crop-cancel'),
     btnCropConfirm: document.getElementById('btn-crop-confirm'),
+    btnCropShare: document.getElementById('btn-crop-share'),
   };
 
   let toastTimer = null;
@@ -583,6 +584,10 @@
 
         const footer = document.createElement('div');
         footer.className = 'gallery-footer';
+
+        const actionRow = document.createElement('div');
+        actionRow.className = 'gallery-footer-row';
+
         const saveBtn = document.createElement('button');
         saveBtn.className = 'btn-save-slice';
         saveBtn.type = 'button';
@@ -591,14 +596,26 @@
           e.stopPropagation();
           downloadImageBlob(imgEl.src || resolvedUrl, filename);
         });
-        footer.appendChild(saveBtn);
+        actionRow.appendChild(saveBtn);
 
-        // 仅大女主觉醒测试切片显示“🔄 重裁”按钮
+        const shareBtn = document.createElement('button');
+        shareBtn.className = 'btn-share-slice';
+        shareBtn.type = 'button';
+        shareBtn.innerHTML = '📤 保存到相册';
+        shareBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          shareSliceToAlbum(imgEl.src || resolvedUrl, filename);
+        });
+        actionRow.appendChild(shareBtn);
+
+        footer.appendChild(actionRow);
+
+        // 仅大女主觉醒测试切片显示“🔄 重新裁剪”按钮
         if (origInfo) {
           const recropBtn = document.createElement('button');
           recropBtn.className = 'btn-recrop-slice';
           recropBtn.type = 'button';
-          recropBtn.innerHTML = '🔄 重裁';
+          recropBtn.innerHTML = '🔄 重新裁剪';
           recropBtn.addEventListener('click', (e) => {
             e.stopPropagation();
             openCropModal(card, img, imgEl);
@@ -668,6 +685,73 @@
       a.click();
       document.body.removeChild(a);
       showToast('已调起图片保存');
+    }
+  }
+
+  async function shareOrFallbackDownload(blob, filename, blobUrl) {
+    const url = blobUrl || URL.createObjectURL(blob);
+    let canShare = false;
+    let file = null;
+
+    try {
+      if (typeof File !== 'undefined' && navigator.share && navigator.canShare) {
+        file = new File([blob], filename, { type: blob.type || 'image/png' });
+        canShare = navigator.canShare({ files: [file] });
+      }
+    } catch (e) {
+      canShare = false;
+    }
+
+    if (canShare && file) {
+      try {
+        showToast('请在分享菜单中点存储图像', 2500);
+        await navigator.share({
+          files: [file],
+          title: filename,
+        });
+        triggerHaptic(30);
+        return;
+      } catch (shareErr) {
+        // 用户在系统分享菜单中点击取消或关闭（AbortError），视为正常完成，不报错、不重复下载
+        if (
+          shareErr.name === 'AbortError' ||
+          (shareErr.message && shareErr.message.toLowerCase().includes('cancel'))
+        ) {
+          return;
+        }
+        console.warn('Share failed with non-cancel error, falling back:', shareErr);
+      }
+    }
+
+    // 不支持系统分享（canShare=false 或没有 navigator.share）或非取消异常时回退为原生下载
+    showToast('当前浏览器不支持直接保存到相册，已改为下载，请去下载文件夹里保存到相册', 3000);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    triggerHaptic(20);
+  }
+
+  async function shareSliceToAlbum(url, filename) {
+    if (!url) return;
+    try {
+      showToast('正在准备保存图片...', 1000);
+      const resp = await fetch(url);
+      if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+      const blob = await resp.blob();
+      await shareOrFallbackDownload(blob, filename || 'xhs_slice.png');
+    } catch (err) {
+      console.warn('Fetch image failed, direct fallback:', err);
+      showToast('当前浏览器不支持直接保存到相册，已改为下载，请去下载文件夹里保存到相册', 3000);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename || 'xhs_slice.png';
+      a.target = '_blank';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
     }
   }
 
@@ -866,6 +950,54 @@
     }
   }
 
+  async function shareRecropToAlbum() {
+    if (!cropState.imgObj || !cropState.card) {
+      closeCropModal();
+      return;
+    }
+    try {
+      showToast('正在按原图分辨率裁切...', 1000);
+      const outCanvas = document.createElement('canvas');
+      outCanvas.width = cropState.naturalW;
+      outCanvas.height = cropState.cropH;
+      const ctx = outCanvas.getContext('2d');
+      ctx.drawImage(
+        cropState.imgObj,
+        0, cropState.currentOffset, cropState.naturalW, cropState.cropH,
+        0, 0, cropState.naturalW, cropState.cropH
+      );
+
+      outCanvas.toBlob(async (blob) => {
+        if (!blob) {
+          showToast('生成裁剪图片失败');
+          return;
+        }
+        const filename = cropState.imgData?.filename || `${cropState.card.id}_slice.png`;
+        const blobUrl = URL.createObjectURL(blob);
+
+        // 存入内存缓存
+        const cacheKey = `${cropState.origInfo.url}_${cropState.currentOffset}`;
+        croppedBlobCache[cacheKey] = blobUrl;
+
+        // 保存位置到 localStorage
+        saveCropOffset(cropState.card, cropState.currentOffset);
+
+        // 更新当前页面画廊该切片展示
+        if (cropState.targetImgEl) {
+          cropState.targetImgEl.src = blobUrl;
+        }
+
+        // 先关弹窗，再调分享
+        closeCropModal();
+
+        // 调起分享或回退下载
+        await shareOrFallbackDownload(blob, filename, blobUrl);
+      }, 'image/png');
+    } catch (err) {
+      showToast(`裁图失败: ${err.message || err}`);
+    }
+  }
+
   function initCropInteraction() {
     if (!el.cropViewport) return;
 
@@ -940,6 +1072,7 @@
     if (el.btnCropCloseX) el.btnCropCloseX.addEventListener('click', closeCropModal);
     if (el.btnCropCancel) el.btnCropCancel.addEventListener('click', closeCropModal);
     if (el.btnCropConfirm) el.btnCropConfirm.addEventListener('click', confirmRecrop);
+    if (el.btnCropShare) el.btnCropShare.addEventListener('click', shareRecropToAlbum);
 
     if (el.cropModal) {
       el.cropModal.addEventListener('click', (e) => {
