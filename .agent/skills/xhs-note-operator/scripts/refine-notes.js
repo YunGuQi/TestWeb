@@ -19,6 +19,42 @@ const fs = require('fs');
 const path = require('path');
 const SD = require(path.join(__dirname, 'skill-data.js'));
 
+// 去标点字符集（写死）：中文标点 ，。！？、；：·—…～“”‘’ ；英文标点 ,.!?;:"'[] ；所有空白字符（空格、换行、制表符）
+const STRIP_PUNCT_REGEX = /[，。！？、；：·—…～“”‘’\,\.\!\?\;\:\"\'\[\]\s]/g;
+
+function countBodyCharsNoPunctuation(textOrLines) {
+  if (!textOrLines) return 0;
+  const str = Array.isArray(textOrLines) ? textOrLines.join('') : String(textOrLines);
+  return str.replace(STRIP_PUNCT_REGEX, '').length;
+}
+
+// 收尾摆拍高危动作清单（只放动作类；不含环境词如晚风；不含硬禁令的拎包走人、设免打扰/静音）
+const RISKY_ENDING_ACTIONS = ['放钥匙', '合上电脑', '戴上耳机'];
+
+function checkRiskyEndingActions(bodyLines) {
+  const warnings = [];
+  if (!bodyLines || bodyLines.length === 0) return warnings;
+  const lastTwo = bodyLines.slice(-2);
+  for (const action of RISKY_ENDING_ACTIONS) {
+    for (const l of lastTwo) {
+      if (l.includes(action)) {
+        warnings.push(`正文末尾两行命中可能摆拍的高危动作 “${action}”，请确认是否为原生道具或属于摆拍收尾`);
+        break;
+      }
+    }
+  }
+  return warnings;
+}
+
+// 四模式试点执行档（待 7 天数据确认）
+const PATTERN_RANGES = {
+  '模式一': { min: 40, max: 60, name: '模式一（数字标尺）' },
+  '模式二': { min: 60, max: 75, name: '模式二（反差自嘲）' },
+  '模式三': { min: 80, max: 135, name: '模式三（痛点自白）' },
+  '模式四': { min: 60, max: 80, name: '模式四（怪癖暗号）' },
+  'A档': { min: 15, max: 35, name: 'A档（纯自嘲微短帖）' },
+};
+
 /** @returns {'长短长'|'短长短'|'长短'|'短长'|'长短错落'|null} */
 function detectCoverRhythm(lengths) {
   if (!lengths.length) return null;
@@ -186,6 +222,10 @@ function checkBody({ bodyLines = [], coverLines = [], title = '' }) {
       issues.push(`[末行暗号超长] 末行超长 (${lastLine.length} 字，建议 <= 25 字): "${lastLine}"`);
     }
   }
+
+  // 收尾摆拍高危动作池检查（Warning，不阻断）
+  const riskyWarnings = checkRiskyEndingActions(bodyLines);
+  riskyWarnings.forEach(w => advisories.push(`[收尾高危动作提示] ${w}`));
 
   return {
     issues,
@@ -598,7 +638,7 @@ function checkBatchCircuitBreakers(cardList = []) {
 
   // ④ 金句插入与看金句顿悟排查
   let quoteCount = 0;
-  const epiphanyBannedRegex = /(?:翻到截图小字|想起卡片那句|扫了眼锁屏|想起那句|翻出截图|看了一眼锁屏)/;
+  const epiphanyBannedRegex = /(?:翻到截图小字|想起卡片那句|扫了眼锁屏|想起那句|翻出截图|看了一眼锁屏|(?:报告|卡片|测试)(?:里)?那句(?:话)?[^，。！？\n]{0,10}(?:治好|治愈|拯救|改变|点醒|顿悟))/;
   let epiphanyBannedHits = [];
 
   cardList.forEach(c => {
@@ -818,6 +858,8 @@ function runCli() {
   let hardFormatIssues = [];
   let allAdvisories = [];
   let fixLogs = [];
+  let auditCountLogs = [];
+  let hasAutoHealed = false;
 
   const rootDir = SD.findRoot(filePath);
   const loadAllProfiles = (r) => {
@@ -1001,6 +1043,80 @@ function runCli() {
       pinnedComment,
     });
 
+    // 计算正文去标点实算字数
+    const actualChars = countBodyCharsNoPunctuation(bodyLines);
+
+    // 模式识别（从 meta、cardId 或周边自检文本推断）
+    let detectedPattern = null;
+    if (meta) {
+      const mPat = meta.match(/模式=(模式[一二三四]|A档)/);
+      if (mPat) detectedPattern = mPat[1];
+    }
+    if (!detectedPattern) {
+      const mCardId = meta ? meta.match(/cardId=([a-zA-Z0-9]+)/) : null;
+      if (mCardId) {
+        const mSub = mCardId[1].match(/_m([1-4])/);
+        if (mSub) {
+          const map = { '1': '模式一', '2': '模式二', '3': '模式三', '4': '模式四' };
+          detectedPattern = map[mSub[1]];
+        }
+      }
+    }
+    if (!detectedPattern && surroundingText) {
+      const mSurr = surroundingText.match(/(模式[一二三四]|A档)/);
+      if (mSurr) detectedPattern = mSurr[1];
+    }
+
+    // 查找写手自检行（自检行格式冻结：必须包含“正文去标点实算 N 字”，脚本只改 N）
+    const CLAIMED_REGEX = /(正文去标点实算\s*)(\d+)(\s*字)/;
+    let claimedTarget = null;
+    if (CLAIMED_REGEX.test(next)) {
+      const m = next.match(CLAIMED_REGEX);
+      claimedTarget = { partIndex: pIdx + 1, claimedChars: parseInt(m[2], 10), match: m };
+    } else if (CLAIMED_REGEX.test(part)) {
+      const m = part.match(CLAIMED_REGEX);
+      claimedTarget = { partIndex: pIdx, claimedChars: parseInt(m[2], 10), match: m };
+    } else if (CLAIMED_REGEX.test(prev)) {
+      const m = prev.match(CLAIMED_REGEX);
+      claimedTarget = { partIndex: pIdx - 1, claimedChars: parseInt(m[2], 10), match: m };
+    }
+
+    // 模式档位区间拦截：若识别到模式且有自检行或指定了四模式试点档，越界强制 exit 1 阻断
+    if (detectedPattern && PATTERN_RANGES[detectedPattern] && (claimedTarget || surroundingText.includes('试点') || surroundingText.includes('自检'))) {
+      const pRange = PATTERN_RANGES[detectedPattern];
+      if (actualChars < pRange.min || actualChars > pRange.max) {
+        hardFormatIssues.push({
+          card: cardCount,
+          text: `[字数档位越界] ${detectedPattern} (${pRange.name}) 正文去标点实算 ${actualChars} 字，越出执行档 [${pRange.min}~${pRange.max} 字] 上下限！`
+        });
+      }
+    }
+
+    // 自检行三档判定
+    if (claimedTarget) {
+      const claimedChars = claimedTarget.claimedChars;
+      const diff = Math.abs(claimedChars - actualChars);
+      if (diff === 0) {
+        // 误差 0：完美通过
+        auditCountLogs.push(`[卡 ${cardCount}] 字数自检吻合: 实算 ${actualChars} 字 (自称 ${claimedChars} 字)`);
+      } else if (diff <= 2) {
+        // 误差 1~2 字：脚本自动把自检行里的“实算 N 字”纠偏为脚本实算值并写回文件，看板提示“自愈通过（自称 X → 实算 Y）”，不阻断流水线
+        const oldStr = claimedTarget.match[0];
+        const newStr = `${claimedTarget.match[1]}${actualChars}${claimedTarget.match[3]}`;
+        refinedParts[claimedTarget.partIndex] = refinedParts[claimedTarget.partIndex].replace(oldStr, newStr);
+        hasAutoHealed = true;
+        const healLog = `[卡 ${cardCount}] 自愈通过（自称 ${claimedChars} → 实算 ${actualChars}）`;
+        auditCountLogs.push(healLog);
+        fixLogs.push(healLog);
+      } else {
+        // 误差 >2 字（谎报）：强制 exit 1 阻断
+        hardFormatIssues.push({
+          card: cardCount,
+          text: `[字数谎报/计算错误] 自检行自称“正文去标点实算 ${claimedChars} 字”，脚本实算为 ${actualChars} 字 (误差 ${diff} > 2 字)，强制阻断！`
+        });
+      }
+    }
+
     cardCheck.issues.forEach(iss => hardFormatIssues.push({ card: cardCount, text: iss }));
     cardCheck.advisories.forEach(adv => allAdvisories.push({ card: cardCount, text: adv }));
 
@@ -1018,9 +1134,13 @@ function runCli() {
     return '```text\n' + newLines.join('\n') + '\n```';
   });
 
-  if (AUTO_FIX) {
+  if (AUTO_FIX || hasAutoHealed) {
     fs.writeFileSync(filePath, refinedParts.join(''), 'utf8');
-    console.log(`💾 自动修复已规范写回原文件。`);
+    if (hasAutoHealed && !AUTO_FIX) {
+      console.log(`💾 自检行字数已执行自愈纠偏并写回原文件。`);
+    } else if (AUTO_FIX) {
+      console.log(`💾 自动修复已规范写回原文件。`);
+    }
     if (fixLogs.length > 0) {
       console.log(`\n🛠️  执行了以下 ${fixLogs.length} 项自愈调整:`);
       fixLogs.forEach(log => console.log(`   ${log}`));
@@ -1045,7 +1165,7 @@ function runCli() {
     console.log(`✅ 2. SSOT 真源防编造门禁：0 违规（结果名/雷达维度与得分/金句原文 全部吻合真源）`);
   }
 
-  const formatOnlyIssues = hardFormatIssues.filter(i => !i.text.includes('SSOT') && !i.text.includes('结果名编造'));
+  const formatOnlyIssues = hardFormatIssues.filter(i => !i.text.includes('SSOT') && !i.text.includes('结果名编造') && !i.text.includes('字数档位越界') && !i.text.includes('字数谎报'));
   if (formatOnlyIssues.length > 0) {
     console.log(`❌ 3. 版式与标签硬门禁违规 (${formatOnlyIssues.length} 处):`);
     formatOnlyIssues.forEach(i => console.log(`   · [卡 ${i.card}] ${i.text}`));
@@ -1060,6 +1180,15 @@ function runCli() {
     batchResult.hardIssues.forEach(iss => console.log(`   · ${iss}`));
   } else {
     console.log(`✅ 4. 批次去同构硬门禁：全部通过（标题公式/报幕轮换/今昔对比/金句可选项/收尾多元/原声对话与事件不跨篇复用）`);
+  }
+
+  // 字数实算与自检硬门禁
+  const countIssues = hardFormatIssues.filter(i => i.text.includes('字数档位越界') || i.text.includes('字数谎报'));
+  if (countIssues.length > 0) {
+    console.log(`❌ 5. 字数实算与自检硬门禁违规 (${countIssues.length} 处):`);
+    countIssues.forEach(i => console.log(`   · [卡 ${i.card}] ${i.text}`));
+  } else if (auditCountLogs.length > 0) {
+    console.log(`✅ 5. 字数实算与自检门禁：全部通过（去标点严格实算，0 谎报，自愈纠偏正常）`);
   }
 
   // 自检计数看板格式输出
@@ -1089,6 +1218,17 @@ function runCli() {
   console.log(`   · “测出”首行破题篇数: ${batchResult.stats.cechuHeadCount || 0} 篇`);
   console.log(`   · 挑衅质问句“你敢”篇数: ${batchResult.stats.tauntingCount || 0} 篇`);
   console.log(`   · 骨架结构模式概览: [${(batchResult.stats.skeletons || []).join(', ')}]`);
+
+  const riskyActionHits = allAdvisories.filter(a => a.text.includes('收尾高危动作提示'));
+  if (riskyActionHits.length > 0) {
+    console.log(`\n⚠️  [黄灯 Warning] 收尾摆拍高危动作提示 (共 ${riskyActionHits.length} 处，请人工核查是否原生道具):`);
+    riskyActionHits.forEach(h => console.log(`   · [卡 ${h.card}] ${h.text}`));
+  }
+
+  if (auditCountLogs.length > 0) {
+    console.log(`\n📏 正文字数去标点实算与自检状态 (共 ${auditCountLogs.length} 处):`);
+    auditCountLogs.forEach(log => console.log(`   · ${log}`));
+  }
 
   if (allAdvisories.length > 0) {
     console.log(`\n💡 正文细节优化灵感建议 (共 ${allAdvisories.length} 条，不阻断发帖):`);
@@ -1122,5 +1262,8 @@ module.exports = {
   checkRadarAndSSOT,
   checkCard,
   checkBatchCircuitBreakers,
+  countBodyCharsNoPunctuation,
+  checkRiskyEndingActions,
+  PATTERN_RANGES,
   runCli,
 };
